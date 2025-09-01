@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BeyondRV — Adventure Beyond Limits</title>
+  <meta name="description" content="BeyondRV is an Australian family-run business building caravans, slide-on campers, motorhomes, and expedition vehicles." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Basic dropdown + sticky header behavior without JS frameworks */
+    .nav-item:hover .nav-panel { display:block }
+  </style>
+</head>
+<body class="antialiased text-slate-800">
+  <!-- Top bar -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-200">
+    <div class="mx-auto max-w-6xl px-4">
+      <div class="flex items-center justify-between h-16">
+        <a href="#" class="font-semibold text-lg">BeyondRV</a>
+        <nav class="hidden md:flex gap-6 text-sm">
+          <a href="#" class="hover:text-slate-900">Home</a>
+          <a href="#about" class="hover:text-slate-900">About Us</a>
+          <a href="#inquiry" class="hover:text-slate-900">Inquiry Form</a>
+
+          <div class="relative nav-item">
+            <button class="hover:text-slate-900 inline-flex items-center gap-1">
+              Our Range
+              <svg width="14" height="14" viewBox="0 0 20 20" class="opacity-70"><path d="M5 7l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            </button>
+            <div class="absolute left-0 top-full mt-2 hidden nav-panel bg-white border border-slate-200 rounded-lg shadow-lg w-[280px] p-3">
+              <p class="text-[11px] uppercase tracking-wide text-slate-500 mb-2">Our Caravans</p>
+              <ul class="space-y-1 mb-3">
+                <li><a class="block px-2 py-1 rounded hover:bg-slate-50" href="#sunpatch-12">Sunpatch 12ft Family/Couples Offroad Van</a></li>
+                <li><a class="block px-2 py-1 rounded hover:bg-slate-50" href="#sunpatch-15f">Sunpatch 15F Family Offroad Van</a></li>
+                <li><a class="block px-2 py-1 rounded hover:bg-slate-50" href="#sunpatch-15pf">Sunpatch 15PF Offroad Poptop Van</a></li>
+                <li><a class="block px-2 py-1 rounded hover:bg-slate-50" href="#sunpatch-17">Sunpatch 17 Luxury Offroad Van</a></li>
+              </ul>
+              <p class="text-[11px] uppercase tracking-wide text-slate-500 mb-2">Our Slide-On Campers</p>
+              <ul class="space-y-1">
+                <li><a class="block px-2 py-1 rounded hover:bg-slate-50" href="#8ft-hardtop">8FT Hardtop Slide-On</a></li>
+                <li><a class="block px-2 py-1 rounded hover:bg-slate-50" href="#7ft-electric">7FT Electric Poptop Slide-On Camper</a></li>
+                <li><a class="block px-2 py-1 rounded hover:bg-slate-50" href="#15ft-truck">15ft Truck Camper – Combined Shower Toilet</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <a href="#custom" class="hover:text-slate-900">Custom</a>
+          <a href="#warranty" class="hover:text-slate-900">Warranty</a>
+        </nav>
+
+        <div class="flex items-center gap-3">
+          <a href="tel:0430863819" class="hidden sm:inline-flex items-center justify-center rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-50">Call Us</a>
+          <div class="flex items-center gap-3 text-slate-500">
+            <a aria-label="YouTube" href="#" class="hover:text-slate-700">YouTube</a>
+            <a aria-label="Facebook" href="#" class="hover:text-slate-700">Facebook</a>
+            <a aria-label="Instagram" href="#" class="hover:text-slate-700">Instagram</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative">
+    <div class="relative h-[56vh] md:h-[70vh] w-full">
+      <img
+        src="https://web.archive.org/web/20250612122934im_/https://beyondrv.com.au/wp-content/uploads/2025/06/20241024_112957-1024x576.jpg"
+        alt="BeyondRV hero"
+        class="absolute inset-0 h-full w-full object-cover" />
+      <div class="absolute inset-0 bg-black/40"></div>
+      <div class="absolute inset-0 flex items-center">
+        <div class="mx-auto max-w-6xl px-4">
+          <div class="max-w-2xl">
+            <h1 class="text-white text-4xl md:text-5xl font-bold leading-tight">Adventure Beyond Limits</h1>
+            <p class="text-white/90 mt-4 text-lg">
+              BeyondRV is an Australian family-run business that builds caravans, slide-on campers, motorhomes, and expedition vehicles.
+              Based in Queensland, we're the only manufacturer in the area capable of producing this full range of camping vehicles to high standards.
+            </p>
+            <p class="text-white/90 mt-3">
+              Contact us today to discuss your requirements and our team will be happy to help you.
+            </p>
+            <div class="mt-6 flex gap-3">
+              <a href="#inquiry" class="inline-flex items-center justify-center rounded-md bg-amber-500 px-5 py-3 font-semibold text-white hover:bg-amber-600">Contact</a>
+              <a href="tel:0430863819" class="inline-flex items-center justify-center rounded-md border border-white/70 px-5 py-3 font-semibold text-white hover:bg-white/10">0430 863 819</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust badges -->
+  <section class="py-12 md:py-16">
+    <div class="mx-auto max-w-6xl px-4 grid md:grid-cols-3 gap-8 text-center">
+      <div class="p-6 rounded-xl border border-slate-200">
+        <h3 class="text-lg font-semibold">Years of Industry Experience</h3>
+        <p class="text-slate-600 mt-2">Speak directly with people who have 10 years of building durable, reliable, quality and luxury campers.</p>
+      </div>
+      <div class="p-6 rounded-xl border border-slate-200">
+        <h3 class="text-lg font-semibold">Family Owned</h3>
+        <p class="text-slate-600 mt-2">A family owned business reflecting honesty, transparency, care and fairness.</p>
+      </div>
+      <div class="p-6 rounded-xl border border-slate-200">
+        <h3 class="text-lg font-semibold">You name it — We build it</h3>
+        <p class="text-slate-600 mt-2">From expedition vehicles and truck campers to pop tops and double-axle caravans — same high-quality finish every time.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Range grid -->
+  <section id="range" class="py-12 md:py-16 bg-slate-50">
+    <div class="mx-auto max-w-6xl px-4">
+      <h2 class="text-2xl md:text-3xl font-bold">Our Range</h2>
+      <p class="text-slate-600 mt-2 max-w-3xl">
+        From caravans to ute/truck campers, Beyond has you covered. Everything designed by us is made to withstand the rugged Australian terrain.
+      </p>
+
+      <div class="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <!-- Eight cards mirroring the snapshot look -->
+        <figure class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <img class="w-full h-40 object-cover" src="https://web.archive.org/web/20250612122934im_/https://beyondrv.com.au/wp-content/uploads/2024/06/20240305_164454-1024x576.jpg" alt="">
+          <figcaption class="p-3 text-sm font-medium">Sunpatch 12ft Family/Couples Offroad Van</figcaption>
+        </figure>
+        <figure class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <img class="w-full h-40 object-cover" src="https://web.archive.org/web/20250612122934im_/https://beyondrv.com.au/wp-content/uploads/2025/06/20250606_112151-1024x576.jpg" alt="">
+          <figcaption class="p-3 text-sm font-medium">Sunpatch 15F Family Offroad Van</figcaption>
+        </figure>
+        <figure class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <img class="w-full h-40 object-cover" src="https://web.archive.org/web/20250612122934im_/https://beyondrv.com.au/wp-content/uploads/2025/06/20241024_112957-1024x576.jpg" alt="">
+          <figcaption class="p-3 text-sm font-medium">Sunpatch 15PF Offroad Poptop Van</figcaption>
+        </figure>
+        <figure class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <img class="w-full h-40 object-cover" src="https://web.archive.org/web/20250612122934im_/https://beyondrv.com.au/wp-content/uploads/2024/06/20240305_164454-1024x576.jpg" alt="">
+          <figcaption class="p-3 text-sm font-medium">Sunpatch 17 Luxury Offroad Van</figcaption>
+        </figure>
+        <figure class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <img class="w-full h-40 object-cover" src="https://web.archive.org/web/20250612122934im_/https://beyondrv.com.au/wp-content/uploads/2025/06/20250606_112151-1024x576.jpg" alt="">
+          <figcaption class="p-3 text-sm font-medium">8FT Hardtop Slide-On</figcaption>
+        </figure>
+        <figure class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <img class="w-full h-40 object-cover" src="https://web.archive.org/web/20250612122934im_/https://beyondrv.com.au/wp-content/uploads/2024/06/20240305_164454-1024x576.jpg" alt="">
+          <figcaption class="p-3 text-sm font-medium">7FT Electric Poptop Slide-On Camper</figcaption>
+        </figure>
+        <figure class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <img class="w-full h-40 object-cover" src="https://web.archive.org/web/20250612122934im_/https://beyondrv.com.au/wp-content/uploads/2025/06/20241024_112957-1024x576.jpg" alt="">
+          <figcaption class="p-3 text-sm font-medium">15ft Truck Camper – Combined Shower Toilet</figcaption>
+        </figure>
+        <figure class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <img class="w-full h-40 object-cover" src="https://web.archive.org/web/20250612122934im_/https://beyondrv.com.au/wp-content/uploads/2025/06/20250606_112151-1024x576.jpg" alt="">
+          <figcaption class="p-3 text-sm font-medium">Custom Builds</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- Inquiry anchor -->
+  <section id="inquiry" class="py-12 md:py-16">
+    <div class="mx-auto max-w-3xl px-4 text-center">
+      <h2 class="text-2xl md:text-3xl font-bold">Ready to talk specs?</h2>
+      <p class="text-slate-600 mt-2">Call <a class="underline" href="tel:0430863819">0430 863 819</a> or email <a class="underline" href="mailto:beyondcaravans@gmail.com">beyondcaravans@gmail.com</a>.</p>
+      <a href="mailto:beyondcaravans@gmail.com?subject=Website%20Inquiry" class="mt-6 inline-flex items-center justify-center rounded-md bg-amber-500 px-5 py-3 font-semibold text-white hover:bg-amber-600">Email Us</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-slate-200">
+    <div class="mx-auto max-w-6xl px-4 py-10 grid md:grid-cols-3 gap-8">
+      <div>
+        <h3 class="font-semibold">Contact info</h3>
+        <p class="mt-2"><a class="hover:underline" href="mailto:beyondcaravans@gmail.com">beyondcaravans@gmail.com</a></p>
+        <p class="mt-1"><a class="hover:underline" href="tel:0430863819">0430 863 819</a></p>
+      </div>
+      <div>
+        <h3 class="font-semibold">Business info</h3>
+        <p class="mt-2">77 Coleyville Rd<br/>Mutdapilly, 4307</p>
+      </div>
+      <div>
+        <h3 class="font-semibold">Links</h3>
+        <ul class="mt-2 space-y-1">
+          <li><a class="hover:underline" href="#about">About</a></li>
+          <li><a class="hover:underline" href="#range">Our Range</a></li>
+          <li><a class="hover:underline" href="#warranty">Warranty</a></li>
+          <li><a class="hover:underline" href="#custom">Custom</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-slate-800">
+      <div class="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between text-sm">
+        <p>Privacy Policy</p>
+        <p>Powered by LocaliQ</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
