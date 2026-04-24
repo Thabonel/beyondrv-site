@@ -1,0 +1,28 @@
+[build]
+  command   = "npm run build"
+  publish   = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from   = "/12-ft/"
+  to     = "/our-caravans/"
+  status = 301
+
+[[redirects]]
+  from   = "/15-ft/"
+  to     = "/our-caravans/"
+  status = 301
+
+[[redirects]]
+  from   = "/sunpatch-12c-couples-caravan/"
+  to     = "/our-caravans/"
+  status = 301
+
+[[headers]]
+  for    = "/*"
+  [headers.values]
+    X-Frame-Options        = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy        = "strict-origin-when-cross-origin"

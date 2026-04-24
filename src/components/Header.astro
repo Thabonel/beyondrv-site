@@ -1,0 +1,66 @@
+---
+interface Props {
+  activePath?: string;
+}
+const { activePath = '' } = Astro.props;
+
+const navLinks = [
+  { href: '/our-caravans/', label: 'Our Caravans' },
+  { href: '/our-slide-on-campers/', label: 'Slide-Ons' },
+  { href: '/expedition/', label: 'Expedition' },
+  { href: '/on-sale/', label: 'On Sale' },
+  { href: '/custom/', label: 'Custom' },
+  { href: '/about-us/', label: 'About' },
+];
+---
+<nav id="navbar">
+  <a href="/" class="nav-logo">
+    <img src="/images/site/logo.jpg" alt="ByondRV logo" width="36" height="36" />
+    <span class="nav-logo-text">Beyond<span>RV</span></span>
+  </a>
+
+  <button class="nav-hamburger" id="navHamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navLinks">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <ul class="nav-links" id="navLinks" role="list">
+    {navLinks.map(({ href, label }) => (
+      <li>
+        <a
+          href={href}
+          class={activePath.startsWith(href) ? 'active' : ''}
+          aria-current={activePath.startsWith(href) ? 'page' : undefined}
+        >
+          {label}
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <a href="/inquiry-form/" class="nav-cta">Enquire Now</a>
+</nav>
+
+<script>
+  const navbar = document.getElementById('navbar');
+  const hamburger = document.getElementById('navHamburger');
+  const navLinks = document.getElementById('navLinks');
+
+  window.addEventListener('scroll', () => {
+    navbar?.classList.toggle('scrolled', window.scrollY > 40);
+  }, { passive: true });
+
+  hamburger?.addEventListener('click', () => {
+    const isOpen = navLinks?.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', String(!!isOpen));
+  });
+
+  // Close menu on outside click
+  document.addEventListener('click', (e) => {
+    if (!navbar?.contains(e.target as Node)) {
+      navLinks?.classList.remove('open');
+      hamburger?.setAttribute('aria-expanded', 'false');
+    }
+  });
+</script>

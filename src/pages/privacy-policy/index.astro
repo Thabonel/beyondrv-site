@@ -1,0 +1,121 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Privacy Policy | ByondRV",
+  "url": "https://beyondrv.com.au/privacy-policy/"
+};
+---
+<BaseLayout
+  title="Privacy Policy | ByondRV"
+  description="ByondRV privacy policy — how we collect, use, and protect your personal information in accordance with the Australian Privacy Principles."
+  activePath="/privacy-policy/"
+  structuredData={schema}
+>
+  <section class="page-hero page-hero--short">
+    <div class="hero-overlay" style="background: rgba(10,10,10,0.85)"></div>
+    <div class="page-hero-content">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Legal</span>
+      </div>
+      <h1 class="hero-title">Privacy Policy</h1>
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="page-content">
+      <!-- TODO: Legal review required before launch. This is a draft — have qualified person review for APP compliance. -->
+
+      <p style="font-size: 0.82rem; color: var(--muted); border-left: 2px solid var(--orange); padding-left: 1rem; margin-bottom: 2rem">
+        Last updated: April 2026. This policy applies to beyondrv.com.au.
+      </p>
+
+      <h2>About This Policy</h2>
+      <p>
+        ByondRV ("we", "us", "our") is committed to protecting your personal information in accordance with the
+        <strong>Australian Privacy Principles (APPs)</strong> set out in the <em>Privacy Act 1988</em> (Cth).
+        This policy explains what personal information we collect, how we use it, and who we share it with.
+      </p>
+
+      <h2>What Information We Collect</h2>
+      <h3>Enquiry form submissions</h3>
+      <p>
+        When you submit an enquiry via our website, we collect your name, email address, message content,
+        preferred call-back date and time, and any product interest you indicate. This is the primary
+        information we use to respond to you.
+      </p>
+
+      <h3>Website analytics</h3>
+      <p>
+        We use <strong>PostHog</strong> (posthog.com) to collect anonymised analytics data about how visitors
+        use this website — including pages visited, time spent, and general geographic region. This data does
+        not personally identify you. PostHog analytics are only loaded after you consent via our cookie banner.
+      </p>
+
+      <h3>Chatbot conversations</h3>
+      <p>
+        Our website includes a customer-facing chat assistant. Conversations with the assistant are processed
+        by <strong>Anthropic</strong> (anthropic.com) and are not stored by ByondRV beyond the active session.
+        Individual conversations are stateless — we do not retain conversation histories.
+      </p>
+
+      <h2>How We Use Your Information</h2>
+      <p>We use the information you provide to:</p>
+      <ul>
+        <li>Respond to your enquiry and contact you at your requested call-back time</li>
+        <li>Understand which products you're interested in so we can assist you effectively</li>
+        <li>Improve our website and products based on aggregated, anonymised analytics</li>
+      </ul>
+      <p>
+        We do not use your personal information for marketing purposes without your explicit consent.
+        Submitting an enquiry implies consent for us to contact you in response to that enquiry only.
+      </p>
+
+      <h2>Third Parties We Share Data With</h2>
+      <ul>
+        <li><strong>Netlify</strong> (netlify.com) — our website host. Netlify stores and processes enquiry form submissions on our behalf. See Netlify's privacy policy for details.</li>
+        <li><strong>Cloudflare</strong> (cloudflare.com) — provides spam protection for our enquiry form via Cloudflare Turnstile. Cloudflare may process minimal data to verify form submissions.</li>
+        <li><strong>PostHog</strong> (posthog.com) — analytics. Only loaded with your consent. PostHog processes anonymised usage data.</li>
+        <li><strong>Anthropic</strong> (anthropic.com) — processes chat assistant conversations in real time. Conversations are not stored by ByondRV.</li>
+        <li><strong>Google Fonts</strong> — loads font files from Google's servers. Google may log font requests.</li>
+      </ul>
+      <p>We do not sell your personal information to any third party.</p>
+
+      <h2>Cookies</h2>
+      <p>
+        We use a cookie consent banner on your first visit. If you accept analytics cookies, PostHog will set
+        cookies to enable usage tracking. If you decline, PostHog is not loaded and no analytics cookies are set.
+        The enquiry form and chat assistant function regardless of your cookie choice.
+      </p>
+
+      <h2>Your Rights</h2>
+      <p>Under the Australian Privacy Principles, you have the right to:</p>
+      <ul>
+        <li>Request access to the personal information we hold about you</li>
+        <li>Request correction of inaccurate or incomplete information</li>
+        <li>Request deletion of your personal information (subject to legal obligations)</li>
+        <li>Lodge a complaint about how we handle your personal information</li>
+      </ul>
+
+      <h2>Contact for Privacy Queries</h2>
+      <p>
+        For any privacy-related requests or complaints, contact us at:<br />
+        <strong>Email:</strong> <a href="mailto:beyondcaravans@gmail.com">beyondcaravans@gmail.com</a><br />
+        <strong>Post:</strong> 77 Coleyville Rd, Mutdapilly QLD 4307
+      </p>
+      <p>
+        If you're not satisfied with our response, you may contact the
+        <a href="https://www.oaic.gov.au" target="_blank" rel="noopener">Office of the Australian Information Commissioner (OAIC)</a>.
+      </p>
+
+      <p style="margin-top: 3rem; font-size: 0.8rem; color: var(--muted)">
+        <!-- TODO: Have a qualified person review this policy for full APP compliance before launch. -->
+        This policy is a working draft and subject to change. ByondRV reserves the right to update this
+        privacy policy at any time. Changes will be posted on this page with an updated date.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

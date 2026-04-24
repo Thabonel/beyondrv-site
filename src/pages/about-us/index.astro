@@ -1,0 +1,96 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  "name": "About ByondRV",
+  "url": "https://beyondrv.com.au/about-us/",
+  "description": "ByondRV builds slide-on campers, truck campers, and expedition vehicles in Mutdapilly, Queensland. Australian-owned, ADR-compliant builds for serious adventurers."
+};
+---
+<BaseLayout
+  title="About ByondRV | Queensland-Built Slide-On Campers"
+  description="ByondRV builds slide-on campers, truck campers, and expedition vehicles in Mutdapilly, Queensland. Learn about our workshop, our process, and what makes us different."
+  activePath="/about-us/"
+  structuredData={schema}
+>
+  <section class="page-hero">
+    <div class="page-hero-bg" style="background-image: url('/images/products/advent-2150/advent-2150-04.jpg')"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-overlay-bottom"></div>
+    <div class="page-hero-content">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">About ByondRV</span>
+      </div>
+      <h1 class="hero-title">Built in<br><span class="accent">Queensland.</span></h1>
+      <p class="hero-sub">
+        Slide-on campers, truck campers, and expedition vehicles designed and finished in our Mutdapilly workshop.
+        Every build by our own hands.
+      </p>
+    </div>
+  </section>
+
+  <!-- Story -->
+  <section class="story">
+    <div class="story-image">
+      <img src="/images/products/advent-2150/advent-2150-06.jpg" alt="ByondRV workshop — Mutdapilly, Queensland" />
+      <div class="story-image-overlay"></div>
+    </div>
+    <div class="story-content">
+      <div class="section-eyebrow reveal">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Our Story</span>
+      </div>
+      <h2 class="section-title reveal reveal-delay-1">Engineered<br>in Queensland</h2>
+      <p style="font-size:0.95rem; color:var(--muted); line-height:1.8; margin-top:1.5rem" class="reveal reveal-delay-2">
+        <!-- TODO: Replace with client-supplied About Us copy -->
+        ByondRV sources high-quality base units globally, then spends weeks completing all electrical fitout,
+        cabinetry, plumbing, customisation, and finishing right here at our workshop in Mutdapilly, Queensland.
+      </p>
+      <p style="font-size:0.95rem; color:var(--muted); line-height:1.8; margin-top:1rem" class="reveal reveal-delay-3">
+        The result is expedition-grade quality built to Australian standards and ADR compliance —
+        at a price that reflects smart manufacturing, not corners cut.
+      </p>
+      <div class="story-numbers reveal reveal-delay-3">
+        <div class="story-num">
+          <div class="story-num-val">3–6</div>
+          <div class="story-num-label">Weeks QLD Finishing</div>
+        </div>
+        <div class="story-num">
+          <div class="story-num-val">100%</div>
+          <div class="story-num-label">ADR Compliant</div>
+        </div>
+        <div class="story-num">
+          <div class="story-num-val">10+</div>
+          <div class="story-num-label">Years Manufacturing</div>
+        </div>
+        <div class="story-num">
+          <div class="story-num-val">QLD</div>
+          <div class="story-num-label">Family Business</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact / Location -->
+  <section class="container">
+    <div class="page-content">
+      <h2>Find Us</h2>
+      <p>We're based in Mutdapilly, Queensland — about an hour south-west of Brisbane.</p>
+      <p>
+        <strong>Address:</strong> 77 Coleyville Rd, Mutdapilly QLD 4307<br />
+        <strong>Phone:</strong> <a href="tel:+61430863819">0430 863 819</a><br />
+        <strong>Email:</strong> <a href="mailto:beyondcaravans@gmail.com">beyondcaravans@gmail.com</a>
+      </p>
+      <p>
+        Viewings are by appointment — call or use the enquiry form below to arrange a time.
+        <!-- TODO: Embed Google Map when client provides permission -->
+      </p>
+      <div style="margin-top: 2rem">
+        <a href="/inquiry-form/" class="btn-primary">Book a Viewing</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

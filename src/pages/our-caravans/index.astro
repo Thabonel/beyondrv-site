@@ -1,0 +1,75 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProductCard from '../../components/ProductCard.astro';
+
+const products = (await getCollection('products'))
+  .filter(p => p.data.category === 'caravan')
+  .sort((a, b) => (a.data.status === 'coming-soon' ? 1 : 0) - (b.data.status === 'coming-soon' ? 1 : 0));
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "ByondRV Off-Road Caravans",
+  "url": "https://beyondrv.com.au/our-caravans/",
+  "hasPart": products.map(p => ({
+    "@type": "Product",
+    "name": p.data.title,
+    "url": `https://beyondrv.com.au/${p.slug}/`
+  }))
+};
+---
+<BaseLayout
+  title="Off-Road Caravans | ByondRV Queensland"
+  description="ByondRV builds composite off-road caravans for couples and families. The Sunpatch range — built in Queensland for serious Australian travel."
+  image="/images/products/sunpatch-15xc/sunpatch-15xc-01.jpg"
+  activePath="/our-caravans/"
+  structuredData={schema}
+>
+  <section class="page-hero">
+    <div class="page-hero-bg" style="background-image: url('/images/products/sunpatch-15xc/sunpatch-15xc-01.jpg')"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-overlay-bottom"></div>
+    <div class="page-hero-content">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Off-Road Caravans</span>
+      </div>
+      <h1 class="hero-title">Our Caravans</h1>
+      <p class="hero-sub">
+        Queensland-built off-road caravans for couples and families who refuse to stay on the beaten track.
+        Full composite construction. Independent suspension. Built to go where you want to go.
+      </p>
+    </div>
+  </section>
+
+  <section class="category-grid container">
+    <div class="product-grid">
+      {products.map(p => (
+        <ProductCard
+          title={p.data.title}
+          slug={p.slug}
+          category={p.data.category}
+          tagline={p.data.tagline}
+          price={p.data.price}
+          status={p.data.status}
+          heroImage={p.data.heroImage}
+          priceBadge={p.data.priceBadge}
+        />
+      ))}
+    </div>
+  </section>
+
+  <section class="cta-section" style="padding: 7rem var(--gutter)">
+    <div class="cta-bg" style="background-image: url('/images/products/sunpatch-15xc/sunpatch-15xc-02.jpg')"></div>
+    <div class="cta-overlay"></div>
+    <div class="cta-content">
+      <h2 class="cta-title reveal">Not sure <span class="italic">which one?</span></h2>
+      <p class="cta-sub reveal reveal-delay-1">Tell us how you travel and we'll point you in the right direction.</p>
+      <div class="cta-actions reveal reveal-delay-2">
+        <a href="/inquiry-form/" class="btn-primary">Talk to the Team</a>
+        <a href="tel:+61430863819" class="btn-ghost">Call 0430 863 819</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

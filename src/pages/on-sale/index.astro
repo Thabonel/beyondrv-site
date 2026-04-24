@@ -1,0 +1,49 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProductCard from '../../components/ProductCard.astro';
+
+const products = (await getCollection('products')).filter(p => p.data.onSale);
+---
+<BaseLayout
+  title="On Sale | Current Stock | ByondRV Queensland"
+  description="ByondRV current in-stock campers and caravans available for immediate delivery. Check what's on sale now."
+  activePath="/on-sale/"
+>
+  <section class="page-hero page-hero--short">
+    <div class="hero-overlay" style="background: rgba(10,10,10,0.7)"></div>
+    <div class="page-hero-content">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Immediate Delivery</span>
+      </div>
+      <h1 class="hero-title">On Sale Now</h1>
+      <p class="hero-sub">In-stock builds ready for immediate delivery — no wait, no compromise.</p>
+    </div>
+  </section>
+
+  <section class="container" style="padding: 4rem 0 8rem">
+    {products.length === 0 ? (
+      <div style="padding: 6rem 0; text-align: center; border: 1px dashed var(--border); color: var(--muted)">
+        <p style="font-size: 1.1rem; margin-bottom: 1rem">No current specials — check back soon.</p>
+        <p style="font-size: 0.88rem; margin-bottom: 2rem">Contact us about availability and lead times.</p>
+        <a href="/inquiry-form/" class="btn-primary">Get in Touch</a>
+      </div>
+    ) : (
+      <div class="product-grid">
+        {products.map(p => (
+          <ProductCard
+            title={p.data.title}
+            slug={p.slug}
+            category={p.data.category}
+            tagline={p.data.tagline}
+            price={p.data.price}
+            status={p.data.status}
+            heroImage={p.data.heroImage}
+            priceBadge={p.data.priceBadge}
+          />
+        ))}
+      </div>
+    )}
+  </section>
+</BaseLayout>

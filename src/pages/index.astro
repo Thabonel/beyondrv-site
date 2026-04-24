@@ -1,0 +1,431 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProductCard from '../components/ProductCard.astro';
+
+const allProducts = await getCollection('products');
+const featuredProducts = allProducts.filter(p => p.data.featured).slice(0, 4);
+
+const orgSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "ByondRV",
+  "url": "https://beyondrv.com.au",
+  "logo": "https://beyondrv.com.au/images/site/logo.jpg",
+  "telephone": "+61430863819",
+  "email": "beyondcaravans@gmail.com",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "77 Coleyville Rd",
+    "addressLocality": "Mutdapilly",
+    "addressRegion": "QLD",
+    "postalCode": "4307",
+    "addressCountry": "AU"
+  }
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "ByondRV",
+  "url": "https://beyondrv.com.au",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://beyondrv.com.au/our-slide-on-campers/?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
+};
+---
+<BaseLayout
+  title="ByondRV — Queensland Slide-On Campers, Caravans & Expedition Vehicles"
+  description="ByondRV builds slide-on campers, hardtop caravans, and expedition vehicles in Mutdapilly, Queensland. For HiLux, Ranger, Unimog, and serious trucks. ADR compliant."
+  structuredData={[orgSchema, websiteSchema]}
+>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg" style="background-image: url('/images/site/unimog-hero.jpg')"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-overlay-bottom"></div>
+
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <div class="hero-eyebrow-line"></div>
+        <span class="hero-eyebrow-text">Queensland's Slide-On Specialists</span>
+      </div>
+      <h1 class="hero-title">
+        Built For<br>
+        <span class="italic">Where</span><br>
+        <span class="accent">Roads End</span>
+      </h1>
+      <p class="hero-sub">
+        Slide-on campers engineered in Queensland for Unimogs, Ivecos, Isuzu trucks and serious utes.
+        Weeks of Australian craftsmanship. Zero compromises.
+      </p>
+      <div class="hero-actions">
+        <a href="/our-slide-on-campers/" class="btn-primary">Explore the Range</a>
+        <a href="/inquiry-form/" class="btn-ghost">Enquire Now</a>
+      </div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num">10<span>+</span></div>
+        <div class="hero-stat-label">Years Experience</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">100<span>%</span></div>
+        <div class="hero-stat-label">Queensland Finished</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">4<span>x</span></div>
+        <div class="hero-stat-label">Vehicle Classes</div>
+      </div>
+    </div>
+
+    <div class="hero-scroll" aria-hidden="true">
+      <div class="hero-scroll-line"></div>
+      <div class="hero-scroll-text">Scroll</div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <span class="ticker-item">Caravans</span>
+      <span class="ticker-item ticker-dot">✦</span>
+      <span class="ticker-item">Slide-On Campers</span>
+      <span class="ticker-item ticker-dot">✦</span>
+      <span class="ticker-item">Unimog Builds</span>
+      <span class="ticker-item ticker-dot">✦</span>
+      <span class="ticker-item">Iveco Daily</span>
+      <span class="ticker-item ticker-dot">✦</span>
+      <span class="ticker-item">Isuzu NPR</span>
+      <span class="ticker-item ticker-dot">✦</span>
+      <span class="ticker-item">Custom Ute Campers</span>
+      <span class="ticker-item ticker-dot">✦</span>
+      <span class="ticker-item">Queensland Finished</span>
+      <span class="ticker-item ticker-dot">✦</span>
+      <span class="ticker-item">Expedition Ready</span>
+      <span class="ticker-item ticker-dot">✦</span>
+      <!-- Duplicate for seamless loop -->
+      <span class="ticker-item">Caravans</span>
+      <span class="ticker-item ticker-dot">✦</span>
+      <span class="ticker-item">Slide-On Campers</span>
+      <span class="ticker-item ticker-dot">✦</span>
+      <span class="ticker-item">Unimog Builds</span>
+      <span class="ticker-item ticker-dot">✦</span>
+      <span class="ticker-item">Iveco Daily</span>
+      <span class="ticker-item ticker-dot">✦</span>
+      <span class="ticker-item">Isuzu NPR</span>
+      <span class="ticker-item ticker-dot">✦</span>
+      <span class="ticker-item">Custom Ute Campers</span>
+      <span class="ticker-item ticker-dot">✦</span>
+      <span class="ticker-item">Queensland Finished</span>
+      <span class="ticker-item ticker-dot">✦</span>
+      <span class="ticker-item">Expedition Ready</span>
+      <span class="ticker-item ticker-dot">✦</span>
+    </div>
+  </div>
+
+  <!-- RANGE OVERVIEW (3-card category grid) -->
+  <section class="range">
+    <div class="range-header">
+      <div>
+        <div class="section-eyebrow reveal">
+          <div class="section-eyebrow-line"></div>
+          <span class="section-eyebrow-text">Our Range</span>
+        </div>
+        <h2 class="section-title reveal reveal-delay-1">Three Ranges.<br>One Standard.</h2>
+      </div>
+      <a href="/our-slide-on-campers/" class="btn-ghost reveal reveal-delay-2">View All Models →</a>
+    </div>
+
+    <div class="range-grid">
+      <div class="model-card featured reveal">
+        <img src="/images/site/unimog-hero.jpg" alt="ByondRV Expedition Vehicles — Unimog builds" style="object-position: center 40%" />
+        <div class="model-card-overlay"></div>
+        <div class="model-card-content">
+          <span class="model-tag">Expedition</span>
+          <div class="model-name">Expedition Vehicles</div>
+          <div class="model-spec">Unimog · Isuzu NPS · Custom builds for where roads end</div>
+          <a href="/expedition/" class="model-link">Explore Expedition →</a>
+        </div>
+      </div>
+
+      <div class="model-card featured reveal">
+        <img src="/images/products/advent-2150/advent-2150-01.jpg" alt="ByondRV Slide-On Campers — Advent range" style="object-position: center 55%" />
+        <div class="model-card-overlay"></div>
+        <div class="model-card-content">
+          <span class="model-tag">Slide-Ons</span>
+          <div class="model-name">Slide-On Campers</div>
+          <div class="model-spec">Advent 2150 · 2300 · 2450 · Pop-tops · Truck campers</div>
+          <a href="/our-slide-on-campers/" class="model-link">Explore Slide-Ons →</a>
+        </div>
+      </div>
+
+      <div class="model-card reveal reveal-delay-1">
+        <img src="/images/products/sunpatch-15xc/sunpatch-15xc-01.jpg" alt="ByondRV Sunpatch caravans" />
+        <div class="model-card-overlay"></div>
+        <div class="model-card-content">
+          <span class="model-tag">Caravans</span>
+          <div class="model-name">Our Caravans</div>
+          <div class="model-spec">Sunpatch 15-XC · Off-road couples & family vans</div>
+          <a href="/our-caravans/" class="model-link">Explore Caravans →</a>
+        </div>
+      </div>
+
+      <div class="model-card reveal reveal-delay-2">
+        <img src="/images/products/advent-2150/advent-2150-04.jpg" alt="ByondRV interior fit-out" />
+        <div class="model-card-overlay"></div>
+        <div class="model-card-content">
+          <span class="model-tag">Custom</span>
+          <div class="model-name">Custom Builds</div>
+          <div class="model-spec">Any truck · Any spec · Built to order in Queensland</div>
+          <a href="/custom/" class="model-link">Start a Custom Build →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED PRODUCTS -->
+  {featuredProducts.length > 0 && (
+    <section style="background: var(--dark); border-top: 1px solid var(--border); padding: 7rem var(--gutter)">
+      <div class="section-eyebrow reveal">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Featured</span>
+      </div>
+      <h2 class="section-title reveal reveal-delay-1">Ready to Roll</h2>
+      <div class="product-grid" style="margin-top: 3rem">
+        {featuredProducts.map(p => (
+          <ProductCard
+            title={p.data.title}
+            slug={p.slug}
+            category={p.data.category}
+            tagline={p.data.tagline}
+            price={p.data.price}
+            status={p.data.status}
+            heroImage={p.data.heroImage}
+            priceBadge={p.data.priceBadge}
+          />
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- STORY / WHY BEYONDRV -->
+  <section class="story">
+    <div class="story-image">
+      <img src="/images/site/mog2.jpg" alt="ByondRV Unimog expedition build — Mutdapilly Queensland workshop" />
+      <div class="story-image-overlay"></div>
+    </div>
+    <div class="story-content">
+      <div class="section-eyebrow reveal">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">How We Build It</span>
+      </div>
+      <h2 class="section-title reveal reveal-delay-1">Engineered<br>in Queensland</h2>
+      <p style="font-size:0.95rem; color:var(--muted); line-height:1.8; margin-top:1.5rem" class="reveal reveal-delay-2">
+        We source the finest base units globally — then spend weeks transforming them in our Mutdapilly workshop.
+        Every circuit wired by hand. Every fitting measured. Every detail checked before it leaves our floor.
+      </p>
+      <p style="font-size:0.95rem; color:var(--muted); line-height:1.8; margin-top:1rem" class="reveal reveal-delay-3">
+        The result: expedition-grade quality built to Australian standards and ADR compliance,
+        at a price that reflects smart manufacturing — not corners cut.
+      </p>
+      <div class="story-numbers reveal reveal-delay-3">
+        <div class="story-num">
+          <div class="story-num-val">3–6</div>
+          <div class="story-num-label">Weeks QLD Finishing</div>
+        </div>
+        <div class="story-num">
+          <div class="story-num-val">100%</div>
+          <div class="story-num-label">ADR Compliant</div>
+        </div>
+        <div class="story-num">
+          <div class="story-num-val">10+</div>
+          <div class="story-num-label">Years Manufacturing</div>
+        </div>
+        <div class="story-num">
+          <div class="story-num-val">QLD</div>
+          <div class="story-num-label">Family Business</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPEDITION HIGHLIGHT -->
+  <section style="background: var(--dark); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 7rem var(--gutter)">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; max-width: var(--max-width); margin: 0 auto">
+      <div>
+        <div class="section-eyebrow reveal">
+          <div class="section-eyebrow-line"></div>
+          <span class="section-eyebrow-text">Expedition Range</span>
+        </div>
+        <h2 class="section-title reveal reveal-delay-1">For the ones<br>who <span style="color: var(--orange)">go furthest.</span></h2>
+        <p style="font-size: 0.95rem; color: var(--muted); line-height: 1.8; margin-top: 1.5rem; max-width: 420px" class="reveal reveal-delay-2">
+          ByondRV builds on Unimog and Isuzu NPS platforms for overlanders who genuinely leave all roads behind.
+          Full composite bodies. Custom-built to order in Queensland.
+        </p>
+        <div style="margin-top: 2.5rem" class="reveal reveal-delay-3">
+          <a href="/expedition/" class="btn-primary">Explore Expedition Range</a>
+        </div>
+      </div>
+      <div style="aspect-ratio: 16/10; overflow: hidden; position: relative" class="reveal reveal-delay-1">
+        <img src="/images/site/unimog-hero.jpg" alt="ByondRV Unimog expedition vehicle" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.8)" />
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST -->
+  <section class="trust">
+    <div class="section-eyebrow reveal">
+      <div class="section-eyebrow-line"></div>
+      <span class="section-eyebrow-text">Why ByondRV</span>
+    </div>
+    <h2 class="section-title reveal reveal-delay-1">Built Different</h2>
+    <div class="trust-grid">
+      <div class="trust-card reveal reveal-delay-1">
+        <div class="trust-icon">⚡</div>
+        <div class="trust-title">Full Electrical Fitout</div>
+        <div class="trust-desc">Every wire run by our QLD team. Solar, lithium battery, 240V, 12V — all to Australian standards.</div>
+      </div>
+      <div class="trust-card reveal reveal-delay-2">
+        <div class="trust-icon">🔧</div>
+        <div class="trust-title">Truck Compatibility</div>
+        <div class="trust-desc">We build to your vehicle's specific tray and payload. Utes to Unimogs — we've fitted them all.</div>
+      </div>
+      <div class="trust-card reveal reveal-delay-3">
+        <div class="trust-icon">🛡</div>
+        <div class="trust-title">Australian Warranty</div>
+        <div class="trust-desc">Full structural and fitout warranty. We stand behind every build we finish and every part we specify.</div>
+      </div>
+      <div class="trust-card reveal reveal-delay-4">
+        <div class="trust-icon">⛺</div>
+        <div class="trust-title">Custom Builds</div>
+        <div class="trust-desc">No catalogue limits. Tell us exactly what you need. We design it. We build it. Done.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS PLACEHOLDER -->
+  <section class="testimonials">
+    <div class="section-eyebrow reveal" style="justify-content: center">
+      <div class="section-eyebrow-line"></div>
+      <span class="section-eyebrow-text">What Customers Say</span>
+    </div>
+    <h2 class="section-title reveal reveal-delay-1">Testimonials</h2>
+    <div class="testimonials-placeholder reveal reveal-delay-2">
+      <!-- TODO: Add customer testimonials once collected. AI admin can populate this section. -->
+      <p>Customer testimonials coming soon.</p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq">
+    <div class="faq-grid">
+      <div class="faq-sticky">
+        <div class="section-eyebrow reveal">
+          <div class="section-eyebrow-line"></div>
+          <span class="section-eyebrow-text">FAQ</span>
+        </div>
+        <h2 class="section-title reveal reveal-delay-1">Common<br>Questions</h2>
+        <p style="font-size:0.85rem; color:var(--muted); line-height:1.7; margin-top:1rem" class="reveal reveal-delay-2">
+          Can't find what you're after? Call us directly.
+        </p>
+        <a href="tel:+61430863819" class="btn-primary" style="display:inline-block; margin-top:2rem">Call 0430 863 819</a>
+      </div>
+
+      <div class="faq-list reveal">
+        <div class="faq-item open">
+          <button class="faq-question">
+            What is a slide-on camper for a ute?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>A slide-on camper (also called a truck camper or ute camper) is a self-contained living unit that sits in the tray of a ute or truck. Unlike a caravan, it doesn't tow — it mounts directly onto the vehicle, giving you full off-road capability. ByondRV builds slide-ons for utes like the HiLux and Ranger, right through to Unimogs and custom expedition trucks.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            Can you build a slide-on camper for a Unimog?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Yes — we're one of the few manufacturers in Australia building bespoke camper units for Unimogs. We design to your specific chassis, wheelbase and payload. Unimog builds are fully custom — all specified and fitted in our Queensland workshop.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            Are ByondRV campers ADR compliant?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Yes. All ByondRV builds are finished and certified in Queensland to meet Australian Design Rules (ADR) and relevant road safety standards. We handle compliance documentation as part of every build.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            Where are ByondRV campers made?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>We source high-quality base units globally, then complete all electrical fitout, cabinetry, plumbing, customisation and finishing at our workshop in Mutdapilly, Queensland. This typically takes 3–6 weeks.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            What's the difference between your caravan and slide-on range?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Our caravans are towed behind your vehicle — great for families and longer-term travel. Our slide-on campers mount onto your ute or truck tray, keeping your full off-road capability. For serious 4WD adventurers and expedition travel, slide-ons are the preferred choice.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            How do I get a quote for a custom slide-on build?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Call us on 0430 863 819 or fill out our enquiry form. Tell us your truck, your travel style, and any specific requirements. We'll come back with a detailed scope and quote. Custom builds are our speciality.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BAND -->
+  <section class="cta-section">
+    <div class="cta-bg" style="background-image: url('/images/site/mog2.jpg')"></div>
+    <div class="cta-overlay"></div>
+    <div class="cta-content">
+      <h2 class="cta-title reveal">
+        Ready to Go<br>
+        <span class="italic">Beyond?</span>
+      </h2>
+      <p class="cta-sub reveal reveal-delay-1">
+        Tell us your truck and your dream. We'll build the rest.
+        Queensland-finished. Expedition-ready. Yours.
+      </p>
+      <div class="cta-actions reveal reveal-delay-2">
+        <a href="/inquiry-form/" class="btn-primary">Enquire Now</a>
+        <a href="tel:+61430863819" class="btn-ghost">Call 0430 863 819</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // FAQ accordion on home page
+  document.querySelectorAll<HTMLButtonElement>('.faq-question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item?.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
+      if (!isOpen && item) item.classList.add('open');
+    });
+  });
+</script>

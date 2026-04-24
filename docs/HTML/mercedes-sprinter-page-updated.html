@@ -1,0 +1,417 @@
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  line-height: 1.6;
+  color: #333;
+}
+
+.product-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.product-hero {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 30px 20px;
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+  color: white;
+  border-radius: 10px;
+}
+
+.product-hero h1 {
+  font-size: 42px;
+  margin-bottom: 15px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.product-price {
+  font-size: 36px;
+  font-weight: bold;
+  color: #FF6B35;
+  margin-bottom: 10px;
+}
+
+.product-status {
+  font-size: 18px;
+  color: #FF6B35;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.premium-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #000;
+  padding: 8px 20px;
+  border-radius: 25px;
+  font-size: 16px;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.main-image-wrapper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 30px;
+  cursor: zoom-in;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.main-image-wrapper img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.thumbnail-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 15px;
+  margin-bottom: 40px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.thumbnail {
+  cursor: pointer;
+  border: 3px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  aspect-ratio: 1;
+}
+
+.thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.thumbnail:hover {
+  border-color: #FF6B35;
+  transform: scale(1.05);
+}
+
+.thumbnail.active {
+  border-color: #FF6B35;
+  box-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+}
+
+.specs-section {
+  background: #f9f9f9;
+  padding: 40px;
+  border-radius: 10px;
+  margin-bottom: 40px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.specs-section h2 {
+  font-size: 32px;
+  margin-bottom: 25px;
+  color: #000;
+  border-bottom: 3px solid #FF6B35;
+  padding-bottom: 10px;
+}
+
+.specs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.spec-item {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #FF6B35;
+}
+
+.spec-item h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #000;
+}
+
+.spec-item p {
+  color: #666;
+  line-height: 1.8;
+}
+
+.contact-section {
+  text-align: center;
+  padding: 50px 20px;
+  background: #000;
+  color: white;
+  border-radius: 10px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.contact-section h2 {
+  font-size: 36px;
+  margin-bottom: 20px;
+}
+
+.contact-section p {
+  font-size: 18px;
+  margin-bottom: 30px;
+  color: #ddd;
+}
+
+.contact-button {
+  display: inline-block;
+  padding: 18px 45px;
+  background: #FF6B35;
+  color: white;
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: bold;
+  font-size: 20px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.contact-button:hover {
+  background: white;
+  color: #000;
+  transform: scale(1.05);
+}
+
+.lightbox {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  justify-content: center;
+  align-items: center;
+}
+
+.lightbox.active {
+  display: flex;
+}
+
+.lightbox img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 40px;
+  color: white;
+  font-size: 40px;
+  cursor: pointer;
+  z-index: 10000;
+}
+
+@media (max-width: 768px) {
+  .product-hero h1 {
+    font-size: 28px;
+  }
+
+  .product-price {
+    font-size: 28px;
+  }
+
+  .thumbnail-gallery {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+  }
+
+  .specs-section {
+    padding: 20px;
+  }
+
+  .contact-section h2 {
+    font-size: 24px;
+  }
+}
+</style>
+
+<div class="product-container">
+  <div class="product-hero">
+    <h1>2022 Mercedes Sprinter Motorhome</h1>
+    <div class="premium-badge">PREMIUM TURNKEY MOTORHOME</div>
+    <div class="product-price">$225,000</div>
+    <div class="product-status">READY TO DRIVE AWAY</div>
+  </div>
+
+  <div class="main-image-wrapper" onclick="openLightbox(document.getElementById('mainImage').src)">
+    <img id="mainImage" src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-17-scaled.jpg" alt="Mercedes Sprinter Motorhome Main">
+  </div>
+
+  <div class="thumbnail-gallery">
+    <div class="thumbnail active" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-17-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-17-scaled.jpg" alt="View 1">
+    </div>
+    <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-01-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-01-scaled.jpg" alt="View 2">
+    </div>
+    <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-02-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-02-scaled.jpg" alt="View 3">
+    </div>
+    <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-03-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-03-scaled.jpg" alt="View 4">
+    </div>
+    <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-04-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-04-scaled.jpg" alt="View 5">
+    </div>
+    <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-05-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-05-scaled.jpg" alt="View 6">
+    </div>
+    <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-06-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-06-scaled.jpg" alt="View 7">
+    </div>
+    <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-07-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-07-scaled.jpg" alt="View 8">
+    </div>
+    <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-08-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-08-scaled.jpg" alt="View 9">
+    </div>
+    <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-09-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-09-scaled.jpg" alt="View 10">
+    </div>
+    <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-10-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-10-scaled.jpg" alt="View 11">
+    </div>
+    <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-11-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-11-scaled.jpg" alt="View 12">
+    </div>
+    <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-12-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-12-scaled.jpg" alt="View 13">
+    </div>
+    <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-13-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-13-scaled.jpg" alt="View 14">
+    </div>
+    <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-14-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-14-scaled.jpg" alt="View 15">
+    </div>
+    <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-15-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-15-scaled.jpg" alt="View 16">
+    </div>
+    <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-16-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-16-scaled.jpg" alt="View 17">
+    </div>
+    <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-18-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-18-scaled.jpg" alt="View 18">
+    </div>
+    <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-19-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-19-scaled.jpg" alt="View 19">
+    </div>
+    <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-20-scaled.jpg')">
+      <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-20-scaled.jpg" alt="View 20">
+    </div>
+  </div>
+
+  <div class="specs-section">
+    <h2>Specifications</h2>
+    <div class="specs-grid">
+      <div class="spec-item">
+        <h3>Vehicle</h3>
+        <p>• 2022 Mercedes-Benz Sprinter<br>
+        • All Wheel Drive (AWD)<br>
+        • Premium German engineering<br>
+        • Reliable and powerful</p>
+      </div>
+      <div class="spec-item">
+        <h3>Camper Dimensions & Weight</h3>
+        <p>• Length: 4700mm (4.7m)<br>
+        • Width: 2200mm<br>
+        • Height: 2100mm<br>
+        • TARE Weight: 1100kg</p>
+      </div>
+      <div class="spec-item">
+        <h3>Construction</h3>
+        <p>• Professional custom conversion<br>
+        • High-quality construction<br>
+        • Modern design<br>
+        • Durable materials</p>
+      </div>
+      <div class="spec-item">
+        <h3>Interior Features</h3>
+        <p>• Complete living facilities<br>
+        • Modern kitchen and bathroom<br>
+        • Comfortable sleeping area<br>
+        • Premium finishes throughout</p>
+      </div>
+      <div class="spec-item">
+        <h3>Power & Climate</h3>
+        <p>• Comprehensive electrical system<br>
+        • Climate control<br>
+        • Solar capability<br>
+        • Off-grid ready</p>
+      </div>
+      <div class="spec-item">
+        <h3>Ready to Go</h3>
+        <p>• Complete turnkey package<br>
+        • Drive away ready<br>
+        • Fully equipped<br>
+        • Start your adventure today</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="contact-section">
+    <h2>Experience Premium Motorhome Living</h2>
+    <p>Contact us today to schedule a viewing of this exceptional 2022 Mercedes-Benz Sprinter Motorhome</p>
+    <a href="/inquiry-form/" class="contact-button">Contact Us Now</a>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <span class="lightbox-close">&times;</span>
+  <img id="lightboxImage" src="" alt="Full size image">
+</div>
+
+<script>
+function changeMainImage(thumbnail, imageUrl) {
+  // Update main image
+  document.getElementById('mainImage').src = imageUrl;
+
+  // Update active thumbnail
+  const thumbnails = document.querySelectorAll('.thumbnail');
+  thumbnails.forEach(t => t.classList.remove('active'));
+  thumbnail.classList.add('active');
+}
+
+function openLightbox(imageUrl) {
+  document.getElementById('lightboxImage').src = imageUrl;
+  document.getElementById('lightbox').classList.add('active');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('active');
+}
+
+// Keyboard navigation for lightbox
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeLightbox();
+  }
+});
+</script>

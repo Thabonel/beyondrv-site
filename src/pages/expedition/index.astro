@@ -1,0 +1,125 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProductCard from '../../components/ProductCard.astro';
+
+const products = (await getCollection('products'))
+  .filter(p => p.data.category === 'expedition');
+
+const unimogProducts = products.filter(p => p.slug.includes('unimog'));
+const isuzuProducts = products.filter(p => p.slug.includes('isuzu'));
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "ByondRV Expedition Vehicles",
+  "url": "https://beyondrv.com.au/expedition/",
+  "hasPart": products.map(p => ({
+    "@type": "Product",
+    "name": p.data.title,
+    "url": `https://beyondrv.com.au/${p.slug}/`
+  }))
+};
+---
+<BaseLayout
+  title="Expedition Vehicles | Unimog & Isuzu Campers | ByondRV Queensland"
+  description="ByondRV builds expedition campers on Unimog and Isuzu NPS platforms. For serious overlanders who genuinely leave all roads behind. Custom-built in Queensland."
+  image="/images/site/unimog-hero.jpg"
+  activePath="/expedition/"
+  structuredData={schema}
+>
+  <section class="page-hero">
+    <div class="page-hero-bg" style="background-image: url('/images/site/unimog-hero.jpg')"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-overlay-bottom"></div>
+    <div class="page-hero-content">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Expedition Vehicles</span>
+      </div>
+      <h1 class="hero-title">Expedition<br><span class="accent">Range</span></h1>
+      <p class="hero-sub">
+        Built for people who go beyond. Unimog and Isuzu NPS platforms with full composite expedition bodies.
+        Custom-built in Queensland for the serious overlander.
+      </p>
+    </div>
+  </section>
+
+  <!-- Founder credibility block — placeholder until client supplies content/photo -->
+  <section class="expedition-callout container" style="margin-top: 5rem">
+    <div>
+      <div class="section-eyebrow reveal">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Built by People Who Use Them</span>
+      </div>
+      <h2 class="section-title reveal reveal-delay-1">We build what<br>we actually drive.</h2>
+      <p style="color: var(--muted); font-size: 0.95rem; line-height: 1.8; max-width: 480px; margin-top: 1rem;" class="reveal reveal-delay-2">
+        ByondRV's expedition range is designed by builders who spend time in the field.
+        Every build is custom — we work with you from chassis selection through to final handover.
+      </p>
+      <!-- TODO: Replace with client-supplied photo and founder bio -->
+    </div>
+    <div class="expedition-callout-image reveal reveal-delay-2">
+      <img src="/images/site/unimog-hero.jpg" alt="ByondRV Unimog expedition build" />
+    </div>
+  </section>
+
+  <!-- Unimog range -->
+  {unimogProducts.length > 0 && (
+    <section class="container" style="margin-top: 5rem">
+      <h2 class="section-title">Unimog Builds</h2>
+      <p class="section-sub">Mercedes-Benz Unimog — the benchmark for extreme-terrain expedition vehicles.</p>
+      <div class="product-grid">
+        {unimogProducts.map(p => (
+          <ProductCard
+            title={p.data.title}
+            slug={p.slug}
+            category={p.data.category}
+            tagline={p.data.tagline}
+            price={p.data.price}
+            status={p.data.status}
+            heroImage={p.data.heroImage}
+            priceBadge={p.data.priceBadge}
+          />
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- Isuzu range -->
+  {isuzuProducts.length > 0 && (
+    <section class="container" style="margin-top: 3rem; padding-bottom: 5rem">
+      <h2 class="section-title">Isuzu NPS Builds</h2>
+      <p class="section-sub">Serious expedition capability on a platform you can service at any Isuzu dealer in Australia.</p>
+      <div class="product-grid">
+        {isuzuProducts.map(p => (
+          <ProductCard
+            title={p.data.title}
+            slug={p.slug}
+            category={p.data.category}
+            tagline={p.data.tagline}
+            price={p.data.price}
+            status={p.data.status}
+            heroImage={p.data.heroImage}
+            priceBadge={p.data.priceBadge}
+          />
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="cta-section">
+    <div class="cta-bg" style="background-image: url('/images/site/mog2.jpg')"></div>
+    <div class="cta-overlay"></div>
+    <div class="cta-content">
+      <h2 class="cta-title reveal">Every expedition<br>build is <span class="italic">custom.</span></h2>
+      <p class="cta-sub reveal reveal-delay-1">
+        Tell us your platform, your mission, and your timeline. We'll design around your reality.
+      </p>
+      <div class="cta-actions reveal reveal-delay-2">
+        <a href="/inquiry-form/?product=expedition-custom" class="btn-primary">Start Your Build</a>
+        <a href="tel:+61430863819" class="btn-ghost">Call 0430 863 819</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

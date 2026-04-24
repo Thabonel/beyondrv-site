@@ -1,0 +1,119 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Custom Build | ByondRV",
+  "url": "https://beyondrv.com.au/custom/",
+  "description": "ByondRV custom camper builds — slide-ons, truck campers, and expedition vehicles built to your exact specification."
+};
+---
+<BaseLayout
+  title="Custom Builds | ByondRV Queensland"
+  description="ByondRV builds custom slide-ons, truck campers, and expedition vehicles to your exact spec. Tell us your truck and your dream — we'll build the rest."
+  image="/images/site/unimog-hero.jpg"
+  activePath="/custom/"
+  structuredData={schema}
+>
+  <section class="page-hero">
+    <div class="page-hero-bg" style="background-image: url('/images/site/unimog-hero.jpg')"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-overlay-bottom"></div>
+    <div class="page-hero-content">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Custom Builds</span>
+      </div>
+      <h1 class="hero-title">Your Truck.<br><span class="italic">Your Build.</span></h1>
+      <p class="hero-sub">
+        No catalogue limits. Tell us exactly what you need — vehicle, terrain, how you travel.
+        We design it. We build it. Queensland-finished.
+      </p>
+      <div class="hero-actions">
+        <a href="/inquiry-form/?product=custom-build&intent=custom" class="btn-primary">Start Your Build</a>
+        <a href="tel:+61430863819" class="btn-ghost">Call 0430 863 819</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- What We Build -->
+  <section class="trust" style="padding: 7rem var(--gutter)">
+    <div class="section-eyebrow reveal">
+      <div class="section-eyebrow-line"></div>
+      <span class="section-eyebrow-text">What We Build</span>
+    </div>
+    <h2 class="section-title reveal reveal-delay-1">No catalogue.<br>No compromises.</h2>
+    <div class="trust-grid" style="margin-top: 3rem">
+      <div class="trust-card reveal reveal-delay-1">
+        <div class="trust-icon">🛻</div>
+        <div class="trust-title">Ute Slide-Ons</div>
+        <div class="trust-desc">HiLux, Ranger, D-Max, Triton, and any dual-cab with the right payload. We spec to your tray.</div>
+      </div>
+      <div class="trust-card reveal reveal-delay-2">
+        <div class="trust-icon">🚛</div>
+        <div class="trust-title">Truck Campers</div>
+        <div class="trust-desc">Iveco Daily, Mercedes Sprinter 4×4, Isuzu NPR/NPS. Medium-duty platforms built for serious travel.</div>
+      </div>
+      <div class="trust-card reveal reveal-delay-3">
+        <div class="trust-icon">⛽</div>
+        <div class="trust-title">Expedition Builds</div>
+        <div class="trust-desc">Unimog U300–U4000, Isuzu FTS, custom chassis. When you go where there are no roads.</div>
+      </div>
+      <div class="trust-card reveal reveal-delay-4">
+        <div class="trust-icon">⚙</div>
+        <div class="trust-title">Full Electrical</div>
+        <div class="trust-desc">Solar, lithium, 240V inverter, 12V accessories — all sized for how long you actually travel. ADR compliant.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Process -->
+  <section class="process">
+    <div class="section-eyebrow reveal">
+      <div class="section-eyebrow-line"></div>
+      <span class="section-eyebrow-text">The Process</span>
+    </div>
+    <h2 class="section-title reveal reveal-delay-1">From Call<br>to Outback</h2>
+    <div class="process-grid">
+      <div class="process-step reveal reveal-delay-1">
+        <div class="process-num">01</div>
+        <div class="process-icon">◎</div>
+        <div class="process-title">Consult</div>
+        <div class="process-desc">Tell us your truck, your terrain, and how you live on the road. We design around your reality.</div>
+      </div>
+      <div class="process-step reveal reveal-delay-2">
+        <div class="process-num">02</div>
+        <div class="process-icon">⬡</div>
+        <div class="process-title">Design</div>
+        <div class="process-desc">Floorplan confirmed. Electrics spec'd. Solar, water, battery, kitchen — all sized for your trip length.</div>
+      </div>
+      <div class="process-step reveal reveal-delay-3">
+        <div class="process-num">03</div>
+        <div class="process-icon">⚙</div>
+        <div class="process-title">Build &amp; Finish</div>
+        <div class="process-desc">3–6 weeks in our Queensland workshop. Every wire, cabinet, and fitting — by our own hands.</div>
+      </div>
+      <div class="process-step reveal reveal-delay-4">
+        <div class="process-num">04</div>
+        <div class="process-icon">▲</div>
+        <div class="process-title">Handover</div>
+        <div class="process-desc">Full walkthrough, orientation, and compliance documentation. Drive away knowing every system inside out.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-bg" style="background-image: url('/images/site/mog2.jpg')"></div>
+    <div class="cta-overlay"></div>
+    <div class="cta-content">
+      <h2 class="cta-title reveal">Tell us your<br><span class="italic">dream build.</span></h2>
+      <p class="cta-sub reveal reveal-delay-1">We love the complex ones. The weirder the better.</p>
+      <div class="cta-actions reveal reveal-delay-2">
+        <a href="/inquiry-form/?product=custom-build&intent=custom" class="btn-primary">Start Your Build</a>
+        <a href="tel:+61430863819" class="btn-ghost">Call 0430 863 819</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

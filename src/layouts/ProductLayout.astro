@@ -1,0 +1,221 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  product: CollectionEntry<'products'>;
+}
+const { product } = Astro.props;
+const { data } = product;
+const isComingSoon = data.status === 'coming-soon';
+const encodedSlug = encodeURIComponent(product.slug);
+const encodedName = encodeURIComponent(data.title);
+const enquiryUrl = `/inquiry-form/?product=${encodedSlug}&name=${encodedName}`;
+
+const priceNum = data.price.replace(/[^0-9.]/g, '');
+const productSchema = {
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": data.title,
+  "description": data.seoDesc ?? data.tagline,
+  "brand": { "@type": "Brand", "name": "ByondRV" },
+  "image": data.heroImage,
+  ...(priceNum && {
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "AUD",
+      "price": priceNum,
+      "availability": isComingSoon
+        ? "https://schema.org/PreOrder"
+        : "https://schema.org/InStock",
+      "seller": { "@type": "Organization", "name": "ByondRV" }
+    }
+  }),
+};
+
+const faqSchema = data.faq && data.faq.length > 0
+  ? {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": data.faq.map(({ q, a }) => ({
+        "@type": "Question",
+        "name": q,
+        "acceptedAnswer": { "@type": "Answer", "text": a }
+      }))
+    }
+  : undefined;
+
+const schemas = [productSchema, ...(faqSchema ? [faqSchema] : [])];
+---
+<BaseLayout
+  title={data.seoTitle ?? `${data.title} | ByondRV`}
+  description={data.seoDesc ?? data.tagline}
+  image={data.heroImage}
+  type="product"
+  canonicalUrl={data.canonicalUrl}
+  structuredData={schemas}
+  activePath={`/${product.slug}/`}
+>
+  <!-- Hero + Gallery -->
+  <section class="product-hero-section">
+    <div class="product-gallery">
+      <div class="product-gallery-main">
+        <img id="productHeroImg" src={data.heroImage} alt={data.title} />
+      </div>
+      {data.gallery.length > 0 && (
+        <div class="product-gallery-thumbs">
+          {[data.heroImage, ...data.gallery].map((img, i) => (
+            <button
+              class={`thumb-btn${i === 0 ? ' active' : ''}`}
+              data-src={img}
+              aria-label={`View image ${i + 1} of ${data.title}`}
+            >
+              <img src={img} alt={`${data.title} — view ${i + 1}`} loading="lazy" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <div class="product-hero-info">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">{data.category}</span>
+      </div>
+      <h1 class="product-title">{data.title}</h1>
+      <p class="product-tagline">{data.tagline}</p>
+
+      <div class="product-price-block">
+        {data.priceBadge && !isComingSoon && <span class="badge">{data.priceBadge}</span>}
+        {isComingSoon && <span class="coming-soon-badge">Coming Soon</span>}
+        <span class="product-price">{data.price}</span>
+      </div>
+
+      {data.keySpecs.length > 0 && (
+        <div class="key-specs">
+          {data.keySpecs.map(s => (
+            <div class="key-spec">
+              <span class="key-spec-label">{s.label}</span>
+              <span class="key-spec-value">{s.value}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div class="product-ctas">
+        {isComingSoon ? (
+          <a href={enquiryUrl + '&intent=register'} class="btn-primary">Register Interest</a>
+        ) : (
+          <>
+            <a href={enquiryUrl} class="btn-primary">Enquire Now</a>
+            <a href={enquiryUrl + '&intent=buy'} class="btn-ghost">Buy Now</a>
+          </>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <!-- Description (Markdown content slot) -->
+  <section class="product-description container">
+    <div class="product-description-body prose">
+      <slot />
+    </div>
+  </section>
+
+  <!-- Full Specs Table -->
+  {data.specs && data.specs.length > 0 && (
+    <section class="product-specs-section container">
+      <h2 class="section-title">Full Specifications</h2>
+      <table class="specs-table">
+        <tbody>
+          {data.specs.map(row => (
+            <tr>
+              <th scope="row">{row.label}</th>
+              <td>{row.value}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  )}
+
+  <!-- Features List -->
+  {data.features && data.features.length > 0 && (
+    <section class="product-features-section container">
+      <h2 class="section-title">Features</h2>
+      <ul class="features-list">
+        {data.features.map(f => <li>{f}</li>)}
+      </ul>
+    </section>
+  )}
+
+  <!-- FAQ -->
+  {data.faq && data.faq.length > 0 && (
+    <section class="product-faq-section container">
+      <h2 class="section-title">FAQ</h2>
+      <div class="faq-list">
+        {data.faq.map(({ q, a }, i) => (
+          <div class="faq-item" id={`faq-${i}`}>
+            <button class="faq-question" aria-expanded="false" aria-controls={`faq-answer-${i}`}>
+              {q}
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-answer" id={`faq-answer-${i}`} role="region">
+              <p>{a}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- Enquiry CTA band -->
+  <section class="product-enquiry-band">
+    <div class="container">
+      <h2>Ready to make it yours?</h2>
+      <p>
+        Talk to the team — we're based in Mutdapilly, QLD, and we build every camper ourselves.
+      </p>
+      <div class="product-ctas">
+        {isComingSoon ? (
+          <a href={enquiryUrl + '&intent=register'} class="btn-primary">Register Interest</a>
+        ) : (
+          <>
+            <a href={enquiryUrl} class="btn-primary">Enquire Now</a>
+            <a href="tel:+61430863819" class="btn-ghost">Call 0430 863 819</a>
+          </>
+        )}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // Thumbnail gallery switcher
+  document.querySelectorAll<HTMLButtonElement>('.thumb-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const heroImg = document.getElementById('productHeroImg') as HTMLImageElement | null;
+      if (heroImg && btn.dataset.src) heroImg.src = btn.dataset.src;
+      document.querySelectorAll('.thumb-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // FAQ accordion
+  document.querySelectorAll<HTMLButtonElement>('.faq-question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item?.classList.contains('open');
+      // Close all
+      document.querySelectorAll('.faq-item').forEach(el => {
+        el.classList.remove('open');
+        el.querySelector<HTMLButtonElement>('.faq-question')?.setAttribute('aria-expanded', 'false');
+      });
+      // Open clicked if it was closed
+      if (!isOpen && item) {
+        item.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+</script>

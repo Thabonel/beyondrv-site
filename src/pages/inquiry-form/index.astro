@@ -1,0 +1,167 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  "name": "ByondRV Enquiry Form",
+  "url": "https://beyondrv.com.au/inquiry-form/",
+  "description": "Send an enquiry to ByondRV. We'll call you back at a time that suits."
+};
+---
+<BaseLayout
+  title="Enquire | ByondRV — We'll Call You Back"
+  description="Get in touch with ByondRV. Tell us what you're interested in and when to call you back. No pressure, no sales scripts."
+  activePath="/inquiry-form/"
+  structuredData={schema}
+>
+  <section class="page-hero page-hero--short">
+    <div class="hero-overlay" style="background: rgba(10,10,10,0.85)"></div>
+    <div class="page-hero-content">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Get In Touch</span>
+      </div>
+      <h1 class="hero-title">Enquire Now</h1>
+      <p class="hero-sub">
+        Tell us what you're after and when's a good time for us to give you a call.
+        No pressure. Just a conversation.
+      </p>
+    </div>
+  </section>
+
+  <section class="enquiry-form-section container">
+    <form
+      name="beyondrv-enquiry"
+      method="POST"
+      data-netlify="true"
+      netlify-honeypot="bot-field"
+      class="enquiry-form"
+      id="enquiryForm"
+      action="/inquiry-form/success/"
+    >
+      <input type="hidden" name="form-name" value="beyondrv-enquiry" />
+      <input type="hidden" name="product_interest" id="productInterestField" value="" />
+      <input type="hidden" name="enquiry_intent" id="intentField" value="" />
+
+      <!-- Honeypot -->
+      <p style="display:none">
+        <label>Don't fill this out if you're human: <input name="bot-field" /></label>
+      </p>
+
+      <div class="form-field">
+        <label class="form-label" for="name">
+          Full Name <span aria-hidden="true" style="color:var(--orange)">*</span>
+        </label>
+        <input
+          class="form-input"
+          type="text"
+          id="name"
+          name="name"
+          required
+          autocomplete="name"
+          placeholder="Your name"
+        />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="email">
+          Email <span aria-hidden="true" style="color:var(--orange)">*</span>
+        </label>
+        <input
+          class="form-input"
+          type="email"
+          id="email"
+          name="email"
+          required
+          autocomplete="email"
+          placeholder="your@email.com"
+        />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="message">
+          Message <span aria-hidden="true" style="color:var(--orange)">*</span>
+        </label>
+        <textarea
+          class="form-textarea"
+          id="message"
+          name="message"
+          rows="5"
+          required
+          placeholder="Tell us what you're interested in, what truck you drive, how you travel..."
+        ></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="callbackDate">When should we call you? (Date)</label>
+          <input
+            class="form-input"
+            type="date"
+            id="callbackDate"
+            name="callback_date"
+            autocomplete="off"
+          />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="callbackTime">Preferred call-back time</label>
+          <input
+            class="form-input"
+            type="time"
+            id="callbackTime"
+            name="callback_time"
+            autocomplete="off"
+          />
+        </div>
+      </div>
+
+      <!-- Cloudflare Turnstile placeholder — replace TURNSTILE_SITEKEY before launch -->
+      <!-- <div class="cf-turnstile" data-sitekey="TURNSTILE_SITEKEY" data-theme="dark"></div> -->
+
+      <button type="submit" class="btn-primary form-submit" style="margin-top: 1.5rem">
+        Send Enquiry
+      </button>
+    </form>
+
+    <div style="margin-top: 4rem; padding-top: 3rem; border-top: 1px solid var(--border)">
+      <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 0.5rem">Prefer to call?</p>
+      <a href="tel:+61430863819" style="font-family: var(--font-heading); font-size: 1.8rem; color: var(--orange); text-decoration: none; letter-spacing: 0.05em">
+        0430 863 819
+      </a>
+      <p style="font-size: 0.82rem; color: var(--muted); margin-top: 1rem">
+        77 Coleyville Rd, Mutdapilly QLD 4307
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const productSlug = params.get('product');
+  const productName = params.get('name');
+  const intent = params.get('intent');
+
+  const msgField = document.getElementById('message') as HTMLTextAreaElement | null;
+  const hiddenField = document.getElementById('productInterestField') as HTMLInputElement | null;
+  const intentField = document.getElementById('intentField') as HTMLInputElement | null;
+
+  const displayName = productName
+    ? decodeURIComponent(productName)
+    : productSlug
+      ? decodeURIComponent(productSlug).replace(/-/g, ' ')
+      : null;
+
+  if (displayName && msgField) {
+    const prefix = intent === 'buy'
+      ? `I'd like to purchase the ${displayName}. `
+      : intent === 'register'
+        ? `I'd like to register my interest in the ${displayName}. `
+        : `I'm interested in the ${displayName}. `;
+    msgField.value = prefix;
+    msgField.focus();
+    msgField.setSelectionRange(prefix.length, prefix.length);
+  }
+  if (productSlug && hiddenField) hiddenField.value = decodeURIComponent(productSlug);
+  if (intent && intentField) intentField.value = intent;
+</script>

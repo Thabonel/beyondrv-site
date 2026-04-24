@@ -1,0 +1,37 @@
+---
+interface Props {
+  title: string;
+  slug: string;
+  category: string;
+  tagline: string;
+  price: string;
+  status: string;
+  heroImage: string;
+  priceBadge?: string;
+}
+const { title, slug, category, tagline, price, status, heroImage, priceBadge } = Astro.props;
+const href = `/${slug}/`;
+const isComingSoon = status === 'coming-soon';
+const categoryLabel = category === 'slide-on' ? 'Slide-On' : category === 'caravan' ? 'Caravan' : 'Expedition';
+---
+<article class="product-card reveal">
+  <a href={href} class="product-card-inner">
+    <div class="product-card-image">
+      <img src={heroImage} alt={title} loading="lazy" />
+      <div class="product-card-overlay"></div>
+      {priceBadge && !isComingSoon && <span class="badge">{priceBadge}</span>}
+      {isComingSoon && <span class="coming-soon-badge">Coming Soon</span>}
+    </div>
+    <div class="product-card-body">
+      <span class="product-card-category">{categoryLabel}</span>
+      <h3 class="product-card-title">{title}</h3>
+      <p class="product-card-tagline">{tagline}</p>
+      <div class="product-card-footer">
+        <span class="product-card-price">{price}</span>
+        <span class="product-card-cta">
+          {isComingSoon ? 'Register Interest →' : 'View Details →'}
+        </span>
+      </div>
+    </div>
+  </a>
+</article>

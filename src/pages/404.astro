@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="Page Not Found | ByondRV"
+  description="This page has wandered off the map. Let's get you back somewhere with a view."
+  noIndex={true}
+>
+  <section class="not-found-section">
+    <div class="not-found-content">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">404</span>
+      </div>
+      <h1 class="hero-title">
+        Looks like you've<br>gone <span class="accent">bush.</span>
+      </h1>
+      <p class="hero-sub">
+        This page has wandered off the map. Happens to the best of us.
+        Let's get you back somewhere with a view.
+      </p>
+      <p class="not-found-sub-copy">Even the Unimog couldn't get here.</p>
+      <div class="hero-actions">
+        <a href="/" class="btn-primary">Back to Home</a>
+        <a href="/our-slide-on-campers/" class="btn-ghost">Browse Campers</a>
+        <a href="/inquiry-form/" class="btn-ghost">Get in Touch</a>
+      </div>
+    </div>
+    <div class="not-found-image">
+      <img
+        src="/images/site/unimog-rear.png"
+        alt="A Unimog disappearing into the distance"
+        loading="lazy"
+      />
+    </div>
+  </section>
+</BaseLayout>
