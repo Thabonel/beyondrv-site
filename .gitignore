@@ -3,3 +3,12 @@
 *.docx
 *.pages
 Thumbs.db
+
+# Astro
+node_modules/
+dist/
+.astro/
+
+# Large product images — deployed via Netlify CLI, not git
+public/images/products/
+
