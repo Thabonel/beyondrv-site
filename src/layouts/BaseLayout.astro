@@ -34,6 +34,47 @@ const { activePath = '', ...headProps } = Astro.props;
   <Footer />
 
   <script>
+    // Referral / UTM attribution — persists for 30 days in localStorage (first-touch wins)
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get('ref');
+      const utmSource = params.get('utm_source');
+      const utmMedium = params.get('utm_medium');
+      const utmCampaign = params.get('utm_campaign');
+      const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
+
+      // Only write if we have a ref= param AND no valid unexpired referral already stored
+      if (ref) {
+        let existing: { ref: string; expires: number } | null = null;
+        try { existing = JSON.parse(localStorage.getItem('brv_referral') || 'null'); } catch {}
+        const isValid = existing && existing.expires > Date.now();
+        if (!isValid) {
+          localStorage.setItem('brv_referral', JSON.stringify({
+            ref,
+            entry_page: window.location.pathname,
+            first_touch: new Date().toISOString(),
+            utm_source: utmSource || '',
+            utm_medium: utmMedium || '',
+            utm_campaign: utmCampaign || '',
+            expires: Date.now() + THIRTY_DAYS,
+          }));
+        }
+      }
+
+      // UTM-only (no ref=) — store separately, always overwrite with freshest campaign data
+      if (!ref && utmSource) {
+        localStorage.setItem('brv_utm', JSON.stringify({
+          utm_source: utmSource,
+          utm_medium: utmMedium || '',
+          utm_campaign: utmCampaign || '',
+          entry_page: window.location.pathname,
+          stored_at: new Date().toISOString(),
+        }));
+      }
+    })();
+  </script>
+
+  <script>
     // Custom cursor (desktop only)
     const cursor = document.getElementById('cursor');
     const ring = document.getElementById('cursor-ring');

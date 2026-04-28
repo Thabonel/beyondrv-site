@@ -43,6 +43,12 @@ const schema = {
       <input type="hidden" name="form-name" value="beyondrv-enquiry" />
       <input type="hidden" name="product_interest" id="productInterestField" value="" />
       <input type="hidden" name="enquiry_intent" id="intentField" value="" />
+      <!-- Attribution hidden fields — populated from localStorage by script below -->
+      <input type="hidden" name="referral_partner" id="referralPartner" value="" />
+      <input type="hidden" name="referral_entry_page" id="referralEntryPage" value="" />
+      <input type="hidden" name="referral_first_touch" id="referralFirstTouch" value="" />
+      <input type="hidden" name="referral_utm_source" id="referralUtmSource" value="" />
+      <input type="hidden" name="referral_utm_campaign" id="referralUtmCampaign" value="" />
 
       <!-- Honeypot -->
       <p style="display:none">
@@ -116,6 +122,26 @@ const schema = {
         </div>
       </div>
 
+      <div class="form-field">
+        <label class="form-label" for="referralSourceSelfReported">How did you hear about us?</label>
+        <select
+          class="form-input"
+          id="referralSourceSelfReported"
+          name="referral_source_self_reported"
+          style="cursor: pointer"
+        >
+          <option value="">— Select an option —</option>
+          <option value="Instagram">Instagram</option>
+          <option value="Facebook">Facebook</option>
+          <option value="TikTok">TikTok</option>
+          <option value="YouTube">YouTube</option>
+          <option value="Google Search">Google Search</option>
+          <option value="Word of mouth">Word of mouth</option>
+          <option value="Referred by Thabo Nel">Referred by Thabo Nel</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
       <!-- Cloudflare Turnstile placeholder — replace TURNSTILE_SITEKEY before launch -->
       <!-- <div class="cf-turnstile" data-sitekey="TURNSTILE_SITEKEY" data-theme="dark"></div> -->
 
@@ -137,6 +163,7 @@ const schema = {
 </BaseLayout>
 
 <script>
+  // Product pre-fill from URL params
   const params = new URLSearchParams(window.location.search);
   const productSlug = params.get('product');
   const productName = params.get('name');
@@ -164,4 +191,46 @@ const schema = {
   }
   if (productSlug && hiddenField) hiddenField.value = decodeURIComponent(productSlug);
   if (intent && intentField) intentField.value = intent;
+
+  // Attribution — populate hidden fields from localStorage
+  (function() {
+    function setField(id: string, value: string) {
+      const el = document.getElementById(id) as HTMLInputElement | null;
+      if (el && value) el.value = value;
+    }
+
+    // Layer 1: referral partner (ref=thabo) — check expiry
+    try {
+      const raw = localStorage.getItem('brv_referral');
+      if (raw) {
+        const referral = JSON.parse(raw) as {
+          ref: string; entry_page: string; first_touch: string;
+          utm_source: string; utm_campaign: string; expires: number;
+        };
+        if (referral.expires > Date.now()) {
+          setField('referralPartner', referral.ref);
+          setField('referralEntryPage', referral.entry_page);
+          setField('referralFirstTouch', referral.first_touch);
+          setField('referralUtmSource', referral.utm_source);
+          setField('referralUtmCampaign', referral.utm_campaign);
+        }
+      }
+    } catch {}
+
+    // Layer 2: UTM-only (no ref=) — use if no partner referral already set
+    try {
+      const partnerField = document.getElementById('referralPartner') as HTMLInputElement | null;
+      if (!partnerField?.value) {
+        const raw = localStorage.getItem('brv_utm');
+        if (raw) {
+          const utm = JSON.parse(raw) as {
+            utm_source: string; utm_campaign: string; entry_page: string;
+          };
+          setField('referralUtmSource', utm.utm_source);
+          setField('referralUtmCampaign', utm.utm_campaign);
+          setField('referralEntryPage', utm.entry_page);
+        }
+      }
+    } catch {}
+  })();
 </script>
