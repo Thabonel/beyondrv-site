@@ -199,7 +199,7 @@ nav.scrolled {
   color: var(--white); line-height: 1;
 }
 .hero-stat-num span { color: var(--orange); }
-.hero-stat-label { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+.hero-stat-label { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--white); }
 
 .hero-scroll {
   position: absolute; right: var(--gutter); bottom: 5rem; z-index: 2;
