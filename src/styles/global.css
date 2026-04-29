@@ -86,8 +86,6 @@ nav.scrolled {
   text-decoration: none;
 }
 .nav-logo img { height: 80px; width: auto; object-fit: contain; }
-.nav-logo-text { font-family: var(--font-heading); font-size: 1.4rem; color: var(--white); letter-spacing: 0.05em; }
-.nav-logo-text span { color: var(--orange); }
 
 .nav-links {
   display: flex; gap: 2.5rem; list-style: none;
