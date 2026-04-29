@@ -1,0 +1,30 @@
+---
+import AdminPanel from '../components/AdminPanel';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ByondRV Admin</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body { height: 100%; background: #0a0a0a; color: #fff; font-family: 'Outfit', system-ui, sans-serif; }
+      header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 1rem; height: 60px;
+        background: #111; border-bottom: 1px solid #333;
+      }
+      header img { height: 36px; }
+      header span { color: #888; font-size: 0.85rem; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img src="/images/site/logo.png" alt="ByondRV" />
+      <span>Site Admin — changes deploy directly to production</span>
+    </header>
+    <AdminPanel client:load />
+  </body>
+</html>
