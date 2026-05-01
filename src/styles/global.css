@@ -954,6 +954,87 @@ footer {
 @keyframes fadeUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
 @keyframes fadeIn  { from { opacity:0; } to { opacity:1; } }
 
+/* ─── WORKSHOP GALLERY ─── */
+.workshop-gallery {
+  padding: 6rem var(--gutter);
+  background: var(--dark);
+  border-top: 1px solid var(--border);
+}
+.workshop-gallery .container { max-width: var(--max-width); margin: 0 auto; }
+.workshop-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: var(--border);
+  margin-top: 3rem;
+}
+.workshop-card { background: var(--panel); overflow: hidden; }
+.workshop-card-image { aspect-ratio: 4/3; overflow: hidden; }
+.workshop-card-image img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: brightness(0.75) saturate(0.85);
+  transition: transform 0.6s ease, filter 0.4s;
+}
+.workshop-card:hover .workshop-card-image img {
+  transform: scale(1.05);
+  filter: brightness(0.9) saturate(1);
+}
+.workshop-card-body { padding: 1.5rem 1.75rem 2rem; border-top: 1px solid var(--border); }
+.workshop-card-title {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  color: var(--white);
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+.workshop-card-tags { display: flex; flex-direction: column; gap: 0.5rem; }
+.workshop-tag {
+  font-size: 0.78rem; color: var(--muted);
+  padding-left: 1rem; position: relative; line-height: 1.5;
+}
+.workshop-tag::before { content: '→'; position: absolute; left: 0; color: var(--orange); }
+
+/* ─── BUILD PROCESS ─── */
+.build-process {
+  padding: 7rem var(--gutter);
+  background: var(--black);
+  border-top: 1px solid var(--border);
+}
+.build-process .container { max-width: var(--max-width); margin: 0 auto; }
+.build-steps { display: flex; flex-direction: column; gap: 0; margin-top: 3rem; border: 1px solid var(--border); }
+.build-step {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.25s;
+}
+.build-step:last-child { border-bottom: none; }
+.build-step:hover { background: var(--panel); }
+.build-step-num {
+  font-family: var(--font-heading);
+  font-size: 3.5rem;
+  color: rgba(232,84,10,0.18);
+  display: flex; align-items: center; justify-content: center;
+  padding: 2rem;
+  border-right: 1px solid var(--border);
+  transition: color 0.25s;
+  line-height: 1;
+}
+.build-step:hover .build-step-num { color: var(--orange); }
+.build-step-body { padding: 2rem 2.5rem; display: flex; flex-direction: column; justify-content: center; }
+.build-step-title { font-family: var(--font-heading); font-size: 1.5rem; color: var(--white); margin-bottom: 0.5rem; }
+.build-step-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.75; max-width: 560px; }
+
+@media (max-width: 1024px) {
+  .workshop-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .workshop-grid { grid-template-columns: 1fr; }
+  .build-step { grid-template-columns: 70px 1fr; }
+  .build-step-num { font-size: 2.2rem; padding: 1.5rem 1rem; }
+  .build-step-body { padding: 1.5rem 1.25rem; }
+}
+
 /* ─── RESPONSIVE ─── */
 @media (max-width: 1024px) {
   .truck-grid { grid-template-columns: repeat(2, 1fr); }
