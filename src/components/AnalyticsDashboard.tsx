@@ -1,7 +1,7 @@
 // src/components/AnalyticsDashboard.tsx
 import { useState, useEffect } from 'react';
 import {
-  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
+  LineChart, Line, BarChart, Bar, PieChart, Pie,
   XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts';
 
@@ -149,13 +149,16 @@ export default function AnalyticsDashboard() {
             ) : (
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
-                  <Pie data={data.sources} dataKey="visits" nameKey="source" cx="50%" cy="50%"
-                    outerRadius={70} label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
-                    labelLine={false}>
-                    {data.sources.map((_, i) => (
-                      <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                    ))}
-                  </Pie>
+                  <Pie
+                    data={data.sources.map((s, i) => ({ ...s, fill: PIE_COLORS[i % PIE_COLORS.length] }))}
+                    dataKey="visits"
+                    nameKey="source"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={70}
+                    label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
+                    labelLine={false}
+                  />
                   <Tooltip contentStyle={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '6px', color: '#fff' }} />
                 </PieChart>
               </ResponsiveContainer>
