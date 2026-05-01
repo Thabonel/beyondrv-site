@@ -14,8 +14,10 @@
     "@astrojs/react": "^5.0.4",
     "@astrojs/sitemap": "^2.0.2",
     "astro": "^4.16.19",
+    "posthog-js": "^1.372.6",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
+    "recharts": "^3.8.1",
     "sitemap": "^7.1.1",
     "typescript": "^5.9.3"
   },
