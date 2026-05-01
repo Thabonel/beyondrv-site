@@ -3,6 +3,8 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
+import CookieConsent from '../components/CookieConsent';
+import PostHogProvider from '../components/PostHogProvider';
 
 interface Props {
   title: string;
@@ -73,6 +75,9 @@ const { activePath = '', ...headProps } = Astro.props;
       }
     })();
   </script>
+
+  <CookieConsent client:load />
+  <PostHogProvider client:load />
 
   <script>
     // Custom cursor (desktop only)
