@@ -44,12 +44,14 @@ export default function AnalyticsDashboard() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const controller = new AbortController();
     setLoading(true);
     setError('');
-    fetch(`/.netlify/functions/analytics-data?range=${range}`)
+    fetch(`/.netlify/functions/analytics-data?range=${range}`, { signal: controller.signal })
       .then(r => r.json())
       .then((d: AnalyticsData) => { setData(d); setLoading(false); })
-      .catch(e => { setError(String(e)); setLoading(false); });
+      .catch(e => { if (e.name !== 'AbortError') { setError(String(e)); setLoading(false); } });
+    return () => controller.abort();
   }, [range]);
 
   const card: React.CSSProperties = {
@@ -91,6 +93,13 @@ export default function AnalyticsDashboard() {
         ))}
         {loading && <span style={{ color: '#555', fontSize: '0.8rem', marginLeft: '0.5rem' }}>Loading…</span>}
       </div>
+
+      {/* Loading state */}
+      {loading && !data && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', color: '#555', fontSize: '0.9rem' }}>
+          Loading analytics…
+        </div>
+      )}
 
       {/* Stat cards */}
       {data && (
