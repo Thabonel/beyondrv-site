@@ -1,0 +1,46 @@
+---
+import AnalyticsDashboard from '../../components/AnalyticsDashboard';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ByondRV Analytics</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body { height: 100%; background: #0a0a0a; color: #fff; font-family: 'Outfit', system-ui, sans-serif; }
+      header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 1.5rem; height: 60px;
+        background: #111; border-bottom: 1px solid #333;
+      }
+      header img { height: 36px; }
+      nav a {
+        color: #888; text-decoration: none; font-size: 0.85rem; margin-left: 1.5rem;
+        padding: 0.3rem 0.5rem; border-radius: 4px;
+      }
+      nav a:hover { color: #fff; }
+      nav a.active { color: #fff; background: #1a1a1a; }
+      main { overflow-y: auto; height: calc(100vh - 60px); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div style="display:flex;align-items:center;gap:1.5rem">
+        <img src="/images/site/logo.png" alt="ByondRV" />
+        <nav>
+          <a href="/admin">Admin</a>
+          <a href="/admin/analytics" class="active">Analytics</a>
+        </nav>
+      </div>
+      <span style="color:#555;font-size:0.8rem">Site Admin — production only</span>
+    </header>
+    <main>
+      <AnalyticsDashboard client:load />
+    </main>
+  </body>
+</html>
