@@ -1,0 +1,391 @@
+[
+  {
+    "slug": "3-5m-poptop-truck-camper",
+    "title": "3.5m Pop-Top Truck Camper",
+    "price": "$62,000",
+    "status": "available",
+    "category": "slide-on",
+    "tagline": "Low profile. Big living.",
+    "keySpecs": [
+      {
+        "label": "Base length",
+        "value": "3,500mm"
+      },
+      {
+        "label": "Roof",
+        "value": "Pop-top"
+      },
+      {
+        "label": "TARE",
+        "value": "~600kg"
+      },
+      {
+        "label": "Construction",
+        "value": "Full composite"
+      }
+    ],
+    "description": "The **3.5m Pop-Top Truck Camper** delivers maximum living in a compact package. Pop the roof and you're standing — keep it down and you're aerodynamic. Simple, reliable, purpose-built in Queensland."
+  },
+  {
+    "slug": "3-5m-truck-camper-cabover",
+    "title": "3.5m Truck Camper with Cabover",
+    "price": "$60,000",
+    "status": "available",
+    "category": "slide-on",
+    "tagline": "Extra sleeping. Same tough footprint.",
+    "keySpecs": [
+      {
+        "label": "Base length",
+        "value": "3,500mm"
+      },
+      {
+        "label": "Cabover",
+        "value": "Extra sleeping berth"
+      },
+      {
+        "label": "TARE",
+        "value": "~650kg"
+      },
+      {
+        "label": "Construction",
+        "value": "Full composite"
+      }
+    ],
+    "description": "The **3.5m Cabover Truck Camper** adds an extra sleeping berth over the cab — ideal for small families or couples who want the guest room. Same tough composite construction, same compact base."
+  },
+  {
+    "slug": "4-7m-truck-camper",
+    "title": "4.7m Truck Camper",
+    "price": "POA",
+    "status": "available",
+    "category": "slide-on",
+    "tagline": "Serious truck. Serious camper.",
+    "keySpecs": [
+      {
+        "label": "Base length",
+        "value": "4,700mm"
+      },
+      {
+        "label": "Construction",
+        "value": "Full composite"
+      },
+      {
+        "label": "Target trucks",
+        "value": "Iveco, Unimog, Isuzu"
+      }
+    ],
+    "description": "The **4.7m Truck Camper** is built for the big rigs — Iveco Eurocargo, Unimog, Isuzu NPS. Full composite construction in a proper live-aboard layout for the travellers who go furthest."
+  },
+  {
+    "slug": "7ft-electric-poptop-slide-on",
+    "title": "7ft Electric Pop-Top Slide-On",
+    "price": "$54,800",
+    "status": "available",
+    "category": "slide-on",
+    "tagline": "Stand-up comfort. Compact footprint.",
+    "keySpecs": [
+      {
+        "label": "Base length",
+        "value": "4,600mm"
+      },
+      {
+        "label": "Roof",
+        "value": "Electric pop-top"
+      },
+      {
+        "label": "TARE",
+        "value": "~700kg"
+      },
+      {
+        "label": "Ceiling (raised)",
+        "value": "Full standing room"
+      }
+    ],
+    "description": "The **7ft Electric Pop-Top** solves the age-old camper dilemma: low enough on the road, tall enough once you're parked. The electric pop-top rises in seconds and gives you full standing room — no more crouching in your own camp."
+  },
+  {
+    "slug": "advent-2150-hardtop-slide-on",
+    "title": "Advent 2150 Hardtop Slide-On",
+    "price": "$72,000",
+    "status": "on-sale",
+    "category": "slide-on",
+    "tagline": "Compact, capable, and ready to go right now.",
+    "keySpecs": [
+      {
+        "label": "Base length",
+        "value": "2,150mm"
+      },
+      {
+        "label": "TARE",
+        "value": "~700kg"
+      },
+      {
+        "label": "Construction",
+        "value": "Full composite"
+      },
+      {
+        "label": "Power",
+        "value": "200Ah lithium"
+      }
+    ],
+    "description": "The **Advent 2150** is the go-anywhere companion for serious ute and mid-size truck owners. At just 2,150mm base length, it's compact enough for tight tracks but packed with everything you need for weeks away.\n\nFull composite construction keeps the weight down (approx. 700kg TARE) without sacrificin"
+  },
+  {
+    "slug": "advent-2300-hardtop-slide-on",
+    "title": "Advent 2300 Hardtop Slide-On",
+    "price": "$72,000",
+    "status": "available",
+    "category": "slide-on",
+    "tagline": "The middle ground — serious capability, serious comfort.",
+    "keySpecs": [
+      {
+        "label": "Base length",
+        "value": "2,300mm"
+      },
+      {
+        "label": "TARE",
+        "value": "~750kg"
+      },
+      {
+        "label": "Construction",
+        "value": "Full composite hardtop"
+      },
+      {
+        "label": "Power",
+        "value": "200Ah lithium"
+      }
+    ],
+    "description": "The **Advent 2300** sits in the sweet spot of the Advent range — more space than the 2150 without the bulk of the 2450. Ideal for ute owners who want genuine live-aboard capability on longer trips."
+  },
+  {
+    "slug": "advent-2450-hardtop-slide-on",
+    "title": "Advent 2450 Hardtop Slide-On",
+    "price": "$72,000",
+    "status": "available",
+    "category": "slide-on",
+    "tagline": "Maximum space. Maximum off-road credibility.",
+    "keySpecs": [
+      {
+        "label": "Base length",
+        "value": "2,450mm"
+      },
+      {
+        "label": "TARE",
+        "value": "~800kg"
+      },
+      {
+        "label": "Construction",
+        "value": "Full composite hardtop"
+      },
+      {
+        "label": "Power",
+        "value": "200Ah lithium"
+      }
+    ],
+    "description": "The **Advent 2450** is the flagship of the Advent slide-on range. At 2,450mm base, it provides the most interior space available in a composite slide-on that still mounts cleanly on a dual-cab ute."
+  },
+  {
+    "slug": "expedition/isuzu-nps-cabover-camper",
+    "title": "Isuzu NPS Cabover Camper",
+    "price": "POA",
+    "status": "available",
+    "category": "expedition",
+    "tagline": "Truck-based expedition capability. More accessible than Unimog, less compromise.",
+    "keySpecs": [
+      {
+        "label": "Platform",
+        "value": "Isuzu NPS"
+      },
+      {
+        "label": "Build",
+        "value": "Cabover expedition camper"
+      },
+      {
+        "label": "Drive",
+        "value": "4WD"
+      },
+      {
+        "label": "Price",
+        "value": "POA"
+      }
+    ],
+    "description": "The **Isuzu NPS Cabover** gives you serious expedition capability on a platform you can service anywhere in Australia. Full composite body, cabover design for maximum living space, and the Isuzu NPS's proven 4WD drivetrain."
+  },
+  {
+    "slug": "expedition/isuzu-nps-poptop-camper",
+    "title": "Isuzu NPS Pop-Top Camper",
+    "price": "POA",
+    "status": "available",
+    "category": "expedition",
+    "tagline": "Pop-top freedom on a trusted truck platform.",
+    "keySpecs": [
+      {
+        "label": "Platform",
+        "value": "Isuzu NPS"
+      },
+      {
+        "label": "Roof",
+        "value": "Pop-top"
+      },
+      {
+        "label": "Drive",
+        "value": "4WD"
+      },
+      {
+        "label": "Price",
+        "value": "POA"
+      }
+    ],
+    "description": "The **Isuzu NPS Pop-Top** delivers expedition-grade capability with the practicality of a pop-top — standing room when you need it, low highway profile when you don't. Built on the proven Isuzu NPS 4WD."
+  },
+  {
+    "slug": "expedition/unimog-overlander-camper",
+    "title": "Unimog Overlander Camper",
+    "price": "POA",
+    "status": "available",
+    "category": "expedition",
+    "tagline": "Where roads end, the Unimog begins.",
+    "keySpecs": [
+      {
+        "label": "Platform",
+        "value": "Mercedes-Benz Unimog"
+      },
+      {
+        "label": "Build",
+        "value": "Full expedition camper"
+      },
+      {
+        "label": "Drive",
+        "value": "Portal axles — extreme clearance"
+      },
+      {
+        "label": "Price",
+        "value": "POA"
+      }
+    ],
+    "description": "The **Unimog Overlander** is ByondRV's most extreme build. Mounted on the legendary Mercedes-Benz Unimog with portal axles, this is the expedition vehicle for people who genuinely leave all roads behind.\n\nFull composite body, complete live-aboard spec, custom-built to order. Contact us to discuss yo"
+  },
+  {
+    "slug": "expedition/unimog-poptop-camper",
+    "title": "Unimog Pop-Top Camper",
+    "price": "POA",
+    "status": "available",
+    "category": "expedition",
+    "tagline": "Extreme terrain. Standing room when you arrive.",
+    "keySpecs": [
+      {
+        "label": "Platform",
+        "value": "Mercedes-Benz Unimog"
+      },
+      {
+        "label": "Roof",
+        "value": "Pop-top"
+      },
+      {
+        "label": "Price",
+        "value": "POA"
+      }
+    ],
+    "description": "The **Unimog Pop-Top** combines the Unimog's unmatched off-road capability with the practicality of a pop-top roof — low profile on the move, full standing room once you've found your spot."
+  },
+  {
+    "slug": "mercedes-sprinter-motorhome",
+    "title": "Mercedes Sprinter Motorhome",
+    "price": "$225,000",
+    "status": "available",
+    "category": "slide-on",
+    "tagline": "The ultimate self-contained adventure vehicle. Custom built on Mercedes Sprinter.",
+    "keySpecs": [
+      {
+        "label": "Base vehicle",
+        "value": "Mercedes-Benz Sprinter"
+      },
+      {
+        "label": "Build",
+        "value": "Full custom motorhome"
+      },
+      {
+        "label": "Price",
+        "value": "$225,000"
+      },
+      {
+        "label": "Construction",
+        "value": "Full composite body"
+      }
+    ],
+    "description": "The **Mercedes Sprinter Motorhome** is ByondRV's flagship build — a complete custom motorhome body on the trusted Mercedes-Benz Sprinter platform. Every component chosen for reliability and comfort on serious Australian roads.\n\nContact us for the full specification sheet and to discuss your build."
+  },
+  {
+    "slug": "sunpatch-15xc-couples-offroad-van",
+    "title": "Sunpatch 15-XC Couples Off-Road Van",
+    "price": "$78,888",
+    "status": "available",
+    "category": "caravan",
+    "tagline": "The ultimate couples' off-road caravan. Built tough, finished beautifully.",
+    "keySpecs": [
+      {
+        "label": "Length",
+        "value": "15 ft (4.57m)"
+      },
+      {
+        "label": "TARE",
+        "value": "~1,800 kg"
+      },
+      {
+        "label": "Sleeps",
+        "value": "2 adults"
+      },
+      {
+        "label": "Construction",
+        "value": "Full composite"
+      }
+    ],
+    "description": "The **Sunpatch 15-XC** is ByondRV's most popular couples caravan — and it's easy to see why. Engineered at our Queensland workshop, every 15-XC is built from full composite panels for a lighter, stronger shell that laughs off corrugated outback tracks.\n\nInside, you'll find a fixed queen island bed,"
+  },
+  {
+    "slug": "sunpatch-19xc-hardtop-couples-offroad-van",
+    "title": "Sunpatch 19-XC Hardtop Couples Off-Road Van",
+    "price": "POA",
+    "status": "coming-soon",
+    "category": "caravan",
+    "tagline": "Bigger, tougher, and coming soon. Register your interest now.",
+    "keySpecs": [
+      {
+        "label": "Length",
+        "value": "~19 ft"
+      },
+      {
+        "label": "Status",
+        "value": "Coming Soon"
+      },
+      {
+        "label": "Construction",
+        "value": "Full composite hardtop"
+      }
+    ],
+    "description": "The **Sunpatch 19-XC Hardtop** is coming. A bigger, better-equipped evolution of our popular 15-XC — hardtop composite construction, expanded living, and the same go-anywhere off-road capability ByondRV is known for.\n\nRegister your interest below and we'll reach out the moment it's ready."
+  },
+  {
+    "slug": "sunpatch-21xf-hardtop-family-offroad-van",
+    "title": "Sunpatch 21-XF Hardtop Family Off-Road Van",
+    "price": "POA",
+    "status": "coming-soon",
+    "category": "caravan",
+    "tagline": "Family adventure without compromise. Coming soon.",
+    "keySpecs": [
+      {
+        "label": "Length",
+        "value": "~21 ft"
+      },
+      {
+        "label": "Sleeps",
+        "value": "Family (TBC)"
+      },
+      {
+        "label": "Status",
+        "value": "Coming Soon"
+      }
+    ],
+    "description": "The **Sunpatch 21-XF Hardtop** brings ByondRV's off-road DNA to families who refuse to leave the kids behind. Coming soon — register your interest and be first in the queue."
+  }
+]
