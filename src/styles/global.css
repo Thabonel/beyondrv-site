@@ -1035,6 +1035,51 @@ footer {
   .build-step-body { padding: 1.5rem 1.25rem; }
 }
 
+/* ─── TESTIMONIALS ─── */
+.testimonials-section {
+  padding: 6rem var(--gutter);
+  background: var(--dark);
+  border-top: 1px solid var(--border);
+}
+.testimonials-section .container { max-width: var(--max-width); margin: 0 auto; }
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+.testimonial-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.testimonial-quote {
+  font-size: 0.95rem;
+  color: var(--white);
+  line-height: 1.75;
+  font-style: italic;
+}
+.testimonial-quote::before { content: '\201C'; color: var(--orange); font-size: 2rem; line-height: 0; vertical-align: -0.5rem; margin-right: 0.15rem; }
+.testimonial-author {
+  font-size: 0.8rem;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.testimonial-author strong { color: var(--white); font-weight: 600; font-style: normal; }
+
+@media (max-width: 1024px) {
+  .testimonials-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .testimonials-grid { grid-template-columns: 1fr; }
+}
+
 /* ─── RESPONSIVE ─── */
 @media (max-width: 1024px) {
   .truck-grid { grid-template-columns: repeat(2, 1fr); }
