@@ -49,7 +49,14 @@ export const handler: Handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  const { messages, productSlug, pageTitle } = JSON.parse(event.body ?? '{}') as {
+  let parsed: { messages?: unknown; productSlug?: unknown; pageTitle?: unknown };
+  try {
+    parsed = JSON.parse(event.body ?? '{}');
+  } catch {
+    return { statusCode: 400, body: 'Bad Request' };
+  }
+
+  const { messages, productSlug, pageTitle } = parsed as {
     messages: Array<{ role: 'user' | 'assistant'; content: string }>;
     productSlug?: string;
     pageTitle?: string;
@@ -59,6 +66,9 @@ export const handler: Handler = async (event) => {
     return { statusCode: 400, body: 'Bad Request' };
   }
 
+  const safeSlug = typeof productSlug === 'string' ? productSlug.slice(0, 100) : undefined;
+  const safeTitle = typeof pageTitle === 'string' ? pageTitle.slice(0, 200) : undefined;
+
   if (messages.length > 30) {
     return {
       statusCode: 200,
@@ -67,7 +77,7 @@ export const handler: Handler = async (event) => {
     };
   }
 
-  const systemPrompt = buildSystemPrompt(productSlug, pageTitle);
+  const systemPrompt = buildSystemPrompt(safeSlug, safeTitle);
 
   try {
     let fullText = '';

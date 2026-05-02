@@ -11,6 +11,10 @@ interface Message {
   content: string;
 }
 
+const SESSION_CAP = 30;
+const TIMEOUT_MS = 15000;
+const FALLBACK_ERROR = "Something went wrong — try again or hit 'Talk to a human'.";
+
 export default function SiteChatWidget({ pageTitle, productSlug, productName }: Props) {
   const initialGreeting = productName
     ? `Got questions about the ${productName}? Ask away.`
@@ -23,13 +27,20 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  // Scroll to bottom on new messages
+  const isCapped = messages.length >= SESSION_CAP;
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
-  // Escape key closes panel
+  useEffect(() => {
+    if (isOpen) {
+      inputRef.current?.focus();
+    }
+  }, [isOpen]);
+
   useEffect(() => {
     if (!isOpen) return;
     function onKeyDown(e: KeyboardEvent) {
@@ -57,7 +68,7 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
 
   async function sendMessage() {
     const text = input.trim();
-    if (!text || loading) return;
+    if (!text || loading || isCapped) return;
 
     setInput('');
     setLoading(true);
@@ -73,30 +84,26 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
 
     const controller = new AbortController();
 
-    // 15-second timeout
     const timeoutId = setTimeout(() => {
       controller.abort();
       setMessages(prev => [
         ...prev,
-        {
-          role: 'assistant',
-          content:
-            "Sorry, I hit a snag. Try again or hit 'Talk to a human' to reach the team directly.",
-        },
+        { role: 'assistant', content: "Sorry, I hit a snag. Try again or hit 'Talk to a human' to reach the team directly." },
       ]);
       setLoading(false);
-    }, 15000);
+    }, TIMEOUT_MS);
+
     try {
       const response = await fetch('/.netlify/functions/site-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: updatedMessages,
-          productSlug,
-          pageTitle,
-        }),
+        body: JSON.stringify({ messages: updatedMessages, productSlug, pageTitle }),
         signal: controller.signal,
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
 
       const reader = response.body?.getReader();
       if (!reader) throw new Error('No response body');
@@ -113,20 +120,19 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
           accumulated += decoder.decode(value, { stream: !done });
         }
 
-        // Process all complete SSE lines in the accumulated buffer
         const lines = accumulated.split('\n');
-        // Keep the last (possibly incomplete) line for the next iteration
         accumulated = lines.pop() ?? '';
 
         for (const line of lines) {
           if (!line.startsWith('data: ')) continue;
-          const payload = line.slice(6); // strip "data: "
+          const payload = line.slice(6);
 
           if (payload === '[DONE]') {
             clearTimeout(timeoutId);
+            reader.cancel();
             setMessages(prev => [
               ...prev,
-              { role: 'assistant', content: finalText },
+              { role: 'assistant', content: finalText || FALLBACK_ERROR },
             ]);
             setLoading(false);
             return;
@@ -134,43 +140,31 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
 
           if (payload === '[ERROR]') {
             clearTimeout(timeoutId);
+            reader.cancel();
             setMessages(prev => [
               ...prev,
-              {
-                role: 'assistant',
-                content:
-                  "Something went wrong — try again or hit 'Talk to a human'.",
-              },
+              { role: 'assistant', content: FALLBACK_ERROR },
             ]);
             setLoading(false);
             return;
           }
 
-          // Decode escaped newlines
           finalText += payload.replace(/\\n/g, '\n');
         }
       }
 
-      // If stream ended without [DONE], still surface whatever we have
       clearTimeout(timeoutId);
-      if (finalText) {
-        setMessages(prev => [
-          ...prev,
-          { role: 'assistant', content: finalText },
-        ]);
-      }
+      setMessages(prev => [
+        ...prev,
+        { role: 'assistant', content: finalText || FALLBACK_ERROR },
+      ]);
       setLoading(false);
     } catch (err: unknown) {
       clearTimeout(timeoutId);
-      // AbortError means the timeout fired and already handled state
       if (err instanceof Error && err.name === 'AbortError') return;
       setMessages(prev => [
         ...prev,
-        {
-          role: 'assistant',
-          content:
-            "Something went wrong — try again or hit 'Talk to a human'.",
-        },
+        { role: 'assistant', content: FALLBACK_ERROR },
       ]);
       setLoading(false);
     }
@@ -183,29 +177,20 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
       message_count: messages.length,
     });
 
-    const lastAssistant = [...messages]
-      .reverse()
-      .find(m => m.role === 'assistant');
+    const lastAssistant = [...messages].reverse().find(m => m.role === 'assistant');
     const encoded = encodeURIComponent(lastAssistant?.content ?? '');
     window.open(`/inquiry-form/?message=${encoded}`, '_blank', 'noopener,noreferrer');
   }
 
   return (
     <div className="chat-widget">
-      {/* Toggle button — always visible */}
       <button
         className="chat-widget-btn"
         onClick={togglePanel}
         aria-label={isOpen ? 'Close chat' : 'Open chat'}
         aria-expanded={isOpen}
       >
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
             fill="currentColor"
@@ -213,61 +198,46 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
         </svg>
       </button>
 
-      {/* Panel — conditionally rendered when isOpen */}
       {isOpen && (
         <div
           className="chat-panel"
           role="dialog"
           aria-label="ByondRV chat assistant"
+          aria-modal="true"
         >
-          {/* Header */}
           <div className="chat-panel-header">
             <span>ByondRV Assistant</span>
             <button className="chat-human-btn" onClick={handleHandoff}>
               Talk to a human →
             </button>
-            <button
-              className="chat-close-btn"
-              onClick={() => setIsOpen(false)}
-            >
+            <button className="chat-close-btn" onClick={() => setIsOpen(false)}>
               ✕
             </button>
           </div>
 
-          {/* Messages */}
           <div className="chat-messages" role="log" aria-live="polite">
             {messages.map((m, i) => (
-              <div
-                key={i}
-                className={`chat-bubble chat-bubble-${m.role}`}
-              >
+              <div key={i} className={`chat-bubble chat-bubble-${m.role}`}>
                 {m.content}
               </div>
             ))}
             {loading && (
-              <div className="chat-bubble chat-bubble-assistant chat-loading">
-                …
-              </div>
+              <div className="chat-bubble chat-bubble-assistant chat-loading">…</div>
             )}
             <div ref={bottomRef} />
           </div>
 
-          {/* Input bar */}
           <div className="chat-input-bar">
             <input
+              ref={inputRef}
               aria-label="Your message"
               value={input}
               onChange={e => setInput(e.target.value)}
-              onKeyDown={e =>
-                e.key === 'Enter' && !e.shiftKey && sendMessage()
-              }
-              placeholder="Ask anything…"
-              disabled={loading}
+              onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+              placeholder={isCapped ? 'Session limit reached' : 'Ask anything…'}
+              disabled={loading || isCapped}
             />
-            <button
-              onClick={sendMessage}
-              disabled={loading || !input.trim()}
-            >
+            <button onClick={sendMessage} disabled={loading || isCapped || !input.trim()}>
               →
             </button>
           </div>
