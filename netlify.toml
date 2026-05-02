@@ -1,5 +1,5 @@
 [build]
-  command   = "node scripts/build-product-catalogue.mjs && npm run build"
+  command   = "node SCRIPTS/build-product-catalogue.mjs && npm run build"
   publish   = "dist"
 
 [build.environment]
