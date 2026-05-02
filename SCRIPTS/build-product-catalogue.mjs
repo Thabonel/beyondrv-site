@@ -2,11 +2,11 @@
  * Build-time script: generates netlify/functions/product-catalogue.json
  * Run before astro build so the Netlify function can import it at deploy time.
  *
- * Usage:  node scripts/build-product-catalogue.mjs
+ * Usage:  node SCRIPTS/build-product-catalogue.mjs
  */
 
-import { readFileSync, writeFileSync, readdirSync } from 'fs';
-import { join, relative } from 'path';
+import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'fs';
+import { join, relative, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import matter from 'gray-matter';
 
@@ -38,16 +38,22 @@ function slugFromPath(filePath) {
   return rel.replace(/\.md$/, '');
 }
 
+if (!existsSync(PRODUCTS_DIR)) {
+  console.error(`Error: products directory not found: ${PRODUCTS_DIR}`);
+  process.exit(1);
+}
+
 const mdFiles = collectMdFiles(PRODUCTS_DIR);
 
 const catalogue = mdFiles.map((filePath) => {
-  const raw = readFileSync(filePath, 'utf-8');
-  const { data, content } = matter(raw);
+  const fileContent = readFileSync(filePath, 'utf-8');
+  const { data, content } = matter(fileContent);
 
   const slug = slugFromPath(filePath);
 
-  // Truncate markdown body to first 300 chars (after frontmatter), trimmed
-  const description = content.trim().slice(0, 300).trimEnd();
+  // Truncate markdown body to 300 chars, backing up to a word boundary
+  const truncated = content.trim().slice(0, 300);
+  const description = truncated.length === 300 ? truncated.replace(/\s+\S*$/, '') + '…' : truncated;
 
   // Keep only the first 4 keySpecs to save tokens
   const keySpecs = Array.isArray(data.keySpecs) ? data.keySpecs.slice(0, 4) : [];
@@ -67,6 +73,7 @@ const catalogue = mdFiles.map((filePath) => {
 // Sort for deterministic output (slug alphabetical)
 catalogue.sort((a, b) => a.slug.localeCompare(b.slug));
 
+mkdirSync(dirname(OUTPUT_FILE), { recursive: true });
 writeFileSync(OUTPUT_FILE, JSON.stringify(catalogue, null, 2) + '\n', 'utf-8');
 
 console.log(`✓ Product catalogue written: ${OUTPUT_FILE}`);
