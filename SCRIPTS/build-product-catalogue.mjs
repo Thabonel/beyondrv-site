@@ -5,7 +5,7 @@
  * Usage:  node scripts/build-product-catalogue.mjs
  */
 
-import { readFileSync, writeFileSync, readdirSync, statSync } from 'fs';
+import { readFileSync, writeFileSync, readdirSync } from 'fs';
 import { join, relative } from 'path';
 import { fileURLToPath } from 'url';
 import matter from 'gray-matter';
