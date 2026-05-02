@@ -161,9 +161,9 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
       }
       setLoading(false);
     } catch (err: unknown) {
+      clearTimeout(timeoutId);
       // AbortError means the timeout fired and already handled state
       if (err instanceof Error && err.name === 'AbortError') return;
-      clearTimeout(timeoutId);
       setMessages(prev => [
         ...prev,
         {
@@ -187,7 +187,7 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
       .reverse()
       .find(m => m.role === 'assistant');
     const encoded = encodeURIComponent(lastAssistant?.content ?? '');
-    window.open(`/inquiry-form/?message=${encoded}`, '_blank');
+    window.open(`/inquiry-form/?message=${encoded}`, '_blank', 'noopener,noreferrer');
   }
 
   return (

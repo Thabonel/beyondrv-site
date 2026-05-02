@@ -55,6 +55,8 @@ const schemas = [productSchema, ...(faqSchema ? [faqSchema] : [])];
   canonicalUrl={data.canonicalUrl}
   structuredData={schemas}
   activePath={`/${product.slug}/`}
+  productTitle={data.title}
+  productSlug={product.slug}
 >
   <!-- Hero + Gallery -->
   <section class="product-hero-section">

@@ -5,6 +5,7 @@ import Footer from '../components/Footer.astro';
 import '../styles/global.css';
 import CookieConsent from '../components/CookieConsent';
 import PostHogProvider from '../components/PostHogProvider';
+import SiteChatWidget from '../components/SiteChatWidget';
 
 interface Props {
   title: string;
@@ -15,8 +16,10 @@ interface Props {
   canonicalUrl?: string;
   structuredData?: object | object[];
   activePath?: string;
+  productTitle?: string;
+  productSlug?: string;
 }
-const { activePath = '', ...headProps } = Astro.props;
+const { activePath = '', productTitle, productSlug, ...headProps } = Astro.props;
 ---
 <!doctype html>
 <html lang="en">
@@ -78,6 +81,7 @@ const { activePath = '', ...headProps } = Astro.props;
 
   <CookieConsent client:load />
   <PostHogProvider client:load />
+  <SiteChatWidget client:load pageTitle={headProps.title} productSlug={productSlug} productName={productTitle} />
 
   <script>
     // Custom cursor (desktop only)
