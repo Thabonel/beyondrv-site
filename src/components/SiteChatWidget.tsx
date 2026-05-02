@@ -22,7 +22,6 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [streamTimeout, setStreamTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Scroll to bottom on new messages
@@ -87,8 +86,6 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
       ]);
       setLoading(false);
     }, 15000);
-    setStreamTimeout(timeoutId);
-
     try {
       const response = await fetch('/.netlify/functions/site-chat', {
         method: 'POST',
@@ -127,7 +124,6 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
 
           if (payload === '[DONE]') {
             clearTimeout(timeoutId);
-            setStreamTimeout(null);
             setMessages(prev => [
               ...prev,
               { role: 'assistant', content: finalText },
@@ -138,7 +134,6 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
 
           if (payload === '[ERROR]') {
             clearTimeout(timeoutId);
-            setStreamTimeout(null);
             setMessages(prev => [
               ...prev,
               {
@@ -158,7 +153,6 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
 
       // If stream ended without [DONE], still surface whatever we have
       clearTimeout(timeoutId);
-      setStreamTimeout(null);
       if (finalText) {
         setMessages(prev => [
           ...prev,
@@ -170,7 +164,6 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
       // AbortError means the timeout fired and already handled state
       if (err instanceof Error && err.name === 'AbortError') return;
       clearTimeout(timeoutId);
-      setStreamTimeout(null);
       setMessages(prev => [
         ...prev,
         {
