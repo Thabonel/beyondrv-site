@@ -33,7 +33,7 @@ function buildSystemPrompt(productSlug?: string, pageTitle?: string): string {
     }
   }
 
-  const catalogueBlock = `PRODUCT CATALOGUE (all current products):\n${JSON.stringify(catalogue, null, 2)}`;
+  const catalogueBlock = `PRODUCT CATALOGUE (all current products):\n${JSON.stringify(catalogue)}`;
 
   return `${BRAND_BLOCK}\n\n${pageContext}${currentProductBlock}\n\n${catalogueBlock}`;
 }
@@ -55,9 +55,13 @@ export const handler: Handler = async (event) => {
     pageTitle?: string;
   };
 
+  if (!Array.isArray(messages)) {
+    return { statusCode: 400, body: 'Bad Request' };
+  }
+
   if (messages.length > 30) {
     return {
-      statusCode: 429,
+      statusCode: 200,
       headers: sseHeaders,
       body: "data: I've reached my session limit — hit \"Talk to a human\" above to reach the team directly.\n\ndata: [DONE]\n\n",
     };
@@ -84,12 +88,14 @@ export const handler: Handler = async (event) => {
       }
     }
 
+    const encoded = fullText.replace(/\n/g, '\\n');
     return {
       statusCode: 200,
       headers: sseHeaders,
-      body: `data: ${fullText}\n\ndata: [DONE]\n\n`,
+      body: `data: ${encoded}\n\ndata: [DONE]\n\n`,
     };
-  } catch {
+  } catch (err) {
+    console.error('[site-chat] Anthropic stream error:', err);
     return {
       statusCode: 500,
       headers: sseHeaders,
