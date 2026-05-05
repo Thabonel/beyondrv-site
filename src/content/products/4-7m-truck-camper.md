@@ -6,15 +6,20 @@ price: "POA"
 status: available
 onSale: false
 featured: false
-heroImage: "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-01-1024x678.jpg"
+heroImage: "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-01-scaled.jpg"
 gallery:
-  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-04-1024x678.jpg"
-  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-09-1024x678.jpg"
-  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-13-1024x678.jpg"
-  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-20-1024x678.jpg"
-  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-22-1024x678.jpg"
-  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-24-1024x678.jpg"
-  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-28-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-02-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-03-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-06-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-07-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-08-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-11-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-12-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-13-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-14-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-16-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-17-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-18-scaled.jpg"
 keySpecs:
   - label: "Base length"
     value: "4,700mm"
