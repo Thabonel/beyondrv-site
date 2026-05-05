@@ -9,6 +9,14 @@ node_modules/
 dist/
 .astro/
 
-# Large product images — deployed via Netlify CLI, not git
-public/images/products/
+# Large product images — most served from WordPress CDN or deployed via Netlify CLI
+# Only commit small hand-supplied folders that have no CDN source
+public/images/products/*
+!public/images/products/isuzu-nps
+!public/images/products/isuzu-nps/**
+!public/images/products/mercedes-sprinter
+!public/images/products/mercedes-sprinter/**
 
+
+# Local Netlify folder
+.netlify
