@@ -7,7 +7,8 @@ status: available
 onSale: false
 featured: true
 heroImage: "/images/products/mercedes-sprinter/mercedes-sprinter-01.jpg"
-gallery: []
+gallery:
+  - "/images/products/mercedes-sprinter/mercedes-sprinter-02.jpg"
 keySpecs:
   - label: "Base vehicle"
     value: "Mercedes-Benz Sprinter"
