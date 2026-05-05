@@ -6,7 +6,7 @@ price: "$225,000"
 status: available
 onSale: false
 featured: true
-heroImage: "/images/products/mercedes-sprinter/placeholder-sprinter.jpg"
+heroImage: "/images/products/mercedes-sprinter/mercedes-sprinter-01.jpg"
 gallery: []
 keySpecs:
   - label: "Base vehicle"
