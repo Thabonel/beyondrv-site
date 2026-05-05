@@ -6,8 +6,16 @@ price: "POA"
 status: available
 onSale: false
 featured: false
-heroImage: "/images/site/hero-02.jpg"
-gallery: []
+heroImage: "/images/products/isuzu-nps/isuzu-nps-03.jpg"
+gallery:
+  - "/images/products/isuzu-nps/isuzu-nps-02.jpg"
+  - "/images/products/isuzu-nps/isuzu-nps-04.jpg"
+  - "/images/products/isuzu-nps/isuzu-nps-06.jpg"
+  - "/images/products/isuzu-nps/isuzu-nps-07.jpg"
+  - "/images/products/isuzu-nps/isuzu-nps-09.jpg"
+  - "/images/products/isuzu-nps/isuzu-nps-10.jpg"
+  - "/images/products/isuzu-nps/isuzu-nps-11.jpg"
+  - "/images/products/isuzu-nps/isuzu-nps-12.jpg"
 keySpecs:
   - label: "Platform"
     value: "Isuzu NPS"
