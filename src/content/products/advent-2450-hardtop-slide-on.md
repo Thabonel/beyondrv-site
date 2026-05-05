@@ -6,12 +6,17 @@ price: "$72,000"
 status: available
 onSale: false
 featured: true
-heroImage: "/images/products/advent-2450/advent-2450-01.jpg"
+heroImage: "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-01-1024x678.jpg"
 gallery:
-  - "/images/products/advent-2450/advent-2450-02.jpg"
-  - "/images/products/advent-2450/advent-2450-03.jpg"
-  - "/images/products/advent-2450/advent-2450-04.jpg"
-  - "/images/products/advent-2450/advent-2450-05.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-02-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-03-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-04-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-05-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-06-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-07-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-08-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-09-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-10-1024x678.jpg"
 keySpecs:
   - label: "Base length"
     value: "2,450mm"

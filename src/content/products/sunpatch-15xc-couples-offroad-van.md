@@ -7,15 +7,19 @@ priceBadge: "IN STOCK"
 status: available
 onSale: false
 featured: true
-heroImage: "/images/products/sunpatch-15xc/sunpatch-15xc-01.jpg"
+heroImage: "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-01-768x509.jpg"
 gallery:
-  - "/images/products/sunpatch-15xc/sunpatch-15xc-02.jpg"
-  - "/images/products/sunpatch-15xc/sunpatch-15xc-03.jpg"
-  - "/images/products/sunpatch-15xc/sunpatch-15xc-04.jpg"
-  - "/images/products/sunpatch-15xc/sunpatch-15xc-05.jpg"
-  - "/images/products/sunpatch-15xc/sunpatch-15xc-06.jpg"
-  - "/images/products/sunpatch-15xc/sunpatch-15xc-07.jpg"
-  - "/images/products/sunpatch-15xc/sunpatch-15xc-08.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-02-768x509.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-03-768x509.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-04-768x509.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-05-768x509.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-06-768x509.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-07-768x509.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-08-768x509.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-09-768x509.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-10-768x509.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-11-768x509.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-12-768x509.jpg"
 keySpecs:
   - label: "Length"
     value: "15 ft (4.57m)"

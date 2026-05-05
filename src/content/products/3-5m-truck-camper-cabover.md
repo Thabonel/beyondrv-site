@@ -6,10 +6,17 @@ price: "$60,000"
 status: available
 onSale: false
 featured: false
-heroImage: "/images/products/3-5m-cabover/3-5m-cabover-01.jpg"
+heroImage: "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-01-scaled.jpg"
 gallery:
-  - "/images/products/3-5m-cabover/3-5m-cabover-02.jpg"
-  - "/images/products/3-5m-cabover/3-5m-cabover-03.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-02-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-03-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-04-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-05-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-06-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-07-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-08-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-09-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-10-scaled.jpg"
 keySpecs:
   - label: "Base length"
     value: "3,500mm"

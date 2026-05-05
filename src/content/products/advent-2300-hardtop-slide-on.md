@@ -6,11 +6,17 @@ price: "$72,000"
 status: available
 onSale: false
 featured: false
-heroImage: "/images/products/advent-2300/advent-2300-01.jpg"
+heroImage: "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-01-1024x678.jpg"
 gallery:
-  - "/images/products/advent-2300/advent-2300-02.jpg"
-  - "/images/products/advent-2300/advent-2300-03.jpg"
-  - "/images/products/advent-2300/advent-2300-04.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-02-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-03-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-04-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-05-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-06-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-07-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-08-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-09-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-10-1024x678.jpg"
 keySpecs:
   - label: "Base length"
     value: "2,300mm"

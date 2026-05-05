@@ -6,11 +6,17 @@ price: "$62,000"
 status: available
 onSale: false
 featured: false
-heroImage: "/images/products/3-5m-poptop/truck-3.5m-box-01.jpg"
+heroImage: "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-01-scaled.jpg"
 gallery:
-  - "/images/products/3-5m-poptop/truck-3.5m-box-02.jpg"
-  - "/images/products/3-5m-poptop/truck-3.5m-box-03.jpg"
-  - "/images/products/3-5m-poptop/truck-3.5m-box-04.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-05-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-06-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-08-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-09-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-10-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-11-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-13-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-14-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-16-scaled.jpg"
 keySpecs:
   - label: "Base length"
     value: "3,500mm"

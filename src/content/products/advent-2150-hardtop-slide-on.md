@@ -7,14 +7,17 @@ priceBadge: "IN STOCK"
 status: on-sale
 onSale: true
 featured: true
-heroImage: "/images/products/advent-2150/advent-2150-01.jpg"
+heroImage: "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-01-1024x678.jpg"
 gallery:
-  - "/images/products/advent-2150/advent-2150-03.jpg"
-  - "/images/products/advent-2150/advent-2150-04.jpg"
-  - "/images/products/advent-2150/advent-2150-05.jpg"
-  - "/images/products/advent-2150/advent-2150-06.jpg"
-  - "/images/products/advent-2150/advent-2150-07.jpg"
-  - "/images/products/advent-2150/advent-2150-08.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-02-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-03-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-04-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-05-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-06-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-07-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-08-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-09-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-10-1024x678.jpg"
 keySpecs:
   - label: "Base length"
     value: "2,150mm"

@@ -6,11 +6,15 @@ price: "POA"
 status: available
 onSale: false
 featured: false
-heroImage: "/images/products/4-7m-truck-camper/4-7m-truck-camper-01.jpg"
+heroImage: "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-01-1024x678.jpg"
 gallery:
-  - "/images/products/4-7m-truck-camper/4-7m-truck-camper-02.jpg"
-  - "/images/products/4-7m-truck-camper/4-7m-truck-camper-03.jpg"
-  - "/images/products/4-7m-truck-camper/4-7m-truck-camper-04.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-04-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-09-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-13-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-20-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-22-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-24-1024x678.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-28-1024x678.jpg"
 keySpecs:
   - label: "Base length"
     value: "4,700mm"

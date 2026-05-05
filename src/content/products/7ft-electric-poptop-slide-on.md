@@ -6,10 +6,8 @@ price: "$54,800"
 status: available
 onSale: false
 featured: false
-heroImage: "/images/products/7ft-poptop/4.6m-poptop-truck-camper-01.jpg"
-gallery:
-  - "/images/products/7ft-poptop/4.6m-poptop-truck-camper-02.jpg"
-  - "/images/products/7ft-poptop/4.6m-poptop-truck-camper-03.jpg"
+heroImage: "https://beyondrv.com.au/wp-content/uploads/2024/10/20240924_105534-768x432.jpg"
+gallery: []
 keySpecs:
   - label: "Base length"
     value: "4,600mm"
