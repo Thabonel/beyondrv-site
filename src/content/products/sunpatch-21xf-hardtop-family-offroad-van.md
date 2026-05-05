@@ -15,6 +15,19 @@ keySpecs:
     value: "Family (TBC)"
   - label: "Status"
     value: "Coming Soon"
+specGroups:
+  - group: "Construction Features"
+    items:
+      - label: "Body"
+        value: "Full composite hardtop"
+      - label: "Length"
+        value: "~21 ft"
+  - group: "Internal Features"
+    items:
+      - label: "Sleeping"
+        value: "Family configuration (TBC)"
+      - label: "Bathroom"
+        value: "Full ensuite"
 features:
   - "Hardtop composite construction"
   - "Family sleeping configuration"
@@ -23,8 +36,8 @@ features:
 relatedSlugs:
   - "sunpatch-15xc-couples-offroad-van"
   - "sunpatch-19xc-hardtop-couples-offroad-van"
-seoTitle: "Sunpatch 21-XF Hardtop Family Off-Road Van | Coming Soon | ByondRV"
-seoDesc: "The Sunpatch 21-XF is ByondRV's upcoming hardtop family off-road van. Register your interest today."
+seoTitle: "Sunpatch 21-XF Hardtop Family Off-Road Van | Coming Soon | Beyond RV"
+seoDesc: "The Sunpatch 21-XF is Beyond RV's upcoming hardtop family off-road van. Register your interest today."
 ---
 
-The **Sunpatch 21-XF Hardtop** brings ByondRV's off-road DNA to families who refuse to leave the kids behind. Coming soon — register your interest and be first in the queue.
+The **Sunpatch 21-XF Hardtop** brings Beyond RV's off-road DNA to families who refuse to leave the kids behind. Coming soon — register your interest and be first in the queue.

@@ -18,11 +18,15 @@ keySpecs:
     value: "Full composite"
   - label: "Target trucks"
     value: "Iveco, Unimog, Isuzu"
-specs:
-  - label: "Base length"
-    value: "4,700mm"
-  - label: "Construction"
-    value: "Full composite"
+specGroups:
+  - group: "Construction Features"
+    items:
+      - label: "Body"
+        value: "Full composite"
+      - label: "Base length"
+        value: "4,700mm"
+      - label: "Target platforms"
+        value: "Iveco, Unimog, Isuzu NPS"
 features:
   - "Full composite construction"
   - "Designed for heavy-duty truck mounting"
@@ -31,8 +35,8 @@ features:
 relatedSlugs:
   - "3-5m-poptop-truck-camper"
   - "3-5m-truck-camper-cabover"
-seoTitle: "4.7m Truck Camper | ByondRV Queensland"
-seoDesc: "ByondRV's 4.7m truck camper — full composite construction, built for Iveco, Unimog, and Isuzu platform trucks. Made in Queensland."
+seoTitle: "4.7m Truck Camper | Beyond RV Queensland"
+seoDesc: "Beyond RV's 4.7m truck camper — full composite construction, built for Iveco, Unimog, and Isuzu platform trucks. Made in Queensland."
 ---
 
 The **4.7m Truck Camper** is built for the big rigs — Iveco Eurocargo, Unimog, Isuzu NPS. Full composite construction in a proper live-aboard layout for the travellers who go furthest.

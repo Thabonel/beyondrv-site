@@ -1,5 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import OptionalExtras from '../components/OptionalExtras';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -18,7 +19,7 @@ const productSchema = {
   "@type": "Product",
   "name": data.title,
   "description": data.seoDesc ?? data.tagline,
-  "brand": { "@type": "Brand", "name": "ByondRV" },
+  "brand": { "@type": "Brand", "name": "Beyond RV" },
   "image": data.heroImage,
   ...(priceNum && {
     "offers": {
@@ -28,7 +29,7 @@ const productSchema = {
       "availability": isComingSoon
         ? "https://schema.org/PreOrder"
         : "https://schema.org/InStock",
-      "seller": { "@type": "Organization", "name": "ByondRV" }
+      "seller": { "@type": "Organization", "name": "Beyond RV" }
     }
   }),
 };
@@ -48,7 +49,7 @@ const faqSchema = data.faq && data.faq.length > 0
 const schemas = [productSchema, ...(faqSchema ? [faqSchema] : [])];
 ---
 <BaseLayout
-  title={data.seoTitle ?? `${data.title} | ByondRV`}
+  title={data.seoTitle ?? `${data.title} | Beyond RV`}
   description={data.seoDesc ?? data.tagline}
   image={data.heroImage}
   type="product"
@@ -124,8 +125,32 @@ const schemas = [productSchema, ...(faqSchema ? [faqSchema] : [])];
     </div>
   </section>
 
-  <!-- Full Specs Table -->
-  {data.specs && data.specs.length > 0 && (
+  <!-- Grouped Spec Tables (preferred) -->
+  {data.specGroups && data.specGroups.length > 0 && (
+    <section class="product-specs-section container">
+      <h2 class="section-title">Specifications</h2>
+      <div class="spec-groups">
+        {data.specGroups.filter(g => g.items.length > 0).map(group => (
+          <div class="spec-group">
+            <h3 class="spec-group-title">{group.group}</h3>
+            <table class="specs-table">
+              <tbody>
+                {group.items.map(row => (
+                  <tr>
+                    <th scope="row">{row.label}</th>
+                    <td>{row.value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- Flat Specs Table (fallback when no specGroups) -->
+  {(!data.specGroups || data.specGroups.length === 0) && data.specs && data.specs.length > 0 && (
     <section class="product-specs-section container">
       <h2 class="section-title">Full Specifications</h2>
       <table class="specs-table">
@@ -139,6 +164,16 @@ const schemas = [productSchema, ...(faqSchema ? [faqSchema] : [])];
         </tbody>
       </table>
     </section>
+  )}
+
+  <!-- Optional Extras -->
+  {!isComingSoon && (
+    <OptionalExtras
+      client:load
+      basePrice={data.price}
+      productSlug={product.slug}
+      productName={data.title}
+    />
   )}
 
   <!-- Features List -->

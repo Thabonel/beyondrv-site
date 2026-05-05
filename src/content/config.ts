@@ -1,6 +1,7 @@
 import { defineCollection, z } from 'astro:content';
 
 const specRow = z.object({ label: z.string(), value: z.string() });
+const specGroup = z.object({ group: z.string(), items: z.array(specRow) });
 
 const products = defineCollection({
   type: 'content',
@@ -17,6 +18,7 @@ const products = defineCollection({
     gallery:      z.array(z.string()),
     keySpecs:     z.array(specRow),
     specs:        z.array(specRow).optional(),
+    specGroups:   z.array(specGroup).optional(),
     features:     z.array(z.string()).optional(),
     faq:          z.array(z.object({ q: z.string(), a: z.string() })).optional(),
     relatedSlugs: z.array(z.string()).optional(),

@@ -15,23 +15,25 @@ gallery:
 keySpecs:
   - label: "Base length"
     value: "2,450mm"
-  - label: "TARE"
-    value: "~800kg"
   - label: "Construction"
     value: "Full composite hardtop"
   - label: "Power"
     value: "200Ah lithium"
-specs:
-  - label: "Base length"
-    value: "2,450mm"
-  - label: "TARE weight"
-    value: "~800kg"
-  - label: "Construction"
-    value: "Full composite hardtop"
-  - label: "Battery"
-    value: "200Ah lithium"
-  - label: "Solar"
-    value: "Solar ready"
+specGroups:
+  - group: "Construction Features"
+    items:
+      - label: "Body"
+        value: "Full composite hardtop"
+      - label: "Base length"
+        value: "2,450mm"
+      - label: "Suitable vehicles"
+        value: "Dual-cab utes and trucks"
+  - group: "Electrical"
+    items:
+      - label: "Battery"
+        value: "200Ah lithium"
+      - label: "Solar"
+        value: "Solar ready"
 features:
   - "Full composite construction"
   - "Largest in the Advent range"
@@ -42,8 +44,8 @@ features:
 relatedSlugs:
   - "advent-2150-hardtop-slide-on"
   - "advent-2300-hardtop-slide-on"
-seoTitle: "Advent 2450 Hardtop Slide-On Camper | ByondRV Queensland"
-seoDesc: "The Advent 2450 hardtop slide-on from ByondRV. Maximum space, full composite, 200Ah lithium. The flagship of the Advent range."
+seoTitle: "Advent 2450 Hardtop Slide-On Camper | Beyond RV Queensland"
+seoDesc: "The Advent 2450 hardtop slide-on from Beyond RV. Maximum space, full composite, 200Ah lithium. The flagship of the Advent range."
 ---
 
 The **Advent 2450** is the flagship of the Advent slide-on range. At 2,450mm base, it provides the most interior space available in a composite slide-on that still mounts cleanly on a dual-cab ute.

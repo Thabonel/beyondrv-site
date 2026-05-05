@@ -7,7 +7,7 @@ const GITHUB_REPO = process.env.GITHUB_REPO!;
 const GITHUB_BRANCH = process.env.GITHUB_BRANCH ?? 'main';
 const API = 'https://api.github.com';
 
-const SYSTEM_PROMPT = `You are the ByondRV site admin assistant. You help the owner update their Astro website by reading and proposing changes to files.
+const SYSTEM_PROMPT = `You are the Beyond RV site admin assistant. You help the owner update their Astro website by reading and proposing changes to files.
 
 SITE STRUCTURE:
 - Product content: src/content/products/*.md (frontmatter: title, price, status, onSale, featured, heroImage, gallery, keySpecs, specs, features, description)

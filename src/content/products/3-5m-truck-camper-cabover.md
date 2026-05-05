@@ -15,19 +15,19 @@ keySpecs:
     value: "3,500mm"
   - label: "Cabover"
     value: "Extra sleeping berth"
-  - label: "TARE"
-    value: "~650kg"
   - label: "Construction"
     value: "Full composite"
-specs:
-  - label: "Base length"
-    value: "3,500mm"
-  - label: "Cabover"
-    value: "Yes — additional sleeping berth"
-  - label: "TARE weight"
-    value: "~650kg"
-  - label: "Construction"
-    value: "Full composite"
+specGroups:
+  - group: "Construction Features"
+    items:
+      - label: "Body"
+        value: "Full composite"
+      - label: "Base length"
+        value: "3,500mm"
+      - label: "Cabover"
+        value: "Additional sleeping berth"
+      - label: "Suitable vehicles"
+        value: "Mid-size trucks"
 features:
   - "Cabover extension for additional sleeping"
   - "Full composite construction"
@@ -36,8 +36,8 @@ features:
 relatedSlugs:
   - "3-5m-poptop-truck-camper"
   - "4-7m-truck-camper"
-seoTitle: "3.5m Truck Camper with Cabover | ByondRV Queensland"
-seoDesc: "ByondRV's 3.5m truck camper with cabover sleeping section. Extra berth, full composite, built in Queensland."
+seoTitle: "3.5m Truck Camper with Cabover | Beyond RV Queensland"
+seoDesc: "Beyond RV's 3.5m truck camper with cabover sleeping section. Extra berth, full composite, built in Queensland."
 ---
 
 The **3.5m Cabover Truck Camper** adds an extra sleeping berth over the cab — ideal for small families or couples who want the guest room. Same tough composite construction, same compact base.

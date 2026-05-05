@@ -566,6 +566,96 @@ nav.scrolled {
 }
 .specs-table td { color: var(--cream); background: var(--dark); }
 
+/* Grouped spec tables */
+.spec-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+.spec-group { }
+.spec-group-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 0;
+}
+.spec-group .specs-table { margin-top: 0.5rem; }
+
+/* Optional extras */
+.extras-section { padding: 3rem 0; border-top: 1px solid var(--border); }
+.extras-subtitle { color: var(--muted); margin-bottom: 2rem; font-size: 0.9rem; }
+.extras-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+.extras-category { }
+.extras-category-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 1rem;
+}
+.extras-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: var(--cream);
+}
+.extras-item:last-child { border-bottom: none; }
+.extras-checkbox {
+  width: 16px; height: 16px;
+  flex-shrink: 0;
+  accent-color: var(--orange);
+  cursor: pointer;
+}
+.extras-item-label { flex: 1; line-height: 1.4; }
+.extras-item-price {
+  color: var(--orange);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.extras-total-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.75rem;
+  flex-wrap: wrap;
+}
+.extras-total-breakdown {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+.extras-total-breakdown strong { color: var(--white); }
+.extras-plus { color: var(--border); font-size: 1.1rem; }
+.extras-grand-total { font-size: 1.1rem; color: var(--white); }
+.extras-grand-total strong { color: var(--orange); font-size: 1.25rem; }
+.extras-enquire-btn { white-space: nowrap; flex-shrink: 0; }
+
+@media (max-width: 768px) {
+  .spec-groups { grid-template-columns: 1fr; }
+  .extras-grid { grid-template-columns: 1fr; }
+  .extras-total-bar { flex-direction: column; align-items: flex-start; }
+}
+
 .product-features-section { padding: 3rem 0; }
 .features-list {
   list-style: none; margin-top: 2rem;

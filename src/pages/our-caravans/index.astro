@@ -10,7 +10,7 @@ const products = (await getCollection('products'))
 const schema = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
-  "name": "ByondRV Off-Road Caravans",
+  "name": "Beyond RV Off-Road Caravans",
   "url": "https://beyondrv.com.au/our-caravans/",
   "hasPart": products.map(p => ({
     "@type": "Product",
@@ -20,8 +20,8 @@ const schema = {
 };
 ---
 <BaseLayout
-  title="Off-Road Caravans | ByondRV Queensland"
-  description="ByondRV builds composite off-road caravans for couples and families. The Sunpatch range — built in Queensland for serious Australian travel."
+  title="Off-Road Caravans | Beyond RV Queensland"
+  description="Beyond RV builds composite off-road caravans for couples and families. The Sunpatch range — built in Queensland for serious Australian travel."
   image="/images/products/sunpatch-15xc/sunpatch-15xc-01.jpg"
   activePath="/our-caravans/"
   structuredData={schema}

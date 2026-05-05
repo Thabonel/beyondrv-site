@@ -18,7 +18,7 @@ const FALLBACK_ERROR = "Something went wrong — try again or hit 'Talk to a hum
 export default function SiteChatWidget({ pageTitle, productSlug, productName }: Props) {
   const initialGreeting = productName
     ? `Got questions about the ${productName}? Ask away.`
-    : "Hi! I'm the ByondRV assistant. Ask me anything about our campers and caravans.";
+    : "Hi! I'm the Beyond RV assistant. Ask me anything about our campers and caravans.";
 
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -202,11 +202,11 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
         <div
           className="chat-panel"
           role="dialog"
-          aria-label="ByondRV chat assistant"
+          aria-label="Beyond RV chat assistant"
           aria-modal="true"
         >
           <div className="chat-panel-header">
-            <span>ByondRV Assistant</span>
+            <span>Beyond RV Assistant</span>
             <button className="chat-human-btn" onClick={handleHandoff}>
               Talk to a human →
             </button>

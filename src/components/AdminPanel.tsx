@@ -15,7 +15,7 @@ type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
 
 export default function AdminPanel() {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: "Hi! I'm the ByondRV admin assistant. Tell me what you'd like to change on the site." }
+    { role: 'assistant', content: "Hi! I'm the Beyond RV admin assistant. Tell me what you'd like to change on the site." }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);

@@ -14,7 +14,7 @@ const products = (await getCollection('products'))
 const schema = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
-  "name": "ByondRV Slide-On Campers",
+  "name": "Beyond RV Slide-On Campers",
   "url": "https://beyondrv.com.au/our-slide-on-campers/",
   "hasPart": products.map(p => ({
     "@type": "Product",
@@ -24,8 +24,8 @@ const schema = {
 };
 ---
 <BaseLayout
-  title="Slide-On Campers for Utes & Trucks | ByondRV Queensland"
-  description="ByondRV slide-on campers — hardtop and pop-top for utes, mid-size trucks, and expedition vehicles. The Advent range and more. Built in Queensland."
+  title="Slide-On Campers for Utes & Trucks | Beyond RV Queensland"
+  description="Beyond RV slide-on campers — hardtop and pop-top for utes, mid-size trucks, and expedition vehicles. The Advent range and more. Built in Queensland."
   image="/images/products/advent-2150/advent-2150-01.jpg"
   activePath="/our-slide-on-campers/"
   structuredData={schema}

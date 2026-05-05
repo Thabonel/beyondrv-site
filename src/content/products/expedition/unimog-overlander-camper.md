@@ -19,15 +19,17 @@ keySpecs:
     value: "Portal axles — extreme clearance"
   - label: "Price"
     value: "POA"
-specs:
-  - label: "Platform"
-    value: "Mercedes-Benz Unimog U300/U400/U4000"
-  - label: "Construction"
-    value: "Full composite expedition body"
-  - label: "Drive"
-    value: "4WD with portal axles"
-  - label: "Price"
-    value: "POA — contact for build specification"
+specGroups:
+  - group: "Construction Features"
+    items:
+      - label: "Platform"
+        value: "Mercedes-Benz Unimog U300/U400/U4000"
+      - label: "Body"
+        value: "Full composite expedition body"
+      - label: "Drive"
+        value: "4WD with portal axles"
+      - label: "Build type"
+        value: "Custom to order"
 features:
   - "Built on the legendary Mercedes-Benz Unimog platform"
   - "Portal axle drive for extreme terrain clearance"
@@ -38,10 +40,10 @@ features:
 relatedSlugs:
   - "expedition/unimog-poptop-camper"
   - "expedition/isuzu-nps-cabover-camper"
-seoTitle: "Unimog Overlander Camper | ByondRV Expedition Vehicles Queensland"
-seoDesc: "ByondRV's Unimog Overlander Camper. Full composite expedition body on the Mercedes-Benz Unimog platform. Built for where roads end."
+seoTitle: "Unimog Overlander Camper | Beyond RV Expedition Vehicles Queensland"
+seoDesc: "Beyond RV's Unimog Overlander Camper. Full composite expedition body on the Mercedes-Benz Unimog platform. Built for where roads end."
 ---
 
-The **Unimog Overlander** is ByondRV's most extreme build. Mounted on the legendary Mercedes-Benz Unimog with portal axles, this is the expedition vehicle for people who genuinely leave all roads behind.
+The **Unimog Overlander** is Beyond RV's most extreme build. Mounted on the legendary Mercedes-Benz Unimog with portal axles, this is the expedition vehicle for people who genuinely leave all roads behind.
 
 Full composite body, complete live-aboard spec, custom-built to order. Contact us to discuss your build.

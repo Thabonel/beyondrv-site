@@ -17,13 +17,17 @@ keySpecs:
     value: "4WD"
   - label: "Price"
     value: "POA"
-specs:
-  - label: "Platform"
-    value: "Isuzu NPS 4WD"
-  - label: "Construction"
-    value: "Full composite body"
-  - label: "Price"
-    value: "POA — contact for specification"
+specGroups:
+  - group: "Construction Features"
+    items:
+      - label: "Platform"
+        value: "Isuzu NPS 4WD"
+      - label: "Body"
+        value: "Full composite expedition body"
+      - label: "Build"
+        value: "Cabover — maximises living space"
+      - label: "Build type"
+        value: "Custom to order"
 features:
   - "Built on Isuzu NPS 4WD platform"
   - "Full composite expedition body"
@@ -33,8 +37,8 @@ features:
 relatedSlugs:
   - "expedition/isuzu-nps-poptop-camper"
   - "expedition/unimog-overlander-camper"
-seoTitle: "Isuzu NPS Cabover Expedition Camper | ByondRV Queensland"
-seoDesc: "ByondRV Isuzu NPS cabover expedition camper. Serious 4WD truck platform with custom composite body. Nationwide Isuzu dealer network."
+seoTitle: "Isuzu NPS Cabover Expedition Camper | Beyond RV Queensland"
+seoDesc: "Beyond RV Isuzu NPS cabover expedition camper. Serious 4WD truck platform with custom composite body. Nationwide Isuzu dealer network."
 ---
 
 The **Isuzu NPS Cabover** gives you serious expedition capability on a platform you can service anywhere in Australia. Full composite body, cabover design for maximum living space, and the Isuzu NPS's proven 4WD drivetrain.
