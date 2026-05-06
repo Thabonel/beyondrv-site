@@ -6,7 +6,7 @@ price: "POA"
 status: available
 onSale: false
 featured: false
-heroImage: "/images/products/unimog-poptop/unimog-poptop-01.jpg"
+heroImage: "/images/products/unimog-poptop/unimog-poptop-15.jpg"
 gallery:
   - "/images/products/unimog-poptop/unimog-poptop-02.jpg"
   - "/images/products/unimog-poptop/unimog-poptop-03.jpg"
