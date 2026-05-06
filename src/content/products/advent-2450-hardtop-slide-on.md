@@ -3,8 +3,9 @@ title: "Advent 2450 Hardtop Slide-On"
 category: slide-on
 tagline: "Maximum space. Maximum off-road credibility."
 price: "$72,000"
-status: available
-onSale: false
+priceBadge: "IN MELBOURNE"
+status: on-sale
+onSale: true
 featured: true
 heroImage: "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-01-1024x678.jpg"
 gallery:

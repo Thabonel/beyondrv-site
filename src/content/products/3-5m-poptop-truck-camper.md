@@ -2,9 +2,10 @@
 title: "3.5m Pop-Top Truck Camper"
 category: slide-on
 tagline: "Low profile. Big living."
-price: "$62,000"
-status: available
-onSale: false
+price: "$49,999"
+priceBadge: "ONE OFF SPECIAL"
+status: on-sale
+onSale: true
 featured: false
 heroImage: "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-01-scaled.jpg"
 gallery:

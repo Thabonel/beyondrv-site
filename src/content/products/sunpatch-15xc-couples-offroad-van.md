@@ -3,9 +3,9 @@ title: "Sunpatch 15-XC Couples Off-Road Van"
 category: caravan
 tagline: "The ultimate couples' off-road caravan. Built tough, finished beautifully."
 price: "$78,888"
-priceBadge: "IN STOCK"
-status: available
-onSale: false
+priceBadge: "COUPLES CARAVAN"
+status: on-sale
+onSale: true
 featured: true
 heroImage: "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-01-768x509.jpg"
 gallery:

@@ -2,9 +2,10 @@
 title: "3.5m Truck Camper with Cabover"
 category: slide-on
 tagline: "Extra sleeping. Same tough footprint."
-price: "$60,000"
-status: available
-onSale: false
+price: "$44,999"
+priceBadge: "ONE OFF SPECIAL"
+status: on-sale
+onSale: true
 featured: false
 heroImage: "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-01-scaled.jpg"
 gallery:

@@ -3,8 +3,9 @@ title: "Mercedes Sprinter Motorhome"
 category: slide-on
 tagline: "The ultimate self-contained adventure vehicle. Custom built on Mercedes Sprinter."
 price: "$225,000"
-status: available
-onSale: false
+priceBadge: "PREMIUM MOTORHOME"
+status: on-sale
+onSale: true
 featured: true
 heroImage: "/images/products/mercedes-sprinter/mercedes-sprinter-01.jpg"
 gallery:

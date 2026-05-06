@@ -3,7 +3,6 @@ title: "Advent 2150 Hardtop Slide-On"
 category: slide-on
 tagline: "Compact, capable, and ready to go right now."
 price: "$72,000"
-priceBadge: "IN STOCK"
 status: on-sale
 onSale: true
 featured: true
