@@ -16,6 +16,8 @@ public/images/products/*
 !public/images/products/isuzu-nps/**
 !public/images/products/mercedes-sprinter
 !public/images/products/mercedes-sprinter/**
+!public/images/products/unimog-poptop
+!public/images/products/unimog-poptop/**
 
 
 # Local Netlify folder
