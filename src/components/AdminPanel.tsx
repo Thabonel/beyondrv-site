@@ -5,13 +5,26 @@ interface Message {
   content: string;
 }
 
+type JudgeDecision = 'allow' | 'block' | 'revise' | 'escalate';
+
 interface PendingChange {
   path: string;
   content: string;
   description: string;
+  proposal_id: string;
+  judgeDecision: JudgeDecision;
+  risk_flags: string[];
+  escalation_reason?: string;
 }
 
 type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
+
+const VERDICT_STYLE: Record<JudgeDecision, { label: string; color: string; border: string }> = {
+  allow:    { label: '✓ Approved',  color: '#4ade80', border: '1px solid #1a3a1a' },
+  escalate: { label: '⚠ Escalated', color: '#fb923c', border: '1px solid #3a2010' },
+  block:    { label: '✕ Blocked',   color: '#f87171', border: '1px solid #3a1010' },
+  revise:   { label: '↩ Revised',   color: '#a78bfa', border: '1px solid #2a1a3a' },
+};
 
 export default function AdminPanel() {
   const [messages, setMessages] = useState<Message[]>([
@@ -79,6 +92,17 @@ export default function AdminPanel() {
 
   async function deploy() {
     if (!pending.length || deployStatus === 'deploying') return;
+
+    const escalated = pending.filter(c => c.judgeDecision === 'escalate');
+    if (escalated.length) {
+      const ok = window.confirm(
+        `${escalated.length} change(s) were flagged for escalation by the safety judge:\n\n` +
+        escalated.map(c => `• ${c.description}\n  Reason: ${c.escalation_reason ?? 'See risk flags'}`).join('\n\n') +
+        '\n\nDeploy anyway?'
+      );
+      if (!ok) return;
+    }
+
     setDeployStatus('deploying');
     try {
       const res = await fetch('/.netlify/functions/admin-deploy', {
@@ -108,6 +132,8 @@ export default function AdminPanel() {
     done: '✓ Live in ~30s',
     error: 'Deploy Failed',
   }[deployStatus];
+
+  const hasEscalated = pending.some(c => c.judgeDecision === 'escalate');
 
   return (
     <div style={{ display: 'flex', height: 'calc(100vh - 60px)', gap: '1rem', padding: '1rem', fontFamily: 'inherit' }}>
@@ -160,24 +186,45 @@ export default function AdminPanel() {
       </div>
 
       {/* Pending panel */}
-      <div style={{ width: '300px', display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333' }}>
-        <div style={{ padding: '1rem', borderBottom: '1px solid #333', fontWeight: 600, color: '#fff' }}>
-          Pending Changes ({pending.length})
+      <div style={{ width: '320px', display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333' }}>
+        <div style={{ padding: '1rem', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontWeight: 600, color: '#fff' }}>Pending Changes ({pending.length})</span>
+          {hasEscalated && (
+            <span style={{ fontSize: '0.7rem', background: '#3a2010', color: '#fb923c', padding: '2px 6px', borderRadius: '4px' }}>
+              ⚠ Needs review
+            </span>
+          )}
         </div>
         <div style={{ flex: 1, overflowY: 'auto', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {pending.length === 0 && (
             <p style={{ color: '#555', fontSize: '0.85rem', textAlign: 'center', marginTop: '2rem' }}>No changes yet</p>
           )}
-          {pending.map((c, i) => (
-            <div key={i} style={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '6px', padding: '0.6rem 0.75rem', fontSize: '0.8rem' }}>
-              <div style={{ color: '#E8540A', marginBottom: '0.25rem' }}>✏️ {c.path.split('/').pop()}</div>
-              <div style={{ color: '#ccc', lineHeight: 1.4 }}>{c.description}</div>
-              <button
-                onClick={() => setPending(prev => prev.filter((_, j) => j !== i))}
-                style={{ marginTop: '0.4rem', background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: '0.75rem', padding: 0 }}
-              >✕ remove</button>
-            </div>
-          ))}
+          {pending.map((c, i) => {
+            const vs = VERDICT_STYLE[c.judgeDecision] ?? VERDICT_STYLE.allow;
+            return (
+              <div key={i} style={{ background: '#1a1a1a', border: vs.border, borderRadius: '6px', padding: '0.6rem 0.75rem', fontSize: '0.8rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.3rem' }}>
+                  <span style={{ color: '#E8540A' }}>✏️ {c.path.split('/').pop()}</span>
+                  <span style={{ color: vs.color, fontSize: '0.7rem', fontWeight: 600 }}>{vs.label}</span>
+                </div>
+                <div style={{ color: '#ccc', lineHeight: 1.4 }}>{c.description}</div>
+                {c.judgeDecision === 'escalate' && c.escalation_reason && (
+                  <div style={{ color: '#fb923c', fontSize: '0.72rem', marginTop: '0.3rem', lineHeight: 1.3 }}>
+                    ⚠ {c.escalation_reason}
+                  </div>
+                )}
+                {c.risk_flags?.length > 0 && c.judgeDecision !== 'allow' && (
+                  <div style={{ color: '#666', fontSize: '0.7rem', marginTop: '0.25rem' }}>
+                    Flags: {c.risk_flags.join(', ')}
+                  </div>
+                )}
+                <button
+                  onClick={() => setPending(prev => prev.filter((_, j) => j !== i))}
+                  style={{ marginTop: '0.4rem', background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: '0.75rem', padding: 0 }}
+                >✕ remove</button>
+              </div>
+            );
+          })}
         </div>
         <div style={{ padding: '0.75rem', borderTop: '1px solid #333', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {deployResults && (
@@ -187,16 +234,16 @@ export default function AdminPanel() {
             onClick={deploy}
             disabled={pending.length === 0 || deployStatus === 'deploying'}
             style={{
-              background: pending.length === 0 ? '#333' : '#E8540A',
+              background: pending.length === 0 ? '#333' : hasEscalated ? '#7c3a10' : '#E8540A',
               color: pending.length === 0 ? '#666' : '#fff',
-              border: 'none',
+              border: hasEscalated ? '1px solid #fb923c' : 'none',
               borderRadius: '6px',
               padding: '0.7rem',
               fontWeight: 700,
               cursor: pending.length === 0 ? 'not-allowed' : 'pointer',
               fontSize: '0.9rem',
             }}
-          >{deployLabel}</button>
+          >{hasEscalated ? `⚠ ${deployLabel}` : deployLabel}</button>
           {deployStatus === 'done' && (
             <button
               onClick={() => { setDeployStatus('idle'); setDeployResults(''); }}

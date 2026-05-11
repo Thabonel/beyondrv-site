@@ -1,11 +1,116 @@
 import Anthropic from '@anthropic-ai/sdk';
 import type { Handler } from '@netlify/functions';
+import { randomUUID } from 'crypto';
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN!;
 const GITHUB_REPO = process.env.GITHUB_REPO!;
 const GITHUB_BRANCH = process.env.GITHUB_BRANCH ?? 'main';
 const API = 'https://api.github.com';
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+type RiskClass = 'readonly' | 'reversible_write' | 'high_risk';
+type JudgeDecision = 'allow' | 'block' | 'revise' | 'escalate';
+
+interface ActionProposal {
+  proposal_id: string;
+  timestamp: string;
+  user_raw_input: string;
+  risk_class: RiskClass;
+  proposed_action: {
+    target: string;
+    description: string;
+    content_length: number;
+  };
+}
+
+interface JudgeVerdict {
+  decision: JudgeDecision;
+  rationale: string;
+  risk_flags: string[];
+  revision_instructions?: string;
+  block_reason?: string;
+  escalation_reason?: string;
+}
+
+export interface PendingChange {
+  path: string;
+  content: string;
+  description: string;
+  proposal_id: string;
+  judgeDecision: JudgeDecision;
+  risk_flags: string[];
+  escalation_reason?: string;
+}
+
+// ─── Risk classification ──────────────────────────────────────────────────────
+
+const HIGH_RISK_PATHS = ['src/styles/', 'src/layouts/', 'src/components/', 'astro.config', 'package.json'];
+
+function classifyRisk(path: string, currentContent: string | null, newContent: string): RiskClass {
+  if (HIGH_RISK_PATHS.some(p => path.includes(p))) return 'high_risk';
+  if (currentContent && newContent.length < currentContent.length * 0.5) return 'high_risk';
+  return 'reversible_write';
+}
+
+// ─── Judge ────────────────────────────────────────────────────────────────────
+
+const JUDGE_POLICY = `You are the ByondRV admin safety judge. A site actor agent has proposed a file change. Evaluate it against the owner's instruction and return JSON only.
+
+POLICY:
+- BLOCK if the file path was not mentioned or implied by the user's instruction (scope creep)
+- BLOCK if the change description doesn't match what the user asked for
+- ESCALATE if content is being drastically shortened (possible accidental deletion)
+- ESCALATE if changing a core layout, style, or config file
+- REVISE if the description is too vague to verify against the instruction
+- ALLOW if it's a straightforward product data update clearly matching user intent
+
+Return ONLY valid JSON with this exact shape:
+{
+  "decision": "allow" | "block" | "revise" | "escalate",
+  "rationale": "one sentence",
+  "risk_flags": ["array", "of", "concerns"],
+  "revision_instructions": "string if decision is revise, else omit",
+  "block_reason": "string if decision is block, else omit",
+  "escalation_reason": "string if decision is escalate, else omit"
+}`;
+
+async function runJudge(proposal: ActionProposal): Promise<JudgeVerdict> {
+  const judgeModel = proposal.risk_class === 'high_risk'
+    ? 'claude-sonnet-4-6'
+    : 'claude-haiku-4-5-20251001';
+
+  const userBlock = `USER'S INSTRUCTION: "${proposal.user_raw_input}"
+
+PROPOSED CHANGE:
+- File: ${proposal.proposed_action.target}
+- Description: ${proposal.proposed_action.description}
+- New content length: ${proposal.proposed_action.content_length} chars
+- Risk class: ${proposal.risk_class}`;
+
+  const response = await client.messages.create({
+    model: judgeModel,
+    max_tokens: 512,
+    system: JUDGE_POLICY,
+    messages: [{ role: 'user', content: userBlock }],
+  });
+
+  const text = response.content.find(b => b.type === 'text')?.text ?? '{}';
+
+  try {
+    // Strip markdown code fences if the model added them
+    const json = text.replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '').trim();
+    const parsed = JSON.parse(json) as JudgeVerdict;
+    console.log(`[judge] proposal=${proposal.proposal_id} model=${judgeModel} decision=${parsed.decision} rationale="${parsed.rationale}"`);
+    return parsed;
+  } catch {
+    console.error('[judge] failed to parse verdict, defaulting to allow', text);
+    return { decision: 'allow', rationale: 'Parse error — defaulting to allow', risk_flags: ['judge_parse_error'] };
+  }
+}
+
+// ─── System prompt & tools ────────────────────────────────────────────────────
 
 const SYSTEM_PROMPT = `You are the Beyond RV site admin assistant. You help the owner update their Astro website by reading and proposing changes to files.
 
@@ -25,9 +130,10 @@ RULES:
 - Confirm what you will change before calling propose_change
 - For images, the owner will upload via the UI — you just note the target path
 - Be concise and friendly
-- After proposing a change, tell the owner to review it in the Pending Changes panel and click Deploy when ready`;
+- After proposing a change, tell the owner to review it in the Pending Changes panel and click Deploy when ready
+- If the judge blocks your proposal, explain why to the owner and ask for clarification`;
 
-async function githubFetch(path: string) {
+async function githubFetch(path: string): Promise<string | null> {
   const res = await fetch(
     `${API}/repos/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}`,
     { headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, Accept: 'application/vnd.github+json' } }
@@ -37,7 +143,7 @@ async function githubFetch(path: string) {
   return Buffer.from(data.content, 'base64').toString('utf-8');
 }
 
-async function githubListDir(path: string) {
+async function githubListDir(path: string): Promise<string[]> {
   const res = await fetch(
     `${API}/repos/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}`,
     { headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, Accept: 'application/vnd.github+json' } }
@@ -68,7 +174,7 @@ const tools: Anthropic.Tool[] = [
   },
   {
     name: 'propose_change',
-    description: 'Queue a file change for the owner to review and deploy. Does NOT commit anything.',
+    description: 'Queue a file change for the owner to review and deploy. Does NOT commit anything. A safety judge will review before queuing.',
     input_schema: {
       type: 'object' as const,
       properties: {
@@ -81,6 +187,8 @@ const tools: Anthropic.Tool[] = [
   },
 ];
 
+// ─── Handler ──────────────────────────────────────────────────────────────────
+
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
 
@@ -88,8 +196,19 @@ export const handler: Handler = async (event) => {
     messages: Anthropic.MessageParam[];
   };
 
+  // Extract the last user message for judge context
+  const lastUserMsg = [...messages].reverse().find(m => m.role === 'user');
+  const userRawInput = typeof lastUserMsg?.content === 'string'
+    ? lastUserMsg.content
+    : (lastUserMsg?.content as Anthropic.ContentBlock[] | undefined)
+        ?.filter(b => b.type === 'text').map(b => (b as Anthropic.TextBlock).text).join(' ')
+    ?? '';
+
+  // Cache of file content the actor has read (for delta-based risk classification)
+  const readCache: Record<string, string> = {};
+
   let currentMessages = [...messages];
-  const pendingChanges: { path: string; content: string; description: string }[] = [];
+  const pendingChanges: PendingChange[] = [];
   let finalText = '';
 
   for (let i = 0; i < 10; i++) {
@@ -118,17 +237,50 @@ export const handler: Handler = async (event) => {
 
         if (block.name === 'read_file') {
           const content = await githubFetch(input.path);
+          if (content) readCache[input.path] = content;
           result = content ?? `Error: file not found at ${input.path}`;
+
         } else if (block.name === 'list_files') {
           const files = await githubListDir(input.dir);
           result = files.length ? files.join('\n') : `Error: directory not found at ${input.dir}`;
+
         } else if (block.name === 'propose_change') {
-          pendingChanges.push({
-            path: input.path,
-            content: input.content,
-            description: input.description,
-          });
-          result = `Change queued: ${input.description}`;
+          const { path, content, description } = input;
+
+          // Build proposal
+          const proposal: ActionProposal = {
+            proposal_id: randomUUID(),
+            timestamp: new Date().toISOString(),
+            user_raw_input: userRawInput,
+            risk_class: classifyRisk(path, readCache[path] ?? null, content),
+            proposed_action: { target: path, description, content_length: content.length },
+          };
+
+          // Run judge
+          const verdict = await runJudge(proposal);
+
+          if (verdict.decision === 'allow' || verdict.decision === 'escalate') {
+            pendingChanges.push({
+              path,
+              content,
+              description,
+              proposal_id: proposal.proposal_id,
+              judgeDecision: verdict.decision,
+              risk_flags: verdict.risk_flags,
+              escalation_reason: verdict.escalation_reason,
+            });
+
+            result = verdict.decision === 'allow'
+              ? `Change queued (judge approved): ${description}`
+              : `Change queued (ESCALATED — review carefully): ${description}. Reason: ${verdict.escalation_reason}`;
+
+          } else if (verdict.decision === 'revise') {
+            result = `REVISION NEEDED: The safety judge requires a revision before this change can be queued. Instructions: ${verdict.revision_instructions}. Please adjust and try propose_change again.`;
+
+          } else {
+            // block
+            result = `BLOCKED: The safety judge blocked this change. Reason: ${verdict.block_reason}. Rationale: ${verdict.rationale}. Please tell the owner and ask for clarification.`;
+          }
         }
 
         toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: result });
