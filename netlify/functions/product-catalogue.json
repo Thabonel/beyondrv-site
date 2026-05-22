@@ -6,6 +6,10 @@
     "status": "on-sale",
     "category": "slide-on",
     "tagline": "Low profile. Big living.",
+    "featured": false,
+    "onSale": true,
+    "heroImage": "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-01-scaled.jpg",
+    "galleryCount": 9,
     "keySpecs": [
       {
         "label": "Base length",
@@ -29,6 +33,10 @@
     "status": "available",
     "category": "slide-on",
     "tagline": "Serious truck. Serious camper.",
+    "featured": false,
+    "onSale": false,
+    "heroImage": "https://beyondrv.com.au/wp-content/uploads/2024/06/20240305_164611-576x1024.jpg",
+    "galleryCount": 20,
     "keySpecs": [
       {
         "label": "Base length",
@@ -52,6 +60,10 @@
     "status": "available",
     "category": "slide-on",
     "tagline": "Stand-up comfort. Compact footprint.",
+    "featured": false,
+    "onSale": false,
+    "heroImage": "https://beyondrv.com.au/wp-content/uploads/2024/10/20240924_105534-768x432.jpg",
+    "galleryCount": 16,
     "keySpecs": [
       {
         "label": "Base length",
@@ -75,6 +87,10 @@
     "status": "on-sale",
     "category": "slide-on",
     "tagline": "Compact, capable, and ready to go right now.",
+    "featured": true,
+    "onSale": true,
+    "heroImage": "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2150-05-1024x576.jpg",
+    "galleryCount": 36,
     "keySpecs": [
       {
         "label": "Base length",
@@ -102,6 +118,10 @@
     "status": "available",
     "category": "slide-on",
     "tagline": "The middle ground — serious capability, serious comfort.",
+    "featured": false,
+    "onSale": false,
+    "heroImage": "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-19-1024x678.jpg",
+    "galleryCount": 20,
     "keySpecs": [
       {
         "label": "Base length",
@@ -125,6 +145,10 @@
     "status": "on-sale",
     "category": "slide-on",
     "tagline": "Maximum space. Maximum off-road credibility.",
+    "featured": true,
+    "onSale": true,
+    "heroImage": "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2450-01-1024x576.jpg",
+    "galleryCount": 29,
     "keySpecs": [
       {
         "label": "Base length",
@@ -148,6 +172,10 @@
     "status": "available",
     "category": "expedition",
     "tagline": "Truck-based expedition capability. More accessible than Unimog, less compromise.",
+    "featured": false,
+    "onSale": false,
+    "heroImage": "/images/products/isuzu-nps/isuzu-nps-03.jpg",
+    "galleryCount": 8,
     "keySpecs": [
       {
         "label": "Platform",
@@ -175,6 +203,10 @@
     "status": "available",
     "category": "expedition",
     "tagline": "Pop-top freedom on a trusted truck platform.",
+    "featured": false,
+    "onSale": false,
+    "heroImage": "/images/products/isuzu-nps/isuzu-nps-01.jpg",
+    "galleryCount": 9,
     "keySpecs": [
       {
         "label": "Platform",
@@ -202,6 +234,10 @@
     "status": "available",
     "category": "expedition",
     "tagline": "Where roads end, the Unimog begins.",
+    "featured": true,
+    "onSale": false,
+    "heroImage": "/images/site/unimog-hero.jpg",
+    "galleryCount": 2,
     "keySpecs": [
       {
         "label": "Platform",
@@ -229,6 +265,10 @@
     "status": "available",
     "category": "expedition",
     "tagline": "Extreme terrain. Standing room when you arrive.",
+    "featured": false,
+    "onSale": false,
+    "heroImage": "/images/products/unimog-poptop/unimog-poptop-15.jpg",
+    "galleryCount": 21,
     "keySpecs": [
       {
         "label": "Platform",
@@ -252,6 +292,10 @@
     "status": "on-sale",
     "category": "slide-on",
     "tagline": "The ultimate self-contained adventure vehicle. Custom built on Mercedes Sprinter.",
+    "featured": true,
+    "onSale": true,
+    "heroImage": "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-17-scaled.jpg",
+    "galleryCount": 12,
     "keySpecs": [
       {
         "label": "Base vehicle",
@@ -279,6 +323,10 @@
     "status": "on-sale",
     "category": "caravan",
     "tagline": "Compact couples caravan. Big enough for the long haul.",
+    "featured": false,
+    "onSale": true,
+    "heroImage": "https://beyondrv.com.au/wp-content/uploads/2025/11/sunpatch-12c-28-scaled.jpg",
+    "galleryCount": 0,
     "keySpecs": [
       {
         "label": "Length",
@@ -302,6 +350,10 @@
     "status": "on-sale",
     "category": "caravan",
     "tagline": "The ultimate couples' off-road caravan. Built tough, finished beautifully.",
+    "featured": true,
+    "onSale": true,
+    "heroImage": "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-01-768x509.jpg",
+    "galleryCount": 23,
     "keySpecs": [
       {
         "label": "Length",
@@ -329,6 +381,10 @@
     "status": "coming-soon",
     "category": "caravan",
     "tagline": "Bigger, tougher, and coming soon. Register your interest now.",
+    "featured": false,
+    "onSale": false,
+    "heroImage": "/images/products/sunpatch-15xc/sunpatch-15xc-01.jpg",
+    "galleryCount": 0,
     "keySpecs": [
       {
         "label": "Length",
@@ -352,6 +408,10 @@
     "status": "coming-soon",
     "category": "caravan",
     "tagline": "Family adventure without compromise. Coming soon.",
+    "featured": false,
+    "onSale": false,
+    "heroImage": "/images/products/sunpatch-15xc/sunpatch-15xc-01.jpg",
+    "galleryCount": 0,
     "keySpecs": [
       {
         "label": "Length",

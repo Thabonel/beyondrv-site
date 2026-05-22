@@ -18,6 +18,30 @@ interface PendingChange {
 }
 
 type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
+type PanelTab = 'products' | 'knowledge' | 'pending';
+type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
+
+interface ProductRecord {
+  slug: string;
+  title: string;
+  price: string;
+  status: 'available' | 'on-sale' | 'coming-soon' | string;
+  category: ProductCategory | string;
+  tagline: string;
+  featured?: boolean;
+  onSale?: boolean;
+  heroImage?: string;
+  galleryCount?: number;
+}
+
+interface NewProductForm {
+  title: string;
+  category: ProductCategory;
+  price: string;
+  tagline: string;
+  keySpecs: string;
+  description: string;
+}
 
 const VERDICT_STYLE: Record<JudgeDecision, { label: string; color: string; border: string }> = {
   allow:    { label: '✓ Approved',  color: '#4ade80', border: '1px solid #1a3a1a' },
@@ -26,13 +50,27 @@ const VERDICT_STYLE: Record<JudgeDecision, { label: string; color: string; borde
   revise:   { label: '↩ Revised',   color: '#a78bfa', border: '1px solid #2a1a3a' },
 };
 
+const EMPTY_PRODUCT_FORM: NewProductForm = {
+  title: '',
+  category: 'slide-on',
+  price: '',
+  tagline: '',
+  keySpecs: '',
+  description: '',
+};
+
 export default function AdminPanel() {
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: "Hi! I'm the Beyond RV admin assistant. Tell me what you'd like to change on the site." }
   ]);
   const [input, setInput] = useState('');
+  const [activeTab, setActiveTab] = useState<PanelTab>('products');
   const [knowledgeInput, setKnowledgeInput] = useState('');
   const [showHelp, setShowHelp] = useState(false);
+  const [products, setProducts] = useState<ProductRecord[]>([]);
+  const [productFilter, setProductFilter] = useState('');
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [newProduct, setNewProduct] = useState<NewProductForm>(EMPTY_PRODUCT_FORM);
   const [loading, setLoading] = useState(false);
   const [pending, setPending] = useState<PendingChange[]>([]);
   const [deployStatus, setDeployStatus] = useState<DeployStatus>('idle');
@@ -43,6 +81,27 @@ export default function AdminPanel() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadProducts() {
+      try {
+        const res = await fetch('/.netlify/functions/admin-products');
+        if (!res.ok) throw new Error('Could not load products');
+        const data = await res.json() as { products: ProductRecord[] };
+        if (!cancelled) setProducts(data.products ?? []);
+      } catch {
+        if (!cancelled) {
+          setMessages(prev => [...prev, { role: 'assistant', content: 'I could not load the product manager list. The chat can still make changes if you type the product name.' }]);
+        }
+      } finally {
+        if (!cancelled) setProductsLoading(false);
+      }
+    }
+
+    loadProducts();
+    return () => { cancelled = true; };
+  }, []);
 
   async function sendMessage(text: string) {
     if (!text.trim() || loading) return;
@@ -102,6 +161,44 @@ export default function AdminPanel() {
     );
   }
 
+  function requestProductUpdate(product: ProductRecord, task: string) {
+    setActiveTab('pending');
+    sendMessage(
+      `${task}\n\nProduct: ${product.title}\nSlug: ${product.slug}\n` +
+      `Read src/content/products/${product.slug}.md first, then queue a complete-file change for review.`
+    );
+  }
+
+  function queueNewProduct() {
+    const missing = [
+      !newProduct.title.trim() && 'title',
+      !newProduct.price.trim() && 'price',
+      !newProduct.tagline.trim() && 'tagline',
+      !newProduct.keySpecs.trim() && 'key specs',
+      !newProduct.description.trim() && 'description',
+    ].filter(Boolean);
+
+    if (missing.length) {
+      setMessages(prev => [...prev, { role: 'assistant', content: `The new product form needs: ${missing.join(', ')}.` }]);
+      return;
+    }
+
+    setActiveTab('pending');
+    sendMessage(
+      `Create a new ${newProduct.category} product page using the existing product markdown format.\n\n` +
+      `Title: ${newProduct.title.trim()}\n` +
+      `Price: ${newProduct.price.trim()}\n` +
+      `Tagline: ${newProduct.tagline.trim()}\n` +
+      `Status: available\n` +
+      `Category: ${newProduct.category}\n` +
+      `Key specs, one per line:\n${newProduct.keySpecs.trim()}\n\n` +
+      `Description/body copy:\n${newProduct.description.trim()}\n\n` +
+      `Use a URL-safe slug based on the title. Before proposing the new file, list src/content/products and confirm the slug does not already exist. ` +
+      `If no real images were supplied, use the closest existing placeholder pattern only if the site already has one; otherwise ask for image details instead of inventing image URLs.`
+    );
+    setNewProduct(EMPTY_PRODUCT_FORM);
+  }
+
   async function deploy() {
     if (!pending.length || deployStatus === 'deploying') return;
 
@@ -146,6 +243,14 @@ export default function AdminPanel() {
   }[deployStatus];
 
   const hasEscalated = pending.some(c => c.judgeDecision === 'escalate');
+  const filteredProducts = products.filter((product) => {
+    const q = productFilter.trim().toLowerCase();
+    if (!q) return true;
+    return [product.title, product.slug, product.category, product.status]
+      .join(' ')
+      .toLowerCase()
+      .includes(q);
+  });
 
   return (
     <>
@@ -204,92 +309,185 @@ export default function AdminPanel() {
         </div>
       </div>
 
-      {/* Pending panel */}
-      <div style={{ width: '360px', display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333' }}>
-        <div style={{ padding: '1rem', borderBottom: '1px solid #333' }}>
-          <div style={{ color: '#fff', fontWeight: 600, marginBottom: '0.45rem' }}>Chatbot Knowledge</div>
-          <p style={{ color: '#888', fontSize: '0.78rem', lineHeight: 1.4, margin: '0 0 0.6rem' }}>
-            Add facts the website chatbot should know about the business, stock, process, or policies.
-          </p>
-          <textarea
-            value={knowledgeInput}
-            onChange={e => setKnowledgeInput(e.target.value)}
-            placeholder="Example: Customers can inspect campers by appointment at Mutdapilly. Ask them to call first."
-            rows={4}
-            style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem 0.65rem', fontSize: '0.82rem', lineHeight: 1.45, outline: 'none' }}
-          />
-          <button
-            onClick={queueKnowledgeUpdate}
-            disabled={loading || !knowledgeInput.trim()}
-            style={{ width: '100%', marginTop: '0.5rem', background: knowledgeInput.trim() ? '#E8540A' : '#333', color: knowledgeInput.trim() ? '#fff' : '#666', border: 'none', borderRadius: '6px', padding: '0.55rem', cursor: knowledgeInput.trim() ? 'pointer' : 'not-allowed', fontWeight: 700 }}
-          >
-            Queue Knowledge Update
-          </button>
-        </div>
-        <div style={{ padding: '1rem', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontWeight: 600, color: '#fff' }}>Pending Changes ({pending.length})</span>
-          {hasEscalated && (
-            <span style={{ fontSize: '0.7rem', background: '#3a2010', color: '#fb923c', padding: '2px 6px', borderRadius: '4px' }}>
-              ⚠ Needs review
-            </span>
-          )}
-        </div>
-        <div style={{ flex: 1, overflowY: 'auto', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          {pending.length === 0 && (
-            <p style={{ color: '#555', fontSize: '0.85rem', textAlign: 'center', marginTop: '2rem' }}>No changes yet</p>
-          )}
-          {pending.map((c, i) => {
-            const vs = VERDICT_STYLE[c.judgeDecision] ?? VERDICT_STYLE.allow;
-            return (
-              <div key={i} style={{ background: '#1a1a1a', border: vs.border, borderRadius: '6px', padding: '0.6rem 0.75rem', fontSize: '0.8rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.3rem' }}>
-                  <span style={{ color: '#E8540A' }}>✏️ {c.path.split('/').pop()}</span>
-                  <span style={{ color: vs.color, fontSize: '0.7rem', fontWeight: 600 }}>{vs.label}</span>
-                </div>
-                <div style={{ color: '#ccc', lineHeight: 1.4 }}>{c.description}</div>
-                {c.judgeDecision === 'escalate' && c.escalation_reason && (
-                  <div style={{ color: '#fb923c', fontSize: '0.72rem', marginTop: '0.3rem', lineHeight: 1.3 }}>
-                    ⚠ {c.escalation_reason}
-                  </div>
-                )}
-                {c.risk_flags?.length > 0 && c.judgeDecision !== 'allow' && (
-                  <div style={{ color: '#666', fontSize: '0.7rem', marginTop: '0.25rem' }}>
-                    Flags: {c.risk_flags.join(', ')}
-                  </div>
-                )}
-                <button
-                  onClick={() => setPending(prev => prev.filter((_, j) => j !== i))}
-                  style={{ marginTop: '0.4rem', background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: '0.75rem', padding: 0 }}
-                >✕ remove</button>
-              </div>
-            );
-          })}
-        </div>
-        <div style={{ padding: '0.75rem', borderTop: '1px solid #333', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          {deployResults && (
-            <p style={{ fontSize: '0.8rem', color: deployStatus === 'error' ? '#f87' : '#8f8', margin: 0 }}>{deployResults}</p>
-          )}
-          <button
-            onClick={deploy}
-            disabled={pending.length === 0 || deployStatus === 'deploying'}
-            style={{
-              background: pending.length === 0 ? '#333' : hasEscalated ? '#7c3a10' : '#E8540A',
-              color: pending.length === 0 ? '#666' : '#fff',
-              border: hasEscalated ? '1px solid #fb923c' : 'none',
-              borderRadius: '6px',
-              padding: '0.7rem',
-              fontWeight: 700,
-              cursor: pending.length === 0 ? 'not-allowed' : 'pointer',
-              fontSize: '0.9rem',
-            }}
-          >{hasEscalated ? `⚠ ${deployLabel}` : deployLabel}</button>
-          {deployStatus === 'done' && (
+      {/* Admin tools panel */}
+      <div style={{ width: '420px', display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333', minWidth: 0 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', borderBottom: '1px solid #333' }}>
+          {(['products', 'knowledge', 'pending'] as PanelTab[]).map(tab => (
             <button
-              onClick={() => { setDeployStatus('idle'); setDeployResults(''); }}
-              style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: '0.8rem' }}
-            >Make more changes</button>
-          )}
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+                background: activeTab === tab ? '#E8540A' : 'transparent',
+                color: activeTab === tab ? '#fff' : '#aaa',
+                border: 'none',
+                borderRight: tab !== 'pending' ? '1px solid #333' : 'none',
+                padding: '0.75rem 0.35rem',
+                cursor: 'pointer',
+                fontWeight: 700,
+                textTransform: 'capitalize',
+              }}
+            >
+              {tab === 'pending' ? `Pending (${pending.length})` : tab}
+            </button>
+          ))}
         </div>
+
+        {activeTab === 'products' && (
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '1rem', borderBottom: '1px solid #333' }}>
+              <div style={{ color: '#fff', fontWeight: 700, marginBottom: '0.45rem' }}>Product Manager</div>
+              <input
+                value={productFilter}
+                onChange={e => setProductFilter(e.target.value)}
+                placeholder="Search products..."
+                style={{ width: '100%', boxSizing: 'border-box', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem 0.65rem', fontSize: '0.82rem', outline: 'none' }}
+              />
+            </div>
+            <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              {productsLoading && <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>Loading products...</p>}
+              {!productsLoading && filteredProducts.map(product => (
+                <div key={product.slug} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', overflow: 'hidden' }}>
+                  {product.heroImage && (
+                    <img src={product.heroImage} alt="" style={{ width: '100%', height: '92px', objectFit: 'cover', display: 'block' }} />
+                  )}
+                  <div style={{ padding: '0.65rem 0.7rem' }}>
+                    <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem', lineHeight: 1.25 }}>{product.title}</div>
+                    <div style={{ color: '#aaa', fontSize: '0.74rem', marginTop: '0.25rem' }}>
+                      {product.price} · {product.category} · {product.status} · {product.galleryCount ?? 0} photos
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.35rem', marginTop: '0.55rem' }}>
+                      <button
+                        onClick={() => requestProductUpdate(product, 'Help me update the price, product copy, specs, or status for this product. Ask me what exact change I want if I have not already provided it.')}
+                        style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => requestProductUpdate(product, 'This product has sold. Remove it from active product listings and make sure the old URL redirects to the most relevant category page.')}
+                        style={{ background: '#2a1410', color: '#fb923c', border: '1px solid #63301f', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
+                      >
+                        Sold
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {!productsLoading && filteredProducts.length === 0 && (
+                <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>No matching products</p>
+              )}
+            </div>
+            <div style={{ padding: '0.85rem', borderTop: '1px solid #333', display: 'grid', gap: '0.5rem' }}>
+              <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem' }}>Add Product Draft</div>
+              <input value={newProduct.title} onChange={e => setNewProduct(p => ({ ...p, title: e.target.value }))} placeholder="Product title" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+                <select value={newProduct.category} onChange={e => setNewProduct(p => ({ ...p, category: e.target.value as ProductCategory }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
+                  <option value="slide-on">Slide-on</option>
+                  <option value="caravan">Caravan</option>
+                  <option value="expedition">Expedition</option>
+                </select>
+                <input value={newProduct.price} onChange={e => setNewProduct(p => ({ ...p, price: e.target.value }))} placeholder="$72,000" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+              </div>
+              <input value={newProduct.tagline} onChange={e => setNewProduct(p => ({ ...p, tagline: e.target.value }))} placeholder="Short tagline" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+              <textarea value={newProduct.keySpecs} onChange={e => setNewProduct(p => ({ ...p, keySpecs: e.target.value }))} placeholder="Key specs, one per line" rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
+              <textarea value={newProduct.description} onChange={e => setNewProduct(p => ({ ...p, description: e.target.value }))} placeholder="Product description" rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
+              <button onClick={queueNewProduct} disabled={loading} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.6rem', cursor: 'pointer', fontWeight: 700 }}>
+                Queue Product Draft
+              </button>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'knowledge' && (
+          <div style={{ padding: '1rem', overflowY: 'auto' }}>
+            <div style={{ color: '#fff', fontWeight: 700, marginBottom: '0.45rem' }}>Chatbot Knowledge</div>
+            <p style={{ color: '#888', fontSize: '0.82rem', lineHeight: 1.45, margin: '0 0 0.7rem' }}>
+              Add facts the website chatbot should know about the business, stock, process, or policies.
+            </p>
+            <textarea
+              value={knowledgeInput}
+              onChange={e => setKnowledgeInput(e.target.value)}
+              placeholder="Example: Customers can inspect campers by appointment at Mutdapilly. Ask them to call first."
+              rows={9}
+              style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.65rem', fontSize: '0.84rem', lineHeight: 1.45, outline: 'none' }}
+            />
+            <button
+              onClick={queueKnowledgeUpdate}
+              disabled={loading || !knowledgeInput.trim()}
+              style={{ width: '100%', marginTop: '0.6rem', background: knowledgeInput.trim() ? '#E8540A' : '#333', color: knowledgeInput.trim() ? '#fff' : '#666', border: 'none', borderRadius: '6px', padding: '0.65rem', cursor: knowledgeInput.trim() ? 'pointer' : 'not-allowed', fontWeight: 700 }}
+            >
+              Queue Knowledge Update
+            </button>
+          </div>
+        )}
+
+        {activeTab === 'pending' && (
+          <>
+            <div style={{ padding: '1rem', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontWeight: 600, color: '#fff' }}>Pending Changes ({pending.length})</span>
+              {hasEscalated && (
+                <span style={{ fontSize: '0.7rem', background: '#3a2010', color: '#fb923c', padding: '2px 6px', borderRadius: '4px' }}>
+                  ⚠ Needs review
+                </span>
+              )}
+            </div>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {pending.length === 0 && (
+                <p style={{ color: '#555', fontSize: '0.85rem', textAlign: 'center', marginTop: '2rem' }}>No changes yet</p>
+              )}
+              {pending.map((c, i) => {
+                const vs = VERDICT_STYLE[c.judgeDecision] ?? VERDICT_STYLE.allow;
+                return (
+                  <div key={i} style={{ background: '#1a1a1a', border: vs.border, borderRadius: '6px', padding: '0.6rem 0.75rem', fontSize: '0.8rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.3rem' }}>
+                      <span style={{ color: '#E8540A' }}>✏️ {c.path.split('/').pop()}</span>
+                      <span style={{ color: vs.color, fontSize: '0.7rem', fontWeight: 600 }}>{vs.label}</span>
+                    </div>
+                    <div style={{ color: '#ccc', lineHeight: 1.4 }}>{c.description}</div>
+                    {c.judgeDecision === 'escalate' && c.escalation_reason && (
+                      <div style={{ color: '#fb923c', fontSize: '0.72rem', marginTop: '0.3rem', lineHeight: 1.3 }}>
+                        ⚠ {c.escalation_reason}
+                      </div>
+                    )}
+                    {c.risk_flags?.length > 0 && c.judgeDecision !== 'allow' && (
+                      <div style={{ color: '#666', fontSize: '0.7rem', marginTop: '0.25rem' }}>
+                        Flags: {c.risk_flags.join(', ')}
+                      </div>
+                    )}
+                    <button
+                      onClick={() => setPending(prev => prev.filter((_, j) => j !== i))}
+                      style={{ marginTop: '0.4rem', background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: '0.75rem', padding: 0 }}
+                    >✕ remove</button>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ padding: '0.75rem', borderTop: '1px solid #333', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {deployResults && (
+                <p style={{ fontSize: '0.8rem', color: deployStatus === 'error' ? '#f87' : '#8f8', margin: 0 }}>{deployResults}</p>
+              )}
+              <button
+                onClick={deploy}
+                disabled={pending.length === 0 || deployStatus === 'deploying'}
+                style={{
+                  background: pending.length === 0 ? '#333' : hasEscalated ? '#7c3a10' : '#E8540A',
+                  color: pending.length === 0 ? '#666' : '#fff',
+                  border: hasEscalated ? '1px solid #fb923c' : 'none',
+                  borderRadius: '6px',
+                  padding: '0.7rem',
+                  fontWeight: 700,
+                  cursor: pending.length === 0 ? 'not-allowed' : 'pointer',
+                  fontSize: '0.9rem',
+                }}
+              >{hasEscalated ? `⚠ ${deployLabel}` : deployLabel}</button>
+              {deployStatus === 'done' && (
+                <button
+                  onClick={() => { setDeployStatus('idle'); setDeployResults(''); }}
+                  style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: '0.8rem' }}
+                >Make more changes</button>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
     {showHelp && (
@@ -318,7 +516,8 @@ export default function AdminPanel() {
             <section>
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Update a product</h3>
               <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
-                <li>Type the product name and exactly what needs changing, such as price, wording, key specs, featured status, or availability.</li>
+                <li>Open the Products tab and search for the product, or type the product name directly in chat.</li>
+                <li>Use Edit for guided changes, then explain the exact price, wording, key specs, featured status, or availability change.</li>
                 <li>Wait for the assistant to read the current product file and queue the proposed change.</li>
                 <li>Check the Pending Changes description and remove anything that looks wrong.</li>
                 <li>Click Deploy. The live site usually updates after the Netlify rebuild completes.</li>
@@ -327,8 +526,9 @@ export default function AdminPanel() {
             <section>
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Add a product</h3>
               <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
-                <li>Provide the product title, price, category, status, main specs, description, and selling points.</li>
-                <li>Ask the assistant to create a new product file using the existing product format.</li>
+                <li>Use Add Product Draft in the Products tab.</li>
+                <li>Provide the product title, price, category, tagline, main specs, description, and selling points.</li>
+                <li>The assistant will create a draft product file using the existing product format.</li>
                 <li>For images, provide the intended filenames and order. Full image uploading still needs a developer or a later media manager.</li>
                 <li>Deploy only after the new product path, price, specs, and image order have been checked.</li>
               </ol>
@@ -336,7 +536,8 @@ export default function AdminPanel() {
             <section>
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Remove or sell a product</h3>
               <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
-                <li>Say which product has sold and whether it should be removed from listings or kept as coming soon.</li>
+                <li>Open the Products tab and click Sold on the matching product.</li>
+                <li>Confirm whether it should be removed from listings or kept as coming soon.</li>
                 <li>The assistant should remove it from active product content and make sure old links redirect to a relevant category page.</li>
                 <li>Review the pending product and redirect changes before deploying.</li>
               </ol>
