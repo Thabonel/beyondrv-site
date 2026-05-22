@@ -86,6 +86,14 @@ interface EnquiryRecord {
   referral_source_self_reported?: string;
 }
 
+interface ContactConfig {
+  toEmail: string;
+  fromEmail: string;
+  hasResendKey: boolean;
+  ready: boolean;
+  missing: string[];
+}
+
 const VERDICT_STYLE: Record<JudgeDecision, { label: string; color: string; border: string }> = {
   allow:    { label: '✓ Approved',  color: '#4ade80', border: '1px solid #1a3a1a' },
   escalate: { label: '⚠ Escalated', color: '#fb923c', border: '1px solid #3a2010' },
@@ -137,6 +145,7 @@ export default function AdminPanel() {
   const [enquiries, setEnquiries] = useState<EnquiryRecord[]>([]);
   const [enquiriesLoading, setEnquiriesLoading] = useState(false);
   const [enquiriesStatus, setEnquiriesStatus] = useState('');
+  const [contactConfig, setContactConfig] = useState<ContactConfig | null>(null);
   const [loading, setLoading] = useState(false);
   const [pending, setPending] = useState<PendingChange[]>([]);
   const [deployStatus, setDeployStatus] = useState<DeployStatus>('idle');
@@ -182,7 +191,10 @@ export default function AdminPanel() {
   }, [mediaSlug]);
 
   useEffect(() => {
-    if (activeTab === 'enquiries') void loadEnquiries();
+    if (activeTab === 'enquiries') {
+      void loadEnquiries();
+      void loadContactConfig();
+    }
   }, [activeTab]);
 
   async function sendMessage(text: string) {
@@ -261,6 +273,17 @@ export default function AdminPanel() {
       setEnquiriesStatus('Could not load recent enquiries.');
     } finally {
       setEnquiriesLoading(false);
+    }
+  }
+
+  async function loadContactConfig() {
+    try {
+      const res = await fetch('/.netlify/functions/admin-contact-config');
+      if (!res.ok) throw new Error('Could not load contact config');
+      const data = await res.json() as ContactConfig;
+      setContactConfig(data);
+    } catch {
+      setContactConfig(null);
     }
   }
 
@@ -798,6 +821,13 @@ export default function AdminPanel() {
                 Refresh
               </button>
             </div>
+            {contactConfig && (
+              <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #333', background: contactConfig.ready ? '#102416' : '#2a1410', color: contactConfig.ready ? '#8f8' : '#fb923c', fontSize: '0.78rem', lineHeight: 1.45 }}>
+                {contactConfig.ready
+                  ? `Email notifications are configured for ${contactConfig.toEmail}.`
+                  : `Email notifications need setup. Missing: ${contactConfig.missing.join(', ')}. Enquiries are still stored here as backup.`}
+              </div>
+            )}
             <div style={{ flex: 1, overflowY: 'auto', padding: '0.75rem', display: 'grid', gap: '0.65rem', alignContent: 'start' }}>
               {enquiriesStatus && <p style={{ color: '#f87', fontSize: '0.85rem' }}>{enquiriesStatus}</p>}
               {enquiriesLoading && <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>Loading enquiries...</p>}
