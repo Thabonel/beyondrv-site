@@ -7,9 +7,20 @@ priceBadge: "PREMIUM MOTORHOME"
 status: on-sale
 onSale: true
 featured: true
-heroImage: "/images/products/mercedes-sprinter/mercedes-sprinter-01.jpg"
+heroImage: "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-17-scaled.jpg"
 gallery:
-  - "/images/products/mercedes-sprinter/mercedes-sprinter-02.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-03-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-01-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-14-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-16-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-02-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-11-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-07-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-12-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-13-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-06-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-08-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-18-scaled.jpg"
 keySpecs:
   - label: "Base vehicle"
     value: "Mercedes-Benz Sprinter"

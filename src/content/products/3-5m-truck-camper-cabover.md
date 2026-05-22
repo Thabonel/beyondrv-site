@@ -7,8 +7,9 @@ priceBadge: "ONE OFF SPECIAL"
 status: on-sale
 onSale: true
 featured: false
-heroImage: "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-01-scaled.jpg"
+heroImage: "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-19-scaled.jpg"
 gallery:
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-01-scaled.jpg"
   - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-02-scaled.jpg"
   - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-03-scaled.jpg"
   - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-04-scaled.jpg"
@@ -18,6 +19,17 @@ gallery:
   - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-08-scaled.jpg"
   - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-09-scaled.jpg"
   - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-10-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-11-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-12-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-13-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-14-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-15-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-16-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-17-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-18-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-20-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-21-scaled.jpg"
+  - "https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-22-scaled.jpg"
 keySpecs:
   - label: "Base length"
     value: "3,500mm"
