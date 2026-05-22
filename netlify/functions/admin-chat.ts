@@ -1,8 +1,11 @@
-import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
 import type { Handler } from '@netlify/functions';
 import { randomUUID } from 'crypto';
+import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const ADMIN_MODEL = process.env.OPENAI_ADMIN_MODEL ?? 'gpt-5-mini';
+const JUDGE_MODEL = process.env.OPENAI_JUDGE_MODEL ?? 'gpt-5-mini';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN!;
 const GITHUB_REPO = process.env.GITHUB_REPO!;
 const GITHUB_BRANCH = process.env.GITHUB_BRANCH ?? 'main';
@@ -77,10 +80,6 @@ Return ONLY valid JSON with this exact shape:
 }`;
 
 async function runJudge(proposal: ActionProposal): Promise<JudgeVerdict> {
-  const judgeModel = proposal.risk_class === 'high_risk'
-    ? 'claude-sonnet-4-6'
-    : 'claude-haiku-4-5-20251001';
-
   const userBlock = `USER'S INSTRUCTION: "${proposal.user_raw_input}"
 
 PROPOSED CHANGE:
@@ -89,20 +88,20 @@ PROPOSED CHANGE:
 - New content length: ${proposal.proposed_action.content_length} chars
 - Risk class: ${proposal.risk_class}`;
 
-  const response = await client.messages.create({
-    model: judgeModel,
-    max_tokens: 512,
-    system: JUDGE_POLICY,
-    messages: [{ role: 'user', content: userBlock }],
+  const response = await client.responses.create({
+    model: JUDGE_MODEL,
+    instructions: JUDGE_POLICY,
+    input: userBlock,
+    max_output_tokens: 512,
   });
 
-  const text = response.content.find(b => b.type === 'text')?.text ?? '{}';
+  const text = response.output_text || '{}';
 
   try {
     // Strip markdown code fences if the model added them
     const json = text.replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '').trim();
     const parsed = JSON.parse(json) as JudgeVerdict;
-    console.log(`[judge] proposal=${proposal.proposal_id} model=${judgeModel} decision=${parsed.decision} rationale="${parsed.rationale}"`);
+    console.log(`[judge] proposal=${proposal.proposal_id} model=${JUDGE_MODEL} decision=${parsed.decision} rationale="${parsed.rationale}"`);
     return parsed;
   } catch {
     console.error('[judge] failed to parse verdict, defaulting to allow', text);
@@ -153,35 +152,41 @@ async function githubListDir(path: string): Promise<string[]> {
   return data.map(f => `${f.type === 'dir' ? '📁' : '📄'} ${f.name}`);
 }
 
-const tools: Anthropic.Tool[] = [
+const tools = [
   {
+    type: 'function',
     name: 'read_file',
     description: 'Read a file from the GitHub repository',
-    input_schema: {
+    parameters: {
       type: 'object' as const,
       properties: { path: { type: 'string', description: 'File path relative to repo root' } },
+      additionalProperties: false,
       required: ['path'],
     },
   },
   {
+    type: 'function',
     name: 'list_files',
     description: 'List files in a directory of the repository',
-    input_schema: {
+    parameters: {
       type: 'object' as const,
       properties: { dir: { type: 'string', description: 'Directory path relative to repo root' } },
+      additionalProperties: false,
       required: ['dir'],
     },
   },
   {
+    type: 'function',
     name: 'propose_change',
     description: 'Queue a file change for the owner to review and deploy. Does NOT commit anything. A safety judge will review before queuing.',
-    input_schema: {
+    parameters: {
       type: 'object' as const,
       properties: {
         path: { type: 'string', description: 'File path to change' },
         content: { type: 'string', description: 'Complete new file content' },
         description: { type: 'string', description: 'Short human-readable summary of what changed (e.g. "Sunpatch price $78,888 → $74,000")' },
       },
+      additionalProperties: false,
       required: ['path', 'content', 'description'],
     },
   },
@@ -191,60 +196,73 @@ const tools: Anthropic.Tool[] = [
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
+  if (!isAdminAuthorized(event)) return unauthorizedResponse();
 
   const { messages } = JSON.parse(event.body ?? '{}') as {
-    messages: Anthropic.MessageParam[];
+    messages: Array<{ role: 'user' | 'assistant'; content: string }>;
   };
 
   // Extract the last user message for judge context
   const lastUserMsg = [...messages].reverse().find(m => m.role === 'user');
-  const userRawInput = typeof lastUserMsg?.content === 'string'
-    ? lastUserMsg.content
-    : (lastUserMsg?.content as Anthropic.ContentBlock[] | undefined)
-        ?.filter(b => b.type === 'text').map(b => (b as Anthropic.TextBlock).text).join(' ')
-    ?? '';
+  const userRawInput = lastUserMsg?.content ?? '';
 
   // Cache of file content the actor has read (for delta-based risk classification)
   const readCache: Record<string, string> = {};
 
-  let currentMessages = [...messages];
+  let responseId: string | undefined;
+  let currentInput: unknown = messages.map((message) => ({
+    role: message.role,
+    content: message.content,
+  }));
   const pendingChanges: PendingChange[] = [];
   let finalText = '';
 
   for (let i = 0; i < 10; i++) {
-    const response = await client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 4096,
-      system: SYSTEM_PROMPT,
+    const response = await client.responses.create({
+      model: ADMIN_MODEL,
+      instructions: SYSTEM_PROMPT,
       tools,
-      messages: currentMessages,
-    });
+      input: currentInput as never,
+      previous_response_id: responseId,
+      max_output_tokens: 4096,
+    } as never);
 
-    for (const block of response.content) {
-      if (block.type === 'text') finalText += block.text;
+    responseId = response.id;
+
+    for (const item of response.output as Array<Record<string, any>>) {
+      if (item.type === 'message') {
+        for (const content of item.content ?? []) {
+          if (content.type === 'output_text') finalText += content.text;
+        }
+      }
     }
 
-    if (response.stop_reason === 'end_turn') break;
+    const functionCalls = (response.output as Array<Record<string, any>>)
+      .filter(item => item.type === 'function_call');
 
-    if (response.stop_reason === 'tool_use') {
-      const toolResults: Anthropic.ToolResultBlockParam[] = [];
+    if (functionCalls.length === 0) break;
 
-      for (const block of response.content) {
-        if (block.type !== 'tool_use') continue;
+    const toolResults: Array<{ type: 'function_call_output'; call_id: string; output: string }> = [];
 
+    for (const call of functionCalls) {
         let result = '';
-        const input = block.input as Record<string, string>;
+        let input: Record<string, string> = {};
+        try {
+          input = JSON.parse(call.arguments ?? '{}') as Record<string, string>;
+        } catch {
+          result = 'Error: tool arguments were not valid JSON';
+        }
 
-        if (block.name === 'read_file') {
+        if (!result && call.name === 'read_file') {
           const content = await githubFetch(input.path);
           if (content) readCache[input.path] = content;
           result = content ?? `Error: file not found at ${input.path}`;
 
-        } else if (block.name === 'list_files') {
+        } else if (!result && call.name === 'list_files') {
           const files = await githubListDir(input.dir);
           result = files.length ? files.join('\n') : `Error: directory not found at ${input.dir}`;
 
-        } else if (block.name === 'propose_change') {
+        } else if (!result && call.name === 'propose_change') {
           const { path, content, description } = input;
 
           // Build proposal
@@ -281,17 +299,18 @@ export const handler: Handler = async (event) => {
             // block
             result = `BLOCKED: The safety judge blocked this change. Reason: ${verdict.block_reason}. Rationale: ${verdict.rationale}. Please tell the owner and ask for clarification.`;
           }
+        } else if (!result) {
+          result = `Error: unknown tool ${call.name}`;
         }
 
-        toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: result });
-      }
-
-      currentMessages = [
-        ...currentMessages,
-        { role: 'assistant', content: response.content },
-        { role: 'user', content: toolResults },
-      ];
+        toolResults.push({
+          type: 'function_call_output',
+          call_id: call.call_id,
+          output: result,
+        });
     }
+
+    currentInput = toolResults;
   }
 
   return {

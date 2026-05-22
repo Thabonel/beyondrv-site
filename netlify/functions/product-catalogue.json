@@ -2,8 +2,8 @@
   {
     "slug": "3-5m-poptop-truck-camper",
     "title": "3.5m Pop-Top Truck Camper",
-    "price": "$62,000",
-    "status": "available",
+    "price": "$49,999",
+    "status": "on-sale",
     "category": "slide-on",
     "tagline": "Low profile. Big living.",
     "keySpecs": [
@@ -16,10 +16,6 @@
         "value": "Pop-top"
       },
       {
-        "label": "TARE",
-        "value": "~600kg"
-      },
-      {
         "label": "Construction",
         "value": "Full composite"
       }
@@ -29,8 +25,8 @@
   {
     "slug": "3-5m-truck-camper-cabover",
     "title": "3.5m Truck Camper with Cabover",
-    "price": "$60,000",
-    "status": "available",
+    "price": "$44,999",
+    "status": "on-sale",
     "category": "slide-on",
     "tagline": "Extra sleeping. Same tough footprint.",
     "keySpecs": [
@@ -41,10 +37,6 @@
       {
         "label": "Cabover",
         "value": "Extra sleeping berth"
-      },
-      {
-        "label": "TARE",
-        "value": "~650kg"
       },
       {
         "label": "Construction",
@@ -93,10 +85,6 @@
         "value": "Electric pop-top"
       },
       {
-        "label": "TARE",
-        "value": "~700kg"
-      },
-      {
         "label": "Ceiling (raised)",
         "value": "Full standing room"
       }
@@ -116,19 +104,19 @@
         "value": "2,150mm"
       },
       {
-        "label": "TARE",
-        "value": "~700kg"
-      },
-      {
         "label": "Construction",
         "value": "Full composite"
       },
       {
         "label": "Power",
         "value": "200Ah lithium"
+      },
+      {
+        "label": "Status",
+        "value": "In Stock"
       }
     ],
-    "description": "The **Advent 2150** is the go-anywhere companion for serious ute and mid-size truck owners. At just 2,150mm base length, it's compact enough for tight tracks but packed with everything you need for weeks away.\n\nFull composite construction keeps the weight down (approx. 700kg TARE) without…"
+    "description": "The **Advent 2150** is the go-anywhere companion for serious ute and mid-size truck owners. At just 2,150mm base length, it's compact enough for tight tracks but packed with everything you need for weeks away.\n\nFull composite construction keeps the weight down without sacrificing durability. The…"
   },
   {
     "slug": "advent-2300-hardtop-slide-on",
@@ -141,10 +129,6 @@
       {
         "label": "Base length",
         "value": "2,300mm"
-      },
-      {
-        "label": "TARE",
-        "value": "~750kg"
       },
       {
         "label": "Construction",
@@ -161,17 +145,13 @@
     "slug": "advent-2450-hardtop-slide-on",
     "title": "Advent 2450 Hardtop Slide-On",
     "price": "$72,000",
-    "status": "available",
+    "status": "on-sale",
     "category": "slide-on",
     "tagline": "Maximum space. Maximum off-road credibility.",
     "keySpecs": [
       {
         "label": "Base length",
         "value": "2,450mm"
-      },
-      {
-        "label": "TARE",
-        "value": "~800kg"
       },
       {
         "label": "Construction",
@@ -263,7 +243,7 @@
         "value": "POA"
       }
     ],
-    "description": "The **Unimog Overlander** is ByondRV's most extreme build. Mounted on the legendary Mercedes-Benz Unimog with portal axles, this is the expedition vehicle for people who genuinely leave all roads behind.\n\nFull composite body, complete live-aboard spec, custom-built to order. Contact us to discuss…"
+    "description": "The **Unimog Overlander** is Beyond RV's most extreme build. Mounted on the legendary Mercedes-Benz Unimog with portal axles, this is the expedition vehicle for people who genuinely leave all roads behind.\n\nFull composite body, complete live-aboard spec, custom-built to order. Contact us to discuss…"
   },
   {
     "slug": "expedition/unimog-poptop-camper",
@@ -292,7 +272,7 @@
     "slug": "mercedes-sprinter-motorhome",
     "title": "Mercedes Sprinter Motorhome",
     "price": "$225,000",
-    "status": "available",
+    "status": "on-sale",
     "category": "slide-on",
     "tagline": "The ultimate self-contained adventure vehicle. Custom built on Mercedes Sprinter.",
     "keySpecs": [
@@ -313,13 +293,36 @@
         "value": "Full composite body"
       }
     ],
-    "description": "The **Mercedes Sprinter Motorhome** is ByondRV's flagship build — a complete custom motorhome body on the trusted Mercedes-Benz Sprinter platform. Every component chosen for reliability and comfort on serious Australian roads.\n\nContact us for the full specification sheet and to discuss your build."
+    "description": "The **Mercedes Sprinter Motorhome** is Beyond RV's flagship build — a complete custom motorhome body on the trusted Mercedes-Benz Sprinter platform. Every component chosen for reliability and comfort on serious Australian roads.\n\nContact us for the full specification sheet and to discuss your…"
+  },
+  {
+    "slug": "sunpatch-12c-couples-caravan",
+    "title": "Sunpatch 12C Couples Caravan",
+    "price": "$38,500",
+    "status": "on-sale",
+    "category": "caravan",
+    "tagline": "Compact couples caravan. Big enough for the long haul.",
+    "keySpecs": [
+      {
+        "label": "Length",
+        "value": "12 ft (3.65m)"
+      },
+      {
+        "label": "Sleeps",
+        "value": "2 adults"
+      },
+      {
+        "label": "Construction",
+        "value": "Full composite"
+      }
+    ],
+    "description": "The **Sunpatch 12C** is the entry point to the Sunpatch caravan range — a compact, well-finished couples caravan built on the same full composite principles as the larger 15-XC and 19-XC models.\n\nTwo units available for immediate delivery. Contact us to arrange an inspection or discuss fit-out…"
   },
   {
     "slug": "sunpatch-15xc-couples-offroad-van",
     "title": "Sunpatch 15-XC Couples Off-Road Van",
     "price": "$78,888",
-    "status": "available",
+    "status": "on-sale",
     "category": "caravan",
     "tagline": "The ultimate couples' off-road caravan. Built tough, finished beautifully.",
     "keySpecs": [
@@ -340,7 +343,7 @@
         "value": "Full composite"
       }
     ],
-    "description": "The **Sunpatch 15-XC** is ByondRV's most popular couples caravan — and it's easy to see why. Engineered at our Queensland workshop, every 15-XC is built from full composite panels for a lighter, stronger shell that laughs off corrugated outback tracks.\n\nInside, you'll find a fixed queen island bed,…"
+    "description": "The **Sunpatch 15-XC** is Beyond RV's most popular couples caravan — and it's easy to see why. Engineered at our Queensland workshop, every 15-XC is built from full composite panels for a lighter, stronger shell that laughs off corrugated outback tracks.\n\nInside, you'll find a fixed queen island…"
   },
   {
     "slug": "sunpatch-19xc-hardtop-couples-offroad-van",
@@ -363,7 +366,7 @@
         "value": "Full composite hardtop"
       }
     ],
-    "description": "The **Sunpatch 19-XC Hardtop** is coming. A bigger, better-equipped evolution of our popular 15-XC — hardtop composite construction, expanded living, and the same go-anywhere off-road capability ByondRV is known for.\n\nRegister your interest below and we'll reach out the moment it's ready."
+    "description": "The **Sunpatch 19-XC Hardtop** is coming. A bigger, better-equipped evolution of our popular 15-XC — hardtop composite construction, expanded living, and the same go-anywhere off-road capability Beyond RV is known for.\n\nRegister your interest below and we'll reach out the moment it's ready."
   },
   {
     "slug": "sunpatch-21xf-hardtop-family-offroad-van",
@@ -386,6 +389,6 @@
         "value": "Coming Soon"
       }
     ],
-    "description": "The **Sunpatch 21-XF Hardtop** brings ByondRV's off-road DNA to families who refuse to leave the kids behind. Coming soon — register your interest and be first in the queue."
+    "description": "The **Sunpatch 21-XF Hardtop** brings Beyond RV's off-road DNA to families who refuse to leave the kids behind. Coming soon — register your interest and be first in the queue."
   }
 ]

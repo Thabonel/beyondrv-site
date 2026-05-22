@@ -1,5 +1,6 @@
 // netlify/functions/analytics-data.ts
 import type { Handler } from '@netlify/functions';
+import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
 
 const API_KEY = process.env.POSTHOG_API_KEY!;
 const PROJECT_ID = process.env.POSTHOG_PROJECT_ID!;
@@ -20,6 +21,7 @@ async function hogql(query: string) {
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'GET') return { statusCode: 405, body: 'Method Not Allowed' };
+  if (!isAdminAuthorized(event)) return unauthorizedResponse();
 
   const range = (event.queryStringParameters?.range ?? '30') as string;
   const days = ['7', '30', '90'].includes(range) ? range : '30';

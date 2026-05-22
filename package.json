@@ -9,11 +9,11 @@
     "check": "astro check"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.91.1",
     "@astrojs/check": "^0.9.8",
     "@astrojs/react": "^5.0.4",
     "@astrojs/sitemap": "^2.0.2",
     "astro": "^4.16.19",
+    "openai": "^6.39.0",
     "posthog-js": "^1.372.6",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",

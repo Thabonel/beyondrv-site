@@ -1,8 +1,9 @@
-import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
 import type { Handler } from '@netlify/functions';
 import catalogue from './product-catalogue.json';
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const CHAT_MODEL = process.env.OPENAI_CHAT_MODEL ?? 'gpt-5-nano';
 
 const BRAND_BLOCK = `You are the Beyond RV assistant — a friendly, knowledgeable helper on the Beyond RV website.
 Beyond RV builds slide-on campers, caravans, and expedition vehicles out of Mutdapilly, Queensland.
@@ -80,24 +81,17 @@ export const handler: Handler = async (event) => {
   const systemPrompt = buildSystemPrompt(safeSlug, safeTitle);
 
   try {
-    let fullText = '';
-
-    const stream = client.messages.stream({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 512,
-      system: systemPrompt,
-      messages,
+    const response = await client.responses.create({
+      model: CHAT_MODEL,
+      instructions: systemPrompt,
+      input: messages.map((message) => ({
+        role: message.role,
+        content: message.content,
+      })),
+      max_output_tokens: 512,
     });
 
-    for await (const chunk of stream) {
-      if (
-        chunk.type === 'content_block_delta' &&
-        chunk.delta.type === 'text_delta'
-      ) {
-        fullText += chunk.delta.text;
-      }
-    }
-
+    const fullText = response.output_text;
     const encoded = fullText.replace(/\n/g, '\\n');
     return {
       statusCode: 200,
@@ -105,7 +99,7 @@ export const handler: Handler = async (event) => {
       body: `data: ${encoded}\n\ndata: [DONE]\n\n`,
     };
   } catch (err) {
-    console.error('[site-chat] Anthropic stream error:', err);
+    console.error('[site-chat] OpenAI response error:', err);
     return {
       statusCode: 500,
       headers: sseHeaders,
