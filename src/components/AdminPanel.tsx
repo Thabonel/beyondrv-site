@@ -18,7 +18,7 @@ interface PendingChange {
 }
 
 type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
-type PanelTab = 'products' | 'media' | 'knowledge' | 'pending';
+type PanelTab = 'products' | 'media' | 'enquiries' | 'knowledge' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 
@@ -73,6 +73,19 @@ interface MediaFile {
   };
 }
 
+interface EnquiryRecord {
+  id: string;
+  submittedAt: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  product_interest?: string;
+  callback_date?: string;
+  callback_time?: string;
+  referral_source_self_reported?: string;
+}
+
 const VERDICT_STYLE: Record<JudgeDecision, { label: string; color: string; border: string }> = {
   allow:    { label: '✓ Approved',  color: '#4ade80', border: '1px solid #1a3a1a' },
   escalate: { label: '⚠ Escalated', color: '#fb923c', border: '1px solid #3a2010' },
@@ -121,6 +134,9 @@ export default function AdminPanel() {
   const [mediaLoading, setMediaLoading] = useState(false);
   const [mediaStatus, setMediaStatus] = useState('');
   const [mediaAlt, setMediaAlt] = useState('');
+  const [enquiries, setEnquiries] = useState<EnquiryRecord[]>([]);
+  const [enquiriesLoading, setEnquiriesLoading] = useState(false);
+  const [enquiriesStatus, setEnquiriesStatus] = useState('');
   const [loading, setLoading] = useState(false);
   const [pending, setPending] = useState<PendingChange[]>([]);
   const [deployStatus, setDeployStatus] = useState<DeployStatus>('idle');
@@ -164,6 +180,10 @@ export default function AdminPanel() {
     if (!mediaSlug) return;
     void loadMedia(mediaSlug);
   }, [mediaSlug]);
+
+  useEffect(() => {
+    if (activeTab === 'enquiries') void loadEnquiries();
+  }, [activeTab]);
 
   async function sendMessage(text: string) {
     if (!text.trim() || loading) return;
@@ -226,6 +246,21 @@ export default function AdminPanel() {
       setMediaStatus('Could not load media for this product.');
     } finally {
       setMediaLoading(false);
+    }
+  }
+
+  async function loadEnquiries() {
+    setEnquiriesLoading(true);
+    try {
+      const res = await fetch('/.netlify/functions/admin-enquiries');
+      if (!res.ok) throw new Error('Could not load enquiries');
+      const data = await res.json() as { enquiries: EnquiryRecord[] };
+      setEnquiries(data.enquiries.filter(Boolean) ?? []);
+      setEnquiriesStatus('');
+    } catch {
+      setEnquiriesStatus('Could not load recent enquiries.');
+    } finally {
+      setEnquiriesLoading(false);
     }
   }
 
@@ -544,8 +579,8 @@ export default function AdminPanel() {
 
       {/* Admin tools panel */}
       <div style={{ width: '420px', display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333', minWidth: 0 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', borderBottom: '1px solid #333' }}>
-          {(['products', 'media', 'knowledge', 'pending'] as PanelTab[]).map(tab => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', borderBottom: '1px solid #333' }}>
+          {(['products', 'media', 'enquiries', 'knowledge', 'pending'] as PanelTab[]).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -742,6 +777,52 @@ export default function AdminPanel() {
                       </button>
                     </div>
                   </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'enquiries' && (
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '1rem', borderBottom: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
+              <div>
+                <div style={{ color: '#fff', fontWeight: 700 }}>Recent Enquiries</div>
+                <div style={{ color: '#888', fontSize: '0.76rem', marginTop: '0.2rem' }}>Backed up from the contact form</div>
+              </div>
+              <button
+                onClick={loadEnquiries}
+                disabled={enquiriesLoading}
+                style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: 'pointer', fontWeight: 700 }}
+              >
+                Refresh
+              </button>
+            </div>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '0.75rem', display: 'grid', gap: '0.65rem', alignContent: 'start' }}>
+              {enquiriesStatus && <p style={{ color: '#f87', fontSize: '0.85rem' }}>{enquiriesStatus}</p>}
+              {enquiriesLoading && <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>Loading enquiries...</p>}
+              {!enquiriesLoading && enquiries.length === 0 && (
+                <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>No enquiries stored yet</p>
+              )}
+              {!enquiriesLoading && enquiries.map(enquiry => (
+                <div key={enquiry.id} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', padding: '0.75rem', display: 'grid', gap: '0.4rem' }}>
+                  <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.88rem' }}>{enquiry.name}</div>
+                  <div style={{ color: '#aaa', fontSize: '0.76rem' }}>
+                    {new Date(enquiry.submittedAt).toLocaleString()} · {enquiry.product_interest || 'General enquiry'}
+                  </div>
+                  <div style={{ display: 'grid', gap: '0.2rem', fontSize: '0.78rem' }}>
+                    <a href={`tel:${enquiry.phone}`} style={{ color: '#E8540A', textDecoration: 'none' }}>{enquiry.phone}</a>
+                    <a href={`mailto:${enquiry.email}`} style={{ color: '#E8540A', textDecoration: 'none' }}>{enquiry.email}</a>
+                  </div>
+                  {(enquiry.callback_date || enquiry.callback_time) && (
+                    <div style={{ color: '#ccc', fontSize: '0.76rem' }}>
+                      Callback: {[enquiry.callback_date, enquiry.callback_time].filter(Boolean).join(' ')}
+                    </div>
+                  )}
+                  <div style={{ color: '#ddd', fontSize: '0.78rem', lineHeight: 1.45, whiteSpace: 'pre-wrap' }}>{enquiry.message}</div>
+                  {enquiry.referral_source_self_reported && (
+                    <div style={{ color: '#777', fontSize: '0.72rem' }}>Heard about us: {enquiry.referral_source_self_reported}</div>
+                  )}
                 </div>
               ))}
             </div>

@@ -86,6 +86,21 @@ const schema = {
       </div>
 
       <div class="form-field">
+        <label class="form-label" for="phone">
+          Phone <span aria-hidden="true" style="color:var(--orange)">*</span>
+        </label>
+        <input
+          class="form-input"
+          type="tel"
+          id="phone"
+          name="phone"
+          required
+          autocomplete="tel"
+          placeholder="Your best contact number"
+        />
+      </div>
+
+      <div class="form-field">
         <label class="form-label" for="message">
           Message <span aria-hidden="true" style="color:var(--orange)">*</span>
         </label>
@@ -148,6 +163,7 @@ const schema = {
       <button type="submit" class="btn-primary form-submit" style="margin-top: 1.5rem">
         Send Enquiry
       </button>
+      <p id="formStatus" style="margin-top: 1rem; color: var(--muted); font-size: 0.85rem" aria-live="polite"></p>
     </form>
 
     <div style="margin-top: 4rem; padding-top: 3rem; border-top: 1px solid var(--border)">
@@ -233,4 +249,45 @@ const schema = {
       }
     } catch {}
   })();
+
+  // Fast server-side delivery path. Native Netlify Forms remains the no-JavaScript fallback.
+  const form = document.getElementById('enquiryForm') as HTMLFormElement | null;
+  const status = document.getElementById('formStatus') as HTMLParagraphElement | null;
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    const formData = new FormData(form);
+    const payload: Record<string, string> = {};
+    formData.forEach((value, key) => {
+      payload[key === 'bot-field' ? 'botField' : key] = String(value);
+    });
+
+    if (status) status.textContent = 'Sending enquiry...';
+    if (submit) {
+      submit.disabled = true;
+      submit.textContent = 'Sending...';
+    }
+
+    try {
+      const res = await fetch('/.netlify/functions/contact-submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json() as { error?: string };
+      if (!res.ok) throw new Error(data.error ?? 'Could not send enquiry');
+      window.location.href = '/inquiry-form/success/';
+    } catch (err) {
+      if (status) {
+        status.textContent = err instanceof Error
+          ? `${err.message}. You can still call us on 0430 863 819.`
+          : 'Could not send enquiry. You can still call us on 0430 863 819.';
+      }
+      if (submit) {
+        submit.disabled = false;
+        submit.textContent = 'Send Enquiry';
+      }
+    }
+  });
 </script>
