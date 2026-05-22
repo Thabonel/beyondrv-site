@@ -32,7 +32,9 @@ interface ProductRecord {
   featured?: boolean;
   onSale?: boolean;
   heroImage?: string;
+  gallery?: string[];
   galleryCount?: number;
+  relatedSlugs?: string[];
 }
 
 interface NewProductForm {
@@ -52,6 +54,9 @@ interface EditProductForm {
   tagline: string;
   featured: boolean;
   onSale: boolean;
+  heroImage: string;
+  galleryText: string;
+  relatedSlugs: string[];
   notes: string;
 }
 
@@ -200,6 +205,9 @@ export default function AdminPanel() {
       tagline: product.tagline,
       featured: Boolean(product.featured),
       onSale: Boolean(product.onSale),
+      heroImage: product.heroImage ?? '',
+      galleryText: (product.gallery ?? []).join('\n'),
+      relatedSlugs: product.relatedSlugs ?? [],
       notes: '',
     });
   }
@@ -210,6 +218,7 @@ export default function AdminPanel() {
       !editProduct.title.trim() && 'title',
       !editProduct.price.trim() && 'price',
       !editProduct.tagline.trim() && 'tagline',
+      !editProduct.heroImage.trim() && 'hero image',
     ].filter(Boolean);
 
     if (missing.length) {
@@ -217,9 +226,26 @@ export default function AdminPanel() {
       return;
     }
 
+    const gallery = editProduct.galleryText
+      .split('\n')
+      .map(line => line.trim())
+      .filter(Boolean);
+    const knownSlugs = new Set(products.map(product => product.slug));
+    const invalidRelated = editProduct.relatedSlugs.filter(slug => !knownSlugs.has(slug));
+
+    if (gallery.length === 0) {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'The gallery must contain at least one image URL or path.' }]);
+      return;
+    }
+
+    if (invalidRelated.length) {
+      setMessages(prev => [...prev, { role: 'assistant', content: `These related product slugs are not valid: ${invalidRelated.join(', ')}.` }]);
+      return;
+    }
+
     setActiveTab('pending');
     sendMessage(
-      `Update this existing product using these structured fields only, preserving all existing gallery images, specs, related products, SEO fields, and body copy unless the notes explicitly say otherwise.\n\n` +
+      `Update this existing product using these structured fields only, preserving all specs, SEO fields, and body copy unless the notes explicitly say otherwise.\n\n` +
       `Product slug: ${editProduct.slug}\n` +
       `File to read first: src/content/products/${editProduct.slug}.md\n\n` +
       `New title: ${editProduct.title.trim()}\n` +
@@ -228,8 +254,11 @@ export default function AdminPanel() {
       `New onSale: ${editProduct.onSale}\n` +
       `New featured: ${editProduct.featured}\n` +
       `New tagline: ${editProduct.tagline.trim()}\n` +
+      `New heroImage: ${editProduct.heroImage.trim()}\n` +
+      `New gallery order, one image per line:\n${gallery.join('\n')}\n\n` +
+      `New relatedSlugs:\n${editProduct.relatedSlugs.length ? editProduct.relatedSlugs.join('\n') : 'None'}\n\n` +
       `Additional owner notes:\n${editProduct.notes.trim() || 'None'}\n\n` +
-      `Queue one complete-file change for review. Do not invent product specs or image URLs.`
+      `Queue one complete-file change for review. Keep the gallery in exactly the order provided and do not invent product specs or image URLs.`
     );
     setEditProduct(null);
   }
@@ -434,7 +463,7 @@ export default function AdminPanel() {
                         Edit
                       </button>
                       <button
-                        onClick={() => requestProductUpdate(product, 'This product has sold. Remove it from active product listings and make sure the old URL redirects to the most relevant category page.')}
+                        onClick={() => requestProductUpdate(product, `This product has sold. Remove it from active product listings and make sure the old URL redirects to ${product.category === 'caravan' ? '/our-caravans/' : product.category === 'expedition' ? '/expedition/' : '/our-slide-on-campers/'}.`)}
                         style={{ background: '#2a1410', color: '#fb923c', border: '1px solid #63301f', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
                       >
                         Sold
@@ -460,6 +489,7 @@ export default function AdminPanel() {
                   </select>
                 </div>
                 <input value={editProduct.tagline} onChange={e => setEditProduct(p => p && ({ ...p, tagline: e.target.value }))} placeholder="Tagline" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                <input value={editProduct.heroImage} onChange={e => setEditProduct(p => p && ({ ...p, heroImage: e.target.value }))} placeholder="Hero image URL or path" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem', color: '#ddd', fontSize: '0.78rem' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     <input type="checkbox" checked={editProduct.onSale} onChange={e => setEditProduct(p => p && ({ ...p, onSale: e.target.checked }))} />
@@ -469,6 +499,28 @@ export default function AdminPanel() {
                     <input type="checkbox" checked={editProduct.featured} onChange={e => setEditProduct(p => p && ({ ...p, featured: e.target.checked }))} />
                     Featured
                   </label>
+                </div>
+                <textarea value={editProduct.galleryText} onChange={e => setEditProduct(p => p && ({ ...p, galleryText: e.target.value }))} placeholder="Gallery image order, one URL or path per line" rows={4} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
+                <div style={{ display: 'grid', gap: '0.35rem' }}>
+                  <div style={{ color: '#aaa', fontSize: '0.74rem', fontWeight: 700 }}>Related Products</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.3rem', maxHeight: '96px', overflowY: 'auto', border: '1px solid #333', borderRadius: '6px', padding: '0.45rem', background: '#101010' }}>
+                    {products.filter(product => product.slug !== editProduct.slug).map(product => (
+                      <label key={product.slug} style={{ color: '#ddd', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '0.3rem', minWidth: 0 }}>
+                        <input
+                          type="checkbox"
+                          checked={editProduct.relatedSlugs.includes(product.slug)}
+                          onChange={e => setEditProduct(p => {
+                            if (!p) return p;
+                            const relatedSlugs = e.target.checked
+                              ? [...p.relatedSlugs, product.slug]
+                              : p.relatedSlugs.filter(slug => slug !== product.slug);
+                            return { ...p, relatedSlugs };
+                          })}
+                        />
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.title}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
                 <textarea value={editProduct.notes} onChange={e => setEditProduct(p => p && ({ ...p, notes: e.target.value }))} placeholder="Optional notes for copy/spec changes" rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
@@ -628,7 +680,8 @@ export default function AdminPanel() {
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Update a product</h3>
               <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
                 <li>Open the Products tab and search for the product, or type the product name directly in chat.</li>
-                <li>Use Edit to change safe fields like price, status, tagline, sale state, or featured state.</li>
+                <li>Use Edit to change safe fields like price, status, tagline, sale state, featured state, hero image, gallery order, or related products.</li>
+                <li>Use the gallery box to reorder photos by moving one image URL per line.</li>
                 <li>Use the notes box for copy or spec changes that need more explanation.</li>
                 <li>Wait for the assistant to read the current product file and queue the proposed change.</li>
                 <li>Open Pending, use Preview to inspect the generated file, and remove anything that looks wrong.</li>

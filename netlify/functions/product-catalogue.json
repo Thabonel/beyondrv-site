@@ -9,7 +9,21 @@
     "featured": false,
     "onSale": true,
     "heroImage": "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-01-scaled.jpg",
+    "gallery": [
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-06-scaled.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-08-scaled.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-09-scaled.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-11-scaled.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-13-scaled.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-14-scaled.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-16-scaled.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-10-scaled.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-05-scaled.jpg"
+    ],
     "galleryCount": 9,
+    "relatedSlugs": [
+      "7ft-electric-poptop-slide-on"
+    ],
     "keySpecs": [
       {
         "label": "Base length",
@@ -36,7 +50,32 @@
     "featured": false,
     "onSale": false,
     "heroImage": "https://beyondrv.com.au/wp-content/uploads/2024/06/20240305_164611-576x1024.jpg",
+    "gallery": [
+      "https://beyondrv.com.au/wp-content/uploads/2024/06/20240305_164454-1024x576.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/06/20240305_164356-1024x576.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/06/20240306_175057-1024x576.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/06/20240306_175108-576x1024.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/06/20240306_175246-576x1024.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/06/20240306_175258-576x1024.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/06/20240306_175303-576x1024.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/06/20240306_175312-576x1024.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/06/20240306_175319-576x1024.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/06/20240306_175326-576x1024.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/06/20240306_175329-576x1024.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/06/20240306_175337-576x1024.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-01-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-04-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-09-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-13-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-20-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-22-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-24-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-4.7m-28-1024x678.jpg"
+    ],
     "galleryCount": 20,
+    "relatedSlugs": [
+      "3-5m-poptop-truck-camper"
+    ],
     "keySpecs": [
       {
         "label": "Base length",
@@ -63,7 +102,29 @@
     "featured": false,
     "onSale": false,
     "heroImage": "https://beyondrv.com.au/wp-content/uploads/2024/10/20240924_105534-768x432.jpg",
+    "gallery": [
+      "https://beyondrv.com.au/wp-content/uploads/2024/10/20240924_105432-768x432.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/10/20240924_105439-768x432.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/10/20240924_105823-768x432.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/10/20240924_105445-768x432.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/10/20240924_105813-768x432.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/10/20240924_105454-768x432.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/10/20240924_110355-768x432.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/10/20240924_110155-768x432.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/10/20240924_110413-768x432.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/10/20240924_110410-768x432.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/10/20240924_110401-768x432.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/10/20240924_110143-768x432.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/10/20240924_110531-768x432.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/10/20240924_110525-768x432.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/10/20240924_110549-768x432.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2024/10/20240924_110553-768x432.jpg"
+    ],
     "galleryCount": 16,
+    "relatedSlugs": [
+      "advent-2150-hardtop-slide-on",
+      "3-5m-poptop-truck-camper"
+    ],
     "keySpecs": [
       {
         "label": "Base length",
@@ -90,7 +151,49 @@
     "featured": true,
     "onSale": true,
     "heroImage": "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2150-05-1024x576.jpg",
+    "gallery": [
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2150-04-1024x576.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2150-06-1024x576.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2150-07-1024x576.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2150-08-1024x576.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2150-11-1024x576.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2150-12-1024x576.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2150-13-1024x576.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2150-14-1024x576.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2150-15-1024x576.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2150-18-1024x576.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2150-19-1024x576.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2150-21-1024x576.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2150-22-1024x576.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2150-23-1024x576.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2150-shower-1024x731.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-09-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-21-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-20-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-08-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-18-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-19-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-17-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-03-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-02-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-16-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-14-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-15-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-01-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-05-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-11-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-10-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-04-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-12-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-06-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-07-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2150-new-13-1024x678.jpg"
+    ],
     "galleryCount": 36,
+    "relatedSlugs": [
+      "advent-2300-hardtop-slide-on",
+      "advent-2450-hardtop-slide-on"
+    ],
     "keySpecs": [
       {
         "label": "Base length",
@@ -121,7 +224,33 @@
     "featured": false,
     "onSale": false,
     "heroImage": "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-19-1024x678.jpg",
+    "gallery": [
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-18-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-08-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-20-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-21-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-09-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-13-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-07-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-06-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-12-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-04-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-10-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-11-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-05-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-01-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-15-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-14-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-16-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-02-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-03-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-2300-Advent-Series-17-1024x678.jpg"
+    ],
     "galleryCount": 20,
+    "relatedSlugs": [
+      "advent-2150-hardtop-slide-on",
+      "advent-2450-hardtop-slide-on"
+    ],
     "keySpecs": [
       {
         "label": "Base length",
@@ -148,7 +277,42 @@
     "featured": true,
     "onSale": true,
     "heroImage": "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2450-01-1024x576.jpg",
+    "gallery": [
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2450-04-1024x576.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2450-05-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2450-07-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2450-09-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2450-11-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2450-13-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2450-15-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2450-20-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2450-23-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2450-24-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/advent-2450-26-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-05-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-11-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-10-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-04-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-12-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-06-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-07-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-13-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-17-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-03-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-02-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-16-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-14-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-15-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-01-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-18-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-09-1024x678.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/12/advent-2450-new-08-1024x678.jpg"
+    ],
     "galleryCount": 29,
+    "relatedSlugs": [
+      "advent-2150-hardtop-slide-on",
+      "advent-2300-hardtop-slide-on"
+    ],
     "keySpecs": [
       {
         "label": "Base length",
@@ -175,7 +339,21 @@
     "featured": false,
     "onSale": false,
     "heroImage": "/images/products/isuzu-nps/isuzu-nps-03.jpg",
+    "gallery": [
+      "/images/products/isuzu-nps/isuzu-nps-02.jpg",
+      "/images/products/isuzu-nps/isuzu-nps-04.jpg",
+      "/images/products/isuzu-nps/isuzu-nps-06.jpg",
+      "/images/products/isuzu-nps/isuzu-nps-07.jpg",
+      "/images/products/isuzu-nps/isuzu-nps-09.jpg",
+      "/images/products/isuzu-nps/isuzu-nps-10.jpg",
+      "/images/products/isuzu-nps/isuzu-nps-11.jpg",
+      "/images/products/isuzu-nps/isuzu-nps-12.jpg"
+    ],
     "galleryCount": 8,
+    "relatedSlugs": [
+      "expedition/isuzu-nps-poptop-camper",
+      "expedition/unimog-overlander-camper"
+    ],
     "keySpecs": [
       {
         "label": "Platform",
@@ -206,7 +384,22 @@
     "featured": false,
     "onSale": false,
     "heroImage": "/images/products/isuzu-nps/isuzu-nps-01.jpg",
+    "gallery": [
+      "/images/products/isuzu-nps/isuzu-nps-02.jpg",
+      "/images/products/isuzu-nps/isuzu-nps-04.jpg",
+      "/images/products/isuzu-nps/isuzu-nps-05.jpg",
+      "/images/products/isuzu-nps/isuzu-nps-06.jpg",
+      "/images/products/isuzu-nps/isuzu-nps-07.jpg",
+      "/images/products/isuzu-nps/isuzu-nps-08.jpg",
+      "/images/products/isuzu-nps/isuzu-nps-10.jpg",
+      "/images/products/isuzu-nps/isuzu-nps-11.jpg",
+      "/images/products/isuzu-nps/isuzu-nps-12.jpg"
+    ],
     "galleryCount": 9,
+    "relatedSlugs": [
+      "expedition/isuzu-nps-cabover-camper",
+      "expedition/unimog-overlander-camper"
+    ],
     "keySpecs": [
       {
         "label": "Platform",
@@ -237,7 +430,15 @@
     "featured": true,
     "onSale": false,
     "heroImage": "/images/site/unimog-hero.jpg",
+    "gallery": [
+      "/images/site/mog2.jpg",
+      "/images/site/unimog-rear.png"
+    ],
     "galleryCount": 2,
+    "relatedSlugs": [
+      "expedition/unimog-poptop-camper",
+      "expedition/isuzu-nps-cabover-camper"
+    ],
     "keySpecs": [
       {
         "label": "Platform",
@@ -268,7 +469,34 @@
     "featured": false,
     "onSale": false,
     "heroImage": "/images/products/unimog-poptop/unimog-poptop-15.jpg",
+    "gallery": [
+      "/images/products/unimog-poptop/unimog-poptop-02.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-03.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-04.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-05.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-06.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-07.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-08.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-09.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-10.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-11.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-12.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-13.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-14.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-15.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-16.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-17.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-18.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-19.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-20.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-21.jpg",
+      "/images/products/unimog-poptop/unimog-poptop-22.jpg"
+    ],
     "galleryCount": 21,
+    "relatedSlugs": [
+      "expedition/unimog-overlander-camper",
+      "expedition/isuzu-nps-poptop-camper"
+    ],
     "keySpecs": [
       {
         "label": "Platform",
@@ -295,7 +523,22 @@
     "featured": true,
     "onSale": true,
     "heroImage": "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-17-scaled.jpg",
+    "gallery": [
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-03-scaled.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-01-scaled.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-14-scaled.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-16-scaled.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-02-scaled.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-11-scaled.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-07-scaled.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-12-scaled.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-13-scaled.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-06-scaled.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-08-scaled.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/4.7m-Truck-Camper-18-scaled.jpg"
+    ],
     "galleryCount": 12,
+    "relatedSlugs": [],
     "keySpecs": [
       {
         "label": "Base vehicle",
@@ -326,7 +569,11 @@
     "featured": false,
     "onSale": true,
     "heroImage": "https://beyondrv.com.au/wp-content/uploads/2025/11/sunpatch-12c-28-scaled.jpg",
+    "gallery": [],
     "galleryCount": 0,
+    "relatedSlugs": [
+      "sunpatch-15xc-couples-offroad-van"
+    ],
     "keySpecs": [
       {
         "label": "Length",
@@ -353,7 +600,36 @@
     "featured": true,
     "onSale": true,
     "heroImage": "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-01-768x509.jpg",
+    "gallery": [
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-08-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-09-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-12-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-06-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-07-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-13-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-05-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-11-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-10-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-04-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-14-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-15-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-17-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-03-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-02-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-16-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-18-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-24-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-19-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-23-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-22-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-20-768x509.jpg",
+      "https://beyondrv.com.au/wp-content/uploads/2025/11/Beyond-RV-Sunpatch-15-XC-21-768x509.jpg"
+    ],
     "galleryCount": 23,
+    "relatedSlugs": [
+      "sunpatch-19xc-hardtop-couples-offroad-van",
+      "sunpatch-21xf-hardtop-family-offroad-van"
+    ],
     "keySpecs": [
       {
         "label": "Length",
@@ -384,7 +660,12 @@
     "featured": false,
     "onSale": false,
     "heroImage": "/images/products/sunpatch-15xc/sunpatch-15xc-01.jpg",
+    "gallery": [],
     "galleryCount": 0,
+    "relatedSlugs": [
+      "sunpatch-15xc-couples-offroad-van",
+      "sunpatch-21xf-hardtop-family-offroad-van"
+    ],
     "keySpecs": [
       {
         "label": "Length",
@@ -411,7 +692,12 @@
     "featured": false,
     "onSale": false,
     "heroImage": "/images/products/sunpatch-15xc/sunpatch-15xc-01.jpg",
+    "gallery": [],
     "galleryCount": 0,
+    "relatedSlugs": [
+      "sunpatch-15xc-couples-offroad-van",
+      "sunpatch-19xc-hardtop-couples-offroad-van"
+    ],
     "keySpecs": [
       {
         "label": "Length",

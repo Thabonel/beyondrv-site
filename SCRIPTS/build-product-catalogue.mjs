@@ -70,7 +70,9 @@ const catalogue = mdFiles.map((filePath) => {
     featured:    data.featured    ?? false,
     onSale:      data.onSale      ?? false,
     heroImage:   data.heroImage   ?? '',
+    gallery:     Array.isArray(data.gallery) ? data.gallery : [],
     galleryCount: Array.isArray(data.gallery) ? data.gallery.length : 0,
+    relatedSlugs: Array.isArray(data.relatedSlugs) ? data.relatedSlugs : [],
     keySpecs,
     description,
   };
