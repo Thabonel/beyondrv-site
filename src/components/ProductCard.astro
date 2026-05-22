@@ -1,4 +1,6 @@
 ---
+import { displayImageUrl } from '../lib/media';
+
 interface Props {
   title: string;
   slug: string;
@@ -13,11 +15,12 @@ const { title, slug, category, tagline, price, status, heroImage, priceBadge } =
 const href = `/${slug}/`;
 const isComingSoon = status === 'coming-soon';
 const categoryLabel = category === 'slide-on' ? 'Slide-On' : category === 'caravan' ? 'Caravan' : 'Expedition';
+const cardImage = displayImageUrl(heroImage, 800);
 ---
 <article class="product-card reveal">
   <a href={href} class="product-card-inner">
     <div class="product-card-image">
-      <img src={heroImage} alt={title} loading="lazy" />
+      <img src={cardImage} alt={title} loading="lazy" />
       <div class="product-card-overlay"></div>
       {priceBadge && !isComingSoon && <span class="badge">{priceBadge}</span>}
       {isComingSoon && <span class="coming-soon-badge">Coming Soon</span>}

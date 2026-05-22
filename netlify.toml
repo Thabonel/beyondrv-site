@@ -25,6 +25,11 @@
   to     = "/our-slide-on-campers/"
   status = 301
 
+[[redirects]]
+  from   = "/media/*"
+  to     = "/.netlify/functions/media-serve?key=:splat"
+  status = 200
+
 [[headers]]
   for    = "/*"
   [headers.values]

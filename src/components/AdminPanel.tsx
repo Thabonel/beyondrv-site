@@ -18,7 +18,7 @@ interface PendingChange {
 }
 
 type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
-type PanelTab = 'products' | 'knowledge' | 'pending';
+type PanelTab = 'products' | 'media' | 'knowledge' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 
@@ -60,6 +60,19 @@ interface EditProductForm {
   notes: string;
 }
 
+interface MediaFile {
+  key: string;
+  url: string;
+  optimizedUrl: string;
+  metadata: {
+    alt?: string;
+    slug?: string;
+    filename?: string;
+    contentType?: string;
+    uploadedAt?: string;
+  };
+}
+
 const VERDICT_STYLE: Record<JudgeDecision, { label: string; color: string; border: string }> = {
   allow:    { label: '✓ Approved',  color: '#4ade80', border: '1px solid #1a3a1a' },
   escalate: { label: '⚠ Escalated', color: '#fb923c', border: '1px solid #3a2010' },
@@ -84,6 +97,11 @@ function slugifyTitle(title: string) {
     .replace(/^-+|-+$/g, '');
 }
 
+function adminImageUrl(src: string) {
+  if (!src.startsWith('/media/')) return src;
+  return `/.netlify/images?url=${encodeURIComponent(src)}&w=800&fit=cover`;
+}
+
 export default function AdminPanel() {
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: "Hi! I'm the Beyond RV admin assistant. Tell me what you'd like to change on the site." }
@@ -98,12 +116,18 @@ export default function AdminPanel() {
   const [newProduct, setNewProduct] = useState<NewProductForm>(EMPTY_PRODUCT_FORM);
   const [editProduct, setEditProduct] = useState<EditProductForm | null>(null);
   const [previewChange, setPreviewChange] = useState<PendingChange | null>(null);
+  const [mediaSlug, setMediaSlug] = useState('');
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
+  const [mediaLoading, setMediaLoading] = useState(false);
+  const [mediaStatus, setMediaStatus] = useState('');
+  const [mediaAlt, setMediaAlt] = useState('');
   const [loading, setLoading] = useState(false);
   const [pending, setPending] = useState<PendingChange[]>([]);
   const [deployStatus, setDeployStatus] = useState<DeployStatus>('idle');
   const [deployResults, setDeployResults] = useState<string>('');
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const mediaFileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -129,6 +153,17 @@ export default function AdminPanel() {
     loadProducts();
     return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => {
+    if (!productsLoading && !mediaSlug && products[0]) {
+      setMediaSlug(products[0].slug);
+    }
+  }, [mediaSlug, products, productsLoading]);
+
+  useEffect(() => {
+    if (!mediaSlug) return;
+    void loadMedia(mediaSlug);
+  }, [mediaSlug]);
 
   async function sendMessage(text: string) {
     if (!text.trim() || loading) return;
@@ -178,6 +213,116 @@ export default function AdminPanel() {
     reader.readAsDataURL(file);
   }
 
+  async function loadMedia(slug = mediaSlug) {
+    if (!slug) return;
+    setMediaLoading(true);
+    try {
+      const res = await fetch(`/.netlify/functions/admin-media?slug=${encodeURIComponent(slug)}`);
+      if (!res.ok) throw new Error('Could not load media');
+      const data = await res.json() as { files: MediaFile[] };
+      setMediaFiles(data.files ?? []);
+      setMediaStatus('');
+    } catch {
+      setMediaStatus('Could not load media for this product.');
+    } finally {
+      setMediaLoading(false);
+    }
+  }
+
+  async function uploadMedia(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !mediaSlug) return;
+    setMediaLoading(true);
+    setMediaStatus('Uploading image...');
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const base64 = (reader.result as string).split(',')[1];
+        const res = await fetch('/.netlify/functions/admin-media-upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            slug: mediaSlug,
+            filename: file.name,
+            contentType: file.type,
+            data: base64,
+            alt: mediaAlt,
+          }),
+        });
+        const data = await res.json() as { error?: string };
+        if (!res.ok) throw new Error(data.error ?? 'Upload failed');
+        setMediaStatus('Image uploaded.');
+        setMediaAlt('');
+        await loadMedia(mediaSlug);
+      } catch (err) {
+        setMediaStatus(err instanceof Error ? err.message : 'Upload failed.');
+      } finally {
+        setMediaLoading(false);
+        if (mediaFileRef.current) mediaFileRef.current.value = '';
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function deleteMedia(key: string) {
+    const ok = window.confirm('Delete this uploaded image? Product pages using this image will need their gallery updated first.');
+    if (!ok) return;
+    setMediaLoading(true);
+    try {
+      const res = await fetch('/.netlify/functions/admin-media', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key }),
+      });
+      if (!res.ok) throw new Error('Delete failed');
+      await loadMedia(mediaSlug);
+      setMediaStatus('Image deleted.');
+    } catch {
+      setMediaStatus('Could not delete image.');
+    } finally {
+      setMediaLoading(false);
+    }
+  }
+
+  function editFormFromProduct(product: ProductRecord): EditProductForm {
+    return {
+      slug: product.slug,
+      title: product.title,
+      price: product.price,
+      status: (['available', 'on-sale', 'coming-soon'].includes(product.status) ? product.status : 'available') as ProductStatus,
+      tagline: product.tagline,
+      featured: Boolean(product.featured),
+      onSale: Boolean(product.onSale),
+      heroImage: product.heroImage ?? '',
+      galleryText: (product.gallery ?? []).join('\n'),
+      relatedSlugs: product.relatedSlugs ?? [],
+      notes: '',
+    };
+  }
+
+  function applyMediaToProduct(url: string, mode: 'hero' | 'gallery') {
+    const product = products.find(item => item.slug === mediaSlug);
+    if (!product) return;
+    const form = editFormFromProduct(product);
+
+    if (mode === 'hero') {
+      form.heroImage = url;
+      form.notes = 'Set the uploaded image as the product hero image.';
+    } else {
+      const gallery = form.galleryText
+        .split('\n')
+        .map(line => line.trim())
+        .filter(Boolean);
+      if (!gallery.includes(url)) gallery.push(url);
+      form.galleryText = gallery.join('\n');
+      form.notes = 'Add the uploaded image to the end of the product gallery.';
+    }
+
+    setEditProduct(form);
+    setActiveTab('products');
+  }
+
   function queueKnowledgeUpdate() {
     const text = knowledgeInput.trim();
     if (!text) return;
@@ -197,19 +342,7 @@ export default function AdminPanel() {
   }
 
   function startStructuredEdit(product: ProductRecord) {
-    setEditProduct({
-      slug: product.slug,
-      title: product.title,
-      price: product.price,
-      status: (['available', 'on-sale', 'coming-soon'].includes(product.status) ? product.status : 'available') as ProductStatus,
-      tagline: product.tagline,
-      featured: Boolean(product.featured),
-      onSale: Boolean(product.onSale),
-      heroImage: product.heroImage ?? '',
-      galleryText: (product.gallery ?? []).join('\n'),
-      relatedSlugs: product.relatedSlugs ?? [],
-      notes: '',
-    });
+    setEditProduct(editFormFromProduct(product));
   }
 
   function queueStructuredEdit() {
@@ -411,8 +544,8 @@ export default function AdminPanel() {
 
       {/* Admin tools panel */}
       <div style={{ width: '420px', display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333', minWidth: 0 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', borderBottom: '1px solid #333' }}>
-          {(['products', 'knowledge', 'pending'] as PanelTab[]).map(tab => (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', borderBottom: '1px solid #333' }}>
+          {(['products', 'media', 'knowledge', 'pending'] as PanelTab[]).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -448,7 +581,7 @@ export default function AdminPanel() {
               {!productsLoading && filteredProducts.map(product => (
                 <div key={product.slug} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', overflow: 'hidden' }}>
                   {product.heroImage && (
-                    <img src={product.heroImage} alt="" style={{ width: '100%', height: '92px', objectFit: 'cover', display: 'block' }} />
+                    <img src={adminImageUrl(product.heroImage)} alt="" style={{ width: '100%', height: '92px', objectFit: 'cover', display: 'block' }} />
                   )}
                   <div style={{ padding: '0.65rem 0.7rem' }}>
                     <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem', lineHeight: 1.25 }}>{product.title}</div>
@@ -550,6 +683,67 @@ export default function AdminPanel() {
               <button onClick={queueNewProduct} disabled={loading} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.6rem', cursor: 'pointer', fontWeight: 700 }}>
                 Queue Product Draft
               </button>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'media' && (
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '1rem', borderBottom: '1px solid #333', display: 'grid', gap: '0.55rem' }}>
+              <div style={{ color: '#fff', fontWeight: 700 }}>Media Manager</div>
+              <select
+                value={mediaSlug}
+                onChange={e => setMediaSlug(e.target.value)}
+                style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.82rem' }}
+              >
+                {products.map(product => (
+                  <option key={product.slug} value={product.slug}>{product.title}</option>
+                ))}
+              </select>
+              <input
+                value={mediaAlt}
+                onChange={e => setMediaAlt(e.target.value)}
+                placeholder="Alt text for uploaded image"
+                style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.82rem' }}
+              />
+              <button
+                onClick={() => mediaFileRef.current?.click()}
+                disabled={!mediaSlug || mediaLoading}
+                style={{ background: mediaSlug ? '#E8540A' : '#333', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.6rem', cursor: mediaSlug ? 'pointer' : 'not-allowed', fontWeight: 700 }}
+              >
+                Upload Image
+              </button>
+              <input ref={mediaFileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" style={{ display: 'none' }} onChange={uploadMedia} />
+              {mediaStatus && <p style={{ margin: 0, color: mediaStatus.includes('Could') || mediaStatus.includes('failed') || mediaStatus.includes('Unsupported') ? '#f87' : '#8f8', fontSize: '0.78rem' }}>{mediaStatus}</p>}
+              <p style={{ margin: 0, color: '#888', fontSize: '0.76rem', lineHeight: 1.35 }}>
+                Uploaded images are stored in Netlify Blobs and can be used as product hero or gallery images without adding files to Git.
+              </p>
+            </div>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '0.75rem', display: 'grid', gap: '0.65rem', alignContent: 'start' }}>
+              {mediaLoading && <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>Loading media...</p>}
+              {!mediaLoading && mediaFiles.length === 0 && (
+                <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>No uploaded media for this product yet</p>
+              )}
+              {!mediaLoading && mediaFiles.map(file => (
+                <div key={file.key} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', overflow: 'hidden' }}>
+                  <img src={file.optimizedUrl} alt={file.metadata.alt ?? ''} style={{ width: '100%', height: '130px', objectFit: 'cover', display: 'block' }} />
+                  <div style={{ padding: '0.65rem', display: 'grid', gap: '0.45rem' }}>
+                    <div style={{ color: '#ddd', fontSize: '0.76rem', overflowWrap: 'anywhere' }}>{file.metadata.filename ?? file.key.split('/').pop()}</div>
+                    {file.metadata.alt && <div style={{ color: '#888', fontSize: '0.72rem' }}>{file.metadata.alt}</div>}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.35rem' }}>
+                      <button onClick={() => applyMediaToProduct(file.url, 'hero')} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700 }}>
+                        Hero
+                      </button>
+                      <button onClick={() => applyMediaToProduct(file.url, 'gallery')} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700 }}>
+                        Gallery
+                      </button>
+                      <button onClick={() => deleteMedia(file.key)} style={{ background: '#2a1410', color: '#fb923c', border: '1px solid #63301f', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700 }}>
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -686,6 +880,15 @@ export default function AdminPanel() {
                 <li>Wait for the assistant to read the current product file and queue the proposed change.</li>
                 <li>Open Pending, use Preview to inspect the generated file, and remove anything that looks wrong.</li>
                 <li>Click Deploy. The live site usually updates after the Netlify rebuild completes.</li>
+              </ol>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Upload product photos</h3>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Open the Media tab and choose the product.</li>
+                <li>Add short alt text, then upload a JPG, PNG, WebP, or GIF image up to 12MB.</li>
+                <li>Use Hero to prepare that image as the main product image, or Gallery to add it to the gallery list.</li>
+                <li>Open Pending, preview the product file, then deploy when the image order is correct.</li>
               </ol>
             </section>
             <section>

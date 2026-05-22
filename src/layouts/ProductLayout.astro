@@ -2,6 +2,7 @@
 import BaseLayout from './BaseLayout.astro';
 import OptionalExtras from '../components/OptionalExtras';
 import type { CollectionEntry } from 'astro:content';
+import { displayImageUrl } from '../lib/media';
 
 interface Props {
   product: CollectionEntry<'products'>;
@@ -12,6 +13,12 @@ const isComingSoon = data.status === 'coming-soon';
 const encodedSlug = encodeURIComponent(product.slug);
 const encodedName = encodeURIComponent(data.title);
 const enquiryUrl = `/inquiry-form/?product=${encodedSlug}&name=${encodedName}`;
+const heroDisplayImage = displayImageUrl(data.heroImage, 1400);
+const galleryImages = [data.heroImage, ...data.gallery].map((img) => ({
+  original: img,
+  display: displayImageUrl(img, 1400),
+  thumb: displayImageUrl(img, 240),
+}));
 
 const priceNum = data.price.replace(/[^0-9.]/g, '');
 const productSchema = {
@@ -63,17 +70,17 @@ const schemas = [productSchema, ...(faqSchema ? [faqSchema] : [])];
   <section class="product-hero-section">
     <div class="product-gallery">
       <div class="product-gallery-main">
-        <img id="productHeroImg" src={data.heroImage} alt={data.title} />
+        <img id="productHeroImg" src={heroDisplayImage} alt={data.title} />
       </div>
       {data.gallery.length > 0 && (
         <div class="product-gallery-thumbs">
-          {[data.heroImage, ...data.gallery].map((img, i) => (
+          {galleryImages.map((img, i) => (
             <button
               class={`thumb-btn${i === 0 ? ' active' : ''}`}
-              data-src={img}
+              data-src={img.display}
               aria-label={`View image ${i + 1} of ${data.title}`}
             >
-              <img src={img} alt={`${data.title} — view ${i + 1}`} loading="lazy" />
+              <img src={img.thumb} alt={`${data.title} — view ${i + 1}`} loading="lazy" />
             </button>
           ))}
         </div>
