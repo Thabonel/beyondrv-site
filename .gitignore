@@ -22,3 +22,50 @@ public/images/products/*
 
 # Local Netlify folder
 .netlify
+
+# Local Playwright/MCP screenshots and logs
+.playwright-mcp/
+
+# Old WordPress/source working assets kept locally, not part of the Astro site
+Mercedes Sprinter Motorhome/
+15-XC/
+2150/
+2300/
+2450/
+2450 Advent Series Hardtop Slide-On Camper Untitled folder/
+3.5m Truck Camper w- Cabover/
+3.5m camper with cabover section/
+3.5m truck camper box/
+3.5m-cabover-page-updated.html
+4.6M POPTOP TRUCK CAMPER/
+4.6m truck camper ONE OFF/
+4.7m Truck Camper/
+Beyond RV 2300 Advent Series Hardtop Slide-On Camper Untitled folder/
+Beyond RV Sunpatch 15-XC/
+New photos - Interior /
+Sunpatch 12C couples caravans/
+Unimog Tool Boxes/
+rebeyondrvwebsitemodifications/
+rebeyondrvwebsitemodifications (1)/
+docs/4.7m-Truck-Camper/
+
+# Loose old-site design/export files in the repo root
+$78 999.png
+15 Feet Sunpatch Hybrid.png
+2nd hero.jpg
+BeyondRV 2300 Advent Hardtop Slideon.docx
+Birds for side of truck 6K.png
+Birds on side of unimog.png
+Birds taking off, reduced mumber.png
+Chiristmas stock.png
+Clearance Sale.png
+Truck birds on side.jpg
+WEB MODIFICATIONS 17.11.25.pages
+Webpage Image1 (Desktop).png
+Webpage Image2(Mobile).png
+back of unimog.png
+floorplan-scaled.jpg
+floorplanafphoto.afphoto
+mockup.html
+mog2.jpg
+unimog-hero.jpg

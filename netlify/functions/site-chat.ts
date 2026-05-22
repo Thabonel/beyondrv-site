@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import type { Handler } from '@netlify/functions';
 import catalogue from './product-catalogue.json';
+import chatbotKnowledge from './chatbot-knowledge.json';
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const CHAT_MODEL = process.env.OPENAI_CHAT_MODEL ?? 'gpt-5-nano';
@@ -35,8 +36,9 @@ function buildSystemPrompt(productSlug?: string, pageTitle?: string): string {
   }
 
   const catalogueBlock = `PRODUCT CATALOGUE (all current products):\n${JSON.stringify(catalogue)}`;
+  const knowledgeBlock = `BUSINESS KNOWLEDGE:\n${chatbotKnowledge.content || 'No additional business knowledge has been added yet.'}`;
 
-  return `${BRAND_BLOCK}\n\n${pageContext}${currentProductBlock}\n\n${catalogueBlock}`;
+  return `${BRAND_BLOCK}\n\n${pageContext}${currentProductBlock}\n\n${catalogueBlock}\n\n${knowledgeBlock}`;
 }
 
 export const handler: Handler = async (event) => {

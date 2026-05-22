@@ -14,6 +14,8 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const ROOT = join(__dirname, '..');
 const PRODUCTS_DIR = join(ROOT, 'src/content/products');
 const OUTPUT_FILE = join(ROOT, 'netlify/functions/product-catalogue.json');
+const KNOWLEDGE_FILE = join(ROOT, 'src/data/chatbot-knowledge.md');
+const KNOWLEDGE_OUTPUT_FILE = join(ROOT, 'netlify/functions/chatbot-knowledge.json');
 
 /** Recursively collect all .md file paths under a directory */
 function collectMdFiles(dir) {
@@ -76,7 +78,18 @@ catalogue.sort((a, b) => a.slug.localeCompare(b.slug));
 mkdirSync(dirname(OUTPUT_FILE), { recursive: true });
 writeFileSync(OUTPUT_FILE, JSON.stringify(catalogue, null, 2) + '\n', 'utf-8');
 
+const chatbotKnowledge = existsSync(KNOWLEDGE_FILE)
+  ? readFileSync(KNOWLEDGE_FILE, 'utf-8').trim()
+  : '';
+
+writeFileSync(
+  KNOWLEDGE_OUTPUT_FILE,
+  JSON.stringify({ content: chatbotKnowledge }, null, 2) + '\n',
+  'utf-8'
+);
+
 console.log(`✓ Product catalogue written: ${OUTPUT_FILE}`);
+console.log(`✓ Chatbot knowledge written: ${KNOWLEDGE_OUTPUT_FILE}`);
 console.log(`  ${catalogue.length} products indexed:`);
 for (const p of catalogue) {
   console.log(`    [${p.status}] ${p.slug} — ${p.title}`);

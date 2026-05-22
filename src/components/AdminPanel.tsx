@@ -31,6 +31,8 @@ export default function AdminPanel() {
     { role: 'assistant', content: "Hi! I'm the Beyond RV admin assistant. Tell me what you'd like to change on the site." }
   ]);
   const [input, setInput] = useState('');
+  const [knowledgeInput, setKnowledgeInput] = useState('');
+  const [showHelp, setShowHelp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pending, setPending] = useState<PendingChange[]>([]);
   const [deployStatus, setDeployStatus] = useState<DeployStatus>('idle');
@@ -90,6 +92,16 @@ export default function AdminPanel() {
     reader.readAsDataURL(file);
   }
 
+  function queueKnowledgeUpdate() {
+    const text = knowledgeInput.trim();
+    if (!text) return;
+    setKnowledgeInput('');
+    sendMessage(
+      `Update the chatbot business knowledge file at src/data/chatbot-knowledge.md with this information. ` +
+      `Read the current file first, preserve useful existing notes, and add or update the relevant note clearly without adding private customer data:\n\n${text}`
+    );
+  }
+
   async function deploy() {
     if (!pending.length || deployStatus === 'deploying') return;
 
@@ -136,11 +148,18 @@ export default function AdminPanel() {
   const hasEscalated = pending.some(c => c.judgeDecision === 'escalate');
 
   return (
+    <>
     <div style={{ display: 'flex', height: 'calc(100vh - 60px)', gap: '1rem', padding: '1rem', fontFamily: 'inherit' }}>
       {/* Chat panel */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333' }}>
-        <div style={{ padding: '1rem', borderBottom: '1px solid #333', fontWeight: 600, color: '#fff' }}>
-          Admin Chat
+        <div style={{ padding: '1rem', borderBottom: '1px solid #333', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
+          <span>Admin Chat</span>
+          <button
+            onClick={() => setShowHelp(true)}
+            style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.4rem 0.65rem', cursor: 'pointer', fontWeight: 600 }}
+          >
+            Help
+          </button>
         </div>
         <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {messages.map((m, i) => (
@@ -186,7 +205,27 @@ export default function AdminPanel() {
       </div>
 
       {/* Pending panel */}
-      <div style={{ width: '320px', display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333' }}>
+      <div style={{ width: '360px', display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333' }}>
+        <div style={{ padding: '1rem', borderBottom: '1px solid #333' }}>
+          <div style={{ color: '#fff', fontWeight: 600, marginBottom: '0.45rem' }}>Chatbot Knowledge</div>
+          <p style={{ color: '#888', fontSize: '0.78rem', lineHeight: 1.4, margin: '0 0 0.6rem' }}>
+            Add facts the website chatbot should know about the business, stock, process, or policies.
+          </p>
+          <textarea
+            value={knowledgeInput}
+            onChange={e => setKnowledgeInput(e.target.value)}
+            placeholder="Example: Customers can inspect campers by appointment at Mutdapilly. Ask them to call first."
+            rows={4}
+            style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem 0.65rem', fontSize: '0.82rem', lineHeight: 1.45, outline: 'none' }}
+          />
+          <button
+            onClick={queueKnowledgeUpdate}
+            disabled={loading || !knowledgeInput.trim()}
+            style={{ width: '100%', marginTop: '0.5rem', background: knowledgeInput.trim() ? '#E8540A' : '#333', color: knowledgeInput.trim() ? '#fff' : '#666', border: 'none', borderRadius: '6px', padding: '0.55rem', cursor: knowledgeInput.trim() ? 'pointer' : 'not-allowed', fontWeight: 700 }}
+          >
+            Queue Knowledge Update
+          </button>
+        </div>
         <div style={{ padding: '1rem', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontWeight: 600, color: '#fff' }}>Pending Changes ({pending.length})</span>
           {hasEscalated && (
@@ -253,5 +292,74 @@ export default function AdminPanel() {
         </div>
       </div>
     </div>
+    {showHelp && (
+      <div
+        role="dialog"
+        aria-modal="true"
+        style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.72)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
+      >
+        <div style={{ width: 'min(860px, 100%)', maxHeight: '88vh', overflowY: 'auto', background: '#111', color: '#fff', border: '1px solid #333', borderRadius: '8px', boxShadow: '0 24px 80px rgba(0,0,0,0.45)' }}>
+          <div style={{ position: 'sticky', top: 0, background: '#111', borderBottom: '1px solid #333', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+            <h2 style={{ margin: 0, fontSize: '1.15rem' }}>Admin Help</h2>
+            <button
+              onClick={() => setShowHelp(false)}
+              style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.4rem 0.65rem', cursor: 'pointer' }}
+            >
+              Close
+            </button>
+          </div>
+          <div style={{ padding: '1rem 1.1rem 1.2rem', display: 'grid', gap: '1rem', fontSize: '0.9rem', lineHeight: 1.55 }}>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>How the admin works</h3>
+              <p style={{ margin: 0, color: '#ddd' }}>
+                The admin chat prepares site changes for review. It does not make a change live immediately. Ask for one clear task, review the queued file changes in Pending Changes, then click Deploy when the change looks right.
+              </p>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Update a product</h3>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Type the product name and exactly what needs changing, such as price, wording, key specs, featured status, or availability.</li>
+                <li>Wait for the assistant to read the current product file and queue the proposed change.</li>
+                <li>Check the Pending Changes description and remove anything that looks wrong.</li>
+                <li>Click Deploy. The live site usually updates after the Netlify rebuild completes.</li>
+              </ol>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Add a product</h3>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Provide the product title, price, category, status, main specs, description, and selling points.</li>
+                <li>Ask the assistant to create a new product file using the existing product format.</li>
+                <li>For images, provide the intended filenames and order. Full image uploading still needs a developer or a later media manager.</li>
+                <li>Deploy only after the new product path, price, specs, and image order have been checked.</li>
+              </ol>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Remove or sell a product</h3>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Say which product has sold and whether it should be removed from listings or kept as coming soon.</li>
+                <li>The assistant should remove it from active product content and make sure old links redirect to a relevant category page.</li>
+                <li>Review the pending product and redirect changes before deploying.</li>
+              </ol>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Teach the chatbot</h3>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Use the Chatbot Knowledge box for facts that apply across the business, not just one product.</li>
+                <li>Add short, factual notes about process, appointments, stock, delivery, policy, warranty, or common customer questions.</li>
+                <li>Do not add passwords, API keys, private customer details, or anything the public should not see.</li>
+                <li>Click Queue Knowledge Update, review the pending change, then Deploy.</li>
+              </ol>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Best practice</h3>
+              <p style={{ margin: 0, color: '#ddd' }}>
+                Make one or two changes at a time. Use exact product names, exact prices, and exact wording where possible. If the assistant says a change needs review, treat it as a warning and check the file description carefully before deploying.
+              </p>
+            </section>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
