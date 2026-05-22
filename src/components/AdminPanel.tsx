@@ -20,6 +20,7 @@ interface PendingChange {
 type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
 type PanelTab = 'products' | 'knowledge' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
+type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 
 interface ProductRecord {
   slug: string;
@@ -43,6 +44,17 @@ interface NewProductForm {
   description: string;
 }
 
+interface EditProductForm {
+  slug: string;
+  title: string;
+  price: string;
+  status: ProductStatus;
+  tagline: string;
+  featured: boolean;
+  onSale: boolean;
+  notes: string;
+}
+
 const VERDICT_STYLE: Record<JudgeDecision, { label: string; color: string; border: string }> = {
   allow:    { label: '✓ Approved',  color: '#4ade80', border: '1px solid #1a3a1a' },
   escalate: { label: '⚠ Escalated', color: '#fb923c', border: '1px solid #3a2010' },
@@ -59,6 +71,14 @@ const EMPTY_PRODUCT_FORM: NewProductForm = {
   description: '',
 };
 
+function slugifyTitle(title: string) {
+  return title
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 export default function AdminPanel() {
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: "Hi! I'm the Beyond RV admin assistant. Tell me what you'd like to change on the site." }
@@ -71,6 +91,8 @@ export default function AdminPanel() {
   const [productFilter, setProductFilter] = useState('');
   const [productsLoading, setProductsLoading] = useState(true);
   const [newProduct, setNewProduct] = useState<NewProductForm>(EMPTY_PRODUCT_FORM);
+  const [editProduct, setEditProduct] = useState<EditProductForm | null>(null);
+  const [previewChange, setPreviewChange] = useState<PendingChange | null>(null);
   const [loading, setLoading] = useState(false);
   const [pending, setPending] = useState<PendingChange[]>([]);
   const [deployStatus, setDeployStatus] = useState<DeployStatus>('idle');
@@ -169,6 +191,49 @@ export default function AdminPanel() {
     );
   }
 
+  function startStructuredEdit(product: ProductRecord) {
+    setEditProduct({
+      slug: product.slug,
+      title: product.title,
+      price: product.price,
+      status: (['available', 'on-sale', 'coming-soon'].includes(product.status) ? product.status : 'available') as ProductStatus,
+      tagline: product.tagline,
+      featured: Boolean(product.featured),
+      onSale: Boolean(product.onSale),
+      notes: '',
+    });
+  }
+
+  function queueStructuredEdit() {
+    if (!editProduct) return;
+    const missing = [
+      !editProduct.title.trim() && 'title',
+      !editProduct.price.trim() && 'price',
+      !editProduct.tagline.trim() && 'tagline',
+    ].filter(Boolean);
+
+    if (missing.length) {
+      setMessages(prev => [...prev, { role: 'assistant', content: `The product edit form needs: ${missing.join(', ')}.` }]);
+      return;
+    }
+
+    setActiveTab('pending');
+    sendMessage(
+      `Update this existing product using these structured fields only, preserving all existing gallery images, specs, related products, SEO fields, and body copy unless the notes explicitly say otherwise.\n\n` +
+      `Product slug: ${editProduct.slug}\n` +
+      `File to read first: src/content/products/${editProduct.slug}.md\n\n` +
+      `New title: ${editProduct.title.trim()}\n` +
+      `New price: ${editProduct.price.trim()}\n` +
+      `New status: ${editProduct.status}\n` +
+      `New onSale: ${editProduct.onSale}\n` +
+      `New featured: ${editProduct.featured}\n` +
+      `New tagline: ${editProduct.tagline.trim()}\n` +
+      `Additional owner notes:\n${editProduct.notes.trim() || 'None'}\n\n` +
+      `Queue one complete-file change for review. Do not invent product specs or image URLs.`
+    );
+    setEditProduct(null);
+  }
+
   function queueNewProduct() {
     const missing = [
       !newProduct.title.trim() && 'title',
@@ -180,6 +245,12 @@ export default function AdminPanel() {
 
     if (missing.length) {
       setMessages(prev => [...prev, { role: 'assistant', content: `The new product form needs: ${missing.join(', ')}.` }]);
+      return;
+    }
+
+    const proposedSlug = slugifyTitle(newProduct.title);
+    if (products.some(product => product.slug === proposedSlug)) {
+      setMessages(prev => [...prev, { role: 'assistant', content: `A product already uses the slug "${proposedSlug}". Change the title or ask me to edit the existing product instead.` }]);
       return;
     }
 
@@ -357,7 +428,7 @@ export default function AdminPanel() {
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.35rem', marginTop: '0.55rem' }}>
                       <button
-                        onClick={() => requestProductUpdate(product, 'Help me update the price, product copy, specs, or status for this product. Ask me what exact change I want if I have not already provided it.')}
+                        onClick={() => startStructuredEdit(product)}
                         style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
                       >
                         Edit
@@ -376,6 +447,40 @@ export default function AdminPanel() {
                 <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>No matching products</p>
               )}
             </div>
+            {editProduct && (
+              <div style={{ padding: '0.85rem', borderTop: '1px solid #333', display: 'grid', gap: '0.5rem', background: '#141414' }}>
+                <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem' }}>Edit Product</div>
+                <input value={editProduct.title} onChange={e => setEditProduct(p => p && ({ ...p, title: e.target.value }))} placeholder="Title" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+                  <input value={editProduct.price} onChange={e => setEditProduct(p => p && ({ ...p, price: e.target.value }))} placeholder="$72,000" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                  <select value={editProduct.status} onChange={e => setEditProduct(p => p && ({ ...p, status: e.target.value as ProductStatus }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
+                    <option value="available">Available</option>
+                    <option value="on-sale">On sale</option>
+                    <option value="coming-soon">Coming soon</option>
+                  </select>
+                </div>
+                <input value={editProduct.tagline} onChange={e => setEditProduct(p => p && ({ ...p, tagline: e.target.value }))} placeholder="Tagline" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem', color: '#ddd', fontSize: '0.78rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <input type="checkbox" checked={editProduct.onSale} onChange={e => setEditProduct(p => p && ({ ...p, onSale: e.target.checked }))} />
+                    On sale
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <input type="checkbox" checked={editProduct.featured} onChange={e => setEditProduct(p => p && ({ ...p, featured: e.target.checked }))} />
+                    Featured
+                  </label>
+                </div>
+                <textarea value={editProduct.notes} onChange={e => setEditProduct(p => p && ({ ...p, notes: e.target.value }))} placeholder="Optional notes for copy/spec changes" rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+                  <button onClick={() => setEditProduct(null)} style={{ background: '#222', color: '#aaa', border: '1px solid #444', borderRadius: '6px', padding: '0.55rem', cursor: 'pointer', fontWeight: 700 }}>
+                    Cancel
+                  </button>
+                  <button onClick={queueStructuredEdit} disabled={loading} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.55rem', cursor: 'pointer', fontWeight: 700 }}>
+                    Queue Edit
+                  </button>
+                </div>
+              </div>
+            )}
             <div style={{ padding: '0.85rem', borderTop: '1px solid #333', display: 'grid', gap: '0.5rem' }}>
               <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem' }}>Add Product Draft</div>
               <input value={newProduct.title} onChange={e => setNewProduct(p => ({ ...p, title: e.target.value }))} placeholder="Product title" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
@@ -453,10 +558,16 @@ export default function AdminPanel() {
                         Flags: {c.risk_flags.join(', ')}
                       </div>
                     )}
-                    <button
-                      onClick={() => setPending(prev => prev.filter((_, j) => j !== i))}
-                      style={{ marginTop: '0.4rem', background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: '0.75rem', padding: 0 }}
-                    >✕ remove</button>
+                    <div style={{ display: 'flex', gap: '0.6rem', marginTop: '0.45rem' }}>
+                      <button
+                        onClick={() => setPreviewChange(c)}
+                        style={{ background: 'none', border: 'none', color: '#aaa', cursor: 'pointer', fontSize: '0.75rem', padding: 0 }}
+                      >Preview</button>
+                      <button
+                        onClick={() => setPending(prev => prev.filter((_, j) => j !== i))}
+                        style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: '0.75rem', padding: 0 }}
+                      >✕ remove</button>
+                    </div>
                   </div>
                 );
               })}
@@ -517,9 +628,10 @@ export default function AdminPanel() {
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Update a product</h3>
               <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
                 <li>Open the Products tab and search for the product, or type the product name directly in chat.</li>
-                <li>Use Edit for guided changes, then explain the exact price, wording, key specs, featured status, or availability change.</li>
+                <li>Use Edit to change safe fields like price, status, tagline, sale state, or featured state.</li>
+                <li>Use the notes box for copy or spec changes that need more explanation.</li>
                 <li>Wait for the assistant to read the current product file and queue the proposed change.</li>
-                <li>Check the Pending Changes description and remove anything that looks wrong.</li>
+                <li>Open Pending, use Preview to inspect the generated file, and remove anything that looks wrong.</li>
                 <li>Click Deploy. The live site usually updates after the Netlify rebuild completes.</li>
               </ol>
             </section>
@@ -530,7 +642,7 @@ export default function AdminPanel() {
                 <li>Provide the product title, price, category, tagline, main specs, description, and selling points.</li>
                 <li>The assistant will create a draft product file using the existing product format.</li>
                 <li>For images, provide the intended filenames and order. Full image uploading still needs a developer or a later media manager.</li>
-                <li>Deploy only after the new product path, price, specs, and image order have been checked.</li>
+                <li>Use Preview in Pending and deploy only after the new product path, price, specs, and image order have been checked.</li>
               </ol>
             </section>
             <section>
@@ -558,6 +670,34 @@ export default function AdminPanel() {
               </p>
             </section>
           </div>
+        </div>
+      </div>
+    )}
+    {previewChange && (
+      <div
+        role="dialog"
+        aria-modal="true"
+        style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.72)', zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
+      >
+        <div style={{ width: 'min(980px, 100%)', maxHeight: '88vh', overflow: 'hidden', background: '#111', color: '#fff', border: '1px solid #333', borderRadius: '8px', boxShadow: '0 24px 80px rgba(0,0,0,0.45)', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ borderBottom: '1px solid #333', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+            <div>
+              <h2 style={{ margin: 0, fontSize: '1.05rem' }}>Pending File Preview</h2>
+              <p style={{ margin: '0.25rem 0 0', color: '#888', fontSize: '0.8rem' }}>{previewChange.path}</p>
+            </div>
+            <button
+              onClick={() => setPreviewChange(null)}
+              style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.4rem 0.65rem', cursor: 'pointer' }}
+            >
+              Close
+            </button>
+          </div>
+          <div style={{ padding: '0.85rem 1rem', borderBottom: '1px solid #333', color: '#ddd', fontSize: '0.85rem', lineHeight: 1.45 }}>
+            {previewChange.description}
+          </div>
+          <pre style={{ margin: 0, padding: '1rem', overflow: 'auto', color: '#ddd', background: '#0b0b0b', fontSize: '0.78rem', lineHeight: 1.45, whiteSpace: 'pre-wrap' }}>
+            {previewChange.content}
+          </pre>
         </div>
       </div>
     )}
