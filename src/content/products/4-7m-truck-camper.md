@@ -51,7 +51,6 @@ features:
   - "Self-contained living"
 relatedSlugs:
   - "3-5m-poptop-truck-camper"
-  - "3-5m-truck-camper-cabover"
 seoTitle: "4.7m Truck Camper | Beyond RV Queensland"
 seoDesc: "Beyond RV's 4.7m truck camper — full composite construction, built for Iveco, Unimog, and Isuzu platform trucks. Made in Queensland."
 ---

@@ -42,7 +42,6 @@ features:
   - "Full composite construction"
   - "Designed for mid-size trucks"
 relatedSlugs:
-  - "3-5m-truck-camper-cabover"
   - "7ft-electric-poptop-slide-on"
 seoTitle: "3.5m Pop-Top Truck Camper | Beyond RV Queensland"
 seoDesc: "Beyond RV's 3.5m pop-top truck camper. Composite build, pop-top roof, compact footprint. Built in Queensland for serious off-road trucks."

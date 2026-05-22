@@ -20,6 +20,11 @@
   to     = "/our-caravans/"
   status = 301
 
+[[redirects]]
+  from   = "/3-5m-truck-camper-cabover/"
+  to     = "/our-slide-on-campers/"
+  status = 301
+
 [[headers]]
   for    = "/*"
   [headers.values]

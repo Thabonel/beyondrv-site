@@ -23,29 +23,6 @@
     "description": "The **3.5m Pop-Top Truck Camper** delivers maximum living in a compact package. Pop the roof and you're standing — keep it down and you're aerodynamic. Simple, reliable, purpose-built in Queensland."
   },
   {
-    "slug": "3-5m-truck-camper-cabover",
-    "title": "3.5m Truck Camper with Cabover",
-    "price": "$44,999",
-    "status": "on-sale",
-    "category": "slide-on",
-    "tagline": "Extra sleeping. Same tough footprint.",
-    "keySpecs": [
-      {
-        "label": "Base length",
-        "value": "3,500mm"
-      },
-      {
-        "label": "Cabover",
-        "value": "Extra sleeping berth"
-      },
-      {
-        "label": "Construction",
-        "value": "Full composite"
-      }
-    ],
-    "description": "The **3.5m Cabover Truck Camper** adds an extra sleeping berth over the cab — ideal for small families or couples who want the guest room. Same tough composite construction, same compact base."
-  },
-  {
     "slug": "4-7m-truck-camper",
     "title": "4.7m Truck Camper",
     "price": "POA",
