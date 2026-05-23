@@ -7,7 +7,7 @@ priceBadge: "2 UNITS AVAILABLE"
 status: on-sale
 onSale: true
 featured: false
-heroImage: "https://beyondrv.com.au/wp-content/uploads/2025/11/sunpatch-12c-28-scaled.jpg"
+heroImage: "/wp-content/uploads/2025/11/sunpatch-12c-28-scaled.jpg"
 gallery: []
 keySpecs:
   - label: "Length"

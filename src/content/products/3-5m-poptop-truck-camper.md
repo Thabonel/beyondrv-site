@@ -7,17 +7,17 @@ priceBadge: "ONE OFF SPECIAL"
 status: on-sale
 onSale: true
 featured: false
-heroImage: "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-01-scaled.jpg"
+heroImage: "/wp-content/uploads/2025/11/truck-3.5m-box-01-scaled.jpg"
 gallery:
-  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-06-scaled.jpg"
-  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-08-scaled.jpg"
-  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-09-scaled.jpg"
-  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-11-scaled.jpg"
-  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-13-scaled.jpg"
-  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-14-scaled.jpg"
-  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-16-scaled.jpg"
-  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-10-scaled.jpg"
-  - "https://beyondrv.com.au/wp-content/uploads/2025/11/truck-3.5m-box-05-scaled.jpg"
+  - "/wp-content/uploads/2025/11/truck-3.5m-box-06-scaled.jpg"
+  - "/wp-content/uploads/2025/11/truck-3.5m-box-08-scaled.jpg"
+  - "/wp-content/uploads/2025/11/truck-3.5m-box-09-scaled.jpg"
+  - "/wp-content/uploads/2025/11/truck-3.5m-box-11-scaled.jpg"
+  - "/wp-content/uploads/2025/11/truck-3.5m-box-13-scaled.jpg"
+  - "/wp-content/uploads/2025/11/truck-3.5m-box-14-scaled.jpg"
+  - "/wp-content/uploads/2025/11/truck-3.5m-box-16-scaled.jpg"
+  - "/wp-content/uploads/2025/11/truck-3.5m-box-10-scaled.jpg"
+  - "/wp-content/uploads/2025/11/truck-3.5m-box-05-scaled.jpg"
 keySpecs:
   - label: "Base length"
     value: "3,500mm"
