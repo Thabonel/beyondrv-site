@@ -493,7 +493,16 @@ Shape:
 - Should stock value include on-sale price only, or original price if `priceBadge` contains old price context?
 - Does the owner want weekly email summaries later?
 
+## Implementation decisions
+
+For the initial build, the open questions are resolved conservatively:
+
+- Lead status lives only in admin. Email notifications should not include private admin links until the deployed admin URL, owner access pattern, and token policy are settled.
+- A `won` lead does not automatically mark a product as sold. The dashboard can surface the cue, but stock changes remain a deliberate owner/admin action because one product can receive multiple leads and some listed products represent models rather than single serialised stock.
+- Stale stock defaults to no matched enquiries in 30 days. This is short enough to be useful for high-value stock monitoring and can become configurable later if real lead volume proves it too noisy.
+- Listed stock value uses the current public `price` field only. `POA`, contact pricing, empty prices, and coming-soon items are excluded, and the result is labelled as an estimate rather than an accounting valuation.
+- Weekly email summaries are deferred until the owner has used the dashboard with real enquiry data. The first priority is an accurate on-demand dashboard and follow-up queue.
+
 ## Recommendation
 
 Build Phase A and Phase B first. Those create the highest immediate business value: a dashboard, email/readiness confidence, and a practical follow-up queue. Product and analytics intelligence should follow once real enquiry data is flowing through the new contact form.
-

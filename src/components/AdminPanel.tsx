@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import AdminDashboard from './AdminDashboard';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -18,7 +19,7 @@ interface PendingChange {
 }
 
 type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
-type PanelTab = 'products' | 'media' | 'enquiries' | 'knowledge' | 'pending';
+type PanelTab = 'dashboard' | 'products' | 'media' | 'enquiries' | 'knowledge' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 
@@ -84,6 +85,13 @@ interface EnquiryRecord {
   callback_date?: string;
   callback_time?: string;
   referral_source_self_reported?: string;
+  leadStatus?: {
+    enquiryId: string;
+    status: 'new' | 'contacted' | 'quoted' | 'won' | 'lost' | 'spam';
+    notes?: string;
+    nextFollowUpDate?: string;
+    updatedAt?: string;
+  };
 }
 
 interface ContactConfig {
@@ -128,7 +136,7 @@ export default function AdminPanel() {
     { role: 'assistant', content: "Hi! I'm the Beyond RV admin assistant. Tell me what you'd like to change on the site." }
   ]);
   const [input, setInput] = useState('');
-  const [activeTab, setActiveTab] = useState<PanelTab>('products');
+  const [activeTab, setActiveTab] = useState<PanelTab>('dashboard');
   const [knowledgeInput, setKnowledgeInput] = useState('');
   const [showHelp, setShowHelp] = useState(false);
   const [products, setProducts] = useState<ProductRecord[]>([]);
@@ -145,6 +153,7 @@ export default function AdminPanel() {
   const [enquiries, setEnquiries] = useState<EnquiryRecord[]>([]);
   const [enquiriesLoading, setEnquiriesLoading] = useState(false);
   const [enquiriesStatus, setEnquiriesStatus] = useState('');
+  const [leadSaving, setLeadSaving] = useState<string | null>(null);
   const [contactConfig, setContactConfig] = useState<ContactConfig | null>(null);
   const [loading, setLoading] = useState(false);
   const [pending, setPending] = useState<PendingChange[]>([]);
@@ -284,6 +293,45 @@ export default function AdminPanel() {
       setContactConfig(data);
     } catch {
       setContactConfig(null);
+    }
+  }
+
+  async function saveLeadStatus(
+    enquiry: EnquiryRecord,
+    patch: Partial<NonNullable<EnquiryRecord['leadStatus']>>
+  ) {
+    const current = enquiry.leadStatus ?? {
+      enquiryId: enquiry.id,
+      status: 'new' as const,
+      notes: '',
+      nextFollowUpDate: enquiry.callback_date ?? '',
+      updatedAt: enquiry.submittedAt,
+    };
+    const next = { ...current, ...patch, enquiryId: enquiry.id };
+    setEnquiries(prev => prev.map(item => item.id === enquiry.id ? { ...item, leadStatus: next } : item));
+    setLeadSaving(enquiry.id);
+    try {
+      const res = await fetch('/.netlify/functions/admin-lead-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          enquiryId: enquiry.id,
+          status: next.status,
+          notes: next.notes ?? '',
+          nextFollowUpDate: next.nextFollowUpDate ?? '',
+        }),
+      });
+      const data = await res.json() as { leadStatus?: EnquiryRecord['leadStatus']; error?: string };
+      if (!res.ok) throw new Error(data.error ?? 'Could not save lead status');
+      if (data.leadStatus) {
+        setEnquiries(prev => prev.map(item => item.id === enquiry.id ? { ...item, leadStatus: data.leadStatus } : item));
+      }
+      setEnquiriesStatus('');
+    } catch (err) {
+      setEnquiriesStatus(err instanceof Error ? err.message : 'Could not save lead status.');
+      setEnquiries(prev => prev.map(item => item.id === enquiry.id ? { ...item, leadStatus: current } : item));
+    } finally {
+      setLeadSaving(null);
     }
   }
 
@@ -602,8 +650,8 @@ export default function AdminPanel() {
 
       {/* Admin tools panel */}
       <div style={{ width: '420px', display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333', minWidth: 0 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', borderBottom: '1px solid #333' }}>
-          {(['products', 'media', 'enquiries', 'knowledge', 'pending'] as PanelTab[]).map(tab => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', borderBottom: '1px solid #333' }}>
+          {(['dashboard', 'products', 'media', 'enquiries', 'knowledge', 'pending'] as PanelTab[]).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -612,16 +660,19 @@ export default function AdminPanel() {
                 color: activeTab === tab ? '#fff' : '#aaa',
                 border: 'none',
                 borderRight: tab !== 'pending' ? '1px solid #333' : 'none',
-                padding: '0.75rem 0.35rem',
+                padding: '0.75rem 0.25rem',
                 cursor: 'pointer',
                 fontWeight: 700,
                 textTransform: 'capitalize',
+                fontSize: '0.72rem',
               }}
             >
               {tab === 'pending' ? `Pending (${pending.length})` : tab}
             </button>
           ))}
         </div>
+
+        {activeTab === 'dashboard' && <AdminDashboard pendingCount={pending.length} />}
 
         {activeTab === 'products' && (
           <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
@@ -853,6 +904,51 @@ export default function AdminPanel() {
                   {enquiry.referral_source_self_reported && (
                     <div style={{ color: '#777', fontSize: '0.72rem' }}>Heard about us: {enquiry.referral_source_self_reported}</div>
                   )}
+                  <div style={{ borderTop: '1px solid #303030', marginTop: '0.25rem', paddingTop: '0.55rem', display: 'grid', gap: '0.45rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+                      <select
+                        value={enquiry.leadStatus?.status ?? 'new'}
+                        onChange={e => saveLeadStatus(enquiry, { status: e.target.value as NonNullable<EnquiryRecord['leadStatus']>['status'] })}
+                        disabled={leadSaving === enquiry.id}
+                        style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }}
+                      >
+                        <option value="new">New</option>
+                        <option value="contacted">Contacted</option>
+                        <option value="quoted">Quoted</option>
+                        <option value="won">Won</option>
+                        <option value="lost">Lost</option>
+                        <option value="spam">Spam</option>
+                      </select>
+                      <input
+                        type="date"
+                        value={enquiry.leadStatus?.nextFollowUpDate ?? enquiry.callback_date ?? ''}
+                        onChange={e => saveLeadStatus(enquiry, { nextFollowUpDate: e.target.value })}
+                        disabled={leadSaving === enquiry.id}
+                        style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }}
+                      />
+                    </div>
+                    <textarea
+                      value={enquiry.leadStatus?.notes ?? ''}
+                      onChange={e => setEnquiries(prev => prev.map(item => item.id === enquiry.id ? {
+                        ...item,
+                        leadStatus: {
+                          enquiryId: enquiry.id,
+                          status: item.leadStatus?.status ?? 'new',
+                          nextFollowUpDate: item.leadStatus?.nextFollowUpDate ?? item.callback_date ?? '',
+                          updatedAt: item.leadStatus?.updatedAt ?? item.submittedAt,
+                          notes: e.target.value,
+                        },
+                      } : item))}
+                      onBlur={e => saveLeadStatus(enquiry, { notes: e.target.value })}
+                      placeholder="Lead notes"
+                      rows={2}
+                      disabled={leadSaving === enquiry.id}
+                      style={{ resize: 'vertical', background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem', lineHeight: 1.35 }}
+                    />
+                    {leadSaving === enquiry.id && (
+                      <div style={{ color: '#777', fontSize: '0.72rem' }}>Saving lead status...</div>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

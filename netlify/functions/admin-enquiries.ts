@@ -3,6 +3,11 @@ import type { Handler } from '@netlify/functions';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
 
 const STORE_NAME = 'customer-enquiries';
+const LEAD_STATUS_STORE = 'customer-lead-status';
+
+function leadKey(enquiryId: string) {
+  return `lead-status/${encodeURIComponent(enquiryId)}.json`;
+}
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'GET') return { statusCode: 405, body: 'Method Not Allowed' };
@@ -14,10 +19,22 @@ export const handler: Handler = async (event) => {
     .sort((a, b) => b.key.localeCompare(a.key))
     .slice(0, 50);
 
+  const statusStore = getStore({ name: LEAD_STATUS_STORE, consistency: 'strong' });
   const enquiries = await Promise.all(
     recent.map(async (blob) => {
-      const data = await store.get(blob.key, { type: 'json', consistency: 'strong' });
-      return data;
+      const data = await store.get(blob.key, { type: 'json', consistency: 'strong' }) as { id?: string; callback_date?: string; submittedAt?: string } | null;
+      if (!data?.id) return data;
+      const leadStatus = await statusStore.get(leadKey(data.id), { type: 'json', consistency: 'strong' });
+      return {
+        ...data,
+        leadStatus: leadStatus ?? {
+          enquiryId: data.id,
+          status: 'new',
+          notes: '',
+          nextFollowUpDate: data.callback_date ?? '',
+          updatedAt: data.submittedAt ?? '',
+        },
+      };
     })
   );
 

@@ -22,6 +22,8 @@ public/images/products/*
 
 # Local Netlify folder
 .netlify
+netlify/functions/*.zip
+netlify/functions/manifest.json
 
 # Local Playwright/MCP screenshots and logs
 .playwright-mcp/
