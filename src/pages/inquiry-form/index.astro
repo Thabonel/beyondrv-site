@@ -138,14 +138,17 @@ const schema = {
       </div>
 
       <div class="form-field">
-        <label class="form-label" for="referralSourceSelfReported">How did you hear about us?</label>
+        <label class="form-label" for="referralSourceSelfReported">
+          How did you hear about us? <span aria-hidden="true" style="color:var(--orange)">*</span>
+        </label>
         <select
           class="form-input"
           id="referralSourceSelfReported"
           name="referral_source_self_reported"
+          required
           style="cursor: pointer"
         >
-          <option value="">— Select an option —</option>
+          <option value="" disabled selected>— Select an option —</option>
           <option value="Instagram">Instagram</option>
           <option value="Facebook">Facebook</option>
           <option value="TikTok">TikTok</option>
