@@ -1074,8 +1074,30 @@ export default function AdminPanel() {
             <section>
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>How the admin works</h3>
               <p style={{ margin: 0, color: '#ddd' }}>
-                The admin chat prepares site changes for review. It does not make a change live immediately. Ask for one clear task, review the queued file changes in Pending Changes, then click Deploy when the change looks right.
+                The admin has two jobs: show the owner what needs attention, and prepare safe site changes for review. Dashboard, Enquiries, and Media save operational data directly. Product, content, and chatbot changes are queued in Pending Changes so they can be previewed before deployment.
               </p>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Read the dashboard</h3>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Open Dashboard first. It summarises product stock, listed value, recent leads, due follow-ups, email readiness, and pending changes.</li>
+                <li>Use the 7, 30, and 90 day buttons to change the reporting window for lead and analytics signals.</li>
+                <li>Check Due Follow-Ups first. Overdue follow-ups need action before browsing product statistics.</li>
+                <li>Check Email Delivery and Launch Readiness. Red items are setup blockers, orange items are warnings, and green items are ready.</li>
+                <li>Use Products Needing Attention to find weak listings, stale stock, or products that need better photos or copy.</li>
+                <li>Use Product Interest, Funnel, and Traffic Quality to understand which products and marketing sources are producing enquiries.</li>
+              </ol>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Manage enquiries and follow-ups</h3>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Open Enquiries to see contact form submissions backed up from the website.</li>
+                <li>Use the phone and email links to contact the customer.</li>
+                <li>Set the lead status to New, Contacted, Quoted, Won, Lost, or Spam.</li>
+                <li>Set the follow-up date for the next call or email. Due and overdue items appear on Dashboard.</li>
+                <li>Add short notes after each contact attempt, quote, or outcome. Do not store passwords, payment details, or unnecessary private information.</li>
+                <li>Marking a lead Won does not automatically remove a product from the website. Use Products or Admin Chat to make stock changes deliberately.</li>
+              </ol>
             </section>
             <section>
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Update a product</h3>
@@ -1094,7 +1116,8 @@ export default function AdminPanel() {
               <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
                 <li>Open the Media tab and choose the product.</li>
                 <li>Add short alt text, then upload a JPG, PNG, WebP, or GIF image up to 12MB.</li>
-                <li>Use Hero to prepare that image as the main product image, or Gallery to add it to the gallery list.</li>
+                <li>The uploaded image is stored in Netlify Blobs, so it does not need to be committed to Git.</li>
+                <li>Use Hero to prepare that image as the main product image, or Gallery to add it to the product gallery list.</li>
                 <li>Open Pending, preview the product file, then deploy when the image order is correct.</li>
               </ol>
             </section>
@@ -1104,7 +1127,7 @@ export default function AdminPanel() {
                 <li>Use Add Product Draft in the Products tab.</li>
                 <li>Provide the product title, price, category, tagline, main specs, description, and selling points.</li>
                 <li>The assistant will create a draft product file using the existing product format.</li>
-                <li>For images, provide the intended filenames and order. Full image uploading still needs a developer or a later media manager.</li>
+                <li>Upload real product photos in Media, then use Hero or Gallery to add those images to the draft.</li>
                 <li>Use Preview in Pending and deploy only after the new product path, price, specs, and image order have been checked.</li>
               </ol>
             </section>
@@ -1127,9 +1150,19 @@ export default function AdminPanel() {
               </ol>
             </section>
             <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Deploy pending changes</h3>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Open Pending after asking the assistant to change a product, page, redirect, or chatbot knowledge.</li>
+                <li>Use Preview to inspect the complete proposed file content before deployment.</li>
+                <li>Remove any change that looks wrong or unclear.</li>
+                <li>If a change is flagged for review, read the reason carefully before deciding whether to deploy.</li>
+                <li>Click Deploy only when the queued changes match the intended business change. The live site normally updates after the Netlify rebuild finishes.</li>
+              </ol>
+            </section>
+            <section>
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Best practice</h3>
               <p style={{ margin: 0, color: '#ddd' }}>
-                Make one or two changes at a time. Use exact product names, exact prices, and exact wording where possible. If the assistant says a change needs review, treat it as a warning and check the file description carefully before deploying.
+                Start each session by checking Dashboard and Enquiries. Keep product/content edits small, use exact product names and prices, and preview every queued file before deployment. Treat the dashboard value as an estimate, not accounting data, and keep customer notes factual and brief.
               </p>
             </section>
           </div>
