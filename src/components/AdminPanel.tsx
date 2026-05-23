@@ -85,6 +85,7 @@ interface EnquiryRecord {
   callback_date?: string;
   callback_time?: string;
   referral_source_self_reported?: string;
+  referral_source_other?: string;
   leadStatus?: {
     enquiryId: string;
     status: 'new' | 'contacted' | 'quoted' | 'won' | 'lost' | 'spam';
@@ -902,7 +903,9 @@ export default function AdminPanel() {
                   )}
                   <div style={{ color: '#ddd', fontSize: '0.78rem', lineHeight: 1.45, whiteSpace: 'pre-wrap' }}>{enquiry.message}</div>
                   {enquiry.referral_source_self_reported && (
-                    <div style={{ color: '#777', fontSize: '0.72rem' }}>Heard about us: {enquiry.referral_source_self_reported}</div>
+                    <div style={{ color: '#777', fontSize: '0.72rem' }}>
+                      Heard about us: {enquiry.referral_source_self_reported}{enquiry.referral_source_other ? ` - ${enquiry.referral_source_other}` : ''}
+                    </div>
                   )}
                   <div style={{ borderTop: '1px solid #303030', marginTop: '0.25rem', paddingTop: '0.55rem', display: 'grid', gap: '0.45rem' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>

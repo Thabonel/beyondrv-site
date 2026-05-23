@@ -16,6 +16,7 @@ interface EnquiryPayload {
   product_interest?: string;
   enquiry_intent?: string;
   referral_source_self_reported?: string;
+  referral_source_other?: string;
   referral_partner?: string;
   referral_entry_page?: string;
   referral_first_touch?: string;
@@ -57,6 +58,7 @@ async function sendEmail(enquiry: Required<Pick<EnquiryPayload, 'name' | 'email'
     field('Preferred callback date', enquiry.callback_date),
     field('Preferred callback time', enquiry.callback_time),
     field('Heard about us', enquiry.referral_source_self_reported),
+    field('Heard about us detail', enquiry.referral_source_other),
     field('Referral partner', enquiry.referral_partner),
     field('Entry page', enquiry.referral_entry_page),
     field('First touch', enquiry.referral_first_touch),
@@ -74,6 +76,7 @@ async function sendEmail(enquiry: Required<Pick<EnquiryPayload, 'name' | 'email'
     <p><strong>Phone:</strong> <a href="tel:${escapeHtml(enquiry.phone)}">${escapeHtml(enquiry.phone)}</a></p>
     <p><strong>Product:</strong> ${escapeHtml(enquiry.product_interest ?? 'Not specified')}</p>
     <p><strong>Callback:</strong> ${escapeHtml([enquiry.callback_date, enquiry.callback_time].filter(Boolean).join(' ') || 'Not specified')}</p>
+    <p><strong>Heard about us:</strong> ${escapeHtml(enquiry.referral_source_self_reported ?? 'Not specified')}${enquiry.referral_source_other ? ` - ${escapeHtml(enquiry.referral_source_other)}` : ''}</p>
     <h3>Message</h3>
     <p>${escapeHtml(enquiry.message).replace(/\n/g, '<br>')}</p>
   `;
@@ -127,6 +130,7 @@ export const handler: Handler = async (event) => {
     product_interest: clean(body.product_interest, 160),
     enquiry_intent: clean(body.enquiry_intent, 80),
     referral_source_self_reported: clean(body.referral_source_self_reported, 120),
+    referral_source_other: clean(body.referral_source_other, 180),
     referral_partner: clean(body.referral_partner, 120),
     referral_entry_page: clean(body.referral_entry_page, 300),
     referral_first_touch: clean(body.referral_first_touch, 80),

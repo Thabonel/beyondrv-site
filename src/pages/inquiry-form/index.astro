@@ -162,6 +162,20 @@ const schema = {
         </select>
       </div>
 
+      <div class="form-field" id="referralOtherField" style="display: none">
+        <label class="form-label" for="referralSourceOther">
+          Please tell us where <span aria-hidden="true" style="color:var(--orange)">*</span>
+        </label>
+        <input
+          class="form-input"
+          type="text"
+          id="referralSourceOther"
+          name="referral_source_other"
+          autocomplete="off"
+          placeholder="Example: a friend, a show, a forum, another channel..."
+        />
+      </div>
+
       <!-- Cloudflare Turnstile placeholder — replace TURNSTILE_SITEKEY before launch -->
       <!-- <div class="cf-turnstile" data-sitekey="TURNSTILE_SITEKEY" data-theme="dark"></div> -->
 
@@ -212,6 +226,22 @@ const schema = {
   }
   if (productSlug && hiddenField) hiddenField.value = decodeURIComponent(productSlug);
   if (intent && intentField) intentField.value = intent;
+
+  const referralSource = document.getElementById('referralSourceSelfReported') as HTMLSelectElement | null;
+  const referralOtherField = document.getElementById('referralOtherField') as HTMLDivElement | null;
+  const referralOther = document.getElementById('referralSourceOther') as HTMLInputElement | null;
+
+  function syncReferralOther() {
+    const isOther = referralSource?.value === 'Other';
+    if (referralOtherField) referralOtherField.style.display = isOther ? 'block' : 'none';
+    if (referralOther) {
+      referralOther.required = Boolean(isOther);
+      if (!isOther) referralOther.value = '';
+    }
+  }
+
+  referralSource?.addEventListener('change', syncReferralOther);
+  syncReferralOther();
 
   // Attribution — populate hidden fields from localStorage
   (function() {
