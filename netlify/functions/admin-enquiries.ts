@@ -13,8 +13,18 @@ export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'GET') return { statusCode: 405, body: 'Method Not Allowed' };
   if (!isAdminAuthorized(event)) return unauthorizedResponse();
 
+  let blobs: Awaited<ReturnType<ReturnType<typeof getStore>['list']>>['blobs'];
   const store = getStore({ name: STORE_NAME, consistency: 'strong' });
-  const { blobs } = await store.list();
+  try {
+    ({ blobs } = await store.list());
+  } catch (error) {
+    console.warn('admin-enquiries: enquiry store unavailable', error);
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enquiries: [] }),
+    };
+  }
   const recent = blobs
     .sort((a, b) => b.key.localeCompare(a.key))
     .slice(0, 50);
@@ -24,7 +34,12 @@ export const handler: Handler = async (event) => {
     recent.map(async (blob) => {
       const data = await store.get(blob.key, { type: 'json', consistency: 'strong' }) as { id?: string; callback_date?: string; submittedAt?: string } | null;
       if (!data?.id) return data;
-      const leadStatus = await statusStore.get(leadKey(data.id), { type: 'json', consistency: 'strong' });
+      let leadStatus = null;
+      try {
+        leadStatus = await statusStore.get(leadKey(data.id), { type: 'json', consistency: 'strong' });
+      } catch {
+        leadStatus = null;
+      }
       return {
         ...data,
         leadStatus: leadStatus ?? {

@@ -100,33 +100,44 @@ function matchProduct(enquiry: EnquiryRecord, products: ProductRecord[]) {
 }
 
 async function getAllJson<T>(storeName: string) {
-  const store = getStore({ name: storeName, consistency: 'strong' });
-  const { blobs } = await store.list();
-  const records = await Promise.all(
-    blobs.map(async (blob) => {
-      try {
-        return await store.get(blob.key, { type: 'json', consistency: 'strong' }) as T | null;
-      } catch {
-        return null;
-      }
-    })
-  );
-  return records.filter(Boolean) as T[];
+  try {
+    const store = getStore({ name: storeName, consistency: 'strong' });
+    const { blobs } = await store.list();
+    const records = await Promise.all(
+      blobs.map(async (blob) => {
+        try {
+          return await store.get(blob.key, { type: 'json', consistency: 'strong' }) as T | null;
+        } catch {
+          return null;
+        }
+      })
+    );
+    return records.filter(Boolean) as T[];
+  } catch (error) {
+    console.warn(`admin-dashboard: ${storeName} unavailable`, error);
+    return [];
+  }
 }
 
 async function getLeadStatuses(enquiries: EnquiryRecord[]) {
-  const store = getStore({ name: LEAD_STATUS_STORE, consistency: 'strong' });
-  const entries = await Promise.all(
-    enquiries.map(async (enquiry) => {
-      try {
-        const status = await store.get(leadKey(enquiry.id), { type: 'json', consistency: 'strong' }) as LeadStatusRecord | null;
-        return [enquiry.id, status] as const;
-      } catch {
-        return [enquiry.id, null] as const;
-      }
-    })
-  );
-  return new Map(entries);
+  if (enquiries.length === 0) return new Map<string, LeadStatusRecord | null>();
+  try {
+    const store = getStore({ name: LEAD_STATUS_STORE, consistency: 'strong' });
+    const entries = await Promise.all(
+      enquiries.map(async (enquiry) => {
+        try {
+          const status = await store.get(leadKey(enquiry.id), { type: 'json', consistency: 'strong' }) as LeadStatusRecord | null;
+          return [enquiry.id, status] as const;
+        } catch {
+          return [enquiry.id, null] as const;
+        }
+      })
+    );
+    return new Map(entries);
+  } catch (error) {
+    console.warn('admin-dashboard: lead status store unavailable', error);
+    return new Map<string, LeadStatusRecord | null>();
+  }
 }
 
 async function hogql(query: string) {

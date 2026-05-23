@@ -16,11 +16,26 @@ export const handler: Handler = async (event) => {
   if (event.httpMethod === 'GET') {
     const slug = event.queryStringParameters?.slug ?? '';
     const prefix = slug ? `products/${slug}/` : 'products/';
-    const { blobs } = await store.list({ prefix });
+    let blobs: Awaited<ReturnType<typeof store.list>>['blobs'];
+    try {
+      ({ blobs } = await store.list({ prefix }));
+    } catch (error) {
+      console.warn('admin-media: media store unavailable', error);
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ files: [] }),
+      };
+    }
 
     const files = await Promise.all(
       blobs.map(async (blob) => {
-        const metadata = await store.getMetadata(blob.key, { consistency: 'strong' });
+        let metadata = null;
+        try {
+          metadata = await store.getMetadata(blob.key, { consistency: 'strong' });
+        } catch {
+          metadata = null;
+        }
         return {
           key: blob.key,
           url: mediaUrl(blob.key),
