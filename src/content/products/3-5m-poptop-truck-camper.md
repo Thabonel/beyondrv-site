@@ -7,17 +7,17 @@ priceBadge: "ONE OFF SPECIAL"
 status: on-sale
 onSale: true
 featured: false
-heroImage: "/wp-content/uploads/2025/11/truck-3.5m-box-01-scaled.jpg"
+heroImage: "/images/optimized/products/3-5m-poptop-truck-camper/01-truck-3-5m-box-01-scaled.webp"
 gallery:
-  - "/wp-content/uploads/2025/11/truck-3.5m-box-06-scaled.jpg"
-  - "/wp-content/uploads/2025/11/truck-3.5m-box-08-scaled.jpg"
-  - "/wp-content/uploads/2025/11/truck-3.5m-box-09-scaled.jpg"
-  - "/wp-content/uploads/2025/11/truck-3.5m-box-11-scaled.jpg"
-  - "/wp-content/uploads/2025/11/truck-3.5m-box-13-scaled.jpg"
-  - "/wp-content/uploads/2025/11/truck-3.5m-box-14-scaled.jpg"
-  - "/wp-content/uploads/2025/11/truck-3.5m-box-16-scaled.jpg"
-  - "/wp-content/uploads/2025/11/truck-3.5m-box-10-scaled.jpg"
-  - "/wp-content/uploads/2025/11/truck-3.5m-box-05-scaled.jpg"
+  - "/images/optimized/products/3-5m-poptop-truck-camper/02-truck-3-5m-box-06-scaled.webp"
+  - "/images/optimized/products/3-5m-poptop-truck-camper/03-truck-3-5m-box-08-scaled.webp"
+  - "/images/optimized/products/3-5m-poptop-truck-camper/04-truck-3-5m-box-09-scaled.webp"
+  - "/images/optimized/products/3-5m-poptop-truck-camper/05-truck-3-5m-box-11-scaled.webp"
+  - "/images/optimized/products/3-5m-poptop-truck-camper/06-truck-3-5m-box-13-scaled.webp"
+  - "/images/optimized/products/3-5m-poptop-truck-camper/07-truck-3-5m-box-14-scaled.webp"
+  - "/images/optimized/products/3-5m-poptop-truck-camper/08-truck-3-5m-box-16-scaled.webp"
+  - "/images/optimized/products/3-5m-poptop-truck-camper/09-truck-3-5m-box-10-scaled.webp"
+  - "/images/optimized/products/3-5m-poptop-truck-camper/10-truck-3-5m-box-05-scaled.webp"
 keySpecs:
   - label: "Base length"
     value: "3,500mm"

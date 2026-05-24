@@ -6,7 +6,7 @@ price: "POA"
 status: coming-soon
 onSale: false
 featured: false
-heroImage: "/images/products/sunpatch-15xc/sunpatch-15xc-01.jpg"
+heroImage: "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/01-sunpatch-15xc-01.webp"
 gallery: []
 keySpecs:
   - label: "Length"

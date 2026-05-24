@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProductCard from '../../components/ProductCard.astro';
+import { displayImageUrl } from '../../lib/media';
 
 const products = (await getCollection('products'))
   .filter(p => p.data.category === 'caravan')
@@ -40,16 +41,18 @@ const faqSchema = {
     }
   ]
 };
+const heroImage = '/images/optimized/products/sunpatch-15xc-couples-offroad-van/01-beyond-rv-sunpatch-15-xc-01-768x509.webp';
+const ctaImage = '/images/optimized/products/sunpatch-15xc-couples-offroad-van/16-beyond-rv-sunpatch-15-xc-02-768x509.webp';
 ---
 <BaseLayout
   title="Off-Road Caravans | Beyond RV Queensland"
   description="Beyond RV builds composite off-road caravans for couples and families. The Sunpatch range — built in Queensland for serious Australian travel."
-  image="/images/products/sunpatch-15xc/sunpatch-15xc-01.jpg"
+  image={heroImage}
   activePath="/our-caravans/"
   structuredData={[schema, faqSchema]}
 >
   <section class="page-hero">
-    <div class="page-hero-bg" style="background-image: url('/images/products/sunpatch-15xc/sunpatch-15xc-01.jpg')"></div>
+    <div class="page-hero-bg" style={`background-image: url('${displayImageUrl(heroImage, 1600)}')`}></div>
     <div class="hero-overlay"></div>
     <div class="hero-overlay-bottom"></div>
     <div class="page-hero-content">
@@ -104,7 +107,7 @@ const faqSchema = {
   </section>
 
   <section class="cta-section" style="padding: 7rem var(--gutter)">
-    <div class="cta-bg" style="background-image: url('/images/products/sunpatch-15xc/sunpatch-15xc-02.jpg')"></div>
+    <div class="cta-bg" style={`background-image: url('${displayImageUrl(ctaImage, 1600)}')`}></div>
     <div class="cta-overlay"></div>
     <div class="cta-content">
       <h2 class="cta-title reveal">Not sure <span class="italic">which one?</span></h2>

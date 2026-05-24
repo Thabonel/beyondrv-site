@@ -6,10 +6,10 @@ price: "POA"
 status: available
 onSale: false
 featured: true
-heroImage: "/images/site/unimog-hero.jpg"
+heroImage: "/images/optimized/products/expedition/unimog-overlander-camper/01-unimog-hero.webp"
 gallery:
-  - "/images/site/mog2.jpg"
-  - "/images/site/unimog-rear.png"
+  - "/images/optimized/products/expedition/unimog-overlander-camper/02-mog2.webp"
+  - "/images/optimized/products/expedition/unimog-overlander-camper/03-unimog-rear.webp"
 keySpecs:
   - label: "Platform"
     value: "Mercedes-Benz Unimog"

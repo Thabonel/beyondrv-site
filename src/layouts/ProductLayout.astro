@@ -2,7 +2,7 @@
 import BaseLayout from './BaseLayout.astro';
 import OptionalExtras from '../components/OptionalExtras';
 import type { CollectionEntry } from 'astro:content';
-import { displayImageUrl } from '../lib/media';
+import { displayImageUrl, imageSrcSet, thumbImageUrl } from '../lib/media';
 
 type ProductData = CollectionEntry<'products'>['data'];
 type ProductCategory = ProductData['category'];
@@ -23,10 +23,13 @@ const enquiryUrl = `/inquiry-form/?product=${encodedSlug}&name=${encodedName}`;
 const siteUrl = Astro.site ?? new URL('https://beyondrv.com.au');
 const productUrl = new URL(`/${product.slug}/`, siteUrl).toString();
 const heroDisplayImage = displayImageUrl(data.heroImage, 1400);
+const heroSrcSet = imageSrcSet(data.heroImage);
+const heroSizes = '(max-width: 900px) 100vw, 58vw';
 const galleryImages = [data.heroImage, ...data.gallery].map((img) => ({
   original: img,
   display: displayImageUrl(img, 1400),
-  thumb: displayImageUrl(img, 240),
+  thumb: thumbImageUrl(img),
+  srcset: imageSrcSet(img),
 }));
 const productImages = [data.heroImage, ...data.gallery]
   .filter(Boolean)
@@ -120,6 +123,7 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
   type="product"
   canonicalUrl={data.canonicalUrl}
   structuredData={schemas}
+  preloadImage={{ src: heroDisplayImage, srcset: heroSrcSet, sizes: heroSizes }}
   activePath={`/${product.slug}/`}
   productTitle={data.title}
   productSlug={product.slug}
@@ -127,7 +131,16 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
   <section class="product-hero-section">
     <div class="product-gallery">
       <div class="product-gallery-main">
-        <img id="productHeroImg" src={heroDisplayImage} alt={data.title} />
+        <img
+          id="productHeroImg"
+          src={heroDisplayImage}
+          srcset={heroSrcSet}
+          sizes={heroSizes}
+          alt={data.title}
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+        />
       </div>
       {data.gallery.length > 0 && (
         <div class="product-gallery-thumbs">
@@ -135,9 +148,10 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
             <button
               class={`thumb-btn${i === 0 ? ' active' : ''}`}
               data-src={img.display}
+              data-srcset={img.srcset}
               aria-label={`View image ${i + 1} of ${data.title}`}
             >
-              <img src={img.thumb} alt={`${data.title} — view ${i + 1}`} loading="lazy" />
+              <img src={img.thumb} alt={`${data.title} — view ${i + 1}`} loading="lazy" decoding="async" />
             </button>
           ))}
         </div>
@@ -295,7 +309,10 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
   document.querySelectorAll<HTMLButtonElement>('.thumb-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const heroImg = document.getElementById('productHeroImg') as HTMLImageElement | null;
-      if (heroImg && btn.dataset.src) heroImg.src = btn.dataset.src;
+      if (heroImg && btn.dataset.src) {
+        heroImg.src = btn.dataset.src;
+        if (btn.dataset.srcset) heroImg.srcset = btn.dataset.srcset;
+      }
       document.querySelectorAll('.thumb-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
     });

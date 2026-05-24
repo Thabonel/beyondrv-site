@@ -6,17 +6,17 @@ price: "POA"
 status: available
 onSale: false
 featured: false
-heroImage: "/images/products/isuzu-nps/isuzu-nps-01.jpg"
+heroImage: "/images/optimized/products/expedition/isuzu-nps-poptop-camper/01-isuzu-nps-01.webp"
 gallery:
-  - "/images/products/isuzu-nps/isuzu-nps-02.jpg"
-  - "/images/products/isuzu-nps/isuzu-nps-04.jpg"
-  - "/images/products/isuzu-nps/isuzu-nps-05.jpg"
-  - "/images/products/isuzu-nps/isuzu-nps-06.jpg"
-  - "/images/products/isuzu-nps/isuzu-nps-07.jpg"
-  - "/images/products/isuzu-nps/isuzu-nps-08.jpg"
-  - "/images/products/isuzu-nps/isuzu-nps-10.jpg"
-  - "/images/products/isuzu-nps/isuzu-nps-11.jpg"
-  - "/images/products/isuzu-nps/isuzu-nps-12.jpg"
+  - "/images/optimized/products/expedition/isuzu-nps-poptop-camper/02-isuzu-nps-02.webp"
+  - "/images/optimized/products/expedition/isuzu-nps-poptop-camper/03-isuzu-nps-04.webp"
+  - "/images/optimized/products/expedition/isuzu-nps-poptop-camper/04-isuzu-nps-05.webp"
+  - "/images/optimized/products/expedition/isuzu-nps-poptop-camper/05-isuzu-nps-06.webp"
+  - "/images/optimized/products/expedition/isuzu-nps-poptop-camper/06-isuzu-nps-07.webp"
+  - "/images/optimized/products/expedition/isuzu-nps-poptop-camper/07-isuzu-nps-08.webp"
+  - "/images/optimized/products/expedition/isuzu-nps-poptop-camper/08-isuzu-nps-10.webp"
+  - "/images/optimized/products/expedition/isuzu-nps-poptop-camper/09-isuzu-nps-11.webp"
+  - "/images/optimized/products/expedition/isuzu-nps-poptop-camper/10-isuzu-nps-12.webp"
 keySpecs:
   - label: "Platform"
     value: "Isuzu NPS"

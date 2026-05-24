@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "images:optimize": "node SCRIPTS/optimize-product-images.mjs --write"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.8",
@@ -25,6 +26,7 @@
   "devDependencies": {
     "@netlify/functions": "^5.2.0",
     "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3"
+    "@types/react-dom": "^19.2.3",
+    "sharp": "^0.34.5"
   }
 }

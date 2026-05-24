@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProductCard from '../../components/ProductCard.astro';
+import { displayImageUrl } from '../../lib/media';
 
 const products = (await getCollection('products'))
   .filter(p => p.data.category === 'slide-on')
@@ -44,16 +45,17 @@ const faqSchema = {
     }
   ]
 };
+const heroImage = '/images/optimized/products/advent-2150-hardtop-slide-on/02-advent-2150-04-1024x576.webp';
 ---
 <BaseLayout
   title="Slide-On Campers for Utes & Trucks | Beyond RV Queensland"
   description="Beyond RV slide-on campers — hardtop and pop-top for utes, mid-size trucks, and expedition vehicles. The Advent range and more. Built in Queensland."
-  image="/images/products/advent-2150/advent-2150-01.jpg"
+  image={heroImage}
   activePath="/our-slide-on-campers/"
   structuredData={[schema, faqSchema]}
 >
   <section class="page-hero">
-    <div class="page-hero-bg" style="background-image: url('/images/products/advent-2150/advent-2150-01.jpg')"></div>
+    <div class="page-hero-bg" style={`background-image: url('${displayImageUrl(heroImage, 1600)}')`}></div>
     <div class="hero-overlay"></div>
     <div class="hero-overlay-bottom"></div>
     <div class="page-hero-content">

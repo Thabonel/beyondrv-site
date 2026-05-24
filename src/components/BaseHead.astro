@@ -7,6 +7,11 @@ interface Props {
   noIndex?: boolean;
   canonicalUrl?: string;
   structuredData?: object | object[];
+  preloadImage?: {
+    src: string;
+    srcset?: string;
+    sizes?: string;
+  };
 }
 const {
   title,
@@ -16,6 +21,7 @@ const {
   noIndex = false,
   canonicalUrl,
   structuredData,
+  preloadImage,
 } = Astro.props;
 const siteUrl = Astro.site ?? new URL('https://beyondrv.com.au');
 const canonical = canonicalUrl ? new URL(canonicalUrl, siteUrl).toString() : new URL(Astro.url.pathname, siteUrl).toString();
@@ -75,6 +81,15 @@ const localBusinessSchema = {
 <link rel="icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
 <link rel="icon" type="image/png" href="/favicon-192.png" sizes="192x192" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+{preloadImage && (
+  <link
+    rel="preload"
+    as="image"
+    href={preloadImage.src}
+    imagesrcset={preloadImage.srcset}
+    imagesizes={preloadImage.sizes}
+  />
+)}
 
 <meta property="og:type" content={type} />
 <meta property="og:title" content={title} />

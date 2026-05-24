@@ -2,9 +2,19 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProductCard from '../components/ProductCard.astro';
+import { displayImageUrl, imageSrcSet } from '../lib/media';
 
 const allProducts = await getCollection('products');
 const featuredProducts = allProducts.filter(p => p.data.featured).slice(0, 4);
+const rangeImages = {
+  expedition: '/images/optimized/products/expedition/isuzu-nps-poptop-camper/01-isuzu-nps-01.webp',
+  slideOn: '/images/optimized/products/advent-2150-hardtop-slide-on/02-advent-2150-04-1024x576.webp',
+  caravan: '/images/optimized/products/sunpatch-19xc-hardtop-couples-offroad-van/01-sunpatch-15xc-01.webp',
+  custom: '/images/optimized/products/advent-2150-hardtop-slide-on/02-advent-2150-04-1024x576.webp',
+  story: '/images/optimized/products/expedition/unimog-overlander-camper/02-mog2.webp',
+  expeditionHighlight: '/images/optimized/products/expedition/isuzu-nps-poptop-camper/03-isuzu-nps-04.webp',
+  advent2300: '/images/optimized/products/advent-2300-hardtop-slide-on/20-beyond-rv-2300-advent-series-03-1024x678.webp',
+};
 
 const orgSchema = {
   "@context": "https://schema.org",
@@ -156,7 +166,15 @@ const websiteSchema = {
 
     <div class="range-grid">
       <div class="model-card featured reveal">
-        <img src="/images/products/isuzu-nps/isuzu-nps-01.jpg" alt="Beyond RV Expedition Vehicles — Isuzu NPS builds" style="object-position: center 40%" />
+        <img
+          src={displayImageUrl(rangeImages.expedition, 800)}
+          srcset={imageSrcSet(rangeImages.expedition, [480, 800, 1200])}
+          sizes="(max-width: 900px) 100vw, 40vw"
+          alt="Beyond RV Expedition Vehicles — Isuzu NPS builds"
+          loading="lazy"
+          decoding="async"
+          style="object-position: center 40%"
+        />
         <div class="model-card-overlay"></div>
         <div class="model-card-content">
           <span class="model-tag">Expedition</span>
@@ -167,7 +185,15 @@ const websiteSchema = {
       </div>
 
       <div class="model-card featured reveal">
-        <img src="/images/products/advent-2150/advent-2150-01.jpg" alt="Beyond RV Slide-On Campers — Advent range" style="object-position: center 55%" />
+        <img
+          src={displayImageUrl(rangeImages.slideOn, 800)}
+          srcset={imageSrcSet(rangeImages.slideOn, [480, 800, 1200])}
+          sizes="(max-width: 900px) 100vw, 40vw"
+          alt="Beyond RV Slide-On Campers — Advent range"
+          loading="lazy"
+          decoding="async"
+          style="object-position: center 55%"
+        />
         <div class="model-card-overlay"></div>
         <div class="model-card-content">
           <span class="model-tag">Slide-Ons</span>
@@ -178,7 +204,14 @@ const websiteSchema = {
       </div>
 
       <div class="model-card reveal reveal-delay-1">
-        <img src="/images/products/sunpatch-15xc/sunpatch-15xc-01.jpg" alt="Beyond RV Sunpatch caravans" />
+        <img
+          src={displayImageUrl(rangeImages.caravan, 800)}
+          srcset={imageSrcSet(rangeImages.caravan, [480, 800, 1200])}
+          sizes="(max-width: 900px) 100vw, 33vw"
+          alt="Beyond RV Sunpatch caravans"
+          loading="lazy"
+          decoding="async"
+        />
         <div class="model-card-overlay"></div>
         <div class="model-card-content">
           <span class="model-tag">Caravans</span>
@@ -189,7 +222,14 @@ const websiteSchema = {
       </div>
 
       <div class="model-card reveal reveal-delay-2">
-        <img src="/images/products/advent-2150/advent-2150-04.jpg" alt="Beyond RV interior fit-out" />
+        <img
+          src={displayImageUrl(rangeImages.custom, 800)}
+          srcset={imageSrcSet(rangeImages.custom, [480, 800, 1200])}
+          sizes="(max-width: 900px) 100vw, 33vw"
+          alt="Beyond RV interior fit-out"
+          loading="lazy"
+          decoding="async"
+        />
         <div class="model-card-overlay"></div>
         <div class="model-card-content">
           <span class="model-tag">Custom</span>
@@ -229,7 +269,14 @@ const websiteSchema = {
   <!-- STORY / WHY BEYONDRV -->
   <section class="story">
     <div class="story-image">
-      <img src="/images/site/mog2.jpg" alt="Beyond RV Unimog expedition build — Mutdapilly Queensland workshop" />
+      <img
+        src={displayImageUrl(rangeImages.story, 1200)}
+        srcset={imageSrcSet(rangeImages.story)}
+        sizes="(max-width: 900px) 100vw, 50vw"
+        alt="Beyond RV Unimog expedition build — Mutdapilly Queensland workshop"
+        loading="lazy"
+        decoding="async"
+      />
       <div class="story-image-overlay"></div>
     </div>
     <div class="story-content">
@@ -285,7 +332,15 @@ const websiteSchema = {
         </div>
       </div>
       <div style="aspect-ratio: 16/10; overflow: hidden; position: relative" class="reveal reveal-delay-1">
-        <img src="/images/products/isuzu-nps/isuzu-nps-04.jpg" alt="Beyond RV Isuzu NPS expedition camper" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.8)" />
+        <img
+          src={displayImageUrl(rangeImages.expeditionHighlight, 1200)}
+          srcset={imageSrcSet(rangeImages.expeditionHighlight)}
+          sizes="(max-width: 900px) 100vw, 50vw"
+          alt="Beyond RV Isuzu NPS expedition camper"
+          loading="lazy"
+          decoding="async"
+          style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.8)"
+        />
       </div>
     </div>
   </section>
@@ -387,7 +442,14 @@ const websiteSchema = {
 
         <div class="workshop-card">
           <div class="workshop-card-image">
-            <img src="/images/products/advent-2150/advent-2150-04.jpg" alt="Advent 2150 slide-on build — Mutdapilly Queensland" />
+            <img
+              src={displayImageUrl(rangeImages.custom, 800)}
+              srcset={imageSrcSet(rangeImages.custom, [480, 800, 1200])}
+              sizes="(max-width: 900px) 100vw, 33vw"
+              alt="Advent 2150 slide-on build — Mutdapilly Queensland"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
           <div class="workshop-card-body">
             <div class="workshop-card-title">Advent 2150 — Dual-Cab HiLux Build</div>
@@ -401,7 +463,14 @@ const websiteSchema = {
 
         <div class="workshop-card">
           <div class="workshop-card-image">
-            <img src="/images/site/mog2.jpg" alt="Unimog U1700L expedition build — Beyond RV Queensland" />
+            <img
+              src={displayImageUrl(rangeImages.story, 800)}
+              srcset={imageSrcSet(rangeImages.story, [480, 800, 1200])}
+              sizes="(max-width: 900px) 100vw, 33vw"
+              alt="Unimog U1700L expedition build — Beyond RV Queensland"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
           <div class="workshop-card-body">
             <div class="workshop-card-title">Built for a Unimog U1700L</div>
@@ -415,7 +484,14 @@ const websiteSchema = {
 
         <div class="workshop-card">
           <div class="workshop-card-image">
-            <img src="/images/products/advent-2300/advent-2300-03.jpg" alt="Advent 2300 slide-on build — Mutdapilly" />
+            <img
+              src={displayImageUrl(rangeImages.advent2300, 800)}
+              srcset={imageSrcSet(rangeImages.advent2300, [480, 800, 1200])}
+              sizes="(max-width: 900px) 100vw, 33vw"
+              alt="Advent 2300 slide-on build — Mutdapilly"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
           <div class="workshop-card-body">
             <div class="workshop-card-title">Advent 2300 — Isuzu D-Max Build</div>

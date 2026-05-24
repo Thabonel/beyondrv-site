@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { displayImageUrl, imageSrcSet } from '../../lib/media';
 
 const schema = {
   "@context": "https://schema.org",
@@ -8,6 +9,8 @@ const schema = {
   "url": "https://beyondrv.com.au/about-us/",
   "description": "Beyond RV builds slide-on campers, truck campers, and expedition vehicles in Mutdapilly, Queensland. Australian-owned, ADR-compliant builds for serious adventurers."
 };
+const heroImage = '/images/optimized/products/advent-2150-hardtop-slide-on/02-advent-2150-04-1024x576.webp';
+const storyImage = '/images/optimized/products/advent-2150-hardtop-slide-on/03-advent-2150-06-1024x576.webp';
 ---
 <BaseLayout
   title="About Beyond RV | Queensland-Built Slide-On Campers"
@@ -16,7 +19,7 @@ const schema = {
   structuredData={schema}
 >
   <section class="page-hero">
-    <div class="page-hero-bg" style="background-image: url('/images/products/advent-2150/advent-2150-04.jpg')"></div>
+    <div class="page-hero-bg" style={`background-image: url('${displayImageUrl(heroImage, 1600)}')`}></div>
     <div class="hero-overlay"></div>
     <div class="hero-overlay-bottom"></div>
     <div class="page-hero-content">
@@ -35,7 +38,14 @@ const schema = {
   <!-- Story -->
   <section class="story">
     <div class="story-image">
-      <img src="/images/products/advent-2150/advent-2150-06.jpg" alt="Beyond RV workshop — Mutdapilly, Queensland" />
+      <img
+        src={displayImageUrl(storyImage, 1200)}
+        srcset={imageSrcSet(storyImage)}
+        sizes="(max-width: 900px) 100vw, 50vw"
+        alt="Beyond RV workshop — Mutdapilly, Queensland"
+        loading="lazy"
+        decoding="async"
+      />
       <div class="story-image-overlay"></div>
     </div>
     <div class="story-content">

@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProductCard from '../../components/ProductCard.astro';
+import { displayImageUrl, imageSrcSet } from '../../lib/media';
 
 const products = (await getCollection('products'))
   .filter(p => p.data.category === 'expedition');
@@ -42,6 +43,7 @@ const faqSchema = {
     }
   ]
 };
+const calloutImage = '/images/optimized/products/expedition/isuzu-nps-poptop-camper/01-isuzu-nps-01.webp';
 ---
 <BaseLayout
   title="Expedition Vehicles | Unimog & Isuzu Campers | Beyond RV Queensland"
@@ -81,7 +83,14 @@ const faqSchema = {
       </p>
     </div>
     <div class="expedition-callout-image reveal reveal-delay-2">
-      <img src="/images/products/isuzu-nps/isuzu-nps-01.jpg" alt="Beyond RV Isuzu NPS expedition camper" />
+      <img
+        src={displayImageUrl(calloutImage, 1200)}
+        srcset={imageSrcSet(calloutImage)}
+        sizes="(max-width: 900px) 100vw, 50vw"
+        alt="Beyond RV Isuzu NPS expedition camper"
+        loading="lazy"
+        decoding="async"
+      />
     </div>
   </section>
 
