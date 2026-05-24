@@ -3,7 +3,8 @@ import type { Handler } from '@netlify/functions';
 import catalogue from './product-catalogue.json';
 import chatbotKnowledge from './chatbot-knowledge.json';
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openAiKey = process.env.OPENAI_API_KEY;
+const client = openAiKey ? new OpenAI({ apiKey: openAiKey }) : null;
 const CHAT_MODEL = process.env.OPENAI_CHAT_MODEL ?? 'gpt-5-nano';
 
 const BRAND_BLOCK = `You are the Beyond RV assistant — a friendly, knowledgeable helper on the Beyond RV website.
@@ -52,6 +53,14 @@ export const handler: Handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
+  if (!client) {
+    return {
+      statusCode: 200,
+      headers: sseHeaders,
+      body: 'data: The chat assistant is not available right now. Please call 0430 863 819 or use the enquiry form.\\n\\ndata: [DONE]\\n\\n',
+    };
+  }
+
   let parsed: { messages?: unknown; productSlug?: unknown; pageTitle?: unknown };
   try {
     parsed = JSON.parse(event.body ?? '{}');
@@ -59,18 +68,22 @@ export const handler: Handler = async (event) => {
     return { statusCode: 400, body: 'Bad Request' };
   }
 
-  const { messages, productSlug, pageTitle } = parsed as {
-    messages: Array<{ role: 'user' | 'assistant'; content: string }>;
-    productSlug?: string;
-    pageTitle?: string;
-  };
-
-  if (!Array.isArray(messages)) {
+  if (!Array.isArray(parsed.messages)) {
     return { statusCode: 400, body: 'Bad Request' };
   }
+  const messages = parsed.messages
+    .filter((message): message is { role: 'user' | 'assistant'; content: string } => (
+      typeof message === 'object' &&
+      message !== null &&
+      ((message as { role?: unknown }).role === 'user' || (message as { role?: unknown }).role === 'assistant') &&
+      typeof (message as { content?: unknown }).content === 'string'
+    ))
+    .slice(-30);
 
-  const safeSlug = typeof productSlug === 'string' ? productSlug.slice(0, 100) : undefined;
-  const safeTitle = typeof pageTitle === 'string' ? pageTitle.slice(0, 200) : undefined;
+  if (!messages.length) return { statusCode: 400, body: 'Bad Request' };
+
+  const safeSlug = typeof parsed.productSlug === 'string' ? parsed.productSlug.slice(0, 100) : undefined;
+  const safeTitle = typeof parsed.pageTitle === 'string' ? parsed.pageTitle.slice(0, 200) : undefined;
 
   if (messages.length > 30) {
     return {

@@ -3,11 +3,12 @@ import type { Handler } from '@netlify/functions';
 import { randomUUID } from 'crypto';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openAiKey = process.env.OPENAI_API_KEY;
+const client = openAiKey ? new OpenAI({ apiKey: openAiKey }) : null;
 const ADMIN_MODEL = process.env.OPENAI_ADMIN_MODEL ?? 'gpt-5-mini';
 const JUDGE_MODEL = process.env.OPENAI_JUDGE_MODEL ?? 'gpt-5-mini';
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN!;
-const GITHUB_REPO = process.env.GITHUB_REPO!;
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const GITHUB_REPO = process.env.GITHUB_REPO;
 const GITHUB_BRANCH = process.env.GITHUB_BRANCH ?? 'main';
 const API = 'https://api.github.com';
 
@@ -80,6 +81,10 @@ Return ONLY valid JSON with this exact shape:
 }`;
 
 async function runJudge(proposal: ActionProposal): Promise<JudgeVerdict> {
+  if (!client) {
+    return { decision: 'block', rationale: 'OpenAI is not configured.', risk_flags: ['missing_openai_key'], block_reason: 'Admin AI cannot verify changes without an OpenAI API key.' };
+  }
+
   const userBlock = `USER'S INSTRUCTION: "${proposal.user_raw_input}"
 
 PROPOSED CHANGE:
@@ -100,12 +105,10 @@ PROPOSED CHANGE:
   try {
     // Strip markdown code fences if the model added them
     const json = text.replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '').trim();
-    const parsed = JSON.parse(json) as JudgeVerdict;
-    console.log(`[judge] proposal=${proposal.proposal_id} model=${JUDGE_MODEL} decision=${parsed.decision} rationale="${parsed.rationale}"`);
-    return parsed;
+    return JSON.parse(json) as JudgeVerdict;
   } catch {
-    console.error('[judge] failed to parse verdict, defaulting to allow', text);
-    return { decision: 'allow', rationale: 'Parse error — defaulting to allow', risk_flags: ['judge_parse_error'] };
+    console.error('[judge] failed to parse verdict', text);
+    return { decision: 'block', rationale: 'Safety judge returned invalid JSON.', risk_flags: ['judge_parse_error'], block_reason: 'Could not verify the proposed change safely.' };
   }
 }
 
@@ -136,6 +139,7 @@ RULES:
 - If the judge blocks your proposal, explain why to the owner and ask for clarification`;
 
 async function githubFetch(path: string): Promise<string | null> {
+  if (!GITHUB_TOKEN || !GITHUB_REPO) return null;
   const res = await fetch(
     `${API}/repos/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}`,
     { headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, Accept: 'application/vnd.github+json' } }
@@ -146,6 +150,7 @@ async function githubFetch(path: string): Promise<string | null> {
 }
 
 async function githubListDir(path: string): Promise<string[]> {
+  if (!GITHUB_TOKEN || !GITHUB_REPO) return [];
   const res = await fetch(
     `${API}/repos/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}`,
     { headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, Accept: 'application/vnd.github+json' } }
@@ -201,9 +206,29 @@ export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
   if (!isAdminAuthorized(event)) return unauthorizedResponse();
 
-  const { messages } = JSON.parse(event.body ?? '{}') as {
-    messages: Array<{ role: 'user' | 'assistant'; content: string }>;
-  };
+  if (!client || !GITHUB_TOKEN || !GITHUB_REPO) {
+    return {
+      statusCode: 503,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: 'Admin AI is not fully configured. Check OpenAI and GitHub environment variables.', pendingChanges: [] }),
+    };
+  }
+
+  let messages: Array<{ role: 'user' | 'assistant'; content: string }>;
+  try {
+    const parsed = JSON.parse(event.body ?? '{}') as { messages?: unknown };
+    if (!Array.isArray(parsed.messages)) throw new Error('messages must be an array');
+    messages = parsed.messages
+      .filter((message): message is { role: 'user' | 'assistant'; content: string } => (
+        typeof message === 'object' &&
+        message !== null &&
+        ((message as { role?: unknown }).role === 'user' || (message as { role?: unknown }).role === 'assistant') &&
+        typeof (message as { content?: unknown }).content === 'string'
+      ))
+      .slice(-20);
+  } catch {
+    return { statusCode: 400, body: JSON.stringify({ error: 'Invalid request' }) };
+  }
 
   // Extract the last user message for judge context
   const lastUserMsg = [...messages].reverse().find(m => m.role === 'user');

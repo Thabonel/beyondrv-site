@@ -1,4 +1,5 @@
 import type { Handler, HandlerResponse } from '@netlify/functions';
+import { createAdminToken } from './admin-auth';
 
 const COOKIE_NAME = 'brv_admin_auth';
 
@@ -60,7 +61,7 @@ function loginPage(error = '') {
   </head>
   <body>
     <form method="POST" action="/.netlify/functions/admin-login">
-      <img src="/images/site/logo.png" alt="Beyond RV" />
+      <img src="/images/site/admin-logo.png" alt="Beyond RV" />
       <h1>Admin Login</h1>
       <label for="password">Password</label>
       <input id="password" name="password" type="password" autocomplete="current-password" autofocus required />
@@ -94,6 +95,6 @@ export const handler: Handler = async (event) => {
 
   return redirectResponse(
     '/admin/',
-    `${COOKIE_NAME}=${encodeURIComponent(expected)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=28800`
+    `${COOKIE_NAME}=${encodeURIComponent(createAdminToken())}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=28800`
   );
 };

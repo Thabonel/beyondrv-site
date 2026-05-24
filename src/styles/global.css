@@ -977,11 +977,6 @@ nav.scrolled {
   padding: 6rem var(--gutter);
   text-align: center;
 }
-.testimonials-placeholder {
-  border: 1px dashed var(--border);
-  padding: 4rem; color: var(--muted);
-  font-size: 0.85rem;
-}
 
 /* ─── FOOTER ─── */
 footer {

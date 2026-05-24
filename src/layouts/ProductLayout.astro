@@ -4,10 +4,17 @@ import OptionalExtras from '../components/OptionalExtras';
 import type { CollectionEntry } from 'astro:content';
 import { displayImageUrl } from '../lib/media';
 
+type ProductData = CollectionEntry<'products'>['data'];
+type ProductCategory = ProductData['category'];
+type SpecRow = ProductData['keySpecs'][number];
+type SpecGroup = NonNullable<ProductData['specGroups']>[number];
+type Feature = NonNullable<ProductData['features']>[number];
+type FaqItem = NonNullable<ProductData['faq']>[number];
+
 interface Props {
   product: CollectionEntry<'products'>;
 }
-const { product } = Astro.props;
+const { product } = Astro.props as Props;
 const { data } = product;
 const isComingSoon = data.status === 'coming-soon';
 const encodedSlug = encodeURIComponent(product.slug);
@@ -24,11 +31,12 @@ const galleryImages = [data.heroImage, ...data.gallery].map((img) => ({
 const productImages = [data.heroImage, ...data.gallery]
   .filter(Boolean)
   .map((img) => new URL(img, siteUrl).toString());
-const categoryMeta = {
+const categoryBySlug: Record<ProductCategory, { name: string; url: string }> = {
   'slide-on': { name: 'Slide-On Campers', url: '/our-slide-on-campers/' },
   caravan: { name: 'Off-Road Caravans', url: '/our-caravans/' },
   expedition: { name: 'Expedition Vehicles', url: '/expedition/' },
-}[data.category];
+};
+const categoryMeta = categoryBySlug[data.category];
 
 const priceNum = data.price.replace(/[^0-9.]/g, '');
 const productSchema = {
@@ -95,7 +103,7 @@ const faqSchema = data.faq && data.faq.length > 0
   ? {
       "@context": "https://schema.org",
       "@type": "FAQPage",
-      "mainEntity": data.faq.map(({ q, a }) => ({
+      "mainEntity": data.faq.map(({ q, a }: FaqItem) => ({
         "@type": "Question",
         "name": q,
         "acceptedAnswer": { "@type": "Answer", "text": a }
@@ -116,7 +124,6 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
   productTitle={data.title}
   productSlug={product.slug}
 >
-  <!-- Hero + Gallery -->
   <section class="product-hero-section">
     <div class="product-gallery">
       <div class="product-gallery-main">
@@ -153,7 +160,7 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
 
       {data.keySpecs.length > 0 && (
         <div class="key-specs">
-          {data.keySpecs.map(s => (
+          {data.keySpecs.map((s: SpecRow) => (
             <div class="key-spec">
               <span class="key-spec-label">{s.label}</span>
               <span class="key-spec-value">{s.value}</span>
@@ -175,7 +182,6 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
     </div>
   </section>
 
-  <!-- Description (Markdown content slot) -->
   <section class="product-description container">
     <div class="product-description-body prose">
       <slot />
@@ -189,17 +195,16 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
     </div>
   </section>
 
-  <!-- Grouped Spec Tables (preferred) -->
   {data.specGroups && data.specGroups.length > 0 && (
     <section class="product-specs-section container">
       <h2 class="section-title">Specifications</h2>
       <div class="spec-groups">
-        {data.specGroups.filter(g => g.items.length > 0).map(group => (
+        {data.specGroups.filter((g: SpecGroup) => g.items.length > 0).map((group: SpecGroup) => (
           <div class="spec-group">
             <h3 class="spec-group-title">{group.group}</h3>
             <table class="specs-table">
               <tbody>
-                {group.items.map(row => (
+                {group.items.map((row: SpecRow) => (
                   <tr>
                     <th scope="row">{row.label}</th>
                     <td>{row.value}</td>
@@ -213,13 +218,12 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
     </section>
   )}
 
-  <!-- Flat Specs Table (fallback when no specGroups) -->
   {(!data.specGroups || data.specGroups.length === 0) && data.specs && data.specs.length > 0 && (
     <section class="product-specs-section container">
       <h2 class="section-title">Full Specifications</h2>
       <table class="specs-table">
         <tbody>
-          {data.specs.map(row => (
+          {data.specs.map((row: SpecRow) => (
             <tr>
               <th scope="row">{row.label}</th>
               <td>{row.value}</td>
@@ -230,7 +234,6 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
     </section>
   )}
 
-  <!-- Optional Extras -->
   {!isComingSoon && (
     <OptionalExtras
       client:load
@@ -240,22 +243,20 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
     />
   )}
 
-  <!-- Features List -->
   {data.features && data.features.length > 0 && (
     <section class="product-features-section container">
       <h2 class="section-title">Features</h2>
       <ul class="features-list">
-        {data.features.map(f => <li>{f}</li>)}
+        {data.features.map((f: Feature) => <li>{f}</li>)}
       </ul>
     </section>
   )}
 
-  <!-- FAQ -->
   {data.faq && data.faq.length > 0 && (
     <section class="product-faq-section container">
       <h2 class="section-title">FAQ</h2>
       <div class="faq-list">
-        {data.faq.map(({ q, a }, i) => (
+        {data.faq.map(({ q, a }: FaqItem, i: number) => (
           <div class="faq-item" id={`faq-${i}`}>
             <button class="faq-question" aria-expanded="false" aria-controls={`faq-answer-${i}`}>
               {q}
@@ -270,7 +271,6 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
     </section>
   )}
 
-  <!-- Enquiry CTA band -->
   <section class="product-enquiry-band">
     <div class="container">
       <h2>Ready to make it yours?</h2>
@@ -292,7 +292,6 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
 </BaseLayout>
 
 <script>
-  // Thumbnail gallery switcher
   document.querySelectorAll<HTMLButtonElement>('.thumb-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const heroImg = document.getElementById('productHeroImg') as HTMLImageElement | null;
@@ -302,17 +301,14 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
     });
   });
 
-  // FAQ accordion
   document.querySelectorAll<HTMLButtonElement>('.faq-question').forEach(btn => {
     btn.addEventListener('click', () => {
       const item = btn.closest('.faq-item');
       const isOpen = item?.classList.contains('open');
-      // Close all
       document.querySelectorAll('.faq-item').forEach(el => {
         el.classList.remove('open');
         el.querySelector<HTMLButtonElement>('.faq-question')?.setAttribute('aria-expanded', 'false');
       });
-      // Open clicked if it was closed
       if (!isOpen && item) {
         item.classList.add('open');
         btn.setAttribute('aria-expanded', 'true');

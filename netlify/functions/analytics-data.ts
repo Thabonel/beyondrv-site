@@ -1,12 +1,12 @@
-// netlify/functions/analytics-data.ts
 import type { Handler } from '@netlify/functions';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
 
-const API_KEY = process.env.POSTHOG_API_KEY!;
-const PROJECT_ID = process.env.POSTHOG_PROJECT_ID!;
-const BASE = `https://app.posthog.com/api/projects/${PROJECT_ID}/query/`;
+const API_KEY = process.env.POSTHOG_API_KEY;
+const PROJECT_ID = process.env.POSTHOG_PROJECT_ID;
+const BASE = PROJECT_ID ? `https://app.posthog.com/api/projects/${PROJECT_ID}/query/` : '';
 
 async function hogql(query: string) {
+  if (!API_KEY || !BASE) throw new Error('PostHog analytics are not configured.');
   const res = await fetch(BASE, {
     method: 'POST',
     headers: {
@@ -22,6 +22,23 @@ async function hogql(query: string) {
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'GET') return { statusCode: 405, body: 'Method Not Allowed' };
   if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  if (!API_KEY || !PROJECT_ID) {
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        range: event.queryStringParameters?.range ?? '30',
+        sessions: 0,
+        enquiries: 0,
+        conversionRate: '0.0',
+        trend: [],
+        topPages: [],
+        sources: [],
+        youtube: [],
+        warning: 'PostHog analytics are not configured.',
+      }),
+    };
+  }
 
   const range = (event.queryStringParameters?.range ?? '30') as string;
   const days = ['7', '30', '90'].includes(range) ? range : '30';
@@ -107,7 +124,7 @@ export const handler: Handler = async (event) => {
       }),
     };
   } catch (err) {
-    console.error('analytics-data error:', err);
+    console.error('[analytics-data] query failed:', err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: String(err) }),

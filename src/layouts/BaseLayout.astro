@@ -39,7 +39,6 @@ const { activePath = '', productTitle, productSlug, ...headProps } = Astro.props
   <Footer />
 
   <script>
-    // Referral / UTM attribution — persists for 30 days in localStorage (first-touch wins)
     (function() {
       const params = new URLSearchParams(window.location.search);
       const ref = params.get('ref');
@@ -48,7 +47,6 @@ const { activePath = '', productTitle, productSlug, ...headProps } = Astro.props
       const utmCampaign = params.get('utm_campaign');
       const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
 
-      // Only write if we have a ref= param AND no valid unexpired referral already stored
       if (ref) {
         let existing: { ref: string; expires: number } | null = null;
         try { existing = JSON.parse(localStorage.getItem('brv_referral') || 'null'); } catch {}
@@ -66,7 +64,6 @@ const { activePath = '', productTitle, productSlug, ...headProps } = Astro.props
         }
       }
 
-      // UTM-only (no ref=) — store separately, always overwrite with freshest campaign data
       if (!ref && utmSource) {
         localStorage.setItem('brv_utm', JSON.stringify({
           utm_source: utmSource,
@@ -84,25 +81,25 @@ const { activePath = '', productTitle, productSlug, ...headProps } = Astro.props
   <SiteChatWidget client:load pageTitle={headProps.title} productSlug={productSlug} productName={productTitle} />
 
   <script>
-    // Custom cursor (desktop only)
     const cursor = document.getElementById('cursor');
     const ring = document.getElementById('cursor-ring');
     if (cursor && ring && !window.matchMedia('(pointer: coarse)').matches) {
+      const cursorEl = cursor;
+      const ringEl = ring;
       let mx = 0, my = 0, rx = 0, ry = 0;
       document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; }, { passive: true });
       function animCursor() {
-        cursor.style.left = mx + 'px';
-        cursor.style.top = my + 'px';
+        cursorEl.style.left = mx + 'px';
+        cursorEl.style.top = my + 'px';
         rx += (mx - rx) * 0.12;
         ry += (my - ry) * 0.12;
-        ring.style.left = rx + 'px';
-        ring.style.top = ry + 'px';
+        ringEl.style.left = rx + 'px';
+        ringEl.style.top = ry + 'px';
         requestAnimationFrame(animCursor);
       }
       animCursor();
     }
 
-    // Scroll reveal
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(e => {
         if (e.isIntersecting) {

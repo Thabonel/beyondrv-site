@@ -1,4 +1,3 @@
-// src/components/PostHogProvider.tsx
 import { useEffect } from 'react';
 import posthog from 'posthog-js';
 
@@ -27,7 +26,6 @@ export default function PostHogProvider() {
     }
     window.addEventListener('brv-cookie-accepted', handleConsent);
 
-    // Fire enquiry_submitted on the thank-you page
     if (window.location.pathname.includes('/inquiry-form/success')) {
       const timer = setTimeout(() => {
         if (!(posthog as any).__loaded) return;

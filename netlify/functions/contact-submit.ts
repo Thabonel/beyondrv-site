@@ -33,6 +33,10 @@ function field(label: string, value?: string) {
   return value ? `${label}: ${value}` : '';
 }
 
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
 function escapeHtml(value: string) {
   return value
     .replace(/&/g, '&amp;')
@@ -141,8 +145,11 @@ export const handler: Handler = async (event) => {
   const missing = [
     !enquiry.name && 'name',
     !enquiry.email && 'email',
+    enquiry.email && !isValidEmail(enquiry.email) && 'valid email',
     !enquiry.phone && 'phone',
     !enquiry.message && 'message',
+    !enquiry.referral_source_self_reported && 'how you heard about us',
+    enquiry.referral_source_self_reported === 'Other' && !enquiry.referral_source_other && 'other referral detail',
   ].filter(Boolean);
 
   if (missing.length) {
@@ -153,17 +160,41 @@ export const handler: Handler = async (event) => {
     };
   }
 
-  const id = `${new Date().toISOString()}-${randomUUID()}`;
+  const submittedAt = new Date().toISOString();
+  const id = `${submittedAt}-${randomUUID()}`;
   const store = getStore({ name: STORE_NAME, consistency: 'strong' });
-  await store.setJSON(id, {
+  const record = {
     ...enquiry,
     id,
-    submittedAt: new Date().toISOString(),
+    submittedAt,
     userAgent: event.headers['user-agent'] ?? '',
     ip: event.headers['x-nf-client-connection-ip'] ?? event.headers['client-ip'] ?? '',
-  });
+  };
 
-  const emailResult = await sendEmail(enquiry);
+  const [storeResult, emailResult] = await Promise.allSettled([
+    store.setJSON(id, record),
+    sendEmail(enquiry),
+  ]);
+
+  if (storeResult.status === 'rejected') {
+    console.error('[contact-submit] enquiry backup failed:', storeResult.reason);
+  }
+
+  if (emailResult.status === 'rejected' || !emailResult.value.sent) {
+    const reason = emailResult.status === 'rejected'
+      ? 'Email delivery failed'
+      : emailResult.value.reason ?? 'Email delivery failed';
+    return {
+      statusCode: 502,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ok: false,
+        id,
+        error: `${reason}. Please call 0430 863 819 if the enquiry is urgent.`,
+        enquiryBackedUp: storeResult.status === 'fulfilled',
+      }),
+    };
+  }
 
   return {
     statusCode: 200,
@@ -171,8 +202,8 @@ export const handler: Handler = async (event) => {
     body: JSON.stringify({
       ok: true,
       id,
-      emailSent: emailResult.sent,
-      emailReason: emailResult.reason,
+      emailSent: true,
+      enquiryBackedUp: storeResult.status === 'fulfilled',
     }),
   };
 };

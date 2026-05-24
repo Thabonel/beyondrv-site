@@ -43,14 +43,12 @@ const schema = {
       <input type="hidden" name="form-name" value="beyondrv-enquiry" />
       <input type="hidden" name="product_interest" id="productInterestField" value="" />
       <input type="hidden" name="enquiry_intent" id="intentField" value="" />
-      <!-- Attribution hidden fields — populated from localStorage by script below -->
       <input type="hidden" name="referral_partner" id="referralPartner" value="" />
       <input type="hidden" name="referral_entry_page" id="referralEntryPage" value="" />
       <input type="hidden" name="referral_first_touch" id="referralFirstTouch" value="" />
       <input type="hidden" name="referral_utm_source" id="referralUtmSource" value="" />
       <input type="hidden" name="referral_utm_campaign" id="referralUtmCampaign" value="" />
 
-      <!-- Honeypot -->
       <p style="display:none">
         <label>Don't fill this out if you're human: <input name="bot-field" /></label>
       </p>
@@ -176,9 +174,6 @@ const schema = {
         />
       </div>
 
-      <!-- Spam protection hook can be added here if the site begins receiving automated submissions. -->
-      <!-- <div class="cf-turnstile" data-sitekey="TURNSTILE_SITEKEY" data-theme="dark"></div> -->
-
       <button type="submit" class="btn-primary form-submit" style="margin-top: 1.5rem">
         Send Enquiry
       </button>
@@ -198,11 +193,11 @@ const schema = {
 </BaseLayout>
 
 <script>
-  // Product pre-fill from URL params
   const params = new URLSearchParams(window.location.search);
   const productSlug = params.get('product');
   const productName = params.get('name');
   const intent = params.get('intent');
+  const message = params.get('message');
 
   const msgField = document.getElementById('message') as HTMLTextAreaElement | null;
   const hiddenField = document.getElementById('productInterestField') as HTMLInputElement | null;
@@ -214,7 +209,11 @@ const schema = {
       ? decodeURIComponent(productSlug).replace(/-/g, ' ')
       : null;
 
-  if (displayName && msgField) {
+  if (message && msgField) {
+    msgField.value = message;
+    msgField.focus();
+    msgField.setSelectionRange(message.length, message.length);
+  } else if (displayName && msgField) {
     const prefix = intent === 'buy'
       ? `I'd like to purchase the ${displayName}. `
       : intent === 'register'
@@ -243,14 +242,12 @@ const schema = {
   referralSource?.addEventListener('change', syncReferralOther);
   syncReferralOther();
 
-  // Attribution — populate hidden fields from localStorage
   (function() {
     function setField(id: string, value: string) {
       const el = document.getElementById(id) as HTMLInputElement | null;
       if (el && value) el.value = value;
     }
 
-    // Layer 1: referral partner (ref=thabo) — check expiry
     try {
       const raw = localStorage.getItem('brv_referral');
       if (raw) {
@@ -268,7 +265,6 @@ const schema = {
       }
     } catch {}
 
-    // Layer 2: UTM-only (no ref=) — use if no partner referral already set
     try {
       const partnerField = document.getElementById('referralPartner') as HTMLInputElement | null;
       if (!partnerField?.value) {
@@ -285,7 +281,6 @@ const schema = {
     } catch {}
   })();
 
-  // Fast server-side delivery path. Native Netlify Forms remains the no-JavaScript fallback.
   const form = document.getElementById('enquiryForm') as HTMLFormElement | null;
   const status = document.getElementById('formStatus') as HTMLParagraphElement | null;
 

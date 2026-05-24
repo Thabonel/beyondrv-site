@@ -178,8 +178,12 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
     });
 
     const lastAssistant = [...messages].reverse().find(m => m.role === 'assistant');
-    const encoded = encodeURIComponent(lastAssistant?.content ?? '');
-    window.open(`/inquiry-form/?message=${encoded}`, '_blank', 'noopener,noreferrer');
+    const summary = lastAssistant?.content ? `Chat summary: ${lastAssistant.content}` : '';
+    const params = new URLSearchParams();
+    if (summary) params.set('message', summary);
+    if (productSlug) params.set('product', productSlug);
+    if (productName) params.set('name', productName);
+    window.open(`/inquiry-form/?${params.toString()}`, '_blank', 'noopener,noreferrer');
   }
 
   return (

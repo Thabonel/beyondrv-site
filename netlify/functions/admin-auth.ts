@@ -1,9 +1,25 @@
 import type { HandlerEvent } from '@netlify/functions';
+import { createHmac, timingSafeEqual } from 'crypto';
 
 const COOKIE_NAME = 'brv_admin_auth';
+const TOKEN_VERSION = 'v1';
 
 function getExpectedPassword() {
   return process.env.ADMIN_PASSWORD ?? '';
+}
+
+function getCookieSecret() {
+  return process.env.ADMIN_COOKIE_SECRET || getExpectedPassword();
+}
+
+function sign(value: string) {
+  return createHmac('sha256', getCookieSecret()).update(value).digest('base64url');
+}
+
+function constantTimeEqual(left: string, right: string) {
+  const leftBuffer = Buffer.from(left);
+  const rightBuffer = Buffer.from(right);
+  return leftBuffer.length === rightBuffer.length && timingSafeEqual(leftBuffer, rightBuffer);
 }
 
 function parseCookies(header = '') {
@@ -27,7 +43,22 @@ export function isAdminAuthorized(event: HandlerEvent) {
   if (headerPassword === expected) return true;
 
   const cookies = parseCookies(event.headers.cookie);
-  return cookies[COOKIE_NAME] === expected;
+  return isValidAdminToken(cookies[COOKIE_NAME]);
+}
+
+export function createAdminToken() {
+  const issuedAt = Date.now().toString();
+  return `${TOKEN_VERSION}.${issuedAt}.${sign(`${TOKEN_VERSION}.${issuedAt}`)}`;
+}
+
+export function isValidAdminToken(token = '') {
+  const [version, issuedAt, signature] = token.split('.');
+  if (version !== TOKEN_VERSION || !issuedAt || !signature) return false;
+  const timestamp = Number(issuedAt);
+  if (!Number.isFinite(timestamp)) return false;
+  if (timestamp > Date.now() + 5 * 60 * 1000) return false;
+  if (Date.now() - timestamp > 8 * 60 * 60 * 1000) return false;
+  return constantTimeEqual(signature, sign(`${version}.${issuedAt}`));
 }
 
 export function unauthorizedResponse() {

@@ -76,7 +76,6 @@ const localBusinessSchema = {
 <link rel="icon" type="image/png" href="/favicon-192.png" sizes="192x192" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-<!-- Open Graph -->
 <meta property="og:type" content={type} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
@@ -84,13 +83,11 @@ const localBusinessSchema = {
 <meta property="og:url" content={canonical} />
 <meta property="og:site_name" content="Beyond RV" />
 
-<!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={ogImage} />
 
-<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
@@ -98,12 +95,10 @@ const localBusinessSchema = {
   rel="stylesheet"
 />
 
-<!-- Structured Data -->
 {structuredData && (
-  <script type="application/ld+json" set:html={JSON.stringify(
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(
     Array.isArray(structuredData) ? structuredData : [structuredData]
   )} />
 )}
 
-<!-- Site-wide LocalBusiness schema -->
-<script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
+<script is:inline type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />

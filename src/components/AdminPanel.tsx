@@ -132,6 +132,14 @@ function adminImageUrl(src: string) {
   return `/.netlify/images?url=${encodeURIComponent(src)}&w=800&fit=cover`;
 }
 
+function redirectToLoginIfUnauthorized(res: Response) {
+  if (res.status === 401) {
+    window.location.href = '/.netlify/functions/admin-login';
+    return true;
+  }
+  return false;
+}
+
 export default function AdminPanel() {
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: "Hi! I'm the Beyond RV admin assistant. Tell me what you'd like to change on the site." }
@@ -173,6 +181,7 @@ export default function AdminPanel() {
     async function loadProducts() {
       try {
         const res = await fetch('/.netlify/functions/admin-products');
+        if (redirectToLoginIfUnauthorized(res)) return;
         if (!res.ok) throw new Error('Could not load products');
         const data = await res.json() as { products: ProductRecord[] };
         if (!cancelled) setProducts(data.products ?? []);
@@ -222,7 +231,9 @@ export default function AdminPanel() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: newMessages }),
       });
+      if (redirectToLoginIfUnauthorized(res)) return;
       const data = await res.json() as { text: string; pendingChanges: PendingChange[] };
+      if (!res.ok) throw new Error(data.text ?? 'Admin AI request failed');
 
       setMessages(prev => [...prev, { role: 'assistant', content: data.text }]);
 
@@ -260,6 +271,7 @@ export default function AdminPanel() {
     setMediaLoading(true);
     try {
       const res = await fetch(`/.netlify/functions/admin-media?slug=${encodeURIComponent(slug)}`);
+      if (redirectToLoginIfUnauthorized(res)) return;
       if (!res.ok) throw new Error('Could not load media');
       const data = await res.json() as { files: MediaFile[] };
       setMediaFiles(data.files ?? []);
@@ -275,6 +287,7 @@ export default function AdminPanel() {
     setEnquiriesLoading(true);
     try {
       const res = await fetch('/.netlify/functions/admin-enquiries');
+      if (redirectToLoginIfUnauthorized(res)) return;
       if (!res.ok) throw new Error('Could not load enquiries');
       const data = await res.json() as { enquiries: EnquiryRecord[] };
       setEnquiries(data.enquiries.filter(Boolean) ?? []);
@@ -289,6 +302,7 @@ export default function AdminPanel() {
   async function loadContactConfig() {
     try {
       const res = await fetch('/.netlify/functions/admin-contact-config');
+      if (redirectToLoginIfUnauthorized(res)) return;
       if (!res.ok) throw new Error('Could not load contact config');
       const data = await res.json() as ContactConfig;
       setContactConfig(data);
@@ -322,6 +336,7 @@ export default function AdminPanel() {
           nextFollowUpDate: next.nextFollowUpDate ?? '',
         }),
       });
+      if (redirectToLoginIfUnauthorized(res)) return;
       const data = await res.json() as { leadStatus?: EnquiryRecord['leadStatus']; error?: string };
       if (!res.ok) throw new Error(data.error ?? 'Could not save lead status');
       if (data.leadStatus) {
@@ -357,6 +372,7 @@ export default function AdminPanel() {
             alt: mediaAlt,
           }),
         });
+        if (redirectToLoginIfUnauthorized(res)) return;
         const data = await res.json() as { error?: string };
         if (!res.ok) throw new Error(data.error ?? 'Upload failed');
         setMediaStatus('Image uploaded.');
@@ -382,6 +398,7 @@ export default function AdminPanel() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key }),
       });
+      if (redirectToLoginIfUnauthorized(res)) return;
       if (!res.ok) throw new Error('Delete failed');
       await loadMedia(mediaSlug);
       setMediaStatus('Image deleted.');
@@ -534,7 +551,7 @@ export default function AdminPanel() {
       `Key specs, one per line:\n${newProduct.keySpecs.trim()}\n\n` +
       `Description/body copy:\n${newProduct.description.trim()}\n\n` +
       `Use a URL-safe slug based on the title. Before proposing the new file, list src/content/products and confirm the slug does not already exist. ` +
-      `If no real images were supplied, use the closest existing placeholder pattern only if the site already has one; otherwise ask for image details instead of inventing image URLs.`
+      `If no real images were supplied, reuse an existing site fallback image only when the product type matches; otherwise ask for image details instead of inventing image URLs.`
     );
     setNewProduct(EMPTY_PRODUCT_FORM);
   }
@@ -559,7 +576,9 @@ export default function AdminPanel() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ changes: pending }),
       });
-      const data = await res.json() as { results: { path: string; ok: boolean; error?: string }[] };
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await res.json() as { results: { path: string; ok: boolean; error?: string }[]; error?: string };
+      if (!res.ok) throw new Error(data.error ?? 'Deploy failed');
       const failed = data.results.filter(r => !r.ok);
       if (failed.length) {
         setDeployStatus('error');

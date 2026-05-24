@@ -1,4 +1,3 @@
-// src/components/AnalyticsDashboard.tsx
 import { useState, useEffect } from 'react';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie,
@@ -14,6 +13,7 @@ interface AnalyticsData {
   topPages: { path: string; views: number }[];
   sources: { source: string; visits: number }[];
   youtube: { campaign: string; visits: number }[];
+  warning?: string;
 }
 
 const PIE_COLORS = ['#E8540A', '#f97316', '#fb923c', '#fed7aa', '#6b7280'];
@@ -48,8 +48,16 @@ export default function AnalyticsDashboard() {
     setLoading(true);
     setError('');
     fetch(`/.netlify/functions/analytics-data?range=${range}`, { signal: controller.signal })
-      .then(r => r.json())
-      .then((d: AnalyticsData) => { setData(d); setLoading(false); })
+      .then(async r => {
+        if (r.status === 401) {
+          window.location.href = '/.netlify/functions/admin-login';
+          return null;
+        }
+        const body = await r.json();
+        if (!r.ok) throw new Error(body.error ?? 'Could not load analytics');
+        return body as AnalyticsData;
+      })
+      .then((d) => { if (d) setData(d); setLoading(false); })
       .catch(e => { if (e.name !== 'AbortError') { setError(String(e)); setLoading(false); } });
     return () => controller.abort();
   }, [range]);
@@ -98,6 +106,12 @@ export default function AnalyticsDashboard() {
       {loading && !data && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', color: '#555', fontSize: '0.9rem' }}>
           Loading analytics…
+        </div>
+      )}
+
+      {data?.warning && (
+        <div style={{ ...card, color: '#fb923c', fontSize: '0.85rem' }}>
+          {data.warning} Set `POSTHOG_API_KEY` and `POSTHOG_PROJECT_ID` in Netlify to enable live traffic reporting.
         </div>
       )}
 
