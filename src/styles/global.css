@@ -1072,6 +1072,11 @@ footer {
   line-height: 1.1;
   margin-bottom: 1rem;
 }
+.workshop-card-title a {
+  color: inherit;
+  text-decoration: none;
+}
+.workshop-card-title a:hover { color: var(--orange); }
 .workshop-card-tags { display: flex; flex-direction: column; gap: 0.5rem; }
 .workshop-tag {
   font-size: 0.78rem; color: var(--muted);

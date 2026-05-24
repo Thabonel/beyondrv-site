@@ -1,0 +1,32 @@
+[
+  {
+    "id": "farmer-dave-house-truck",
+    "quote": "Can't tell you how bloody ripped I am to have my own House Truck! Li and his team worked round the clock to get my rig not just great but beyond my expectations. I can't recommend these guys enough.",
+    "customerName": "Farmer Dave",
+    "customerLocation": "SE Queensland",
+    "productName": "House Truck Build",
+    "rating": 5,
+    "isVisible": true,
+    "sortOrder": 1
+  },
+  {
+    "id": "graeme-slide-on-awd-truck",
+    "quote": "We were able to drive all the way out to Lake Eyre on a 4x4 road that caravans and trailers were banned from. Having your slide-on on our small AWD truck is perhaps one of the highlights of our travelling life.",
+    "customerName": "Graeme S.",
+    "customerLocation": "South Australia",
+    "productName": "Slide-On · AWD Truck",
+    "rating": 5,
+    "isVisible": true,
+    "sortOrder": 2
+  },
+  {
+    "id": "malcolm-dianne-custom-build",
+    "quote": "A big shout out to Li, Alex, Oscar and Melissa at Beyond RV. Worth the wait. We love the set-up, the quality of the build and the space that we have.",
+    "customerName": "Malcolm & Dianne B.",
+    "customerLocation": "South Australia",
+    "productName": "Custom Build · Isuzu NPR",
+    "rating": 5,
+    "isVisible": true,
+    "sortOrder": 3
+  }
+]

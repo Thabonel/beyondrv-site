@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import AdminDashboard from './AdminDashboard';
+import initialRecentBuilds from '../data/homepage/recent-builds.json';
+import initialTestimonials from '../data/homepage/testimonials.json';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -19,7 +21,7 @@ interface PendingChange {
 }
 
 type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
-type PanelTab = 'dashboard' | 'products' | 'media' | 'enquiries' | 'knowledge' | 'pending';
+type PanelTab = 'dashboard' | 'products' | 'media' | 'homepage' | 'enquiries' | 'knowledge' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 
@@ -103,6 +105,35 @@ interface ContactConfig {
   missing: string[];
 }
 
+interface RecentBuild {
+  id: string;
+  title: string;
+  image: string;
+  alt: string;
+  tags: string[];
+  link?: string;
+  caption?: string;
+  completedDate?: string;
+  vehiclePlatform?: string;
+  productSlug?: string;
+  isVisible: boolean;
+  sortOrder: number;
+}
+
+interface Testimonial {
+  id: string;
+  quote: string;
+  customerName: string;
+  customerLocation?: string;
+  productName?: string;
+  image?: string;
+  rating?: number;
+  source?: string;
+  approvedDate?: string;
+  isVisible: boolean;
+  sortOrder: number;
+}
+
 const VERDICT_STYLE: Record<JudgeDecision, { label: string; color: string; border: string }> = {
   allow:    { label: '✓ Approved',  color: '#4ade80', border: '1px solid #1a3a1a' },
   escalate: { label: '⚠ Escalated', color: '#fb923c', border: '1px solid #3a2010' },
@@ -117,6 +148,28 @@ const EMPTY_PRODUCT_FORM: NewProductForm = {
   tagline: '',
   keySpecs: '',
   description: '',
+};
+
+const EMPTY_RECENT_BUILD: RecentBuild = {
+  id: '',
+  title: '',
+  image: '',
+  alt: '',
+  tags: ['Finished in Mutdapilly, Queensland'],
+  link: '',
+  isVisible: true,
+  sortOrder: 1,
+};
+
+const EMPTY_TESTIMONIAL: Testimonial = {
+  id: '',
+  quote: '',
+  customerName: '',
+  customerLocation: '',
+  productName: '',
+  rating: 5,
+  isVisible: false,
+  sortOrder: 1,
 };
 
 function slugifyTitle(title: string) {
@@ -138,6 +191,25 @@ function redirectToLoginIfUnauthorized(res: Response) {
     return true;
   }
   return false;
+}
+
+function makePendingChange(path: string, content: string, description: string): PendingChange {
+  return {
+    path,
+    content,
+    description,
+    proposal_id: `admin-ui-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    judgeDecision: 'allow',
+    risk_flags: [],
+  };
+}
+
+function orderedItems<T extends { sortOrder: number }>(items: T[]) {
+  return [...items].sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
+function renumber<T extends { sortOrder: number }>(items: T[]) {
+  return items.map((item, index) => ({ ...item, sortOrder: index + 1 }));
 }
 
 export default function AdminPanel() {
@@ -164,6 +236,9 @@ export default function AdminPanel() {
   const [enquiriesStatus, setEnquiriesStatus] = useState('');
   const [leadSaving, setLeadSaving] = useState<string | null>(null);
   const [contactConfig, setContactConfig] = useState<ContactConfig | null>(null);
+  const [recentBuilds, setRecentBuilds] = useState<RecentBuild[]>(renumber(orderedItems(initialRecentBuilds as RecentBuild[])));
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(renumber(orderedItems(initialTestimonials as Testimonial[])));
+  const [homepageStatus, setHomepageStatus] = useState('');
   const [loading, setLoading] = useState(false);
   const [pending, setPending] = useState<PendingChange[]>([]);
   const [deployStatus, setDeployStatus] = useState<DeployStatus>('idle');
@@ -556,6 +631,159 @@ export default function AdminPanel() {
     setNewProduct(EMPTY_PRODUCT_FORM);
   }
 
+  function updateRecentBuild(id: string, patch: Partial<RecentBuild>) {
+    setRecentBuilds(prev => prev.map(item => item.id === id ? { ...item, ...patch } : item));
+  }
+
+  function updateTestimonial(id: string, patch: Partial<Testimonial>) {
+    setTestimonials(prev => prev.map(item => item.id === id ? { ...item, ...patch } : item));
+  }
+
+  function addRecentBuild() {
+    const title = `Recent Build ${recentBuilds.length + 1}`;
+    setRecentBuilds(prev => renumber([
+      ...prev,
+      {
+        ...EMPTY_RECENT_BUILD,
+        id: slugifyTitle(`${title}-${Date.now()}`),
+        title,
+        sortOrder: prev.length + 1,
+      },
+    ]));
+  }
+
+  function addTestimonial() {
+    const title = `testimonial-${testimonials.length + 1}`;
+    setTestimonials(prev => renumber([
+      ...prev,
+      {
+        ...EMPTY_TESTIMONIAL,
+        id: slugifyTitle(`${title}-${Date.now()}`),
+        sortOrder: prev.length + 1,
+      },
+    ]));
+  }
+
+  function removeRecentBuild(id: string) {
+    setRecentBuilds(prev => renumber(prev.filter(item => item.id !== id)));
+  }
+
+  function removeTestimonial(id: string) {
+    setTestimonials(prev => renumber(prev.filter(item => item.id !== id)));
+  }
+
+  function moveRecentBuild(id: string, direction: -1 | 1) {
+    setRecentBuilds(prev => {
+      const next = orderedItems(prev);
+      const index = next.findIndex(item => item.id === id);
+      const target = index + direction;
+      if (index < 0 || target < 0 || target >= next.length) return prev;
+      [next[index], next[target]] = [next[target], next[index]];
+      return renumber(next);
+    });
+  }
+
+  function moveTestimonial(id: string, direction: -1 | 1) {
+    setTestimonials(prev => {
+      const next = orderedItems(prev);
+      const index = next.findIndex(item => item.id === id);
+      const target = index + direction;
+      if (index < 0 || target < 0 || target >= next.length) return prev;
+      [next[index], next[target]] = [next[target], next[index]];
+      return renumber(next);
+    });
+  }
+
+  function applyProductToRecentBuild(id: string, slug: string) {
+    const product = products.find(item => item.slug === slug);
+    if (!product) return;
+    updateRecentBuild(id, {
+      image: product.heroImage ?? '',
+      alt: `${product.title} build at Beyond RV`,
+      link: `/${product.slug}/`,
+      productSlug: product.slug,
+      title: product.title.includes('Advent') ? `${product.title.replace(' Hardtop Slide-On', '')} Build` : product.title,
+    });
+  }
+
+  function validateHomepageData() {
+    const buildErrors = orderedItems(recentBuilds).flatMap((build, index) => {
+      const prefix = `Recent build ${index + 1}`;
+      return [
+        !build.id.trim() && `${prefix}: ID`,
+        !build.title.trim() && `${prefix}: title`,
+        !build.image.trim() && `${prefix}: image`,
+        !build.alt.trim() && `${prefix}: alt text`,
+        build.tags.filter(tag => tag.trim()).length === 0 && `${prefix}: at least one tag`,
+      ].filter(Boolean);
+    });
+
+    const testimonialErrors = orderedItems(testimonials).flatMap((testimonial, index) => {
+      const prefix = `Testimonial ${index + 1}`;
+      return [
+        !testimonial.id.trim() && `${prefix}: ID`,
+        !testimonial.quote.trim() && `${prefix}: quote`,
+        !testimonial.customerName.trim() && `${prefix}: customer name`,
+        testimonial.rating && (testimonial.rating < 1 || testimonial.rating > 5) && `${prefix}: rating must be 1-5`,
+      ].filter(Boolean);
+    });
+
+    return [...buildErrors, ...testimonialErrors];
+  }
+
+  function queueHomepageUpdate() {
+    const errors = validateHomepageData();
+    if (errors.length) {
+      setHomepageStatus(`Fix before queueing: ${errors.join(', ')}.`);
+      return;
+    }
+
+    const cleanBuilds = renumber(orderedItems(recentBuilds)).map(build => ({
+      ...build,
+      id: slugifyTitle(build.id) || slugifyTitle(build.title),
+      title: build.title.trim(),
+      image: build.image.trim(),
+      alt: build.alt.trim(),
+      tags: build.tags.map(tag => tag.trim()).filter(Boolean),
+      link: build.link?.trim() || undefined,
+      caption: build.caption?.trim() || undefined,
+      completedDate: build.completedDate?.trim() || undefined,
+      vehiclePlatform: build.vehiclePlatform?.trim() || undefined,
+      productSlug: build.productSlug?.trim() || undefined,
+    }));
+
+    const cleanTestimonials = renumber(orderedItems(testimonials)).map(testimonial => ({
+      ...testimonial,
+      id: slugifyTitle(testimonial.id) || slugifyTitle(testimonial.customerName),
+      quote: testimonial.quote.trim(),
+      customerName: testimonial.customerName.trim(),
+      customerLocation: testimonial.customerLocation?.trim() || undefined,
+      productName: testimonial.productName?.trim() || undefined,
+      image: testimonial.image?.trim() || undefined,
+      rating: testimonial.rating || undefined,
+      source: testimonial.source?.trim() || undefined,
+      approvedDate: testimonial.approvedDate?.trim() || undefined,
+    }));
+
+    setRecentBuilds(cleanBuilds);
+    setTestimonials(cleanTestimonials);
+    setPending(prev => [
+      ...prev,
+      makePendingChange(
+        'src/data/homepage/recent-builds.json',
+        `${JSON.stringify(cleanBuilds, null, 2)}\n`,
+        'Update homepage recent builds'
+      ),
+      makePendingChange(
+        'src/data/homepage/testimonials.json',
+        `${JSON.stringify(cleanTestimonials, null, 2)}\n`,
+        'Update homepage testimonials'
+      ),
+    ]);
+    setHomepageStatus('Homepage updates queued. Open Pending to preview and deploy.');
+    setActiveTab('pending');
+  }
+
   async function deploy() {
     if (!pending.length || deployStatus === 'deploying') return;
 
@@ -670,8 +898,8 @@ export default function AdminPanel() {
 
       {/* Admin tools panel */}
       <div style={{ width: '420px', display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333', minWidth: 0 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', borderBottom: '1px solid #333' }}>
-          {(['dashboard', 'products', 'media', 'enquiries', 'knowledge', 'pending'] as PanelTab[]).map(tab => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderBottom: '1px solid #333' }}>
+          {(['dashboard', 'products', 'media', 'homepage', 'enquiries', 'knowledge', 'pending'] as PanelTab[]).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -873,6 +1101,108 @@ export default function AdminPanel() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'homepage' && (
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '1rem', borderBottom: '1px solid #333', display: 'grid', gap: '0.45rem' }}>
+              <div style={{ color: '#fff', fontWeight: 700 }}>Homepage Sections</div>
+              <p style={{ color: '#888', fontSize: '0.78rem', lineHeight: 1.4, margin: 0 }}>
+                Edit Recent Builds and customer testimonials. Changes are queued as structured JSON files for review before deployment.
+              </p>
+              {homepageStatus && (
+                <p style={{ color: homepageStatus.startsWith('Fix') ? '#f87' : '#8f8', fontSize: '0.78rem', lineHeight: 1.35, margin: 0 }}>{homepageStatus}</p>
+              )}
+            </div>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '0.75rem', display: 'grid', gap: '0.85rem', alignContent: 'start' }}>
+              <section style={{ display: 'grid', gap: '0.55rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
+                  <h3 style={{ margin: 0, color: '#fff', fontSize: '0.9rem' }}>Recent Builds</h3>
+                  <button onClick={addRecentBuild} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.38rem 0.55rem', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700 }}>
+                    Add
+                  </button>
+                </div>
+                {orderedItems(recentBuilds).map((build, index) => (
+                  <div key={build.id} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', padding: '0.7rem', display: 'grid', gap: '0.45rem' }}>
+                    {build.image && <img src={adminImageUrl(build.image)} alt="" style={{ width: '100%', height: '110px', objectFit: 'cover', borderRadius: '4px' }} />}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '0.35rem', alignItems: 'center' }}>
+                      <input value={build.title} onChange={e => updateRecentBuild(build.id, { title: e.target.value })} placeholder="Build title" style={{ minWidth: 0, background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                      <button onClick={() => moveRecentBuild(build.id, -1)} disabled={index === 0} style={{ background: '#222', color: index === 0 ? '#555' : '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: index === 0 ? 'not-allowed' : 'pointer' }}>↑</button>
+                      <button onClick={() => moveRecentBuild(build.id, 1)} disabled={index === recentBuilds.length - 1} style={{ background: '#222', color: index === recentBuilds.length - 1 ? '#555' : '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: index === recentBuilds.length - 1 ? 'not-allowed' : 'pointer' }}>↓</button>
+                      <button onClick={() => removeRecentBuild(build.id)} style={{ background: '#2a1410', color: '#fb923c', border: '1px solid #63301f', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer' }}>×</button>
+                    </div>
+                    <select
+                      value={build.productSlug ?? ''}
+                      onChange={e => applyProductToRecentBuild(build.id, e.target.value)}
+                      style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.45rem', fontSize: '0.76rem' }}
+                    >
+                      <option value="">Use product hero image...</option>
+                      {products.map(product => (
+                        <option key={product.slug} value={product.slug}>{product.title}</option>
+                      ))}
+                    </select>
+                    <input value={build.image} onChange={e => updateRecentBuild(build.id, { image: e.target.value })} placeholder="Image path" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                    <input value={build.alt} onChange={e => updateRecentBuild(build.id, { alt: e.target.value })} placeholder="Image alt text" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                    <input value={build.link ?? ''} onChange={e => updateRecentBuild(build.id, { link: e.target.value })} placeholder="/product-link/" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                    <textarea
+                      value={build.tags.join('\n')}
+                      onChange={e => updateRecentBuild(build.id, { tags: e.target.value.split('\n') })}
+                      placeholder="Tags, one per line"
+                      rows={3}
+                      style={{ resize: 'vertical', background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.45rem', fontSize: '0.76rem', lineHeight: 1.35 }}
+                    />
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#ddd', fontSize: '0.76rem' }}>
+                      <input type="checkbox" checked={build.isVisible} onChange={e => updateRecentBuild(build.id, { isVisible: e.target.checked })} />
+                      Show on homepage
+                    </label>
+                  </div>
+                ))}
+              </section>
+
+              <section style={{ display: 'grid', gap: '0.55rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
+                  <h3 style={{ margin: 0, color: '#fff', fontSize: '0.9rem' }}>Testimonials</h3>
+                  <button onClick={addTestimonial} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.38rem 0.55rem', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700 }}>
+                    Add
+                  </button>
+                </div>
+                {orderedItems(testimonials).map((testimonial, index) => (
+                  <div key={testimonial.id} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', padding: '0.7rem', display: 'grid', gap: '0.45rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '0.35rem', alignItems: 'center' }}>
+                      <input value={testimonial.customerName} onChange={e => updateTestimonial(testimonial.id, { customerName: e.target.value })} placeholder="Customer display name" style={{ minWidth: 0, background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                      <button onClick={() => moveTestimonial(testimonial.id, -1)} disabled={index === 0} style={{ background: '#222', color: index === 0 ? '#555' : '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: index === 0 ? 'not-allowed' : 'pointer' }}>↑</button>
+                      <button onClick={() => moveTestimonial(testimonial.id, 1)} disabled={index === testimonials.length - 1} style={{ background: '#222', color: index === testimonials.length - 1 ? '#555' : '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: index === testimonials.length - 1 ? 'not-allowed' : 'pointer' }}>↓</button>
+                      <button onClick={() => removeTestimonial(testimonial.id)} style={{ background: '#2a1410', color: '#fb923c', border: '1px solid #63301f', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer' }}>×</button>
+                    </div>
+                    <textarea
+                      value={testimonial.quote}
+                      onChange={e => updateTestimonial(testimonial.id, { quote: e.target.value })}
+                      placeholder="Exact customer quote"
+                      rows={4}
+                      style={{ resize: 'vertical', background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.45rem', fontSize: '0.76rem', lineHeight: 1.35 }}
+                    />
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+                      <input value={testimonial.productName ?? ''} onChange={e => updateTestimonial(testimonial.id, { productName: e.target.value })} placeholder="Product/build" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                      <input value={testimonial.customerLocation ?? ''} onChange={e => updateTestimonial(testimonial.id, { customerLocation: e.target.value })} placeholder="Location" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 92px', gap: '0.4rem' }}>
+                      <input value={testimonial.source ?? ''} onChange={e => updateTestimonial(testimonial.id, { source: e.target.value })} placeholder="Source or approval note" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                      <input type="number" min={1} max={5} value={testimonial.rating ?? ''} onChange={e => updateTestimonial(testimonial.id, { rating: e.target.value ? Number(e.target.value) : undefined })} placeholder="Rating" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                    </div>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#ddd', fontSize: '0.76rem' }}>
+                      <input type="checkbox" checked={testimonial.isVisible} onChange={e => updateTestimonial(testimonial.id, { isVisible: e.target.checked })} />
+                      Show on homepage
+                    </label>
+                  </div>
+                ))}
+              </section>
+            </div>
+            <div style={{ padding: '0.75rem', borderTop: '1px solid #333' }}>
+              <button onClick={queueHomepageUpdate} style={{ width: '100%', background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.7rem', cursor: 'pointer', fontWeight: 700 }}>
+                Queue Homepage Updates
+              </button>
             </div>
           </div>
         )}
@@ -1096,7 +1426,7 @@ export default function AdminPanel() {
             <section>
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>How the admin works</h3>
               <p style={{ margin: 0, color: '#ddd' }}>
-                The admin has two jobs: show the owner what needs attention, and prepare safe site changes for review. Dashboard, Enquiries, and Media save operational data directly. Product, content, and chatbot changes are queued in Pending Changes so they can be previewed before deployment.
+                The admin has two jobs: show the owner what needs attention, and prepare safe site changes for review. Dashboard, Enquiries, and Media save operational data directly. Product, homepage, content, and chatbot changes are queued in Pending Changes so they can be previewed before deployment.
               </p>
             </section>
             <section>
@@ -1141,6 +1471,16 @@ export default function AdminPanel() {
                 <li>The uploaded image is stored in Netlify Blobs, so it does not need to be committed to Git.</li>
                 <li>Use Hero to prepare that image as the main product image, or Gallery to add it to the product gallery list.</li>
                 <li>Open Pending, preview the product file, then deploy when the image order is correct.</li>
+              </ol>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Update homepage proof sections</h3>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Open the Homepage tab to edit Recent Builds and customer testimonials.</li>
+                <li>For Recent Builds, use a product hero image or paste an approved image path, then update the title, alt text, link, tags, and visibility.</li>
+                <li>Use the arrow buttons to reorder cards. Hidden cards stay in the data file but do not appear on the homepage.</li>
+                <li>For Testimonials, enter only real customer-provided wording. Do not invent names, quotes, or ratings.</li>
+                <li>Click Queue Homepage Updates, then open Pending to preview the JSON files before deploying.</li>
               </ol>
             </section>
             <section>

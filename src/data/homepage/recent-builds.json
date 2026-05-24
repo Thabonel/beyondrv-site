@@ -1,0 +1,44 @@
+[
+  {
+    "id": "advent-2150-mutdapilly",
+    "title": "Advent 2150 Build",
+    "image": "/images/optimized/products/advent-2150-hardtop-slide-on/02-advent-2150-04-1024x576.webp",
+    "alt": "Advent 2150 slide-on build at Beyond RV in Mutdapilly Queensland",
+    "tags": [
+      "Finished in Mutdapilly, Queensland",
+      "Electrical, cabinetry & compliance completed locally",
+      "ADR certified"
+    ],
+    "link": "/advent-2150-hardtop-slide-on/",
+    "isVisible": true,
+    "sortOrder": 1
+  },
+  {
+    "id": "unimog-u1700l-expedition",
+    "title": "Built for a Unimog U1700L",
+    "image": "/images/optimized/products/expedition/unimog-overlander-camper/02-mog2.webp",
+    "alt": "Unimog U1700L expedition build by Beyond RV Queensland",
+    "tags": [
+      "Finished in Mutdapilly, Queensland",
+      "Electrical, cabinetry & compliance completed locally",
+      "Full custom expedition fitout"
+    ],
+    "link": "/expedition/unimog-overlander-camper/",
+    "isVisible": true,
+    "sortOrder": 2
+  },
+  {
+    "id": "advent-2300-mutdapilly",
+    "title": "Advent 2300 Build",
+    "image": "/images/optimized/products/advent-2300-hardtop-slide-on/01-beyond-rv-2300-advent-series-19-1024x678.webp",
+    "alt": "Advent 2300 slide-on camper build at Beyond RV in Mutdapilly",
+    "tags": [
+      "Finished in Mutdapilly, Queensland",
+      "Solar, lithium & 240V fitout",
+      "Queensland warranty & ongoing support"
+    ],
+    "link": "/advent-2300-hardtop-slide-on/",
+    "isVisible": true,
+    "sortOrder": 3
+  }
+]

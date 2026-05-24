@@ -3,9 +3,17 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProductCard from '../components/ProductCard.astro';
 import { displayImageUrl, imageSrcSet } from '../lib/media';
+import recentBuildsData from '../data/homepage/recent-builds.json';
+import testimonialsData from '../data/homepage/testimonials.json';
 
 const allProducts = await getCollection('products');
 const featuredProducts = allProducts.filter(p => p.data.featured).slice(0, 4);
+const visibleRecentBuilds = recentBuildsData
+  .filter(build => build.isVisible)
+  .sort((a, b) => a.sortOrder - b.sortOrder);
+const visibleTestimonials = testimonialsData
+  .filter(testimonial => testimonial.isVisible)
+  .sort((a, b) => a.sortOrder - b.sortOrder);
 const rangeImages = {
   expedition: '/images/optimized/products/expedition/isuzu-nps-poptop-camper/01-isuzu-nps-01.webp',
   slideOn: '/images/optimized/products/advent-2150-hardtop-slide-on/02-advent-2150-04-1024x576.webp',
@@ -13,7 +21,6 @@ const rangeImages = {
   custom: '/images/optimized/products/advent-2150-hardtop-slide-on/02-advent-2150-04-1024x576.webp',
   story: '/images/optimized/products/expedition/unimog-overlander-camper/02-mog2.webp',
   expeditionHighlight: '/images/optimized/products/expedition/isuzu-nps-poptop-camper/03-isuzu-nps-04.webp',
-  advent2300: '/images/optimized/products/advent-2300-hardtop-slide-on/20-beyond-rv-2300-advent-series-03-1024x678.webp',
 };
 
 const orgSchema = {
@@ -439,70 +446,30 @@ const websiteSchema = {
         Every build that leaves Mutdapilly goes through the same process — specified, fitted and certified by our Queensland team.
       </p>
       <div class="workshop-grid reveal reveal-delay-2">
-
-        <div class="workshop-card">
-          <div class="workshop-card-image">
-            <img
-              src={displayImageUrl(rangeImages.custom, 800)}
-              srcset={imageSrcSet(rangeImages.custom, [480, 800, 1200])}
-              sizes="(max-width: 900px) 100vw, 33vw"
-              alt="Advent 2150 slide-on build — Mutdapilly Queensland"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-          <div class="workshop-card-body">
-            <div class="workshop-card-title">Advent 2150 — Dual-Cab HiLux Build</div>
-            <div class="workshop-card-tags">
-              <span class="workshop-tag">Finished in Mutdapilly, Queensland</span>
-              <span class="workshop-tag">Electrical, cabinetry &amp; compliance completed locally</span>
-              <span class="workshop-tag">ADR certified</span>
+        {visibleRecentBuilds.map(build => (
+          <div class="workshop-card">
+            <div class="workshop-card-image">
+              <img
+                src={displayImageUrl(build.image, 800)}
+                srcset={imageSrcSet(build.image, [480, 800, 1200])}
+                sizes="(max-width: 900px) 100vw, 33vw"
+                alt={build.alt}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div class="workshop-card-body">
+              <div class="workshop-card-title">
+                {build.link ? <a href={build.link}>{build.title}</a> : build.title}
+              </div>
+              <div class="workshop-card-tags">
+                {build.tags.map(tag => (
+                  <span class="workshop-tag">{tag}</span>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-
-        <div class="workshop-card">
-          <div class="workshop-card-image">
-            <img
-              src={displayImageUrl(rangeImages.story, 800)}
-              srcset={imageSrcSet(rangeImages.story, [480, 800, 1200])}
-              sizes="(max-width: 900px) 100vw, 33vw"
-              alt="Unimog U1700L expedition build — Beyond RV Queensland"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-          <div class="workshop-card-body">
-            <div class="workshop-card-title">Built for a Unimog U1700L</div>
-            <div class="workshop-card-tags">
-              <span class="workshop-tag">Finished in Mutdapilly, Queensland</span>
-              <span class="workshop-tag">Electrical, cabinetry &amp; compliance completed locally</span>
-              <span class="workshop-tag">Full custom expedition fitout</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="workshop-card">
-          <div class="workshop-card-image">
-            <img
-              src={displayImageUrl(rangeImages.advent2300, 800)}
-              srcset={imageSrcSet(rangeImages.advent2300, [480, 800, 1200])}
-              sizes="(max-width: 900px) 100vw, 33vw"
-              alt="Advent 2300 slide-on build — Mutdapilly"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-          <div class="workshop-card-body">
-            <div class="workshop-card-title">Advent 2300 — Isuzu D-Max Build</div>
-            <div class="workshop-card-tags">
-              <span class="workshop-tag">Finished in Mutdapilly, Queensland</span>
-              <span class="workshop-tag">Solar, lithium &amp; 240V fitout</span>
-              <span class="workshop-tag">Queensland warranty &amp; ongoing support</span>
-            </div>
-          </div>
-        </div>
-
+        ))}
       </div>
     </div>
   </section>
@@ -516,31 +483,17 @@ const websiteSchema = {
       </div>
       <h2 class="section-title reveal reveal-delay-1">Built to Last.<br><span style="color: var(--orange)">Backed by Real Owners.</span></h2>
       <div class="testimonials-grid">
-
-        <div class="testimonial-card reveal">
-          <p class="testimonial-quote">Can't tell you how bloody ripped I am to have my own House Truck! Li and his team worked round the clock to get my rig not just great but beyond my expectations. I can't recommend these guys enough.</p>
-          <div class="testimonial-author">
-            <strong>— Farmer Dave</strong>
-            <span>House Truck Build · SE Queensland</span>
+        {visibleTestimonials.map((testimonial, index) => (
+          <div class={`testimonial-card reveal${index > 0 ? ` reveal-delay-${Math.min(index, 2)}` : ''}`}>
+            <p class="testimonial-quote">{testimonial.quote}</p>
+            <div class="testimonial-author">
+              <strong>— {testimonial.customerName}</strong>
+              {(testimonial.productName || testimonial.customerLocation) && (
+                <span>{[testimonial.productName, testimonial.customerLocation].filter(Boolean).join(' · ')}</span>
+              )}
+            </div>
           </div>
-        </div>
-
-        <div class="testimonial-card reveal reveal-delay-1">
-          <p class="testimonial-quote">We were able to drive all the way out to Lake Eyre on a 4x4 road that caravans and trailers were banned from. Having your slide-on on our small AWD truck is perhaps one of the highlights of our travelling life.</p>
-          <div class="testimonial-author">
-            <strong>— Graeme S.</strong>
-            <span>Slide-On · AWD Truck · South Australia</span>
-          </div>
-        </div>
-
-        <div class="testimonial-card reveal reveal-delay-2">
-          <p class="testimonial-quote">A big shout out to Li, Alex, Oscar and Melissa at Beyond RV. Worth the wait. We love the set-up, the quality of the build and the space that we have.</p>
-          <div class="testimonial-author">
-            <strong>— Malcolm &amp; Dianne B.</strong>
-            <span>Custom Build · Isuzu NPR · South Australia</span>
-          </div>
-        </div>
-
+        ))}
       </div>
     </div>
   </section>
