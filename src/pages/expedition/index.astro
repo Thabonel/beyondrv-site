@@ -20,13 +20,35 @@ const schema = {
     "url": `https://beyondrv.com.au/${p.slug}/`
   }))
 };
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What platforms suit an expedition camper?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Common expedition camper platforms include Mercedes-Benz Unimog, Isuzu NPS, Iveco Daily 4x4, and other trucks with suitable payload and off-road capability."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why choose a truck camper instead of a caravan?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A truck camper keeps the living body on the vehicle, which can improve manoeuvrability, departure angle, and access to tighter or rougher tracks compared with towing."
+      }
+    }
+  ]
+};
 ---
 <BaseLayout
   title="Expedition Vehicles | Unimog & Isuzu Campers | Beyond RV Queensland"
   description="Beyond RV builds expedition campers on Unimog and Isuzu NPS platforms. For serious overlanders who genuinely leave all roads behind. Custom-built in Queensland."
   image="/images/site/unimog-hero.jpg"
   activePath="/expedition/"
-  structuredData={schema}
+  structuredData={[schema, faqSchema]}
 >
   <section class="page-hero">
     <div class="page-hero-bg" style="background-image: url('/images/site/unimog-hero.jpg')"></div>
@@ -45,7 +67,7 @@ const schema = {
     </div>
   </section>
 
-  <!-- Founder credibility block — placeholder until client supplies content/photo -->
+  <!-- Builder credibility block -->
   <section class="expedition-callout container" style="margin-top: 5rem">
     <div>
       <div class="section-eyebrow reveal">
@@ -106,6 +128,28 @@ const schema = {
       </div>
     </section>
   )}
+
+  <section class="container" style="padding-bottom: 5rem">
+    <div class="page-content">
+      <h2>Expedition campers for serious travel</h2>
+      <h3>Which platforms work best?</h3>
+      <p>
+        Unimog and Isuzu NPS platforms are common choices because they offer real payload, ground clearance,
+        and off-road capability. The best platform depends on serviceability, payload, budget, and how remote
+        you plan to travel.
+      </p>
+      <h3>Truck camper or caravan?</h3>
+      <p>
+        A truck camper keeps the camper body on the vehicle, which helps on tight, rough, or steep tracks.
+        A caravan can suit touring routes where towing access, camp setup, and separation from the tow vehicle
+        are more important.
+      </p>
+      <p>
+        If you are comparing an Isuzu, Unimog, Sprinter, or Iveco platform, send the details through the
+        <a href="/inquiry-form/?product=expedition-custom">expedition enquiry form</a>.
+      </p>
+    </div>
+  </section>
 
   <section class="cta-section">
     <div class="cta-bg" style="background-image: url('/images/site/mog2.jpg')"></div>

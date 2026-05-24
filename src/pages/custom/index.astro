@@ -8,13 +8,35 @@ const schema = {
   "url": "https://beyondrv.com.au/custom/",
   "description": "Beyond RV custom camper builds — slide-ons, truck campers, and expedition vehicles built to your exact specification."
 };
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What information should I provide for a custom camper build?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Provide your vehicle, tray or chassis dimensions, payload details, number of travellers, intended terrain, power needs, water needs, and any must-have layout features."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can Beyond RV build for uncommon trucks?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Beyond RV can discuss custom slide-on, truck camper, and expedition body options for unusual platforms where the payload and mounting approach are suitable."
+      }
+    }
+  ]
+};
 ---
 <BaseLayout
   title="Custom Builds | Beyond RV Queensland"
   description="Beyond RV builds custom slide-ons, truck campers, and expedition vehicles to your exact spec. Tell us your truck and your dream — we'll build the rest."
   image="/images/site/unimog-hero.jpg"
   activePath="/custom/"
-  structuredData={schema}
+  structuredData={[schema, faqSchema]}
 >
   <section class="page-hero">
     <div class="page-hero-bg" style="background-image: url('/images/site/unimog-hero.jpg')"></div>
@@ -100,6 +122,28 @@ const schema = {
         <div class="process-title">Handover</div>
         <div class="process-desc">Full walkthrough, orientation, and compliance documentation. Drive away knowing every system inside out.</div>
       </div>
+    </div>
+  </section>
+
+  <section class="container" style="padding-bottom: 5rem">
+    <div class="page-content">
+      <h2>Planning a custom camper build</h2>
+      <h3>What should you send us first?</h3>
+      <p>
+        Start with your vehicle make and model, tray or chassis dimensions, payload details, number of travellers,
+        expected terrain, and the systems you care about most: lithium battery capacity, solar, water, heating,
+        cooling, bathroom, kitchen, and storage.
+      </p>
+      <h3>Can we build for unusual vehicles?</h3>
+      <p>
+        Yes, provided the vehicle has the payload, mounting points, and legal pathway for the camper body or fitout.
+        We regularly discuss custom requirements for utes, mid-size trucks, Sprinter-style platforms, Isuzu trucks,
+        and expedition vehicles.
+      </p>
+      <p>
+        Use the <a href="/inquiry-form/?product=custom-build&intent=custom">custom build enquiry form</a>
+        and include photos or dimensions if you already have them.
+      </p>
     </div>
   </section>
 

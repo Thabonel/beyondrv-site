@@ -22,13 +22,35 @@ const schema = {
     "url": `https://beyondrv.com.au/${p.slug}/`
   }))
 };
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What vehicles can take a Beyond RV slide-on camper?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Beyond RV works with utes, tray backs, mid-size trucks, and larger expedition platforms. Suitability depends on tray size, payload, axle limits, and how the vehicle is set up."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Should I choose a hardtop or pop-top slide-on?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Hardtops suit buyers who want fixed interior height and simple setup. Pop-tops suit buyers who want a lower travel profile and standing room once camped."
+      }
+    }
+  ]
+};
 ---
 <BaseLayout
   title="Slide-On Campers for Utes & Trucks | Beyond RV Queensland"
   description="Beyond RV slide-on campers — hardtop and pop-top for utes, mid-size trucks, and expedition vehicles. The Advent range and more. Built in Queensland."
   image="/images/products/advent-2150/advent-2150-01.jpg"
   activePath="/our-slide-on-campers/"
-  structuredData={schema}
+  structuredData={[schema, faqSchema]}
 >
   <section class="page-hero">
     <div class="page-hero-bg" style="background-image: url('/images/products/advent-2150/advent-2150-01.jpg')"></div>
@@ -61,6 +83,27 @@ const schema = {
           priceBadge={p.data.priceBadge}
         />
       ))}
+    </div>
+  </section>
+
+  <section class="container" style="padding-bottom: 5rem">
+    <div class="page-content">
+      <h2>Choosing a slide-on camper</h2>
+      <h3>What vehicles can take a slide-on camper?</h3>
+      <p>
+        The right slide-on depends on tray size, payload, axle limits, suspension setup, and how much water,
+        battery, and gear you want to carry. Beyond RV can help match a camper to utes, tray backs, Iveco,
+        Isuzu, Sprinter, and similar platforms.
+      </p>
+      <h3>Hardtop or pop-top?</h3>
+      <p>
+        Choose a hardtop when you want fixed living height and quick access. Choose a pop-top when travel
+        height and wind resistance matter, but you still want standing room at camp.
+      </p>
+      <p>
+        For unusual tray dimensions or a touring setup that needs more battery, water, or storage, start a
+        <a href="/custom/">custom build enquiry</a>.
+      </p>
     </div>
   </section>
 

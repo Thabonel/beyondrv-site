@@ -17,14 +17,59 @@ const {
   canonicalUrl,
   structuredData,
 } = Astro.props;
-const canonical = canonicalUrl ?? Astro.url.href;
-const ogImage = Astro.site ? new URL(image, Astro.site).toString() : image;
+const siteUrl = Astro.site ?? new URL('https://beyondrv.com.au');
+const canonical = canonicalUrl ? new URL(canonicalUrl, siteUrl).toString() : new URL(Astro.url.pathname, siteUrl).toString();
+const ogImage = new URL(image, siteUrl).toString();
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": ["LocalBusiness", "AutomotiveBusiness"],
+  "@id": "https://beyondrv.com.au/#business",
+  "name": "Beyond RV",
+  "alternateName": "Beyond Caravans",
+  "url": "https://beyondrv.com.au/",
+  "logo": "https://beyondrv.com.au/images/site/admin-logo.png",
+  "image": "https://beyondrv.com.au/images/site/unimog-hero.jpg",
+  "telephone": "+61430863819",
+  "email": "beyondcaravans@gmail.com",
+  "priceRange": "$$",
+  "description": "Queensland builder of slide-on campers, truck campers, off-road caravans, and expedition vehicle bodies.",
+  "sameAs": [
+    "https://www.youtube.com/@beyondrvcampers4129",
+    "https://www.facebook.com/BeyondCaravans",
+    "https://www.instagram.com/beyondrvaus/"
+  ],
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "77 Coleyville Rd",
+    "addressLocality": "Mutdapilly",
+    "addressRegion": "QLD",
+    "postalCode": "4307",
+    "addressCountry": "AU"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": -27.66,
+    "longitude": 152.55
+  },
+  "areaServed": [
+    { "@type": "Country", "name": "Australia" },
+    { "@type": "State", "name": "Queensland" },
+    { "@type": "City", "name": "Brisbane" }
+  ],
+  "openingHoursSpecification": [{
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    "opens": "09:00",
+    "closes": "17:00",
+    "description": "Workshop viewings by appointment."
+  }]
+};
 ---
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>{title}</title>
 <meta name="description" content={description} />
-{noIndex && <meta name="robots" content="noindex" />}
+{noIndex && <meta name="robots" content="noindex, nofollow" />}
 <link rel="canonical" href={canonical} />
 <link rel="icon" href="/favicon.ico" sizes="any" />
 <link rel="icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
@@ -61,24 +106,4 @@ const ogImage = Astro.site ? new URL(image, Astro.site).toString() : image;
 )}
 
 <!-- Site-wide LocalBusiness schema -->
-<script type="application/ld+json">{JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "LocalBusiness",
-  "name": "Beyond RV",
-  "url": "https://beyondrv.com.au",
-  "telephone": "+61430863819",
-  "email": "beyondcaravans@gmail.com",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "77 Coleyville Rd",
-    "addressLocality": "Mutdapilly",
-    "addressRegion": "QLD",
-    "postalCode": "4307",
-    "addressCountry": "AU"
-  },
-  "geo": {
-    "@type": "GeoCoordinates",
-    "latitude": -27.66,
-    "longitude": 152.55
-  }
-})}</script>
+<script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />

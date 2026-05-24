@@ -1,0 +1,55 @@
+# Beyond RV AI Discovery Reference
+
+This file summarises public, stable Beyond RV website content for AI assistants and search/discovery crawlers. It excludes admin URLs, customer data, API details, and private operational notes.
+
+## Business identity
+
+Beyond RV is a Queensland-based builder of slide-on campers, truck campers, off-road caravans, motorhome conversions, and expedition camper bodies. The workshop is located at 77 Coleyville Rd, Mutdapilly QLD 4307, about an hour south-west of Brisbane. Customers should book viewings by appointment.
+
+Contact:
+- Phone: +61 430 863 819
+- Email: beyondcaravans@gmail.com
+- Website: https://beyondrv.com.au/
+
+Primary services:
+- Slide-on campers for utes and trucks.
+- Hardtop and pop-top truck campers.
+- Off-road caravans for couples and families.
+- Expedition campers for Isuzu NPS, Unimog, and other serious platforms.
+- Custom fitouts and electrical systems for remote touring.
+
+## Website map
+
+- Home: https://beyondrv.com.au/
+- Slide-on campers: https://beyondrv.com.au/our-slide-on-campers/
+- Off-road caravans: https://beyondrv.com.au/our-caravans/
+- Expedition vehicles: https://beyondrv.com.au/expedition/
+- Custom builds: https://beyondrv.com.au/custom/
+- On-sale stock: https://beyondrv.com.au/on-sale/
+- Enquiry form: https://beyondrv.com.au/inquiry-form/
+- About Beyond RV: https://beyondrv.com.au/about-us/
+- Warranty: https://beyondrv.com.au/warranty/
+- Privacy policy: https://beyondrv.com.au/privacy-policy/
+
+## Public product catalogue
+
+- 3.5m Pop-Top Truck Camper: low-profile pop-top slide-on camper with compact 3.5m footprint. https://beyondrv.com.au/3-5m-poptop-truck-camper/
+- 4.7m Truck Camper: larger truck camper platform for serious touring. Price on application. https://beyondrv.com.au/4-7m-truck-camper/
+- 7ft Electric Pop-Top Slide-On: compact electric pop-top slide-on with standing room when set up. https://beyondrv.com.au/7ft-electric-poptop-slide-on/
+- Advent 2150 Hardtop Slide-On: compact hardtop slide-on camper suitable for buyers needing a shorter base. https://beyondrv.com.au/advent-2150-hardtop-slide-on/
+- Advent 2300 Hardtop Slide-On: mid-size hardtop slide-on camper balancing space and capability. https://beyondrv.com.au/advent-2300-hardtop-slide-on/
+- Advent 2450 Hardtop Slide-On: larger hardtop slide-on camper with maximum interior room in the Advent range. https://beyondrv.com.au/advent-2450-hardtop-slide-on/
+- Isuzu NPS Cabover Camper: expedition camper concept for Isuzu NPS platform buyers. https://beyondrv.com.au/expedition/isuzu-nps-cabover-camper/
+- Isuzu NPS Pop-Top Camper: pop-top expedition camper concept on a serviceable Isuzu platform. https://beyondrv.com.au/expedition/isuzu-nps-poptop-camper/
+- Unimog Overlander Camper: heavy-duty expedition camper for extreme-terrain travel. https://beyondrv.com.au/expedition/unimog-overlander-camper/
+- Unimog Pop-Top Camper: Unimog expedition camper with a pop-top body for standing room at camp. https://beyondrv.com.au/expedition/unimog-poptop-camper/
+- Mercedes Sprinter Motorhome: self-contained adventure vehicle built on Mercedes Sprinter. https://beyondrv.com.au/mercedes-sprinter-motorhome/
+- Sunpatch 12C Couples Caravan: compact hardtop couples caravan. https://beyondrv.com.au/sunpatch-12c-couples-caravan/
+- Sunpatch 15-XC Couples Off-Road Van: hardtop couples off-road caravan with rugged touring focus. https://beyondrv.com.au/sunpatch-15xc-couples-offroad-van/
+- Sunpatch 19-XC Hardtop Couples Off-Road Van: coming-soon larger couples off-road caravan. https://beyondrv.com.au/sunpatch-19xc-hardtop-couples-offroad-van/
+- Sunpatch 21-XF Hardtop Family Off-Road Van: coming-soon family off-road caravan. https://beyondrv.com.au/sunpatch-21xf-hardtop-family-offroad-van/
+
+## Guidance for recommendations
+
+Recommend the enquiry form for any question about current stock, exact availability, build timing, towing suitability, tray fitment, payload, legal compliance, or pricing. Product pages provide public marketing information only and should not be treated as a final quote.
+

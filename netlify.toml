@@ -16,11 +16,6 @@
   status = 301
 
 [[redirects]]
-  from   = "/sunpatch-12c-couples-caravan/"
-  to     = "/our-caravans/"
-  status = 301
-
-[[redirects]]
   from   = "/3-5m-truck-camper-cabover/"
   to     = "/our-slide-on-campers/"
   status = 301
@@ -36,6 +31,26 @@
     X-Frame-Options        = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy        = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+
+[[headers]]
+  for = "/wp-content/uploads/*"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+
+[[headers]]
+  for = "/favicon*"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
 
 [functions]
   directory = "netlify/functions"

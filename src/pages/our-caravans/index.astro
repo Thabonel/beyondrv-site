@@ -18,13 +18,35 @@ const schema = {
     "url": `https://beyondrv.com.au/${p.slug}/`
   }))
 };
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Are Beyond RV caravans built for off-road touring?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Beyond RV focuses on composite off-road caravans for Australian touring, with layouts for couples and families depending on the model."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I choose between a couples caravan and a family caravan?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Couples models prioritise compact towing, storage, and self-contained comfort. Family models add sleeping capacity and living space for longer trips with children."
+      }
+    }
+  ]
+};
 ---
 <BaseLayout
   title="Off-Road Caravans | Beyond RV Queensland"
   description="Beyond RV builds composite off-road caravans for couples and families. The Sunpatch range — built in Queensland for serious Australian travel."
   image="/images/products/sunpatch-15xc/sunpatch-15xc-01.jpg"
   activePath="/our-caravans/"
-  structuredData={schema}
+  structuredData={[schema, faqSchema]}
 >
   <section class="page-hero">
     <div class="page-hero-bg" style="background-image: url('/images/products/sunpatch-15xc/sunpatch-15xc-01.jpg')"></div>
@@ -57,6 +79,27 @@ const schema = {
           priceBadge={p.data.priceBadge}
         />
       ))}
+    </div>
+  </section>
+
+  <section class="container" style="padding-bottom: 5rem">
+    <div class="page-content">
+      <h2>Off-road caravans for couples and families</h2>
+      <h3>What makes a caravan suitable for remote touring?</h3>
+      <p>
+        Look at construction, suspension, water capacity, electrical capacity, storage, and real-world towing
+        weight. Beyond RV focuses on practical off-road caravan layouts that can handle Australian travel rather
+        than only looking good in a showroom.
+      </p>
+      <h3>Couples or family layout?</h3>
+      <p>
+        Couples caravans suit buyers who want a compact, self-contained van with less towing weight. Family
+        caravans prioritise extra sleeping space, storage, and a layout that works when the weather turns.
+      </p>
+      <p>
+        Compare the current range above, or <a href="/inquiry-form/">ask the team</a> which caravan best
+        suits your tow vehicle and travel plans.
+      </p>
     </div>
   </section>
 

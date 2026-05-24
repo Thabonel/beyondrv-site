@@ -6,7 +6,20 @@ export default defineConfig({
   site: 'https://beyondrv.com.au',
   output: 'static',
   outDir: './dist',
-  integrations: [sitemap(), react()],
+  integrations: [
+    sitemap({
+      filter: (page) => {
+        const excludedPaths = [
+          '/admin/',
+          '/admin/analytics/',
+          '/inquiry-form/success/',
+          '/404.html',
+        ];
+        return !excludedPaths.some((path) => page.endsWith(path));
+      },
+    }),
+    react(),
+  ],
   image: {
     remotePatterns: [],
   },

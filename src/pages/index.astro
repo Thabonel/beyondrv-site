@@ -9,11 +9,20 @@ const featuredProducts = allProducts.filter(p => p.data.featured).slice(0, 4);
 const orgSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": "https://beyondrv.com.au/#organization",
   "name": "Beyond RV",
-  "url": "https://beyondrv.com.au",
-  "logo": "https://beyondrv.com.au/images/site/logo.jpg",
+  "alternateName": "Beyond Caravans",
+  "url": "https://beyondrv.com.au/",
+  "logo": "https://beyondrv.com.au/images/site/admin-logo.png",
   "telephone": "+61430863819",
   "email": "beyondcaravans@gmail.com",
+  "sameAs": [
+    "https://www.youtube.com/@beyondrvcampers4129",
+    "https://www.facebook.com/BeyondCaravans",
+    "https://www.instagram.com/beyondrvaus/"
+  ],
+  "areaServed": ["Australia", "Queensland", "Brisbane"],
+  "description": "Beyond RV builds slide-on campers, truck campers, off-road caravans, and expedition vehicle bodies from Mutdapilly, Queensland.",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "77 Coleyville Rd",
@@ -27,8 +36,10 @@ const orgSchema = {
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
+  "@id": "https://beyondrv.com.au/#website",
   "name": "Beyond RV",
-  "url": "https://beyondrv.com.au",
+  "url": "https://beyondrv.com.au/",
+  "publisher": { "@id": "https://beyondrv.com.au/#organization" },
   "potentialAction": {
     "@type": "SearchAction",
     "target": {

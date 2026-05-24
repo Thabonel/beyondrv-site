@@ -13,32 +13,82 @@ const isComingSoon = data.status === 'coming-soon';
 const encodedSlug = encodeURIComponent(product.slug);
 const encodedName = encodeURIComponent(data.title);
 const enquiryUrl = `/inquiry-form/?product=${encodedSlug}&name=${encodedName}`;
+const siteUrl = Astro.site ?? new URL('https://beyondrv.com.au');
+const productUrl = new URL(`/${product.slug}/`, siteUrl).toString();
 const heroDisplayImage = displayImageUrl(data.heroImage, 1400);
 const galleryImages = [data.heroImage, ...data.gallery].map((img) => ({
   original: img,
   display: displayImageUrl(img, 1400),
   thumb: displayImageUrl(img, 240),
 }));
+const productImages = [data.heroImage, ...data.gallery]
+  .filter(Boolean)
+  .map((img) => new URL(img, siteUrl).toString());
+const categoryMeta = {
+  'slide-on': { name: 'Slide-On Campers', url: '/our-slide-on-campers/' },
+  caravan: { name: 'Off-Road Caravans', url: '/our-caravans/' },
+  expedition: { name: 'Expedition Vehicles', url: '/expedition/' },
+}[data.category];
 
 const priceNum = data.price.replace(/[^0-9.]/g, '');
 const productSchema = {
   "@context": "https://schema.org",
   "@type": "Product",
+  "@id": `${productUrl}#product`,
   "name": data.title,
   "description": data.seoDesc ?? data.tagline,
+  "url": productUrl,
+  "sku": `BRV-${product.slug.toUpperCase().replace(/[^A-Z0-9]+/g, '-')}`,
   "brand": { "@type": "Brand", "name": "Beyond RV" },
-  "image": data.heroImage,
+  "manufacturer": { "@type": "Organization", "name": "Beyond RV", "url": "https://beyondrv.com.au/" },
+  "image": productImages,
+  "category": categoryMeta.name,
+  "itemCondition": "https://schema.org/NewCondition",
+  "areaServed": { "@type": "Country", "name": "Australia" },
   ...(priceNum && {
     "offers": {
       "@type": "Offer",
+      "url": productUrl,
       "priceCurrency": "AUD",
       "price": priceNum,
+      "priceValidUntil": "2026-12-31",
+      "itemCondition": "https://schema.org/NewCondition",
       "availability": isComingSoon
         ? "https://schema.org/PreOrder"
         : "https://schema.org/InStock",
-      "seller": { "@type": "Organization", "name": "Beyond RV" }
+      "seller": {
+        "@type": "Organization",
+        "name": "Beyond RV",
+        "url": "https://beyondrv.com.au/"
+      },
+      "areaServed": { "@type": "Country", "name": "Australia" }
     }
   }),
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://beyondrv.com.au/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": categoryMeta.name,
+      "item": new URL(categoryMeta.url, siteUrl).toString()
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": data.title,
+      "item": productUrl
+    }
+  ]
 };
 
 const faqSchema = data.faq && data.faq.length > 0
@@ -53,7 +103,7 @@ const faqSchema = data.faq && data.faq.length > 0
     }
   : undefined;
 
-const schemas = [productSchema, ...(faqSchema ? [faqSchema] : [])];
+const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : [])];
 ---
 <BaseLayout
   title={data.seoTitle ?? `${data.title} | Beyond RV`}
@@ -129,6 +179,13 @@ const schemas = [productSchema, ...(faqSchema ? [faqSchema] : [])];
   <section class="product-description container">
     <div class="product-description-body prose">
       <slot />
+      <h2>Is this the right build for you?</h2>
+      <p>
+        This {data.category === 'caravan' ? 'off-road caravan' : data.category === 'expedition' ? 'expedition camper' : 'slide-on camper'} is best assessed against your vehicle, payload, travel style, and the terrain you expect to cover.
+        If you are comparing sizes, tow weights, tray fitment, or custom options, start with the
+        <a href={categoryMeta.url}>{categoryMeta.name.toLowerCase()}</a> range or send the team an
+        <a href={enquiryUrl}>enquiry for this product</a>.
+      </p>
     </div>
   </section>
 
