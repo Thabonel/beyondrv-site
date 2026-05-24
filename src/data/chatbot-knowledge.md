@@ -22,3 +22,4 @@ Use this file for business knowledge that should guide the public website chatbo
 
 Add new business notes below this line. Keep each note short, factual, and dated if it may change later.
 
+- 2026-05-25: Lead times for Unimog campers and custom expedition fitouts depend on the vehicle, build specification, current production queue, and compliance requirements. Do not give a fixed lead time unless the owner has supplied one; ask the customer to contact the team with vehicle details for the current production slot.

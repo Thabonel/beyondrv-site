@@ -6,6 +6,7 @@ import chatbotKnowledge from './chatbot-knowledge.json';
 const openAiKey = process.env.OPENAI_API_KEY;
 const client = openAiKey ? new OpenAI({ apiKey: openAiKey }) : null;
 const CHAT_MODEL = process.env.OPENAI_CHAT_MODEL ?? 'gpt-5-nano';
+const FALLBACK_REPLY = 'I had trouble getting the AI response just then. Please call 0430 863 819 or hit Talk to a human and the Beyond RV team can help directly.';
 
 const BRAND_BLOCK = `You are the Beyond RV assistant — a friendly, knowledgeable helper on the Beyond RV website.
 Beyond RV builds slide-on campers, caravans, and expedition vehicles out of Mutdapilly, Queensland.
@@ -40,6 +41,34 @@ function buildSystemPrompt(productSlug?: string, pageTitle?: string): string {
   const knowledgeBlock = `BUSINESS KNOWLEDGE:\n${chatbotKnowledge.content || 'No additional business knowledge has been added yet.'}`;
 
   return `${BRAND_BLOCK}\n\n${pageContext}${currentProductBlock}\n\n${catalogueBlock}\n\n${knowledgeBlock}`;
+}
+
+function fallbackForQuestion(messages: { role: 'user' | 'assistant'; content: string }[]) {
+  const lastUserMessage = [...messages].reverse().find(message => message.role === 'user')?.content.toLowerCase() ?? '';
+
+  if (lastUserMessage.includes('lead time') || lastUserMessage.includes('how long')) {
+    return 'Lead time depends on the vehicle, build spec, current production queue, and whether it is a custom expedition fitout. For a Unimog camper, the team should confirm the current slot directly — call 0430 863 819 or hit Talk to a human and send through your vehicle details.';
+  }
+
+  return FALLBACK_REPLY;
+}
+
+function responseOptions(messages: { role: 'user' | 'assistant'; content: string }[], systemPrompt: string) {
+  const options: OpenAI.Responses.ResponseCreateParamsNonStreaming = {
+    model: CHAT_MODEL,
+    instructions: systemPrompt,
+    input: messages.map((message) => ({
+      role: message.role,
+      content: message.content,
+    })),
+    max_output_tokens: 1200,
+  };
+
+  if (CHAT_MODEL.startsWith('gpt-5')) {
+    options.reasoning = { effort: 'minimal' };
+  }
+
+  return options;
 }
 
 export const handler: Handler = async (event) => {
@@ -96,17 +125,9 @@ export const handler: Handler = async (event) => {
   const systemPrompt = buildSystemPrompt(safeSlug, safeTitle);
 
   try {
-    const response = await client.responses.create({
-      model: CHAT_MODEL,
-      instructions: systemPrompt,
-      input: messages.map((message) => ({
-        role: message.role,
-        content: message.content,
-      })),
-      max_output_tokens: 512,
-    });
+    const response = await client.responses.create(responseOptions(messages, systemPrompt));
 
-    const fullText = response.output_text;
+    const fullText = response.output_text?.trim() || fallbackForQuestion(messages);
     const encoded = fullText.replace(/\n/g, '\\n');
     return {
       statusCode: 200,
