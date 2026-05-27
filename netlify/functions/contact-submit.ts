@@ -47,6 +47,21 @@ function escapeHtml(value: string) {
     .replace(/'/g, '&#039;');
 }
 
+function providerRejectReason(status: number, body: string) {
+  try {
+    const parsed = JSON.parse(body) as { message?: unknown; error?: unknown; name?: unknown };
+    const message = [parsed.message, parsed.error, parsed.name]
+      .filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
+      .join(' ');
+    if (message) return `Email provider rejected the message (${status}): ${message.slice(0, 240)}`;
+  } catch {}
+
+  const text = body.replace(/\s+/g, ' ').trim();
+  return text
+    ? `Email provider rejected the message (${status}): ${text.slice(0, 240)}`
+    : `Email provider rejected the message (${status})`;
+}
+
 async function sendEmail(enquiry: Required<Pick<EnquiryPayload, 'name' | 'email' | 'phone' | 'message'>> & EnquiryPayload) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return { sent: false, reason: 'RESEND_API_KEY not configured' };
@@ -105,7 +120,7 @@ async function sendEmail(enquiry: Required<Pick<EnquiryPayload, 'name' | 'email'
   if (!res.ok) {
     const body = await res.text();
     console.error('[contact-submit] email failed:', body);
-    return { sent: false, reason: 'Email provider rejected the message' };
+    return { sent: false, reason: providerRejectReason(res.status, body) };
   }
 
   return { sent: true };
