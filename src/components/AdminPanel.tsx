@@ -202,8 +202,34 @@ function slugifyTitle(title: string) {
 }
 
 function adminImageUrl(src: string) {
-  if (!src.startsWith('/media/')) return src;
+  if (!src) return '';
+  if (src.startsWith('/images/optimized/')) return src.replace(/\.webp$/, '-480.webp');
+  if (src.startsWith('/images/products/')) return src;
   return `/.netlify/images?url=${encodeURIComponent(src)}&w=800&fit=cover`;
+}
+
+function AdminProductThumb({ src, title }: { src?: string; title: string }) {
+  const [failed, setFailed] = useState(false);
+  const imageUrl = src && !failed ? adminImageUrl(src) : '';
+
+  return (
+    <div style={{ width: '100%', height: '110px', background: '#101010', borderBottom: '1px solid #303030', position: 'relative', overflow: 'hidden' }}>
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          onError={() => setFailed(true)}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
+        />
+      ) : (
+        <div style={{ height: '100%', display: 'grid', placeItems: 'center', color: '#777', fontSize: '0.72rem', padding: '0.75rem', textAlign: 'center' }}>
+          No hero image for {title}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function redirectToLoginIfUnauthorized(res: Response) {
@@ -863,9 +889,9 @@ export default function AdminPanel() {
 
   return (
     <>
-    <div style={{ display: 'flex', height: 'calc(100vh - 60px)', gap: '1rem', padding: '1rem', fontFamily: 'inherit' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', height: 'calc(100vh - 60px)', gap: '1rem', padding: '1rem', fontFamily: 'inherit' }}>
       {/* Chat panel */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333' }}>
+      <div style={{ minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333' }}>
         <div style={{ padding: '1rem', borderBottom: '1px solid #333', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
           <span>Admin Chat</span>
           <button
@@ -919,7 +945,7 @@ export default function AdminPanel() {
       </div>
 
       {/* Admin tools panel */}
-      <div style={{ width: '420px', display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333', minWidth: 0 }}>
+      <div style={{ minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderBottom: '1px solid #333' }}>
           {(['dashboard', 'products', 'media', 'homepage', 'enquiries', 'knowledge', 'pending'] as PanelTab[]).map(tab => (
             <button
@@ -963,9 +989,7 @@ export default function AdminPanel() {
               {productsLoading && <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>Loading products...</p>}
               {!productsLoading && filteredProducts.map(product => (
                 <div key={product.slug} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', overflow: 'hidden' }}>
-                  {product.heroImage && (
-                    <img src={adminImageUrl(product.heroImage)} alt="" style={{ width: '100%', height: '92px', objectFit: 'cover', display: 'block' }} />
-                  )}
+                  <AdminProductThumb src={product.heroImage} title={product.title} />
                   <div style={{ padding: '0.65rem 0.7rem' }}>
                     <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem', lineHeight: 1.25 }}>{product.title}</div>
                     <div style={{ color: '#aaa', fontSize: '0.74rem', marginTop: '0.25rem' }}>
