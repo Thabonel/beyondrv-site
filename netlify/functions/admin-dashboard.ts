@@ -155,6 +155,11 @@ async function hogql(query: string) {
 }
 
 async function loadAnalytics(days: number, products: ProductRecord[]) {
+  const emptyChat = {
+    recent: [] as { timestamp: string; question: string; answer: string; topic: string; page: string; productSlug: string }[],
+    topTopics: [] as { topic: string; count: number }[],
+  };
+
   if (!POSTHOG_API_KEY || !POSTHOG_PROJECT_ID) {
     return {
       status: 'unavailable',
@@ -162,6 +167,7 @@ async function loadAnalytics(days: number, products: ProductRecord[]) {
       productPageViews: [] as { slug: string; path: string; views: number }[],
       funnel: [] as { label: string; count: number; dropOff?: string }[],
       sources: [] as { source: string; sessions: number; enquiries: number; conversionRate: string }[],
+      chat: emptyChat,
     };
   }
 
@@ -169,7 +175,7 @@ async function loadAnalytics(days: number, products: ProductRecord[]) {
   const pathList = paths.map((path) => `'${path.replace(/'/g, "\\'")}'`).join(', ');
 
   try {
-    const [productViewsRes, funnelRes, sourcesRes] = await Promise.all([
+    const [productViewsRes, funnelRes, sourcesRes, chatTopicsRes, recentChatRes] = await Promise.all([
       hogql(`
         SELECT properties.$pathname as path, count() as views
         FROM events
@@ -204,6 +210,29 @@ async function loadAnalytics(days: number, products: ProductRecord[]) {
         GROUP BY source
         ORDER BY sessions DESC
       `),
+      hogql(`
+        SELECT coalesce(properties.topic, 'general') as topic, count() as total
+        FROM events
+        WHERE event = 'chat_interaction'
+          AND timestamp > now() - INTERVAL ${days} DAY
+        GROUP BY topic
+        ORDER BY total DESC
+        LIMIT 8
+      `),
+      hogql(`
+        SELECT
+          timestamp,
+          properties.question as question,
+          properties.answer as answer,
+          coalesce(properties.topic, 'general') as topic,
+          coalesce(properties.page, '') as page,
+          coalesce(properties.product_slug, '') as product_slug
+        FROM events
+        WHERE event = 'chat_interaction'
+          AND timestamp > now() - INTERVAL ${days} DAY
+        ORDER BY timestamp DESC
+        LIMIT 10
+      `),
     ]);
 
     const productPageViews = productViewsRes.results.map(([path, views]) => {
@@ -234,6 +263,20 @@ async function loadAnalytics(days: number, products: ProductRecord[]) {
           conversionRate: sessionCount > 0 ? ((enquiryCount / sessionCount) * 100).toFixed(1) : '0.0',
         };
       }),
+      chat: {
+        topTopics: chatTopicsRes.results.map(([topic, count]) => ({
+          topic: String(topic),
+          count: Number(count) || 0,
+        })),
+        recent: recentChatRes.results.map(([timestamp, question, answer, topic, page, productSlug]) => ({
+          timestamp: String(timestamp),
+          question: String(question ?? ''),
+          answer: String(answer ?? ''),
+          topic: String(topic ?? 'general'),
+          page: String(page ?? ''),
+          productSlug: String(productSlug ?? ''),
+        })),
+      },
     };
   } catch (error) {
     console.error('admin-dashboard analytics error:', error);
@@ -243,6 +286,7 @@ async function loadAnalytics(days: number, products: ProductRecord[]) {
       productPageViews: [] as { slug: string; path: string; views: number }[],
       funnel: [] as { label: string; count: number; dropOff?: string }[],
       sources: [] as { source: string; sessions: number; enquiries: number; conversionRate: string }[],
+      chat: emptyChat,
     };
   }
 }

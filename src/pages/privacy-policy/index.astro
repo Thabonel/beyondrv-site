@@ -56,8 +56,10 @@ const schema = {
       <h3>Chatbot conversations</h3>
       <p>
         Our website includes a customer-facing chat assistant. Conversations with the assistant are processed
-        by <strong>OpenAI</strong> (openai.com) and are not stored by Beyond RV beyond the active session.
-        Individual conversations are stateless — we do not retain conversation histories.
+        by <strong>OpenAI</strong> (openai.com). We may record chatbot questions, assistant responses, page context,
+        product context, and broad topic categories in PostHog so we can understand what customers are asking,
+        improve our product information, and identify when customers need human follow-up. Obvious email addresses
+        and phone numbers are redacted before analytics storage where possible.
       </p>
 
       <h2>How We Use Your Information</h2>
@@ -65,6 +67,7 @@ const schema = {
       <ul>
         <li>Respond to your enquiry and contact you at your requested call-back time</li>
         <li>Understand which products you're interested in so we can assist you effectively</li>
+        <li>Review chatbot questions and common topics so we can improve product information and customer support</li>
         <li>Improve our website and products based on aggregated, anonymised analytics</li>
       </ul>
       <p>
@@ -76,8 +79,8 @@ const schema = {
       <ul>
         <li><strong>Netlify</strong> (netlify.com) — our website host. Netlify stores and processes enquiry form submissions on our behalf. See Netlify's privacy policy for details.</li>
         <li><strong>Resend</strong> (resend.com) — email delivery provider for sending enquiry notifications to the Beyond RV team.</li>
-        <li><strong>PostHog</strong> (posthog.com) — analytics. Only loaded with your consent. PostHog processes anonymised usage data.</li>
-        <li><strong>OpenAI</strong> (openai.com) — processes chat assistant conversations in real time. Conversations are not stored by Beyond RV.</li>
+        <li><strong>PostHog</strong> (posthog.com) — analytics and chatbot question reporting. Browser analytics only load with your consent; chatbot question reporting is used as an operational support tool.</li>
+        <li><strong>OpenAI</strong> (openai.com) — processes chat assistant conversations in real time.</li>
         <li><strong>Google Fonts</strong> — loads font files from Google's servers. Google may log font requests.</li>
       </ul>
       <p>We do not sell your personal information to any third party.</p>

@@ -1,11 +1,14 @@
 import OpenAI from 'openai';
 import type { Handler } from '@netlify/functions';
+import { createHash } from 'crypto';
 import catalogue from './product-catalogue.json';
 import chatbotKnowledge from './chatbot-knowledge.json';
 
 const openAiKey = process.env.OPENAI_API_KEY;
 const client = openAiKey ? new OpenAI({ apiKey: openAiKey }) : null;
 const CHAT_MODEL = process.env.OPENAI_CHAT_MODEL ?? 'gpt-5-nano';
+const POSTHOG_CAPTURE_KEY = process.env.POSTHOG_CAPTURE_KEY ?? process.env.PUBLIC_POSTHOG_KEY;
+const POSTHOG_CAPTURE_HOST = process.env.POSTHOG_CAPTURE_HOST ?? 'https://us.i.posthog.com';
 const FALLBACK_REPLY = 'I had trouble getting the AI response just then. Please call 0430 863 819 or hit Talk to a human and the Beyond RV team can help directly.';
 
 const BRAND_BLOCK = `You are the Beyond RV assistant — a friendly, knowledgeable helper on the Beyond RV website.
@@ -72,6 +75,71 @@ function responseOptions(messages: { role: 'user' | 'assistant'; content: string
   return options;
 }
 
+function redact(value: string, max = 900) {
+  return value
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[email]')
+    .replace(/(?:\+?61|0)\s?(?:\d[\s-]?){8,10}/g, '[phone]')
+    .trim()
+    .slice(0, max);
+}
+
+function classifyQuestion(question: string) {
+  const lower = question.toLowerCase();
+  if (/lead time|how long|eta|delivery|wait/.test(lower)) return 'lead_time';
+  if (/price|cost|quote|finance|deposit|payment/.test(lower)) return 'pricing';
+  if (/fit|payload|weight|gvm|vehicle|truck|ute|unimog|isuzu|iveco|hilux|ranger/.test(lower)) return 'fitment';
+  if (/stock|available|sold|sale|ready/.test(lower)) return 'availability';
+  if (/warranty|service|support|repair/.test(lower)) return 'warranty_support';
+  if (/battery|solar|lithium|power|water|toilet|shower|fridge|spec/.test(lower)) return 'specs';
+  return 'general';
+}
+
+function anonymousVisitorId(event: Parameters<Handler>[0]) {
+  const ip = event.headers['x-nf-client-connection-ip'] ?? event.headers['client-ip'] ?? '';
+  const ua = event.headers['user-agent'] ?? '';
+  const day = new Date().toISOString().slice(0, 10);
+  return createHash('sha256').update(`${ip}|${ua}|${day}`).digest('hex').slice(0, 32);
+}
+
+async function captureChatInteraction(params: {
+  event: Parameters<Handler>[0];
+  messages: { role: 'user' | 'assistant'; content: string }[];
+  answer: string;
+  pageTitle?: string;
+  productSlug?: string;
+}) {
+  if (!POSTHOG_CAPTURE_KEY) return;
+  const question = [...params.messages].reverse().find(message => message.role === 'user')?.content ?? '';
+  if (!question.trim()) return;
+
+  const safeQuestion = redact(question, 700);
+  const safeAnswer = redact(params.answer, 1200);
+  const topic = classifyQuestion(question);
+
+  try {
+    await fetch(`${POSTHOG_CAPTURE_HOST.replace(/\/$/, '')}/capture/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        api_key: POSTHOG_CAPTURE_KEY,
+        event: 'chat_interaction',
+        distinct_id: anonymousVisitorId(params.event),
+        properties: {
+          question: safeQuestion,
+          answer: safeAnswer,
+          topic,
+          page: params.pageTitle ?? 'Beyond RV website',
+          product_slug: params.productSlug ?? '',
+          message_count: params.messages.length,
+          handoff_suggested: /talk to a human|call 0430|email beyondcaravans/i.test(params.answer),
+        },
+      }),
+    });
+  } catch (error) {
+    console.warn('[site-chat] chat analytics capture failed:', error);
+  }
+}
+
 export const handler: Handler = async (event) => {
   const sseHeaders = {
     'Content-Type': 'text/event-stream',
@@ -129,6 +197,13 @@ export const handler: Handler = async (event) => {
     const response = await client.responses.create(responseOptions(messages, systemPrompt));
 
     const fullText = response.output_text?.trim() || fallbackForQuestion(messages);
+    await captureChatInteraction({
+      event,
+      messages,
+      answer: fullText,
+      pageTitle: safeTitle,
+      productSlug: safeSlug,
+    });
     const encoded = fullText.replace(/\n/g, '\\n');
     return {
       statusCode: 200,

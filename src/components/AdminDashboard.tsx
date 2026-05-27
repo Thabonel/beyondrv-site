@@ -70,6 +70,17 @@ interface DashboardData {
   };
   traffic: { source: string; sessions: number; enquiries: number; conversionRate: string }[];
   funnel: { label: string; count: number; dropOff?: string }[];
+  chat: {
+    topTopics: { topic: string; count: number }[];
+    recent: {
+      timestamp: string;
+      question: string;
+      answer: string;
+      topic: string;
+      page: string;
+      productSlug: string;
+    }[];
+  };
   analytics: { status: HealthStatus; message: string };
   contact: { ready: boolean; toEmail: string; fromEmail: string };
   readiness: { label: string; status: HealthStatus; detail: string }[];
@@ -101,6 +112,10 @@ function money(value: number) {
     currency: 'AUD',
     maximumFractionDigits: 0,
   }).format(value);
+}
+
+function labelise(value: string) {
+  return value.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
 }
 
 function StatCard({ label, value, sub, tone = 'ready' }: { label: string; value: string | number; sub?: string; tone?: string }) {
@@ -304,6 +319,36 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
             {data.productInterest.unknownProductEnquiries > 0 && (
               <p style={{ margin: 0, color: '#888', fontSize: '0.72rem' }}>{data.productInterest.unknownProductEnquiries} enquiries could not be matched to a specific product.</p>
+            )}
+          </Panel>
+
+          <Panel title="Chatbot Questions">
+            {data.analytics.status !== 'ready' ? (
+              <p style={{ margin: 0, color: '#888', fontSize: '0.78rem' }}>{data.analytics.message}</p>
+            ) : data.chat.recent.length === 0 ? (
+              <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No chatbot questions recorded in this range yet.</p>
+            ) : (
+              <div style={{ display: 'grid', gap: '0.65rem' }}>
+                {data.chat.topTopics.length > 0 && (
+                  <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
+                    {data.chat.topTopics.map((topic) => (
+                      <span key={topic.topic} style={{ border: '1px solid #333', borderRadius: '999px', color: '#ccc', fontSize: '0.68rem', padding: '0.18rem 0.45rem' }}>
+                        {labelise(topic.topic)} · {topic.count}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {data.chat.recent.map((chat) => (
+                  <div key={`${chat.timestamp}-${chat.question}`} style={{ borderBottom: '1px solid #252525', paddingBottom: '0.55rem', display: 'grid', gap: '0.28rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', color: '#777', fontSize: '0.66rem' }}>
+                      <span>{labelise(chat.topic)}{chat.productSlug ? ` · ${chat.productSlug}` : ''}</span>
+                      <span>{new Date(chat.timestamp).toLocaleDateString('en-AU')}</span>
+                    </div>
+                    <div style={{ color: '#fff', fontSize: '0.78rem', lineHeight: 1.35 }}>{chat.question}</div>
+                    <div style={{ color: '#999', fontSize: '0.72rem', lineHeight: 1.35 }}>{chat.answer}</div>
+                  </div>
+                ))}
+              </div>
             )}
           </Panel>
 
