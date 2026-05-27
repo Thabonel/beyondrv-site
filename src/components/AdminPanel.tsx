@@ -46,6 +46,16 @@ type PanelTab = 'dashboard' | 'products' | 'media' | 'homepage' | 'enquiries' | 
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 
+interface YoutubeVideoMeta {
+  id?: string;
+  title?: string;
+  description?: string;
+  thumbnail?: string;
+  uploadDate?: string;
+  duration?: string;
+  transcriptSummary?: string;
+}
+
 interface ProductRecord {
   slug: string;
   title: string;
@@ -59,6 +69,7 @@ interface ProductRecord {
   gallery?: string[];
   galleryCount?: number;
   relatedSlugs?: string[];
+  youtubeVideo?: YoutubeVideoMeta;
 }
 
 interface NewProductForm {
@@ -70,6 +81,13 @@ interface NewProductForm {
   description: string;
   heroImage: string;
   galleryText: string;
+  youtubeVideoUrl: string;
+  youtubeVideoTitle: string;
+  youtubeVideoDescription: string;
+  youtubeVideoThumbnail: string;
+  youtubeVideoUploadDate: string;
+  youtubeVideoDuration: string;
+  youtubeVideoTranscriptSummary: string;
 }
 
 interface EditProductForm {
@@ -83,6 +101,13 @@ interface EditProductForm {
   heroImage: string;
   galleryText: string;
   relatedSlugs: string[];
+  youtubeVideoUrl: string;
+  youtubeVideoTitle: string;
+  youtubeVideoDescription: string;
+  youtubeVideoThumbnail: string;
+  youtubeVideoUploadDate: string;
+  youtubeVideoDuration: string;
+  youtubeVideoTranscriptSummary: string;
   notes: string;
 }
 
@@ -173,6 +198,13 @@ const EMPTY_PRODUCT_FORM: NewProductForm = {
   description: '',
   heroImage: '',
   galleryText: '',
+  youtubeVideoUrl: '',
+  youtubeVideoTitle: '',
+  youtubeVideoDescription: '',
+  youtubeVideoThumbnail: '',
+  youtubeVideoUploadDate: '',
+  youtubeVideoDuration: '',
+  youtubeVideoTranscriptSummary: '',
 };
 
 const EMPTY_RECENT_BUILD: RecentBuild = {
@@ -217,6 +249,43 @@ function parseGalleryText(text: string) {
     .split('\n')
     .map(line => line.trim())
     .filter(Boolean);
+}
+
+function extractYouTubeVideoId(input: string) {
+  const value = input.trim();
+  if (!value) return '';
+  if (/^[a-zA-Z0-9_-]{6,20}$/.test(value)) return value;
+
+  try {
+    const url = new URL(value);
+    const host = url.hostname.replace(/^www\./, '');
+    if (host === 'youtu.be') {
+      return url.pathname.split('/').filter(Boolean)[0] ?? '';
+    }
+    if (host.endsWith('youtube.com') || host.endsWith('youtube-nocookie.com')) {
+      const watchId = url.searchParams.get('v');
+      if (watchId) return watchId;
+      const parts = url.pathname.split('/').filter(Boolean);
+      const marker = parts.findIndex(part => ['embed', 'shorts', 'live'].includes(part));
+      if (marker >= 0 && parts[marker + 1]) return parts[marker + 1];
+    }
+  } catch {
+    return '';
+  }
+
+  return '';
+}
+
+function isValidYouTubeVideoId(id: string) {
+  return /^[a-zA-Z0-9_-]{6,20}$/.test(id);
+}
+
+function youtubeWatchUrl(id?: string) {
+  return id ? `https://www.youtube.com/watch?v=${id}` : '';
+}
+
+function youtubeThumbnailUrl(id?: string) {
+  return id ? `https://i.ytimg.com/vi/${id}/maxresdefault.jpg` : '';
 }
 
 function formatGalleryText(images: string[]) {
@@ -348,6 +417,124 @@ function ProductGalleryEditor({
           Add
         </button>
       </div>
+    </div>
+  );
+}
+
+interface ProductVideoEditorProps {
+  videoUrl: string;
+  title: string;
+  description: string;
+  thumbnail: string;
+  uploadDate: string;
+  duration: string;
+  transcriptSummary: string;
+  onChange: (patch: {
+    youtubeVideoUrl?: string;
+    youtubeVideoTitle?: string;
+    youtubeVideoDescription?: string;
+    youtubeVideoThumbnail?: string;
+    youtubeVideoUploadDate?: string;
+    youtubeVideoDuration?: string;
+    youtubeVideoTranscriptSummary?: string;
+  }) => void;
+}
+
+function ProductVideoEditor({
+  videoUrl,
+  title,
+  description,
+  thumbnail,
+  uploadDate,
+  duration,
+  transcriptSummary,
+  onChange,
+}: ProductVideoEditorProps) {
+  const videoId = extractYouTubeVideoId(videoUrl);
+  const hasVideoInput = Boolean(videoUrl.trim() || title.trim() || description.trim() || thumbnail.trim() || uploadDate.trim() || duration.trim() || transcriptSummary.trim());
+  const videoIsValid = !videoUrl.trim() || isValidYouTubeVideoId(videoId);
+  const previewTitle = title.trim() || 'Product walkthrough video';
+
+  function setVideoUrl(nextUrl: string) {
+    const nextId = extractYouTubeVideoId(nextUrl);
+    onChange({
+      youtubeVideoUrl: nextUrl,
+      ...(nextId && !thumbnail.trim() ? { youtubeVideoThumbnail: youtubeThumbnailUrl(nextId) } : {}),
+    });
+  }
+
+  return (
+    <div style={{ display: 'grid', gap: '0.45rem', border: '1px solid #333', borderRadius: '6px', padding: '0.55rem', background: '#101010' }}>
+      <div>
+        <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.78rem' }}>Product Video</div>
+        <div style={{ color: '#777', fontSize: '0.68rem', marginTop: '0.15rem' }}>Paste a YouTube URL. The clean video ID will be saved to the product page.</div>
+      </div>
+      <input
+        value={videoUrl}
+        onChange={e => setVideoUrl(e.target.value)}
+        placeholder="YouTube URL, Shorts URL, embed URL, or video ID"
+        style={{ background: '#1a1a1a', border: videoIsValid ? '1px solid #444' : '1px solid #fb923c', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.78rem' }}
+      />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+        <input
+          value={title}
+          onChange={e => onChange({ youtubeVideoTitle: e.target.value })}
+          placeholder="Video title"
+          style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.78rem' }}
+        />
+        <input
+          value={uploadDate}
+          onChange={e => onChange({ youtubeVideoUploadDate: e.target.value })}
+          placeholder="Upload date, e.g. 2026-05-28"
+          style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.78rem' }}
+        />
+      </div>
+      <input
+        value={thumbnail}
+        onChange={e => onChange({ youtubeVideoThumbnail: e.target.value })}
+        placeholder={videoId ? youtubeThumbnailUrl(videoId) : 'Thumbnail URL'}
+        style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.78rem' }}
+      />
+      <input
+        value={duration}
+        onChange={e => onChange({ youtubeVideoDuration: e.target.value })}
+        placeholder="Duration, e.g. PT5M42S"
+        style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.78rem' }}
+      />
+      <textarea
+        value={description}
+        onChange={e => onChange({ youtubeVideoDescription: e.target.value })}
+        placeholder="Short video description"
+        rows={2}
+        style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.78rem', lineHeight: 1.4 }}
+      />
+      <textarea
+        value={transcriptSummary}
+        onChange={e => onChange({ youtubeVideoTranscriptSummary: e.target.value })}
+        placeholder="Optional transcript summary for search and AI context"
+        rows={2}
+        style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.78rem', lineHeight: 1.4 }}
+      />
+      {videoUrl.trim() && (
+        <div style={{ color: videoIsValid ? '#aaa' : '#fb923c', fontSize: '0.7rem' }}>
+          {videoIsValid ? `Detected video ID: ${videoId}` : 'Could not detect a valid YouTube video ID from this value.'}
+        </div>
+      )}
+      {videoIsValid && videoId && (
+        <div style={{ aspectRatio: '16 / 9', border: '1px solid #333', borderRadius: '6px', overflow: 'hidden', background: '#050505' }}>
+          <iframe
+            src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0&playsinline=1`}
+            title={previewTitle}
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            style={{ width: '100%', height: '100%', border: 0, display: 'block' }}
+          />
+        </div>
+      )}
+      {hasVideoInput && !videoUrl.trim() && (
+        <div style={{ color: '#fb923c', fontSize: '0.7rem' }}>Add a YouTube URL or clear all video fields.</div>
+      )}
     </div>
   );
 }
@@ -734,6 +921,13 @@ export default function AdminPanel() {
       heroImage: product.heroImage ?? '',
       galleryText: (product.gallery ?? []).join('\n'),
       relatedSlugs: product.relatedSlugs ?? [],
+      youtubeVideoUrl: youtubeWatchUrl(product.youtubeVideo?.id),
+      youtubeVideoTitle: product.youtubeVideo?.title ?? '',
+      youtubeVideoDescription: product.youtubeVideo?.description ?? '',
+      youtubeVideoThumbnail: product.youtubeVideo?.thumbnail ?? '',
+      youtubeVideoUploadDate: product.youtubeVideo?.uploadDate ?? '',
+      youtubeVideoDuration: product.youtubeVideo?.duration ?? '',
+      youtubeVideoTranscriptSummary: product.youtubeVideo?.transcriptSummary ?? '',
       notes: '',
     };
   }
@@ -796,6 +990,16 @@ export default function AdminPanel() {
     const gallery = parseGalleryText(editProduct.galleryText);
     const knownSlugs = new Set(products.map(product => product.slug));
     const invalidRelated = editProduct.relatedSlugs.filter(slug => !knownSlugs.has(slug));
+    const videoId = extractYouTubeVideoId(editProduct.youtubeVideoUrl);
+    const hasVideoFields = Boolean(
+      editProduct.youtubeVideoUrl.trim() ||
+      editProduct.youtubeVideoTitle.trim() ||
+      editProduct.youtubeVideoDescription.trim() ||
+      editProduct.youtubeVideoThumbnail.trim() ||
+      editProduct.youtubeVideoUploadDate.trim() ||
+      editProduct.youtubeVideoDuration.trim() ||
+      editProduct.youtubeVideoTranscriptSummary.trim()
+    );
 
     if (gallery.length === 0) {
       setMessages(prev => [...prev, { role: 'assistant', content: 'The gallery must contain at least one image URL or path.' }]);
@@ -806,6 +1010,32 @@ export default function AdminPanel() {
       setMessages(prev => [...prev, { role: 'assistant', content: `These related product slugs are not valid: ${invalidRelated.join(', ')}.` }]);
       return;
     }
+
+    if (hasVideoFields && !editProduct.youtubeVideoUrl.trim()) {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Add a YouTube URL for the product video, or clear all video fields.' }]);
+      return;
+    }
+
+    if (editProduct.youtubeVideoUrl.trim() && !isValidYouTubeVideoId(videoId)) {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'The YouTube video URL does not look valid. Paste a normal YouTube, youtu.be, Shorts, embed URL, or a clean video ID.' }]);
+      return;
+    }
+
+    if (videoId && !editProduct.youtubeVideoTitle.trim()) {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Add a short video title before queueing the product edit.' }]);
+      return;
+    }
+
+    const videoInstructions = videoId
+      ? `New youtubeVideo frontmatter:\n` +
+        `id: ${videoId}\n` +
+        `title: ${editProduct.youtubeVideoTitle.trim()}\n` +
+        `description: ${editProduct.youtubeVideoDescription.trim() || 'None'}\n` +
+        `thumbnail: ${editProduct.youtubeVideoThumbnail.trim() || youtubeThumbnailUrl(videoId)}\n` +
+        `uploadDate: ${editProduct.youtubeVideoUploadDate.trim() || 'None'}\n` +
+        `duration: ${editProduct.youtubeVideoDuration.trim() || 'None'}\n` +
+        `transcriptSummary: ${editProduct.youtubeVideoTranscriptSummary.trim() || 'None'}`
+      : `New youtubeVideo frontmatter: None. Remove any existing youtubeVideo block from this product if present.`;
 
     setActiveTab('pending');
     sendMessage(
@@ -821,8 +1051,9 @@ export default function AdminPanel() {
       `New heroImage: ${editProduct.heroImage.trim()}\n` +
       `New gallery order, one image per line:\n${gallery.join('\n')}\n\n` +
       `New relatedSlugs:\n${editProduct.relatedSlugs.length ? editProduct.relatedSlugs.join('\n') : 'None'}\n\n` +
+      `${videoInstructions}\n\n` +
       `Additional owner notes:\n${editProduct.notes.trim() || 'None'}\n\n` +
-      `Queue one complete-file change for review. Keep the gallery in exactly the order provided and do not invent product specs or image URLs.`
+      `Queue one complete-file change for review. Keep the gallery in exactly the order provided, store only the clean YouTube video ID in youtubeVideo.id, and do not invent product specs, image URLs, or video metadata.`
     );
     setEditProduct(null);
   }
@@ -850,6 +1081,43 @@ export default function AdminPanel() {
       return;
     }
 
+    const videoId = extractYouTubeVideoId(newProduct.youtubeVideoUrl);
+    const hasVideoFields = Boolean(
+      newProduct.youtubeVideoUrl.trim() ||
+      newProduct.youtubeVideoTitle.trim() ||
+      newProduct.youtubeVideoDescription.trim() ||
+      newProduct.youtubeVideoThumbnail.trim() ||
+      newProduct.youtubeVideoUploadDate.trim() ||
+      newProduct.youtubeVideoDuration.trim() ||
+      newProduct.youtubeVideoTranscriptSummary.trim()
+    );
+
+    if (hasVideoFields && !newProduct.youtubeVideoUrl.trim()) {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Add a YouTube URL for the new product video, or clear all video fields.' }]);
+      return;
+    }
+
+    if (newProduct.youtubeVideoUrl.trim() && !isValidYouTubeVideoId(videoId)) {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'The YouTube video URL does not look valid. Paste a normal YouTube, youtu.be, Shorts, embed URL, or a clean video ID.' }]);
+      return;
+    }
+
+    if (videoId && !newProduct.youtubeVideoTitle.trim()) {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Add a short video title before queueing the new product draft.' }]);
+      return;
+    }
+
+    const videoInstructions = videoId
+      ? `YouTube video frontmatter:\n` +
+        `id: ${videoId}\n` +
+        `title: ${newProduct.youtubeVideoTitle.trim()}\n` +
+        `description: ${newProduct.youtubeVideoDescription.trim() || 'None'}\n` +
+        `thumbnail: ${newProduct.youtubeVideoThumbnail.trim() || youtubeThumbnailUrl(videoId)}\n` +
+        `uploadDate: ${newProduct.youtubeVideoUploadDate.trim() || 'None'}\n` +
+        `duration: ${newProduct.youtubeVideoDuration.trim() || 'None'}\n` +
+        `transcriptSummary: ${newProduct.youtubeVideoTranscriptSummary.trim() || 'None'}`
+      : `YouTube video frontmatter: None. Do not add a youtubeVideo block.`;
+
     setActiveTab('pending');
     sendMessage(
       `Create a new ${newProduct.category} product page using the existing product markdown format.\n\n` +
@@ -862,8 +1130,9 @@ export default function AdminPanel() {
       `Gallery order, one image per line:\n${gallery.join('\n')}\n\n` +
       `Key specs, one per line:\n${newProduct.keySpecs.trim()}\n\n` +
       `Description/body copy:\n${newProduct.description.trim()}\n\n` +
+      `${videoInstructions}\n\n` +
       `Use a URL-safe slug based on the title. Before proposing the new file, list src/content/products and confirm the slug does not already exist. ` +
-      `Use exactly the supplied hero image and gallery order. Do not invent image URLs.`
+      `Use exactly the supplied hero image and gallery order. Store only the clean YouTube video ID in youtubeVideo.id. Do not invent image URLs or video metadata.`
     );
     setNewProduct(EMPTY_PRODUCT_FORM);
   }
@@ -1254,6 +1523,16 @@ export default function AdminPanel() {
                   onGalleryTextChange={galleryText => setEditProduct(p => p && ({ ...p, galleryText }))}
                   onHeroImageChange={heroImage => setEditProduct(p => p && ({ ...p, heroImage }))}
                 />
+                <ProductVideoEditor
+                  videoUrl={editProduct.youtubeVideoUrl}
+                  title={editProduct.youtubeVideoTitle}
+                  description={editProduct.youtubeVideoDescription}
+                  thumbnail={editProduct.youtubeVideoThumbnail}
+                  uploadDate={editProduct.youtubeVideoUploadDate}
+                  duration={editProduct.youtubeVideoDuration}
+                  transcriptSummary={editProduct.youtubeVideoTranscriptSummary}
+                  onChange={patch => setEditProduct(p => p && ({ ...p, ...patch }))}
+                />
                 <div style={{ display: 'grid', gap: '0.35rem' }}>
                   <div style={{ color: '#aaa', fontSize: '0.74rem', fontWeight: 700 }}>Related Products</div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.3rem', maxHeight: '96px', overflowY: 'auto', border: '1px solid #333', borderRadius: '6px', padding: '0.45rem', background: '#101010' }}>
@@ -1326,6 +1605,16 @@ export default function AdminPanel() {
                   galleryText={newProduct.galleryText}
                   onGalleryTextChange={galleryText => setNewProduct(p => ({ ...p, galleryText }))}
                   onHeroImageChange={heroImage => setNewProduct(p => ({ ...p, heroImage }))}
+                />
+                <ProductVideoEditor
+                  videoUrl={newProduct.youtubeVideoUrl}
+                  title={newProduct.youtubeVideoTitle}
+                  description={newProduct.youtubeVideoDescription}
+                  thumbnail={newProduct.youtubeVideoThumbnail}
+                  uploadDate={newProduct.youtubeVideoUploadDate}
+                  duration={newProduct.youtubeVideoDuration}
+                  transcriptSummary={newProduct.youtubeVideoTranscriptSummary}
+                  onChange={patch => setNewProduct(p => ({ ...p, ...patch }))}
                 />
               </div>
               <button onClick={queueNewProduct} disabled={loading} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.6rem', cursor: 'pointer', fontWeight: 700 }}>
@@ -1750,6 +2039,9 @@ export default function AdminPanel() {
                 <li>Open the Products tab and search for the product, or type the product name directly in chat.</li>
                 <li>Use Edit to change safe fields like price, status, tagline, sale state, featured state, hero image, gallery order, or related products.</li>
                 <li>Use Gallery Photos to see the images in order. Move photos up or down, remove photos, add a new image path, or set a gallery photo as the hero image.</li>
+                <li>Use Product Video to paste the YouTube URL for a walkthrough. Normal YouTube links, youtu.be links, Shorts links, and embed links are accepted.</li>
+                <li>Add a clear video title. The admin will detect the video ID, show a preview, and queue the video metadata with the product edit.</li>
+                <li>To remove a video from a product, clear the Product Video fields before queueing the edit.</li>
                 <li>Use the notes box for copy or spec changes that need more explanation.</li>
                 <li>Wait for the assistant to read the current product file and queue the proposed change.</li>
                 <li>Open Pending, use Preview to inspect the generated file, and remove anything that looks wrong.</li>
@@ -1783,6 +2075,7 @@ export default function AdminPanel() {
                 <li>Provide the product title, price, category, tagline, main specs, description, and selling points.</li>
                 <li>Upload the product photos in the same form. The first uploaded photo becomes the hero image automatically.</li>
                 <li>Use the gallery controls to move photos up or down, remove any wrong photo, or set a different hero image before queuing the draft.</li>
+                <li>If the product has a walkthrough, paste the YouTube URL in Product Video and add a short title before queueing the draft.</li>
                 <li>The assistant will create a draft product file using the existing product format.</li>
                 <li>Use Preview in Pending and deploy only after the new product path, price, specs, and image order have been checked.</li>
               </ol>

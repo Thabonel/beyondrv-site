@@ -10,6 +10,7 @@ type SpecRow = ProductData['keySpecs'][number];
 type SpecGroup = NonNullable<ProductData['specGroups']>[number];
 type Feature = NonNullable<ProductData['features']>[number];
 type FaqItem = NonNullable<ProductData['faq']>[number];
+type YoutubeVideo = NonNullable<ProductData['youtubeVideo']>;
 
 interface Props {
   product: CollectionEntry<'products'>;
@@ -40,6 +41,15 @@ const categoryBySlug: Record<ProductCategory, { name: string; url: string }> = {
   expedition: { name: 'Expedition Vehicles', url: '/expedition/' },
 };
 const categoryMeta = categoryBySlug[data.category];
+const youtubeVideo: YoutubeVideo | undefined = data.youtubeVideo;
+const youtubeEmbedUrl = youtubeVideo
+  ? `https://www.youtube-nocookie.com/embed/${youtubeVideo.id}?rel=0&playsinline=1`
+  : '';
+const youtubeWatchUrl = youtubeVideo
+  ? `https://www.youtube.com/watch?v=${youtubeVideo.id}`
+  : '';
+const youtubeThumbnail = youtubeVideo?.thumbnail
+  ?? (youtubeVideo ? `https://i.ytimg.com/vi/${youtubeVideo.id}/maxresdefault.jpg` : '');
 
 const priceNum = data.price.replace(/[^0-9.]/g, '');
 const productSchema = {
@@ -114,7 +124,30 @@ const faqSchema = data.faq && data.faq.length > 0
     }
   : undefined;
 
-const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : [])];
+const videoSchema = youtubeVideo
+  ? {
+      "@context": "https://schema.org",
+      "@type": "VideoObject",
+      "@id": `${productUrl}#video`,
+      "name": youtubeVideo.title,
+      "description": youtubeVideo.description ?? data.seoDesc ?? data.tagline,
+      "thumbnailUrl": youtubeThumbnail,
+      ...(youtubeVideo.uploadDate && { "uploadDate": youtubeVideo.uploadDate }),
+      ...(youtubeVideo.duration && { "duration": youtubeVideo.duration }),
+      "embedUrl": `https://www.youtube-nocookie.com/embed/${youtubeVideo.id}`,
+      "contentUrl": youtubeWatchUrl,
+      "publisher": {
+        "@type": "Organization",
+        "name": "Beyond RV",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://beyondrv.com.au/images/site/admin-logo.png"
+        }
+      }
+    }
+  : undefined;
+
+const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : []), ...(videoSchema ? [videoSchema] : [])];
 ---
 <BaseLayout
   title={data.seoTitle ?? `${data.title} | Beyond RV`}
@@ -208,6 +241,36 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
       </p>
     </div>
   </section>
+
+  {youtubeVideo && (
+    <section class="product-video-section container" id="walkthrough-video">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Video Walkthrough</span>
+      </div>
+      <h2 class="section-title">Watch the walkthrough</h2>
+      {(youtubeVideo.description || youtubeVideo.transcriptSummary) && (
+        <p class="product-video-intro">
+          {youtubeVideo.description ?? youtubeVideo.transcriptSummary}
+        </p>
+      )}
+      <div class="product-video-frame">
+        <iframe
+          src={youtubeEmbedUrl}
+          title={youtubeVideo.title}
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        ></iframe>
+      </div>
+      {youtubeVideo.transcriptSummary && youtubeVideo.description && (
+        <p class="product-video-summary">{youtubeVideo.transcriptSummary}</p>
+      )}
+      <div class="product-video-actions">
+        <a href={enquiryUrl} class="btn-primary">Enquire About This Build</a>
+      </div>
+    </section>
+  )}
 
   {data.specGroups && data.specGroups.length > 0 && (
     <section class="product-specs-section container">

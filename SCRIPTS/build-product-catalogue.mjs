@@ -73,6 +73,7 @@ const catalogue = mdFiles.map((filePath) => {
     gallery:     Array.isArray(data.gallery) ? data.gallery : [],
     galleryCount: Array.isArray(data.gallery) ? data.gallery.length : 0,
     relatedSlugs: Array.isArray(data.relatedSlugs) ? data.relatedSlugs : [],
+    youtubeVideo: data.youtubeVideo && typeof data.youtubeVideo === 'object' ? data.youtubeVideo : undefined,
     keySpecs,
     description,
   };
