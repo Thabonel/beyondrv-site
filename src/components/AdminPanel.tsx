@@ -68,6 +68,8 @@ interface NewProductForm {
   tagline: string;
   keySpecs: string;
   description: string;
+  heroImage: string;
+  galleryText: string;
 }
 
 interface EditProductForm {
@@ -169,6 +171,8 @@ const EMPTY_PRODUCT_FORM: NewProductForm = {
   tagline: '',
   keySpecs: '',
   description: '',
+  heroImage: '',
+  galleryText: '',
 };
 
 const EMPTY_RECENT_BUILD: RecentBuild = {
@@ -267,12 +271,22 @@ function ProductImagePreview({ src, title }: { src?: string; title: string }) {
   );
 }
 
-function ProductGalleryEditor({ form, onChange }: { form: EditProductForm; onChange: (next: EditProductForm) => void }) {
+function ProductGalleryEditor({
+  heroImage,
+  galleryText,
+  onGalleryTextChange,
+  onHeroImageChange,
+}: {
+  heroImage?: string;
+  galleryText: string;
+  onGalleryTextChange: (next: string) => void;
+  onHeroImageChange?: (next: string) => void;
+}) {
   const [newImage, setNewImage] = useState('');
-  const gallery = parseGalleryText(form.galleryText);
+  const gallery = parseGalleryText(galleryText);
 
   function updateGallery(nextGallery: string[]) {
-    onChange({ ...form, galleryText: formatGalleryText(nextGallery) });
+    onGalleryTextChange(formatGalleryText(nextGallery));
   }
 
   function moveImage(index: number, direction: -1 | 1) {
@@ -291,6 +305,7 @@ function ProductGalleryEditor({ form, onChange }: { form: EditProductForm; onCha
     const trimmed = newImage.trim();
     if (!trimmed || gallery.includes(trimmed)) return;
     updateGallery([...gallery, trimmed]);
+    if (!heroImage && onHeroImageChange) onHeroImageChange(trimmed);
     setNewImage('');
   }
 
@@ -312,7 +327,7 @@ function ProductGalleryEditor({ form, onChange }: { form: EditProductForm; onCha
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '0.3rem' }}>
                 <button type="button" onClick={() => moveImage(index, -1)} disabled={index === 0} style={{ background: '#222', color: index === 0 ? '#666' : '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.34rem', cursor: index === 0 ? 'not-allowed' : 'pointer', fontSize: '0.68rem', fontWeight: 700 }}>Up</button>
                 <button type="button" onClick={() => moveImage(index, 1)} disabled={index === gallery.length - 1} style={{ background: '#222', color: index === gallery.length - 1 ? '#666' : '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.34rem', cursor: index === gallery.length - 1 ? 'not-allowed' : 'pointer', fontSize: '0.68rem', fontWeight: 700 }}>Down</button>
-                <button type="button" onClick={() => onChange({ ...form, heroImage: image })} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.34rem', cursor: 'pointer', fontSize: '0.68rem', fontWeight: 700 }}>Set Hero</button>
+                <button type="button" onClick={() => onHeroImageChange?.(image)} disabled={!onHeroImageChange} style={{ background: '#222', color: !onHeroImageChange ? '#666' : '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.34rem', cursor: !onHeroImageChange ? 'not-allowed' : 'pointer', fontSize: '0.68rem', fontWeight: 700 }}>Set Hero</button>
                 <button type="button" onClick={() => removeImage(index)} style={{ background: '#2a1410', color: '#fb923c', border: '1px solid #63301f', borderRadius: '5px', padding: '0.34rem', cursor: 'pointer', fontSize: '0.68rem', fontWeight: 700 }}>Remove</button>
               </div>
             </div>
@@ -384,6 +399,7 @@ export default function AdminPanel() {
   const [mediaLoading, setMediaLoading] = useState(false);
   const [mediaStatus, setMediaStatus] = useState('');
   const [mediaAlt, setMediaAlt] = useState('');
+  const [newProductMediaStatus, setNewProductMediaStatus] = useState('');
   const [enquiries, setEnquiries] = useState<EnquiryRecord[]>([]);
   const [enquiriesLoading, setEnquiriesLoading] = useState(false);
   const [enquiriesStatus, setEnquiriesStatus] = useState('');
@@ -399,6 +415,7 @@ export default function AdminPanel() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const mediaFileRef = useRef<HTMLInputElement>(null);
+  const newProductFileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -579,6 +596,34 @@ export default function AdminPanel() {
     }
   }
 
+  function readFileAsBase64(file: File) {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve((reader.result as string).split(',')[1] ?? '');
+      reader.onerror = () => reject(new Error('Could not read image file'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function uploadProductImage(slug: string, file: File, alt: string) {
+    const base64 = await readFileAsBase64(file);
+    const res = await adminFetch('/.netlify/functions/admin-media-upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        slug,
+        filename: file.name,
+        contentType: file.type,
+        data: base64,
+        alt,
+      }),
+    });
+    if (redirectToLoginIfUnauthorized(res)) return '';
+    const data = await res.json() as { url?: string; error?: string };
+    if (!res.ok || !data.url) throw new Error(data.error ?? 'Upload failed');
+    return data.url;
+  }
+
   async function uploadMedia(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file || !mediaSlug) return;
@@ -614,6 +659,46 @@ export default function AdminPanel() {
       }
     };
     reader.readAsDataURL(file);
+  }
+
+  async function uploadNewProductMedia(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    const proposedSlug = slugifyTitle(newProduct.title);
+
+    if (!files.length) return;
+    if (!proposedSlug) {
+      setNewProductMediaStatus('Enter the product title before uploading photos.');
+      if (newProductFileRef.current) newProductFileRef.current.value = '';
+      return;
+    }
+
+    setMediaLoading(true);
+    setNewProductMediaStatus(`Uploading ${files.length} photo${files.length === 1 ? '' : 's'}...`);
+    try {
+      const uploadedUrls: string[] = [];
+      for (const file of files) {
+        uploadedUrls.push(await uploadProductImage(proposedSlug, file, newProduct.title));
+      }
+
+      setNewProduct(prev => {
+        const gallery = parseGalleryText(prev.galleryText);
+        const nextGallery = [...gallery];
+        for (const url of uploadedUrls) {
+          if (url && !nextGallery.includes(url)) nextGallery.push(url);
+        }
+        return {
+          ...prev,
+          heroImage: prev.heroImage || uploadedUrls[0] || '',
+          galleryText: formatGalleryText(nextGallery),
+        };
+      });
+      setNewProductMediaStatus('Photos uploaded and added to this product draft.');
+    } catch (err) {
+      setNewProductMediaStatus(err instanceof Error ? err.message : 'Photo upload failed.');
+    } finally {
+      setMediaLoading(false);
+      if (newProductFileRef.current) newProductFileRef.current.value = '';
+    }
   }
 
   async function deleteMedia(key: string) {
@@ -743,12 +828,15 @@ export default function AdminPanel() {
   }
 
   function queueNewProduct() {
+    const gallery = parseGalleryText(newProduct.galleryText);
     const missing = [
       !newProduct.title.trim() && 'title',
       !newProduct.price.trim() && 'price',
       !newProduct.tagline.trim() && 'tagline',
       !newProduct.keySpecs.trim() && 'key specs',
       !newProduct.description.trim() && 'description',
+      !newProduct.heroImage.trim() && 'hero photo',
+      gallery.length === 0 && 'gallery photos',
     ].filter(Boolean);
 
     if (missing.length) {
@@ -770,10 +858,12 @@ export default function AdminPanel() {
       `Tagline: ${newProduct.tagline.trim()}\n` +
       `Status: available\n` +
       `Category: ${newProduct.category}\n` +
+      `Hero image: ${newProduct.heroImage.trim()}\n` +
+      `Gallery order, one image per line:\n${gallery.join('\n')}\n\n` +
       `Key specs, one per line:\n${newProduct.keySpecs.trim()}\n\n` +
       `Description/body copy:\n${newProduct.description.trim()}\n\n` +
       `Use a URL-safe slug based on the title. Before proposing the new file, list src/content/products and confirm the slug does not already exist. ` +
-      `If no real images were supplied, reuse an existing site fallback image only when the product type matches; otherwise ask for image details instead of inventing image URLs.`
+      `Use exactly the supplied hero image and gallery order. Do not invent image URLs.`
     );
     setNewProduct(EMPTY_PRODUCT_FORM);
   }
@@ -1158,7 +1248,12 @@ export default function AdminPanel() {
                     Featured
                   </label>
                 </div>
-                <ProductGalleryEditor form={editProduct} onChange={setEditProduct} />
+                <ProductGalleryEditor
+                  heroImage={editProduct.heroImage}
+                  galleryText={editProduct.galleryText}
+                  onGalleryTextChange={galleryText => setEditProduct(p => p && ({ ...p, galleryText }))}
+                  onHeroImageChange={heroImage => setEditProduct(p => p && ({ ...p, heroImage }))}
+                />
                 <div style={{ display: 'grid', gap: '0.35rem' }}>
                   <div style={{ color: '#aaa', fontSize: '0.74rem', fontWeight: 700 }}>Related Products</div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.3rem', maxHeight: '96px', overflowY: 'auto', border: '1px solid #333', borderRadius: '6px', padding: '0.45rem', background: '#101010' }}>
@@ -1205,6 +1300,34 @@ export default function AdminPanel() {
               <input value={newProduct.tagline} onChange={e => setNewProduct(p => ({ ...p, tagline: e.target.value }))} placeholder="Short tagline" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
               <textarea value={newProduct.keySpecs} onChange={e => setNewProduct(p => ({ ...p, keySpecs: e.target.value }))} placeholder="Key specs, one per line" rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
               <textarea value={newProduct.description} onChange={e => setNewProduct(p => ({ ...p, description: e.target.value }))} placeholder="Product description" rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
+              <div style={{ display: 'grid', gap: '0.45rem', border: '1px solid #333', borderRadius: '6px', padding: '0.55rem', background: '#101010' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.65rem' }}>
+                  <div>
+                    <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.78rem' }}>Product Photos</div>
+                    <div style={{ color: '#777', fontSize: '0.68rem', marginTop: '0.15rem' }}>{newProduct.title.trim() ? `Uploads will be saved under ${slugifyTitle(newProduct.title)}` : 'Enter the product title first, then upload photos.'}</div>
+                  </div>
+                  <button type="button" onClick={() => newProductFileRef.current?.click()} disabled={mediaLoading || !newProduct.title.trim()} style={{ background: '#222', color: mediaLoading || !newProduct.title.trim() ? '#666' : '#fff', border: '1px solid #444', borderRadius: '6px', padding: '0.42rem 0.65rem', cursor: mediaLoading || !newProduct.title.trim() ? 'not-allowed' : 'pointer', fontSize: '0.72rem', fontWeight: 700 }}>
+                    Upload Photos
+                  </button>
+                  <input ref={newProductFileRef} type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={uploadNewProductMedia} />
+                </div>
+                {newProductMediaStatus && <div style={{ color: newProductMediaStatus.includes('failed') || newProductMediaStatus.includes('Enter') ? '#fb923c' : '#aaa', fontSize: '0.7rem' }}>{newProductMediaStatus}</div>}
+                {newProduct.heroImage && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '120px minmax(0, 1fr)', gap: '0.5rem', alignItems: 'center' }}>
+                    <ProductImagePreview src={newProduct.heroImage} title={`${newProduct.title} hero`} />
+                    <div style={{ display: 'grid', gap: '0.3rem', minWidth: 0 }}>
+                      <div style={{ color: '#aaa', fontSize: '0.72rem', fontWeight: 700 }}>Hero Image</div>
+                      <input value={newProduct.heroImage} onChange={e => setNewProduct(p => ({ ...p, heroImage: e.target.value }))} placeholder="Hero image URL or path" style={{ minWidth: 0, background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.74rem' }} />
+                    </div>
+                  </div>
+                )}
+                <ProductGalleryEditor
+                  heroImage={newProduct.heroImage}
+                  galleryText={newProduct.galleryText}
+                  onGalleryTextChange={galleryText => setNewProduct(p => ({ ...p, galleryText }))}
+                  onHeroImageChange={heroImage => setNewProduct(p => ({ ...p, heroImage }))}
+                />
+              </div>
               <button onClick={queueNewProduct} disabled={loading} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.6rem', cursor: 'pointer', fontWeight: 700 }}>
                 Queue Product Draft
               </button>
@@ -1658,8 +1781,9 @@ export default function AdminPanel() {
               <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
                 <li>Use Add Product Draft in the Products tab.</li>
                 <li>Provide the product title, price, category, tagline, main specs, description, and selling points.</li>
+                <li>Upload the product photos in the same form. The first uploaded photo becomes the hero image automatically.</li>
+                <li>Use the gallery controls to move photos up or down, remove any wrong photo, or set a different hero image before queuing the draft.</li>
                 <li>The assistant will create a draft product file using the existing product format.</li>
-                <li>Upload real product photos in Media, then use Hero or Gallery to add those images to the draft.</li>
                 <li>Use Preview in Pending and deploy only after the new product path, price, specs, and image order have been checked.</li>
               </ol>
             </section>
