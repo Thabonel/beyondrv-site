@@ -1,6 +1,6 @@
-import { getStore } from '@netlify/blobs';
 import type { Handler } from '@netlify/functions';
 import { randomUUID } from 'crypto';
+import { getBlobStore } from './blob-store';
 
 const STORE_NAME = 'customer-enquiries';
 const RESEND_API = 'https://api.resend.com/emails';
@@ -128,7 +128,7 @@ async function sendEmail(enquiry: Required<Pick<EnquiryPayload, 'name' | 'email'
 
 async function backupEnquiry(id: string, record: Record<string, unknown>) {
   try {
-    const store = getStore({ name: STORE_NAME, consistency: 'strong' });
+    const store = getBlobStore(STORE_NAME);
     await store.setJSON(id, record);
     return { backedUp: true };
   } catch (err) {

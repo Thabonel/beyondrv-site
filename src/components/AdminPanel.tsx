@@ -412,9 +412,9 @@ export default function AdminPanel() {
       const res = await adminFetch('/.netlify/functions/admin-enquiries');
       if (redirectToLoginIfUnauthorized(res)) return;
       if (!res.ok) throw new Error('Could not load enquiries');
-      const data = await res.json() as { enquiries: EnquiryRecord[] };
+      const data = await res.json() as { enquiries: EnquiryRecord[]; storageReady?: boolean; warning?: string };
       setEnquiries(data.enquiries.filter(Boolean) ?? []);
-      setEnquiriesStatus('');
+      setEnquiriesStatus(data.warning ?? '');
     } catch {
       setEnquiriesStatus('Could not load recent enquiries.');
     } finally {
@@ -1262,7 +1262,7 @@ export default function AdminPanel() {
             <div style={{ padding: '1rem', borderBottom: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
               <div>
                 <div style={{ color: '#fff', fontWeight: 700 }}>Recent Enquiries</div>
-                <div style={{ color: '#888', fontSize: '0.76rem', marginTop: '0.2rem' }}>Backed up from the contact form</div>
+                <div style={{ color: '#888', fontSize: '0.76rem', marginTop: '0.2rem' }}>Stored contact form submissions</div>
               </div>
               <button
                 onClick={loadEnquiries}
@@ -1276,14 +1276,16 @@ export default function AdminPanel() {
               <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #333', background: contactConfig.ready ? '#102416' : '#2a1410', color: contactConfig.ready ? '#8f8' : '#fb923c', fontSize: '0.78rem', lineHeight: 1.45 }}>
                 {contactConfig.ready
                   ? `Email notifications are configured for ${contactConfig.toEmail}.`
-                  : `Email notifications need setup. Missing: ${contactConfig.missing.join(', ')}. Enquiries are still stored here as backup.`}
+                  : `Email notifications need setup. Missing: ${contactConfig.missing.join(', ')}.`}
               </div>
             )}
             <div style={{ flex: 1, overflowY: 'auto', padding: '0.75rem', display: 'grid', gap: '0.65rem', alignContent: 'start' }}>
-              {enquiriesStatus && <p style={{ color: '#f87', fontSize: '0.85rem' }}>{enquiriesStatus}</p>}
+              {enquiriesStatus && <p style={{ color: '#fb923c', fontSize: '0.85rem', lineHeight: 1.45 }}>{enquiriesStatus}</p>}
               {enquiriesLoading && <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>Loading enquiries...</p>}
               {!enquiriesLoading && enquiries.length === 0 && (
-                <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>No enquiries stored yet</p>
+                <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>
+                  No stored enquiries yet. Email notifications may still have been sent.
+                </p>
               )}
               {!enquiriesLoading && enquiries.map(enquiry => (
                 <div key={enquiry.id} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', padding: '0.75rem', display: 'grid', gap: '0.4rem' }}>
