@@ -977,48 +977,61 @@ export default function AdminPanel() {
         {activeTab === 'products' && (
           <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '1rem', borderBottom: '1px solid #333' }}>
-              <div style={{ color: '#fff', fontWeight: 700, marginBottom: '0.45rem' }}>Product Manager</div>
-              <input
-                value={productFilter}
-                onChange={e => setProductFilter(e.target.value)}
-                placeholder="Search products..."
-                style={{ width: '100%', boxSizing: 'border-box', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem 0.65rem', fontSize: '0.82rem', outline: 'none' }}
-              />
-            </div>
-            <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-              {productsLoading && <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>Loading products...</p>}
-              {!productsLoading && filteredProducts.map(product => (
-                <div key={product.slug} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', overflow: 'hidden', flexShrink: 0 }}>
-                  <AdminProductThumb src={product.heroImage} title={product.title} />
-                  <div style={{ padding: '0.65rem 0.7rem' }}>
-                    <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem', lineHeight: 1.25 }}>{product.title}</div>
-                    <div style={{ color: '#aaa', fontSize: '0.74rem', marginTop: '0.25rem' }}>
-                      {product.price} · {product.category} · {product.status} · {product.galleryCount ?? 0} photos
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.35rem', marginTop: '0.55rem' }}>
-                      <button
-                        onClick={() => startStructuredEdit(product)}
-                        style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => requestProductUpdate(product, `This product has sold. Remove it from active product listings and make sure the old URL redirects to ${product.category === 'caravan' ? '/our-caravans/' : product.category === 'expedition' ? '/expedition/' : '/our-slide-on-campers/'}.`)}
-                        style={{ background: '#2a1410', color: '#fb923c', border: '1px solid #63301f', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
-                      >
-                        Sold
-                      </button>
-                    </div>
-                  </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', marginBottom: editProduct ? 0 : '0.45rem' }}>
+                <div>
+                  <div style={{ color: '#fff', fontWeight: 700 }}>{editProduct ? 'Edit Product' : 'Product Manager'}</div>
+                  {editProduct && <div style={{ color: '#888', fontSize: '0.74rem', marginTop: '0.18rem' }}>{editProduct.slug}</div>}
                 </div>
-              ))}
-              {!productsLoading && filteredProducts.length === 0 && (
-                <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>No matching products</p>
+                {editProduct && (
+                  <button onClick={() => setEditProduct(null)} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '6px', padding: '0.42rem 0.6rem', cursor: 'pointer', fontWeight: 700 }}>
+                    Back
+                  </button>
+                )}
+              </div>
+              {!editProduct && (
+                <input
+                  value={productFilter}
+                  onChange={e => setProductFilter(e.target.value)}
+                  placeholder="Search products..."
+                  style={{ width: '100%', boxSizing: 'border-box', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem 0.65rem', fontSize: '0.82rem', outline: 'none' }}
+                />
               )}
             </div>
+            {!editProduct && (
+              <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                {productsLoading && <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>Loading products...</p>}
+                {!productsLoading && filteredProducts.map(product => (
+                  <div key={product.slug} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', overflow: 'hidden', flexShrink: 0, display: 'grid', gridTemplateColumns: '150px minmax(0, 1fr)' }}>
+                    <AdminProductThumb src={product.heroImage} title={product.title} />
+                    <div style={{ padding: '0.65rem 0.7rem', minWidth: 0, display: 'grid', gap: '0.35rem', alignContent: 'center' }}>
+                      <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem', lineHeight: 1.25 }}>{product.title}</div>
+                      <div style={{ color: '#aaa', fontSize: '0.74rem' }}>
+                        {product.price} · {product.category} · {product.status} · {product.galleryCount ?? 0} photos
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.35rem' }}>
+                        <button
+                          onClick={() => startStructuredEdit(product)}
+                          style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => requestProductUpdate(product, `This product has sold. Remove it from active product listings and make sure the old URL redirects to ${product.category === 'caravan' ? '/our-caravans/' : product.category === 'expedition' ? '/expedition/' : '/our-slide-on-campers/'}.`)}
+                          style={{ background: '#2a1410', color: '#fb923c', border: '1px solid #63301f', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
+                        >
+                          Sold
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {!productsLoading && filteredProducts.length === 0 && (
+                  <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>No matching products</p>
+                )}
+              </div>
+            )}
             {editProduct && (
-              <div style={{ padding: '0.85rem', borderTop: '1px solid #333', display: 'grid', gap: '0.5rem', background: '#141414' }}>
-                <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem' }}>Edit Product</div>
+              <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.85rem', display: 'grid', gap: '0.6rem', alignContent: 'start', background: '#141414' }}>
                 <input value={editProduct.title} onChange={e => setEditProduct(p => p && ({ ...p, title: e.target.value }))} placeholder="Title" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
                   <input value={editProduct.price} onChange={e => setEditProduct(p => p && ({ ...p, price: e.target.value }))} placeholder="$72,000" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
@@ -1073,7 +1086,7 @@ export default function AdminPanel() {
                 </div>
               </div>
             )}
-            <div style={{ padding: '0.85rem', borderTop: '1px solid #333', display: 'grid', gap: '0.5rem' }}>
+            {!editProduct && <div style={{ padding: '0.85rem', borderTop: '1px solid #333', display: 'grid', gap: '0.5rem' }}>
               <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem' }}>Add Product Draft</div>
               <input value={newProduct.title} onChange={e => setNewProduct(p => ({ ...p, title: e.target.value }))} placeholder="Product title" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
@@ -1090,7 +1103,7 @@ export default function AdminPanel() {
               <button onClick={queueNewProduct} disabled={loading} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.6rem', cursor: 'pointer', fontWeight: 700 }}>
                 Queue Product Draft
               </button>
-            </div>
+            </div>}
           </div>
         )}
 
