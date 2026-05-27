@@ -110,6 +110,17 @@ async function sendEmail(enquiry: Required<Pick<EnquiryPayload, 'name' | 'email'
   return { sent: true };
 }
 
+async function backupEnquiry(id: string, record: Record<string, unknown>) {
+  try {
+    const store = getStore({ name: STORE_NAME, consistency: 'strong' });
+    await store.setJSON(id, record);
+    return { backedUp: true };
+  } catch (err) {
+    console.error('[contact-submit] enquiry backup unavailable:', err);
+    return { backedUp: false };
+  }
+}
+
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
 
@@ -162,7 +173,6 @@ export const handler: Handler = async (event) => {
 
   const submittedAt = new Date().toISOString();
   const id = `${submittedAt}-${randomUUID()}`;
-  const store = getStore({ name: STORE_NAME, consistency: 'strong' });
   const record = {
     ...enquiry,
     id,
@@ -172,7 +182,7 @@ export const handler: Handler = async (event) => {
   };
 
   const [storeResult, emailResult] = await Promise.allSettled([
-    store.setJSON(id, record),
+    backupEnquiry(id, record),
     sendEmail(enquiry),
   ]);
 
@@ -191,7 +201,7 @@ export const handler: Handler = async (event) => {
         ok: false,
         id,
         error: `${reason}. Please call 0430 863 819 if the enquiry is urgent.`,
-        enquiryBackedUp: storeResult.status === 'fulfilled',
+        enquiryBackedUp: storeResult.status === 'fulfilled' && storeResult.value.backedUp,
       }),
     };
   }
@@ -203,7 +213,7 @@ export const handler: Handler = async (event) => {
       ok: true,
       id,
       emailSent: true,
-      enquiryBackedUp: storeResult.status === 'fulfilled',
+      enquiryBackedUp: storeResult.status === 'fulfilled' && storeResult.value.backedUp,
     }),
   };
 };
