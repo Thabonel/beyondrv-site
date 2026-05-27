@@ -208,6 +208,17 @@ function adminImageUrl(src: string) {
   return `/.netlify/images?url=${encodeURIComponent(src)}&w=800&fit=cover`;
 }
 
+function parseGalleryText(text: string) {
+  return text
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean);
+}
+
+function formatGalleryText(images: string[]) {
+  return images.join('\n');
+}
+
 function AdminProductThumb({ src, title }: { src?: string; title: string }) {
   const [failed, setFailed] = useState(false);
   const imageUrl = src && !failed ? adminImageUrl(src) : '';
@@ -228,6 +239,100 @@ function AdminProductThumb({ src, title }: { src?: string; title: string }) {
           No hero image for {title}
         </div>
       )}
+    </div>
+  );
+}
+
+function ProductImagePreview({ src, title }: { src?: string; title: string }) {
+  const [failed, setFailed] = useState(false);
+  const imageUrl = src && !failed ? adminImageUrl(src) : '';
+
+  return (
+    <div style={{ width: '100%', aspectRatio: '16 / 9', background: '#0d0d0d', border: '1px solid #333', borderRadius: '6px', overflow: 'hidden' }}>
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          onError={() => setFailed(true)}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
+        />
+      ) : (
+        <div style={{ height: '100%', display: 'grid', placeItems: 'center', color: '#777', fontSize: '0.72rem', padding: '0.75rem', textAlign: 'center' }}>
+          No image preview for {title}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ProductGalleryEditor({ form, onChange }: { form: EditProductForm; onChange: (next: EditProductForm) => void }) {
+  const [newImage, setNewImage] = useState('');
+  const gallery = parseGalleryText(form.galleryText);
+
+  function updateGallery(nextGallery: string[]) {
+    onChange({ ...form, galleryText: formatGalleryText(nextGallery) });
+  }
+
+  function moveImage(index: number, direction: -1 | 1) {
+    const nextIndex = index + direction;
+    if (nextIndex < 0 || nextIndex >= gallery.length) return;
+    const nextGallery = [...gallery];
+    [nextGallery[index], nextGallery[nextIndex]] = [nextGallery[nextIndex], nextGallery[index]];
+    updateGallery(nextGallery);
+  }
+
+  function removeImage(index: number) {
+    updateGallery(gallery.filter((_, itemIndex) => itemIndex !== index));
+  }
+
+  function addImage() {
+    const trimmed = newImage.trim();
+    if (!trimmed || gallery.includes(trimmed)) return;
+    updateGallery([...gallery, trimmed]);
+    setNewImage('');
+  }
+
+  return (
+    <div style={{ display: 'grid', gap: '0.45rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem', alignItems: 'baseline' }}>
+        <div style={{ color: '#aaa', fontSize: '0.74rem', fontWeight: 700 }}>Gallery Photos</div>
+        <div style={{ color: '#777', fontSize: '0.68rem' }}>Shown top to bottom in this order</div>
+      </div>
+      <div style={{ display: 'grid', gap: '0.4rem', maxHeight: '360px', overflowY: 'auto', border: '1px solid #333', borderRadius: '6px', padding: '0.45rem', background: '#101010' }}>
+        {gallery.map((image, index) => (
+          <div key={`${image}-${index}`} style={{ display: 'grid', gridTemplateColumns: '84px minmax(0, 1fr)', gap: '0.55rem', alignItems: 'center', padding: '0.45rem', border: '1px solid #282828', borderRadius: '6px', background: '#181818' }}>
+            <ProductImagePreview src={image} title={`Gallery image ${index + 1}`} />
+            <div style={{ minWidth: 0, display: 'grid', gap: '0.35rem' }}>
+              <div style={{ display: 'flex', gap: '0.45rem', alignItems: 'center', minWidth: 0 }}>
+                <span style={{ color: '#fff', fontSize: '0.72rem', fontWeight: 800, flexShrink: 0 }}>Photo {index + 1}</span>
+                <span title={image} style={{ color: '#aaa', fontSize: '0.68rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{image}</span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '0.3rem' }}>
+                <button type="button" onClick={() => moveImage(index, -1)} disabled={index === 0} style={{ background: '#222', color: index === 0 ? '#666' : '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.34rem', cursor: index === 0 ? 'not-allowed' : 'pointer', fontSize: '0.68rem', fontWeight: 700 }}>Up</button>
+                <button type="button" onClick={() => moveImage(index, 1)} disabled={index === gallery.length - 1} style={{ background: '#222', color: index === gallery.length - 1 ? '#666' : '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.34rem', cursor: index === gallery.length - 1 ? 'not-allowed' : 'pointer', fontSize: '0.68rem', fontWeight: 700 }}>Down</button>
+                <button type="button" onClick={() => onChange({ ...form, heroImage: image })} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.34rem', cursor: 'pointer', fontSize: '0.68rem', fontWeight: 700 }}>Set Hero</button>
+                <button type="button" onClick={() => removeImage(index)} style={{ background: '#2a1410', color: '#fb923c', border: '1px solid #63301f', borderRadius: '5px', padding: '0.34rem', cursor: 'pointer', fontSize: '0.68rem', fontWeight: 700 }}>Remove</button>
+              </div>
+            </div>
+          </div>
+        ))}
+        {gallery.length === 0 && (
+          <div style={{ color: '#777', fontSize: '0.74rem', textAlign: 'center', padding: '0.8rem' }}>No gallery photos yet.</div>
+        )}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', gap: '0.35rem' }}>
+        <input
+          value={newImage}
+          onChange={e => setNewImage(e.target.value)}
+          placeholder="Add image URL or path"
+          style={{ minWidth: 0, background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.76rem' }}
+        />
+        <button type="button" onClick={addImage} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '6px', padding: '0.45rem 0.65rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.72rem' }}>
+          Add
+        </button>
+      </div>
     </div>
   );
 }
@@ -557,10 +662,7 @@ export default function AdminPanel() {
       form.heroImage = url;
       form.notes = 'Set the uploaded image as the product hero image.';
     } else {
-      const gallery = form.galleryText
-        .split('\n')
-        .map(line => line.trim())
-        .filter(Boolean);
+      const gallery = parseGalleryText(form.galleryText);
       if (!gallery.includes(url)) gallery.push(url);
       form.galleryText = gallery.join('\n');
       form.notes = 'Add the uploaded image to the end of the product gallery.';
@@ -606,10 +708,7 @@ export default function AdminPanel() {
       return;
     }
 
-    const gallery = editProduct.galleryText
-      .split('\n')
-      .map(line => line.trim())
-      .filter(Boolean);
+    const gallery = parseGalleryText(editProduct.galleryText);
     const knownSlugs = new Set(products.map(product => product.slug));
     const invalidRelated = editProduct.relatedSlugs.filter(slug => !knownSlugs.has(slug));
 
@@ -1042,7 +1141,13 @@ export default function AdminPanel() {
                   </select>
                 </div>
                 <input value={editProduct.tagline} onChange={e => setEditProduct(p => p && ({ ...p, tagline: e.target.value }))} placeholder="Tagline" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                <input value={editProduct.heroImage} onChange={e => setEditProduct(p => p && ({ ...p, heroImage: e.target.value }))} placeholder="Hero image URL or path" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                <div style={{ display: 'grid', gridTemplateColumns: '150px minmax(0, 1fr)', gap: '0.55rem', alignItems: 'center', border: '1px solid #333', borderRadius: '6px', padding: '0.45rem', background: '#101010' }}>
+                  <ProductImagePreview src={editProduct.heroImage} title={`${editProduct.title} hero`} />
+                  <div style={{ display: 'grid', gap: '0.35rem', minWidth: 0 }}>
+                    <div style={{ color: '#aaa', fontSize: '0.74rem', fontWeight: 700 }}>Hero Image</div>
+                    <input value={editProduct.heroImage} onChange={e => setEditProduct(p => p && ({ ...p, heroImage: e.target.value }))} placeholder="Hero image URL or path" style={{ minWidth: 0, background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                  </div>
+                </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem', color: '#ddd', fontSize: '0.78rem' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     <input type="checkbox" checked={editProduct.onSale} onChange={e => setEditProduct(p => p && ({ ...p, onSale: e.target.checked }))} />
@@ -1053,7 +1158,7 @@ export default function AdminPanel() {
                     Featured
                   </label>
                 </div>
-                <textarea value={editProduct.galleryText} onChange={e => setEditProduct(p => p && ({ ...p, galleryText: e.target.value }))} placeholder="Gallery image order, one URL or path per line" rows={4} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
+                <ProductGalleryEditor form={editProduct} onChange={setEditProduct} />
                 <div style={{ display: 'grid', gap: '0.35rem' }}>
                   <div style={{ color: '#aaa', fontSize: '0.74rem', fontWeight: 700 }}>Related Products</div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.3rem', maxHeight: '96px', overflowY: 'auto', border: '1px solid #333', borderRadius: '6px', padding: '0.45rem', background: '#101010' }}>
@@ -1521,7 +1626,7 @@ export default function AdminPanel() {
               <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
                 <li>Open the Products tab and search for the product, or type the product name directly in chat.</li>
                 <li>Use Edit to change safe fields like price, status, tagline, sale state, featured state, hero image, gallery order, or related products.</li>
-                <li>Use the gallery box to reorder photos by moving one image URL per line.</li>
+                <li>Use Gallery Photos to see the images in order. Move photos up or down, remove photos, add a new image path, or set a gallery photo as the hero image.</li>
                 <li>Use the notes box for copy or spec changes that need more explanation.</li>
                 <li>Wait for the assistant to read the current product file and queue the proposed change.</li>
                 <li>Open Pending, use Preview to inspect the generated file, and remove anything that looks wrong.</li>
