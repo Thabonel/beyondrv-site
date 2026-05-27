@@ -579,6 +579,7 @@ export default function AdminPanel() {
   const [productFilter, setProductFilter] = useState('');
   const [productsLoading, setProductsLoading] = useState(true);
   const [newProduct, setNewProduct] = useState<NewProductForm>(EMPTY_PRODUCT_FORM);
+  const [showNewProductForm, setShowNewProductForm] = useState(false);
   const [editProduct, setEditProduct] = useState<EditProductForm | null>(null);
   const [previewChange, setPreviewChange] = useState<PendingChange | null>(null);
   const [mediaSlug, setMediaSlug] = useState('');
@@ -1135,6 +1136,7 @@ export default function AdminPanel() {
       `Use exactly the supplied hero image and gallery order. Store only the clean YouTube video ID in youtubeVideo.id. Do not invent image URLs or video metadata.`
     );
     setNewProduct(EMPTY_PRODUCT_FORM);
+    setShowNewProductForm(false);
   }
 
   function updateRecentBuild(id: string, patch: Partial<RecentBuild>) {
@@ -1435,9 +1437,9 @@ export default function AdminPanel() {
         {activeTab === 'products' && (
           <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '1rem', borderBottom: '1px solid #333' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', marginBottom: editProduct ? 0 : '0.45rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', marginBottom: editProduct || showNewProductForm ? 0 : '0.45rem' }}>
                 <div>
-                  <div style={{ color: '#fff', fontWeight: 700 }}>{editProduct ? 'Edit Product' : 'Product Manager'}</div>
+                  <div style={{ color: '#fff', fontWeight: 700 }}>{editProduct ? 'Edit Product' : showNewProductForm ? 'Add Product Draft' : 'Product Manager'}</div>
                   {editProduct && <div style={{ color: '#888', fontSize: '0.74rem', marginTop: '0.18rem' }}>{editProduct.slug}</div>}
                 </div>
                 {editProduct && (
@@ -1445,8 +1447,18 @@ export default function AdminPanel() {
                     Back
                   </button>
                 )}
+                {showNewProductForm && !editProduct && (
+                  <button onClick={() => setShowNewProductForm(false)} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '6px', padding: '0.42rem 0.6rem', cursor: 'pointer', fontWeight: 700 }}>
+                    Back
+                  </button>
+                )}
+                {!editProduct && !showNewProductForm && (
+                  <button onClick={() => setShowNewProductForm(true)} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.46rem 0.7rem', cursor: 'pointer', fontWeight: 700 }}>
+                    Add Product
+                  </button>
+                )}
               </div>
-              {!editProduct && (
+              {!editProduct && !showNewProductForm && (
                 <input
                   value={productFilter}
                   onChange={e => setProductFilter(e.target.value)}
@@ -1455,7 +1467,7 @@ export default function AdminPanel() {
                 />
               )}
             </div>
-            {!editProduct && (
+            {!editProduct && !showNewProductForm && (
               <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
                 {productsLoading && <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>Loading products...</p>}
                 {!productsLoading && filteredProducts.map(product => (
@@ -1565,8 +1577,7 @@ export default function AdminPanel() {
                 </div>
               </div>
             )}
-            {!editProduct && <div style={{ padding: '0.85rem', borderTop: '1px solid #333', display: 'grid', gap: '0.5rem' }}>
-              <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem' }}>Add Product Draft</div>
+            {!editProduct && showNewProductForm && <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.85rem', display: 'grid', gap: '0.5rem', alignContent: 'start', background: '#141414' }}>
               <input value={newProduct.title} onChange={e => setNewProduct(p => ({ ...p, title: e.target.value }))} placeholder="Product title" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
                 <select value={newProduct.category} onChange={e => setNewProduct(p => ({ ...p, category: e.target.value as ProductCategory }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
@@ -1617,9 +1628,14 @@ export default function AdminPanel() {
                   onChange={patch => setNewProduct(p => ({ ...p, ...patch }))}
                 />
               </div>
-              <button onClick={queueNewProduct} disabled={loading} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.6rem', cursor: 'pointer', fontWeight: 700 }}>
-                Queue Product Draft
-              </button>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+                <button onClick={() => setShowNewProductForm(false)} style={{ background: '#222', color: '#aaa', border: '1px solid #444', borderRadius: '6px', padding: '0.6rem', cursor: 'pointer', fontWeight: 700 }}>
+                  Cancel
+                </button>
+                <button onClick={queueNewProduct} disabled={loading} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.6rem', cursor: 'pointer', fontWeight: 700 }}>
+                  Queue Product Draft
+                </button>
+              </div>
             </div>}
           </div>
         )}
@@ -2071,7 +2087,7 @@ export default function AdminPanel() {
             <section>
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Add a product</h3>
               <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
-                <li>Use Add Product Draft in the Products tab.</li>
+                <li>Use Add Product in the Products tab.</li>
                 <li>Provide the product title, price, category, tagline, main specs, description, and selling points.</li>
                 <li>Upload the product photos in the same form. The first uploaded photo becomes the hero image automatically.</li>
                 <li>Use the gallery controls to move photos up or down, remove any wrong photo, or set a different hero image before queuing the draft.</li>
