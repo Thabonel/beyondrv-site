@@ -988,7 +988,7 @@ export default function AdminPanel() {
             <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
               {productsLoading && <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>Loading products...</p>}
               {!productsLoading && filteredProducts.map(product => (
-                <div key={product.slug} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', overflow: 'hidden' }}>
+                <div key={product.slug} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', overflow: 'hidden', flexShrink: 0 }}>
                   <AdminProductThumb src={product.heroImage} title={product.title} />
                   <div style={{ padding: '0.65rem 0.7rem' }}>
                     <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem', lineHeight: 1.25 }}>{product.title}</div>
