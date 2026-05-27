@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { Component, type ReactNode, useState, useRef, useEffect } from 'react';
 import AdminDashboard from './AdminDashboard';
 import initialRecentBuilds from '../data/homepage/recent-builds.json';
 import initialTestimonials from '../data/homepage/testimonials.json';
@@ -7,6 +7,26 @@ import { adminFetch, clearAdminToken } from '../lib/adminApi';
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+}
+
+class AdminSectionBoundary extends Component<{ children: ReactNode }, { error: string }> {
+  state = { error: '' };
+
+  static getDerivedStateFromError(error: unknown) {
+    return { error: error instanceof Error ? error.message : 'Admin section failed to load.' };
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ padding: '1rem', color: '#f87171', fontSize: '0.85rem', lineHeight: 1.45 }}>
+          Could not load this admin section: {this.state.error}
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
 }
 
 type JudgeDecision = 'allow' | 'block' | 'revise' | 'escalate';
@@ -922,7 +942,11 @@ export default function AdminPanel() {
           ))}
         </div>
 
-        {activeTab === 'dashboard' && <AdminDashboard pendingCount={pending.length} />}
+        {activeTab === 'dashboard' && (
+          <AdminSectionBoundary>
+            <AdminDashboard pendingCount={pending.length} />
+          </AdminSectionBoundary>
+        )}
 
         {activeTab === 'products' && (
           <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>

@@ -193,6 +193,8 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
     );
   }
 
+  const chat = data?.chat ?? { recent: [], topTopics: [] };
+
   return (
     <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.85rem', display: 'grid', gap: '0.85rem', alignContent: 'start' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
@@ -333,27 +335,27 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
           <Panel title="Chatbot Questions">
             {data.analytics.status !== 'ready' ? (
               <p style={{ margin: 0, color: '#888', fontSize: '0.78rem' }}>{data.analytics.message}</p>
-            ) : data.chat.recent.length === 0 ? (
+            ) : chat.recent.length === 0 ? (
               <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No chatbot questions recorded in this range yet.</p>
             ) : (
               <div style={{ display: 'grid', gap: '0.65rem' }}>
-                {data.chat.topTopics.length > 0 && (
+                {chat.topTopics.length > 0 && (
                   <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
-                    {data.chat.topTopics.map((topic) => (
+                    {chat.topTopics.map((topic) => (
                       <span key={topic.topic} style={{ border: '1px solid #333', borderRadius: '999px', color: '#ccc', fontSize: '0.68rem', padding: '0.18rem 0.45rem' }}>
                         {labelise(topic.topic)} · {topic.count}
                       </span>
                     ))}
                   </div>
                 )}
-                {data.chat.recent.map((chat) => (
-                  <div key={`${chat.timestamp}-${chat.question}`} style={{ borderBottom: '1px solid #252525', paddingBottom: '0.55rem', display: 'grid', gap: '0.28rem' }}>
+                {chat.recent.map((item) => (
+                  <div key={`${item.timestamp}-${item.question}`} style={{ borderBottom: '1px solid #252525', paddingBottom: '0.55rem', display: 'grid', gap: '0.28rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', color: '#777', fontSize: '0.66rem' }}>
-                      <span>{labelise(chat.topic)}{chat.productSlug ? ` · ${chat.productSlug}` : ''}</span>
-                      <span>{new Date(chat.timestamp).toLocaleDateString('en-AU')}</span>
+                      <span>{labelise(item.topic)}{item.productSlug ? ` · ${item.productSlug}` : ''}</span>
+                      <span>{item.timestamp ? new Date(item.timestamp).toLocaleDateString('en-AU') : ''}</span>
                     </div>
-                    <div style={{ color: '#fff', fontSize: '0.78rem', lineHeight: 1.35 }}>{chat.question}</div>
-                    <div style={{ color: '#999', fontSize: '0.72rem', lineHeight: 1.35 }}>{chat.answer}</div>
+                    <div style={{ color: '#fff', fontSize: '0.78rem', lineHeight: 1.35 }}>{item.question}</div>
+                    <div style={{ color: '#999', fontSize: '0.72rem', lineHeight: 1.35 }}>{item.answer}</div>
                   </div>
                 ))}
               </div>
