@@ -25,6 +25,27 @@ const RANGE_OPTIONS = [
   { label: '90 days', value: '90' },
 ];
 
+const SOURCE_OPTIONS = [
+  { label: 'YouTube', value: 'youtube', example: 'unimog-video' },
+  { label: 'Instagram', value: 'instagram', example: 'advent-2150-reel' },
+  { label: 'Facebook', value: 'facebook', example: 'sunpatch-post' },
+];
+
+function campaignSlug(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function buildTrackedUrl(pageUrl: string, source: string, campaign: string) {
+  const base = pageUrl.trim() || 'https://beyondrv.com.au/';
+  const separator = base.includes('?') ? '&' : '?';
+  const safeCampaign = campaignSlug(campaign) || SOURCE_OPTIONS.find(option => option.value === source)?.example || 'campaign';
+  return `${base}${separator}utm_source=${encodeURIComponent(source)}&utm_campaign=${encodeURIComponent(safeCampaign)}`;
+}
+
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
     <div style={{
@@ -43,6 +64,10 @@ export default function AnalyticsDashboard() {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [campaignSource, setCampaignSource] = useState('youtube');
+  const [campaignName, setCampaignName] = useState('unimog-video');
+  const [campaignPage, setCampaignPage] = useState('https://beyondrv.com.au/our-slide-on-campers/');
+  const [copyStatus, setCopyStatus] = useState('');
 
   useEffect(() => {
     const controller = new AbortController();
@@ -70,6 +95,16 @@ export default function AnalyticsDashboard() {
   const sectionTitle: React.CSSProperties = {
     color: '#fff', fontWeight: 600, fontSize: '0.9rem', marginBottom: '1rem',
   };
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    background: '#1a1a1a',
+    border: '1px solid #333',
+    borderRadius: '6px',
+    color: '#fff',
+    padding: '0.6rem',
+    fontSize: '0.82rem',
+  };
+  const trackedUrl = buildTrackedUrl(campaignPage, campaignSource, campaignName);
 
   if (error) {
     return (
@@ -130,6 +165,60 @@ export default function AnalyticsDashboard() {
           />
         </div>
       )}
+
+      <div style={card}>
+        <div style={sectionTitle}>Campaign Link Builder</div>
+        <p style={{ color: '#aaa', fontSize: '0.84rem', lineHeight: 1.55, margin: '0 0 1rem' }}>
+          Use these tracked links anywhere Beyond RV posts content. They tell the dashboard which platform and post sent the visitor, so Facebook, Instagram, and YouTube traffic can be measured properly.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr 1.4fr', gap: '0.75rem' }}>
+          <label style={{ display: 'grid', gap: '0.35rem', color: '#888', fontSize: '0.74rem' }}>
+            Platform
+            <select value={campaignSource} onChange={event => setCampaignSource(event.target.value)} style={inputStyle}>
+              {SOURCE_OPTIONS.map(option => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </label>
+          <label style={{ display: 'grid', gap: '0.35rem', color: '#888', fontSize: '0.74rem' }}>
+            Campaign / post name
+            <input
+              value={campaignName}
+              onChange={event => setCampaignName(event.target.value)}
+              placeholder="Example: unimog-video"
+              style={inputStyle}
+            />
+          </label>
+          <label style={{ display: 'grid', gap: '0.35rem', color: '#888', fontSize: '0.74rem' }}>
+            Website page to link to
+            <input
+              value={campaignPage}
+              onChange={event => setCampaignPage(event.target.value)}
+              placeholder="https://beyondrv.com.au/our-slide-on-campers/"
+              style={inputStyle}
+            />
+          </label>
+        </div>
+        <div style={{ marginTop: '0.85rem', background: '#080808', border: '1px solid #2a2a2a', borderRadius: '6px', padding: '0.75rem', display: 'grid', gap: '0.55rem' }}>
+          <div style={{ color: '#777', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 700 }}>Tracked URL</div>
+          <code style={{ color: '#E8540A', fontSize: '0.82rem', lineHeight: 1.5, wordBreak: 'break-all' }}>{trackedUrl}</code>
+          <button
+            onClick={async () => {
+              await navigator.clipboard.writeText(trackedUrl);
+              setCopyStatus('Copied. Paste this link into the post, video description, bio, story, or ad.');
+            }}
+            style={{ justifySelf: 'start', background: '#E8540A', border: 0, color: '#fff', borderRadius: '5px', padding: '0.45rem 0.75rem', cursor: 'pointer', fontWeight: 700 }}
+          >
+            Copy Link
+          </button>
+          {copyStatus && <p style={{ color: '#4ade80', margin: 0, fontSize: '0.76rem' }}>{copyStatus}</p>}
+        </div>
+        <ul style={{ margin: '0.85rem 0 0', paddingLeft: '1.1rem', color: '#888', fontSize: '0.78rem', lineHeight: 1.6 }}>
+          <li>Use one campaign name per post, reel, video, story, or ad.</li>
+          <li>Keep names short, for example <code style={{ color: '#E8540A' }}>unimog-video</code> or <code style={{ color: '#E8540A' }}>advent-2150-reel</code>.</li>
+          <li>If a page already has a question mark in the URL, the builder automatically uses <code style={{ color: '#E8540A' }}>&amp;</code> instead.</li>
+        </ul>
+      </div>
 
       {/* Trend chart */}
       {data && data.trend.length > 0 && (
