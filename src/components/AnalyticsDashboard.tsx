@@ -306,7 +306,7 @@ export default function AnalyticsDashboard() {
 
       {data && data.youtube.length === 0 && (
         <div style={{ ...card, color: '#555', fontSize: '0.85rem' }}>
-          No YouTube traffic in the last {range} days. Add <code style={{ color: '#E8540A' }}>?utm_source=youtube&utm_campaign=video-title</code> to links in your video descriptions.
+          No tracked social campaign traffic in the last {range} days. Use the Campaign Link Builder above for YouTube, Instagram, and Facebook links so visits can be attributed to the right post, video, reel, or ad.
         </div>
       )}
     </div>
