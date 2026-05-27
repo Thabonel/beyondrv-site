@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import AdminDashboard from './AdminDashboard';
 import initialRecentBuilds from '../data/homepage/recent-builds.json';
 import initialTestimonials from '../data/homepage/testimonials.json';
+import { adminFetch, clearAdminToken } from '../lib/adminApi';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -187,6 +188,7 @@ function adminImageUrl(src: string) {
 
 function redirectToLoginIfUnauthorized(res: Response) {
   if (res.status === 401) {
+    clearAdminToken();
     window.location.href = '/.netlify/functions/admin-login';
     return true;
   }
@@ -255,7 +257,7 @@ export default function AdminPanel() {
     let cancelled = false;
     async function loadProducts() {
       try {
-        const res = await fetch('/.netlify/functions/admin-products');
+        const res = await adminFetch('/.netlify/functions/admin-products');
         if (redirectToLoginIfUnauthorized(res)) return;
         if (!res.ok) throw new Error('Could not load products');
         const data = await res.json() as { products: ProductRecord[] };
@@ -301,7 +303,7 @@ export default function AdminPanel() {
     setMessages(newMessages);
 
     try {
-      const res = await fetch('/.netlify/functions/admin-chat', {
+      const res = await adminFetch('/.netlify/functions/admin-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: newMessages }),
@@ -345,7 +347,7 @@ export default function AdminPanel() {
     if (!slug) return;
     setMediaLoading(true);
     try {
-      const res = await fetch(`/.netlify/functions/admin-media?slug=${encodeURIComponent(slug)}`);
+      const res = await adminFetch(`/.netlify/functions/admin-media?slug=${encodeURIComponent(slug)}`);
       if (redirectToLoginIfUnauthorized(res)) return;
       if (!res.ok) throw new Error('Could not load media');
       const data = await res.json() as { files: MediaFile[] };
@@ -361,7 +363,7 @@ export default function AdminPanel() {
   async function loadEnquiries() {
     setEnquiriesLoading(true);
     try {
-      const res = await fetch('/.netlify/functions/admin-enquiries');
+      const res = await adminFetch('/.netlify/functions/admin-enquiries');
       if (redirectToLoginIfUnauthorized(res)) return;
       if (!res.ok) throw new Error('Could not load enquiries');
       const data = await res.json() as { enquiries: EnquiryRecord[] };
@@ -376,7 +378,7 @@ export default function AdminPanel() {
 
   async function loadContactConfig() {
     try {
-      const res = await fetch('/.netlify/functions/admin-contact-config');
+      const res = await adminFetch('/.netlify/functions/admin-contact-config');
       if (redirectToLoginIfUnauthorized(res)) return;
       if (!res.ok) throw new Error('Could not load contact config');
       const data = await res.json() as ContactConfig;
@@ -401,7 +403,7 @@ export default function AdminPanel() {
     setEnquiries(prev => prev.map(item => item.id === enquiry.id ? { ...item, leadStatus: next } : item));
     setLeadSaving(enquiry.id);
     try {
-      const res = await fetch('/.netlify/functions/admin-lead-status', {
+      const res = await adminFetch('/.netlify/functions/admin-lead-status', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -436,7 +438,7 @@ export default function AdminPanel() {
     reader.onload = async () => {
       try {
         const base64 = (reader.result as string).split(',')[1];
-        const res = await fetch('/.netlify/functions/admin-media-upload', {
+        const res = await adminFetch('/.netlify/functions/admin-media-upload', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -468,7 +470,7 @@ export default function AdminPanel() {
     if (!ok) return;
     setMediaLoading(true);
     try {
-      const res = await fetch('/.netlify/functions/admin-media', {
+      const res = await adminFetch('/.netlify/functions/admin-media', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key }),
@@ -799,7 +801,7 @@ export default function AdminPanel() {
 
     setDeployStatus('deploying');
     try {
-      const res = await fetch('/.netlify/functions/admin-deploy', {
+      const res = await adminFetch('/.netlify/functions/admin-deploy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ changes: pending }),

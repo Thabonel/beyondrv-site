@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { adminFetch, clearAdminToken } from '../lib/adminApi';
 
 type HealthStatus = 'ready' | 'warning' | 'blocker' | 'unavailable' | 'error';
 
@@ -163,13 +164,20 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
     const controller = new AbortController();
     setLoading(true);
     setError('');
-    fetch(`/.netlify/functions/admin-dashboard?range=${range}`, { signal: controller.signal })
+    adminFetch(`/.netlify/functions/admin-dashboard?range=${range}`, { signal: controller.signal })
       .then(async (res) => {
+        if (res.status === 401) {
+          clearAdminToken();
+          window.location.href = '/.netlify/functions/admin-login';
+          return null;
+        }
         const body = await res.json();
         if (!res.ok) throw new Error(body.error ?? 'Could not load dashboard');
         return body as DashboardData;
       })
-      .then((body) => setData(body))
+      .then((body) => {
+        if (body) setData(body);
+      })
       .catch((err) => {
         if (err.name !== 'AbortError') setError(err instanceof Error ? err.message : 'Could not load dashboard');
       })

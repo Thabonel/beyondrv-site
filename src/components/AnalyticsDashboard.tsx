@@ -3,6 +3,7 @@ import {
   LineChart, Line, BarChart, Bar, PieChart, Pie,
   XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts';
+import { adminFetch, clearAdminToken } from '../lib/adminApi';
 
 interface AnalyticsData {
   range: string;
@@ -47,9 +48,10 @@ export default function AnalyticsDashboard() {
     const controller = new AbortController();
     setLoading(true);
     setError('');
-    fetch(`/.netlify/functions/analytics-data?range=${range}`, { signal: controller.signal })
+    adminFetch(`/.netlify/functions/analytics-data?range=${range}`, { signal: controller.signal })
       .then(async r => {
         if (r.status === 401) {
+          clearAdminToken();
           window.location.href = '/.netlify/functions/admin-login';
           return null;
         }

@@ -41,6 +41,11 @@ export function isAdminAuthorized(event: HandlerEvent) {
     event.headers['X-Admin-Password'];
 
   if (headerPassword === expected) return true;
+  const headerToken =
+    event.headers['x-admin-token'] ??
+    event.headers['X-Admin-Token'];
+
+  if (typeof headerToken === 'string' && isValidAdminToken(headerToken)) return true;
 
   const cookies = parseCookies(event.headers.cookie);
   return isValidAdminToken(cookies[COOKIE_NAME]);

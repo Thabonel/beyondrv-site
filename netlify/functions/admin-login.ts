@@ -15,14 +15,30 @@ function textResponse(statusCode: number, body: string): HandlerResponse {
   return { statusCode, body };
 }
 
-function redirectResponse(location: string, cookie: string): HandlerResponse {
+function successResponse(location: string, token: string, cookie: string): HandlerResponse {
   return {
-    statusCode: 302,
+    statusCode: 200,
     headers: {
-      Location: location,
+      'Content-Type': 'text/html',
+      'Cache-Control': 'no-store',
       'Set-Cookie': cookie,
     },
-    body: '',
+    body: `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Signing in...</title>
+  </head>
+  <body style="background:#0a0a0a;color:#fff;font-family:system-ui,sans-serif">
+    <p>Signing in...</p>
+    <script>
+      localStorage.setItem('brv_admin_token', ${JSON.stringify(token)});
+      window.location.replace(${JSON.stringify(location)});
+    </script>
+    <p><a href="${location}" style="color:#E8540A">Continue to admin</a></p>
+  </body>
+</html>`,
   };
 }
 
@@ -93,8 +109,10 @@ export const handler: Handler = async (event) => {
     return htmlResponse(401, loginPage('Incorrect password.'));
   }
 
-  return redirectResponse(
+  const token = createAdminToken();
+  return successResponse(
     '/admin/',
-    `${COOKIE_NAME}=${encodeURIComponent(createAdminToken())}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=28800`
+    token,
+    `${COOKIE_NAME}=${encodeURIComponent(token)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=28800`
   );
 };
