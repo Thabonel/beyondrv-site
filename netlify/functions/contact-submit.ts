@@ -5,6 +5,7 @@ import { randomUUID } from 'crypto';
 const STORE_NAME = 'customer-enquiries';
 const RESEND_API = 'https://api.resend.com/emails';
 const DEFAULT_TO_EMAIL = 'beyondcaravans@gmail.com';
+const DEFAULT_FROM_EMAIL = 'Beyond RV Website <enquiries@beyondrv.com.au>';
 
 interface EnquiryPayload {
   name?: string;
@@ -51,7 +52,7 @@ async function sendEmail(enquiry: Required<Pick<EnquiryPayload, 'name' | 'email'
   if (!apiKey) return { sent: false, reason: 'RESEND_API_KEY not configured' };
 
   const to = process.env.CONTACT_TO_EMAIL ?? DEFAULT_TO_EMAIL;
-  const from = process.env.CONTACT_FROM_EMAIL ?? 'Beyond RV Website <onboarding@resend.dev>';
+  const from = process.env.CONTACT_FROM_EMAIL ?? DEFAULT_FROM_EMAIL;
   const subject = `New Beyond RV enquiry from ${enquiry.name}`;
   const lines = [
     field('Name', enquiry.name),
