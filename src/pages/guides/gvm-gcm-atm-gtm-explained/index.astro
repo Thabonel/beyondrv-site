@@ -1,0 +1,151 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+const pageUrl = 'https://beyondrv.com.au/guides/gvm-gcm-atm-gtm-explained/';
+const disclaimer = 'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. ByondRV must confirm final suitability before purchase.';
+
+const faqs = [
+  {
+    q: 'What is the difference between GVM and GCM?',
+    a: 'GVM is the maximum legal loaded weight of the vehicle. GCM is the maximum legal combined loaded weight of the vehicle and trailer together.'
+  },
+  {
+    q: 'What is the difference between ATM and GTM?',
+    a: 'ATM is the total loaded caravan weight when it is standing on its own. GTM is the weight on the caravan wheels when the caravan is hitched to the vehicle.'
+  },
+  {
+    q: 'Does tow ball weight count as vehicle payload?',
+    a: 'Yes. Tow ball download pushes down on the vehicle, so it uses part of the vehicle payload and affects GVM, rear axle load and tyre load.'
+  }
+];
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'GVM, GCM, ATM and GTM Explained',
+    url: pageUrl,
+    description: 'Plain-English guide to Australian vehicle and caravan weight terms for slide-on camper and caravan buyers.'
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(item => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: { '@type': 'Answer', text: item.a }
+    }))
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://beyondrv.com.au/' },
+      { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://beyondrv.com.au/guides/' },
+      { '@type': 'ListItem', position: 3, name: 'GVM, GCM, ATM and GTM Explained', item: pageUrl }
+    ]
+  }
+];
+---
+<BaseLayout
+  title="GVM, GCM, ATM and GTM Explained | ByondRV Guide"
+  description="Plain-English Australian guide to GVM, GCM, ATM, GTM, payload, tare, tow ball download and weighbridge weights for camper and caravan buyers."
+  activePath="/vehicle-suitability-checker/"
+  structuredData={schema}
+>
+  <section class="page-hero page-hero--short">
+    <div class="hero-overlay" style="background: rgba(10,10,10,0.48)"></div>
+    <div class="page-hero-content">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Australian Weight Guide</span>
+      </div>
+      <h1 class="hero-title">GVM, GCM, ATM and GTM Explained</h1>
+      <p class="hero-sub">Simple definitions for ute slide-on camper and caravan buyers who want to stay within the right limits.</p>
+    </div>
+  </section>
+
+  <section class="container authority-section">
+    <article class="authority-copy">
+      <h2>The short version</h2>
+      <p>
+        Every vehicle and caravan has limits. The main job is to make sure the real loaded weight stays under every relevant limit at the same time. Passing one limit does not mean the whole setup is suitable.
+      </p>
+      <div class="authority-table-wrap">
+        <table class="authority-table">
+          <thead>
+            <tr>
+              <th>Term</th>
+              <th>Plain-English meaning</th>
+              <th>Why it matters</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>GVM</td>
+              <td>Maximum loaded weight of the vehicle by itself.</td>
+              <td>Passengers, accessories, luggage, tow ball download and a slide-on camper all use GVM.</td>
+            </tr>
+            <tr>
+              <td>GCM</td>
+              <td>Maximum loaded weight of the vehicle and trailer together.</td>
+              <td>A tow vehicle can be under towing capacity but still over GCM.</td>
+            </tr>
+            <tr>
+              <td>ATM</td>
+              <td>Maximum loaded caravan weight when unhitched and standing on its wheels and jockey wheel.</td>
+              <td>This is commonly compared with braked towing capacity.</td>
+            </tr>
+            <tr>
+              <td>GTM</td>
+              <td>Loaded caravan weight carried by the caravan wheels when hitched.</td>
+              <td>Useful for understanding axle and tyre loads on the caravan.</td>
+            </tr>
+            <tr>
+              <td>Payload</td>
+              <td>How much weight can be added before a limit is reached.</td>
+              <td>Real payload is reduced by accessories, passengers, water, tools and gear.</td>
+            </tr>
+            <tr>
+              <td>Tow ball download</td>
+              <td>The downward weight the caravan places on the tow ball.</td>
+              <td>It counts as vehicle load and can push the tow vehicle over GVM or rear axle limits.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Worked example: slide-on camper</h2>
+      <div class="worked-example">
+        <h3>Ute payload check</h3>
+        <p>A ute has a 3350kg GVM and weighs 2400kg on a weighbridge before the camper is fitted. That leaves 950kg before GVM. If passengers, accessories and loaded camper weight add 1000kg, the ute is estimated at 3400kg. That is 50kg over GVM before axle limits are even checked.</p>
+      </div>
+
+      <h2>Worked example: caravan towing</h2>
+      <div class="worked-example">
+        <h3>GCM and ball weight check</h3>
+        <p>A tow vehicle has 3500kg braked towing capacity, but its GCM is 6000kg. If the loaded vehicle is 3000kg and the loaded caravan is 3200kg, the combination is 6200kg. Even though the caravan is under the tow rating, the combination is over GCM.</p>
+      </div>
+
+      <h2>Use the calculators</h2>
+      <p>
+        If you are comparing a <a href="/our-slide-on-campers/">ByondRV slide-on camper</a>, start with the <a href="/slide-on-camper-weight-calculator/">slide-on camper weight calculator</a>. If you are comparing a <a href="/our-caravans/">ByondRV caravan</a>, use the <a href="/caravan-towing-calculator/">caravan towing calculator</a>.
+      </p>
+      <p class="calculator-disclaimer">{disclaimer}</p>
+    </article>
+  </section>
+
+  <section class="authority-section authority-section--dark">
+    <div class="container authority-copy">
+      <h2>Weight terms FAQ</h2>
+      <div class="faq-list">
+        {faqs.map(item => (
+          <details>
+            <summary>{item.q}</summary>
+            <p>{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

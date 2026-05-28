@@ -1,0 +1,286 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const pageUrl = 'https://beyondrv.com.au/slide-on-camper-weight-calculator/';
+const disclaimer = 'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. ByondRV must confirm final suitability before purchase.';
+
+const faqs = [
+  {
+    q: 'What is available payload?',
+    a: 'Available payload is the amount of weight left before your vehicle reaches GVM after you allow for its current weight, passengers, accessories, fuel, water, tools and gear.'
+  },
+  {
+    q: 'Does tray size matter as much as payload?',
+    a: 'Yes. A slide-on camper must suit the physical tray or tub as well as the legal weight limits. Tray length, tray width, centre of gravity and rear overhang all matter.'
+  },
+  {
+    q: 'Should I use tare weight or weighbridge weight?',
+    a: 'Use a current weighbridge weight whenever possible. Tare figures often do not include accessories, tray changes, bull bars, winches, canopies or real touring gear.'
+  }
+];
+
+const products = [
+  { name: 'Advent 2150 Hardtop Ute Slide-On Camper', url: 'https://beyondrv.com.au/advent-2150-hardtop-slide-on/', fit: 'Compact hardtop option for suitable space cab and selected dual cab utes.', dryWeight: 'Manual entry required' },
+  { name: 'Advent 2300 Hardtop Ute Slide-On Camper', url: 'https://beyondrv.com.au/advent-2300-hardtop-slide-on/', fit: 'Mid-size hardtop slide-on for suitable ute tray platforms.', dryWeight: 'Manual entry required' },
+  { name: 'Advent 2450 Hardtop Ute Slide-On Camper', url: 'https://beyondrv.com.au/advent-2450-hardtop-slide-on/', fit: 'Larger hardtop slide-on for vehicles with more tray and payload capacity.', dryWeight: 'Manual entry required' },
+  { name: '7ft Electric Pop-Top Slide-On Camper', url: 'https://beyondrv.com.au/7ft-electric-poptop-slide-on/', fit: 'Lower travel-profile pop-top option for suitable ute platforms.', dryWeight: 'Manual entry required' }
+];
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Slide-On Camper Weight Calculator',
+    url: pageUrl,
+    description: 'Manual Australian payload and GVM calculator for checking whether a ute may suit a ByondRV slide-on camper.'
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(item => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: { '@type': 'Answer', text: item.a }
+    }))
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://beyondrv.com.au/' },
+      { '@type': 'ListItem', position: 2, name: 'Vehicle Suitability Checker', item: 'https://beyondrv.com.au/vehicle-suitability-checker/' },
+      { '@type': 'ListItem', position: 3, name: 'Slide-On Camper Weight Calculator', item: pageUrl }
+    ]
+  },
+  ...products.map(product => ({
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    url: product.url,
+    brand: { '@type': 'Brand', name: 'ByondRV' },
+    category: 'Slide-on camper'
+  }))
+];
+---
+<BaseLayout
+  title="Slide-On Camper Weight Calculator | ByondRV"
+  description="Estimate whether your ute has enough payload, GVM margin and tray size for a ByondRV slide-on camper. Manual Australian calculator for non-technical buyers."
+  activePath="/vehicle-suitability-checker/"
+  structuredData={schema}
+>
+  <section class="page-hero page-hero--short">
+    <div class="hero-overlay" style="background: rgba(10,10,10,0.48)"></div>
+    <div class="page-hero-content">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Slide-On Camper Weight Calculator</span>
+      </div>
+      <h1 class="hero-title">Can Your Ute Carry a Slide-On?</h1>
+      <p class="hero-sub">
+        Enter your own vehicle figures to estimate payload, loaded vehicle weight, GVM margin and which ByondRV slide-on range may be worth discussing.
+      </p>
+    </div>
+  </section>
+
+  <section class="container checker-layout">
+    <div class="checker-panel">
+      <form class="checker-form" id="slideCalculator">
+        <div class="form-field form-field--full">
+          <label class="form-label" for="vehicleName">Vehicle</label>
+          <input class="form-input" id="vehicleName" type="text" value="Example: Ford Ranger dual cab" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="gvm">Vehicle GVM (kg)</label>
+          <input class="form-input" id="gvm" type="number" min="0" value="3350" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="currentWeight">Current vehicle weight before listed accessories (kg)</label>
+          <input class="form-input" id="currentWeight" type="number" min="0" value="2200" />
+          <span class="form-help">If your weighbridge weight already includes accessories, enter 0 for those accessories below.</span>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="passengers">Passengers (kg)</label>
+          <input class="form-input" id="passengers" type="number" min="0" value="180" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="accessories">Accessories already fitted (kg)</label>
+          <input class="form-input" id="accessories" type="number" min="0" value="80" />
+          <span class="form-help">Only include bull bar, winch, canopy, drawers, racks or battery weight not already counted above.</span>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="camperDry">Camper dry weight (kg)</label>
+          <input class="form-input" id="camperDry" type="number" min="0" value="650" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="camperLoad">Water, gas, food and camper gear (kg)</label>
+          <input class="form-input" id="camperLoad" type="number" min="0" value="180" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="trayLength">Tray or tub usable length (mm)</label>
+          <input class="form-input" id="trayLength" type="number" min="0" value="2150" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="trayWidth">Tray or tub usable width (mm)</label>
+          <input class="form-input" id="trayWidth" type="number" min="0" value="1850" />
+        </div>
+      </form>
+      <p class="calculator-disclaimer">{disclaimer}</p>
+    </div>
+
+    <aside class="result-panel" id="resultPanel" data-status="amber" aria-live="polite">
+      <div class="result-status" id="statusLabel">Possible but close to limit</div>
+      <h2 id="resultTitle">Enter your numbers</h2>
+      <p class="result-summary" id="resultSummary">The calculator will estimate your loaded vehicle weight and remaining GVM margin.</p>
+      <div class="result-metrics">
+        <div class="result-metric"><span>Available payload</span><strong id="availablePayload">0 kg</strong></div>
+        <div class="result-metric"><span>Estimated loaded vehicle weight</span><strong id="loadedWeight">0 kg</strong></div>
+        <div class="result-metric"><span>Remaining GVM margin</span><strong id="gvmMargin">0 kg</strong></div>
+        <div class="result-metric"><span>Estimated loaded camper weight</span><strong id="loadedCamper">0 kg</strong></div>
+      </div>
+      <div class="result-recommendation">
+        <strong>ByondRV product recommendation</strong>
+        <p id="recommendation">Manual data required.</p>
+      </div>
+      <ul class="result-notes" id="warningNotes"></ul>
+      <a class="btn-primary" id="sendResult" href="/inquiry-form/?intent=vehicle-suitability">Send this result to ByondRV</a>
+    </aside>
+  </section>
+
+  <section class="authority-section authority-section--dark">
+    <div class="container authority-copy">
+      <h2>How this slide-on camper calculator works</h2>
+      <p>
+        The calculator starts with your vehicle GVM, subtracts the current vehicle weight, then allows for passengers, accessories, the camper dry weight and the loaded camper weight. It also flags tray dimensions because a ute can have enough payload but still be physically unsuitable.
+      </p>
+      <div class="worked-example">
+        <h3>Worked example</h3>
+        <p>A ute with 3350kg GVM and a 2400kg current weighbridge weight has 950kg before it reaches GVM. If passengers, accessories and loaded camper weight add 1130kg, the vehicle is estimated at 3530kg loaded. That is 180kg over GVM, so the result is red.</p>
+      </div>
+      <h2>ByondRV slide-on recommendation table</h2>
+      <div class="authority-table-wrap">
+        <table class="authority-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Typical fit conversation</th>
+              <th>Data needed</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map(product => (
+              <tr>
+                <td><a href={new URL(product.url).pathname}>{product.name}</a></td>
+                <td>{product.fit}</td>
+                <td>{product.dryWeight}, tray size, GVM margin, axle limits and weighbridge result.</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="container authority-section">
+    <div class="authority-copy">
+      <h2>Slide-on camper FAQ</h2>
+      <div class="faq-list">
+        {faqs.map(item => (
+          <details>
+            <summary>{item.q}</summary>
+            <p>{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const form = document.getElementById('slideCalculator');
+  const resultPanel = document.getElementById('resultPanel');
+  const fields = ['vehicleName', 'gvm', 'currentWeight', 'passengers', 'accessories', 'camperDry', 'camperLoad', 'trayLength', 'trayWidth'];
+  const byId = (id) => document.getElementById(id);
+  const num = (id) => Number(byId(id)?.value || 0);
+  const fmt = (value) => `${Math.round(value).toLocaleString()} kg`;
+
+  function setText(id, value) {
+    const el = byId(id);
+    if (el) el.textContent = value;
+  }
+
+  function calculateSlideOn() {
+    const vehicleName = byId('vehicleName')?.value || 'your vehicle';
+    const gvm = num('gvm');
+    const currentWeight = num('currentWeight');
+    const passengers = num('passengers');
+    const accessories = num('accessories');
+    const camperDry = num('camperDry');
+    const camperLoad = num('camperLoad');
+    const trayLength = num('trayLength');
+    const trayWidth = num('trayWidth');
+    const loadedCamper = camperDry + camperLoad;
+    const availablePayload = gvm - currentWeight;
+    const loadedWeight = currentWeight + passengers + accessories + loadedCamper;
+    const gvmMargin = gvm - loadedWeight;
+    const closeLimit = Math.min(150, gvm * 0.05);
+    const physicalWarning = trayLength < 2100 || trayWidth < 1750;
+
+    let status = 'green';
+    let statusLabel = 'Looks suitable';
+    let title = 'Looks suitable on this estimate';
+    if (gvmMargin < 0 || availablePayload <= 0 || physicalWarning) {
+      status = 'red';
+      statusLabel = 'Not recommended';
+      title = 'Not recommended on this estimate';
+    } else if (gvmMargin <= closeLimit) {
+      status = 'amber';
+      statusLabel = 'Possible but close to limit';
+      title = 'Possible, but close to the limit';
+    }
+
+    const recommendation = gvmMargin < 0
+      ? 'A slide-on camper is not recommended from these numbers. Talk to ByondRV before choosing a model, and arrange current weighbridge figures.'
+      : loadedCamper <= 750 && trayLength >= 2100
+        ? 'Start with the Advent 2150 or 7ft Electric Pop-Top conversation, subject to exact dry weight, tray fit, axle limits and ByondRV confirmation.'
+        : loadedCamper <= 950 && trayLength >= 2300
+          ? 'Your figures may suit a mid-size slide-on discussion such as Advent 2300, subject to exact weights and tray fit.'
+          : 'This looks like a higher-payload vehicle conversation. Ask ByondRV to compare Advent 2450, custom slide-on or expedition options against certified weights.';
+
+    const notes = [];
+    if (gvmMargin < 0) notes.push(`Estimated loaded vehicle weight is ${fmt(Math.abs(gvmMargin))} over GVM.`);
+    if (gvmMargin >= 0 && gvmMargin <= closeLimit) notes.push('The GVM margin is small. Small additions like water, tools or recovery gear may change the result.');
+    if (physicalWarning) notes.push('Tray or tub size looks short or narrow for many slide-on campers. Confirm usable tray dimensions with ByondRV.');
+    notes.push('Final checking must include axle limits, tyre ratings, suspension setup and a certified weighbridge result.');
+
+    resultPanel?.setAttribute('data-status', status);
+    setText('statusLabel', statusLabel);
+    setText('resultTitle', title);
+    setText('resultSummary', `${vehicleName} is estimated at ${fmt(loadedWeight)} loaded against a ${fmt(gvm)} GVM.`);
+    setText('availablePayload', fmt(availablePayload));
+    setText('loadedWeight', fmt(loadedWeight));
+    setText('gvmMargin', fmt(gvmMargin));
+    setText('loadedCamper', fmt(loadedCamper));
+    setText('recommendation', recommendation);
+
+    const warningNotes = byId('warningNotes');
+    if (warningNotes) warningNotes.innerHTML = notes.map(note => `<li>${note}</li>`).join('');
+
+    const message = [
+      'Vehicle Suitability Checker result - slide-on camper',
+      `Vehicle: ${vehicleName}`,
+      `Status: ${statusLabel}`,
+      `Available payload: ${fmt(availablePayload)}`,
+      `Estimated loaded vehicle weight: ${fmt(loadedWeight)}`,
+      `Remaining GVM margin: ${fmt(gvmMargin)}`,
+      `Estimated loaded camper weight: ${fmt(loadedCamper)}`,
+      `Tray/tub: ${trayLength}mm long x ${trayWidth}mm wide`,
+      `Recommendation: ${recommendation}`
+    ].join('\n');
+    const send = byId('sendResult');
+    if (send) send.setAttribute('href', `/inquiry-form/?intent=vehicle-suitability&message=${encodeURIComponent(message)}`);
+  }
+
+  fields.forEach(id => byId(id)?.addEventListener('input', calculateSlideOn));
+  form?.addEventListener('submit', (event) => event.preventDefault());
+  calculateSlideOn();
+</script>

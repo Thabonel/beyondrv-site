@@ -1,0 +1,149 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const pageUrl = 'https://beyondrv.com.au/vehicle-suitability-checker/';
+const disclaimer = 'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. ByondRV must confirm final suitability before purchase.';
+
+const faqs = [
+  {
+    q: 'Can this checker confirm my vehicle is legal?',
+    a: 'No. It is an estimate to help you start the conversation. Final suitability must be checked against your exact vehicle variant, compliance plate, manufacturer limits, towbar rating, axle limits, tyre ratings and certified weighbridge weights.'
+  },
+  {
+    q: 'Do I need a GVM upgrade for a slide-on camper?',
+    a: 'Some utes may need a GVM upgrade, but that depends on the vehicle, accessories, passenger load, tray setup and camper weight. A weighbridge result is the best starting point.'
+  },
+  {
+    q: 'What matters most when towing a caravan?',
+    a: 'You need to check GVM, GCM, braked towing capacity, tow ball download, towbar rating, payload and the real loaded weight of the caravan.'
+  }
+];
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Vehicle Suitability Checker',
+    url: pageUrl,
+    description: 'Manual vehicle suitability checker for Australian buyers comparing ByondRV slide-on campers and caravans.'
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(item => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: { '@type': 'Answer', text: item.a }
+    }))
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://beyondrv.com.au/' },
+      { '@type': 'ListItem', position: 2, name: 'Vehicle Suitability Checker', item: pageUrl }
+    ]
+  }
+];
+---
+<BaseLayout
+  title="Vehicle Suitability Checker | ByondRV Australia"
+  description="Check whether your ute may suit a ByondRV slide-on camper or whether your vehicle may tow a ByondRV caravan. Manual Australian GVM, GCM, payload and towing calculator."
+  activePath="/vehicle-suitability-checker/"
+  structuredData={schema}
+>
+  <section class="page-hero page-hero--short">
+    <div class="hero-overlay" style="background: rgba(10,10,10,0.48)"></div>
+    <div class="page-hero-content">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Vehicle Suitability Checker</span>
+      </div>
+      <h1 class="hero-title">Can Your Vehicle Carry or Tow It?</h1>
+      <p class="hero-sub">
+        A plain-English starting point for Australian buyers checking payload, GVM, GCM and towing limits before choosing a ByondRV slide-on camper or caravan.
+      </p>
+    </div>
+  </section>
+
+  <section class="container authority-section">
+    <div class="authority-grid">
+      <a class="authority-card" href="/slide-on-camper-weight-calculator/">
+        <span class="authority-card-kicker">Slide-on camper</span>
+        <h2>Check payload and tray fit</h2>
+        <p>Use this if you drive a ute or tray-back and want to understand whether it may safely carry a ByondRV slide-on camper.</p>
+      </a>
+      <a class="authority-card" href="/caravan-towing-calculator/">
+        <span class="authority-card-kicker">Caravan towing</span>
+        <h2>Check towing and GCM</h2>
+        <p>Use this if you want to tow a ByondRV caravan and need to compare GVM, GCM, tow rating, ball weight and luggage.</p>
+      </a>
+      <a class="authority-card" href="/guides/gvm-gcm-atm-gtm-explained/">
+        <span class="authority-card-kicker">Not sure</span>
+        <h2>Learn the weight terms first</h2>
+        <p>Start with simple explanations of GVM, GCM, ATM, GTM, payload, tare and tow ball download.</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="authority-section authority-section--dark">
+    <div class="container authority-copy">
+      <h2>Why vehicle suitability matters</h2>
+      <p>
+        A camper or caravan can be excellent on paper and still be the wrong match for a specific vehicle. The safe answer depends on the exact vehicle variant, the compliance plate, accessories already fitted, passengers, water, batteries, tools, recovery gear, luggage and real measured weight.
+      </p>
+      <p>
+        This checker asks for manual vehicle data first. It does not connect to an external vehicle database yet, because published figures can vary by model year, engine, cab style, tray, towbar and upgrade history.
+      </p>
+      <div class="calculator-disclaimer">{disclaimer}</div>
+    </div>
+  </section>
+
+  <section class="container authority-section">
+    <div class="authority-copy">
+      <h2>Product starting points</h2>
+      <div class="authority-table-wrap">
+        <table class="authority-table">
+          <thead>
+            <tr>
+              <th>Use case</th>
+              <th>ByondRV range</th>
+              <th>Best next step</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Ute tray or selected dual cab setup</td>
+              <td><a href="/our-slide-on-campers/">Advent and 7ft slide-on campers</a></td>
+              <td>Check available payload, loaded vehicle weight, tray length and tray width.</td>
+            </tr>
+            <tr>
+              <td>Couples off-road touring</td>
+              <td><a href="/our-caravans/">Sunpatch couples caravans</a></td>
+              <td>Check loaded towing mass, GCM, ball download and remaining vehicle payload.</td>
+            </tr>
+            <tr>
+              <td>Larger expedition or truck platform</td>
+              <td><a href="/expedition/">Expedition campers and truck bodies</a></td>
+              <td>Talk to ByondRV with your chassis, wheelbase, axle limits and build goal.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="authority-section authority-section--dark">
+    <div class="container authority-copy">
+      <h2>Vehicle suitability FAQ</h2>
+      <div class="faq-list">
+        {faqs.map(item => (
+          <details>
+            <summary>{item.q}</summary>
+            <p>{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

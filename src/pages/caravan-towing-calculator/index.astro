@@ -1,0 +1,310 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const pageUrl = 'https://beyondrv.com.au/caravan-towing-calculator/';
+const disclaimer = 'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. ByondRV must confirm final suitability before purchase.';
+
+const faqs = [
+  {
+    q: 'Why can a vehicle with 3500kg towing capacity still be unsuitable?',
+    a: 'Because towing capacity is only one limit. You also need to stay within GVM, GCM, tow ball download, towbar rating, axle limits and tyre ratings.'
+  },
+  {
+    q: 'What is tow ball download?',
+    a: 'Tow ball download is the weight the caravan places down onto the tow ball. It counts as load on the vehicle and reduces remaining payload.'
+  },
+  {
+    q: 'Should I use ATM or GTM?',
+    a: 'Use ATM to understand the total loaded caravan weight. GTM is the weight carried by the caravan wheels when hitched. Both are useful, but ATM is commonly used against braked towing capacity.'
+  }
+];
+
+const products = [
+  { name: 'Sunpatch 12C Couples Off-Road Van', url: 'https://beyondrv.com.au/sunpatch-12c-couples-caravan/', atm: '2420kg', ball: '160kg', fit: 'Compact couples van for buyers wanting a lighter towing setup.' },
+  { name: 'Sunpatch 15-XC Couples Off-Road Van', url: 'https://beyondrv.com.au/sunpatch-15xc-couples-offroad-van/', atm: '2500kg', ball: 'Confirm with ByondRV', fit: 'Couples off-road van with more space while staying in a mid-weight towing discussion.' },
+  { name: 'Sunpatch 19-XC Hardtop Couples Off-Road Van', url: 'https://beyondrv.com.au/sunpatch-19xc-hardtop-couples-offroad-van/', atm: 'Confirm with ByondRV', ball: 'Confirm with ByondRV', fit: 'Larger couples hardtop caravan requiring careful tow vehicle matching.' },
+  { name: 'Sunpatch 21-XF Hardtop Family Off-Road Van', url: 'https://beyondrv.com.au/sunpatch-21xf-hardtop-family-offroad-van/', atm: 'Confirm with ByondRV', ball: 'Confirm with ByondRV', fit: 'Family layout requiring the strongest towing and payload checks.' }
+];
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Caravan Towing Calculator',
+    url: pageUrl,
+    description: 'Manual Australian caravan towing calculator for GVM, GCM, braked towing capacity, tow ball download, ATM, GTM, payload and luggage.'
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(item => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: { '@type': 'Answer', text: item.a }
+    }))
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://beyondrv.com.au/' },
+      { '@type': 'ListItem', position: 2, name: 'Vehicle Suitability Checker', item: 'https://beyondrv.com.au/vehicle-suitability-checker/' },
+      { '@type': 'ListItem', position: 3, name: 'Caravan Towing Calculator', item: pageUrl }
+    ]
+  },
+  ...products.map(product => ({
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    url: product.url,
+    brand: { '@type': 'Brand', name: 'ByondRV' },
+    category: 'Off-road caravan'
+  }))
+];
+---
+<BaseLayout
+  title="Caravan Towing Calculator | ByondRV"
+  description="Estimate whether your tow vehicle may safely tow a ByondRV caravan using GVM, GCM, braked towing capacity, tow ball download, ATM, GTM and payload."
+  activePath="/vehicle-suitability-checker/"
+  structuredData={schema}
+>
+  <section class="page-hero page-hero--short">
+    <div class="hero-overlay" style="background: rgba(10,10,10,0.48)"></div>
+    <div class="page-hero-content">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Caravan Towing Calculator</span>
+      </div>
+      <h1 class="hero-title">Can Your Vehicle Tow It?</h1>
+      <p class="hero-sub">
+        Estimate GVM, GCM, tow capacity, tow ball download and caravan payload before choosing a ByondRV off-road caravan.
+      </p>
+    </div>
+  </section>
+
+  <section class="container checker-layout">
+    <div class="checker-panel">
+      <form class="checker-form" id="towCalculator">
+        <div class="form-field form-field--full">
+          <label class="form-label" for="vehicleName">Vehicle</label>
+          <input class="form-input" id="vehicleName" type="text" value="Example: Toyota LandCruiser 300" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="gvm">Vehicle GVM (kg)</label>
+          <input class="form-input" id="gvm" type="number" min="0" value="3280" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="gcm">Vehicle GCM (kg)</label>
+          <input class="form-input" id="gcm" type="number" min="0" value="6750" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="currentWeight">Current vehicle weight before listed accessories (kg)</label>
+          <input class="form-input" id="currentWeight" type="number" min="0" value="2500" />
+          <span class="form-help">If your weighbridge weight already includes accessories or luggage, enter 0 for those items below.</span>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="towCapacity">Braked towing capacity (kg)</label>
+          <input class="form-input" id="towCapacity" type="number" min="0" value="3500" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="towBallLimit">Tow ball or towbar ball limit (kg)</label>
+          <input class="form-input" id="towBallLimit" type="number" min="0" value="350" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="ballDownload">Estimated tow ball download (kg)</label>
+          <input class="form-input" id="ballDownload" type="number" min="0" value="160" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="atm">Caravan ATM or loaded weight (kg)</label>
+          <input class="form-input" id="atm" type="number" min="0" value="2420" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="gtm">Caravan GTM (kg)</label>
+          <input class="form-input" id="gtm" type="number" min="0" value="2260" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="passengers">Passengers in vehicle (kg)</label>
+          <input class="form-input" id="passengers" type="number" min="0" value="180" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="accessories">Vehicle accessories (kg)</label>
+          <input class="form-input" id="accessories" type="number" min="0" value="80" />
+        </div>
+        <div class="form-field form-field--full">
+          <label class="form-label" for="luggage">Vehicle luggage and touring gear (kg)</label>
+          <input class="form-input" id="luggage" type="number" min="0" value="80" />
+        </div>
+      </form>
+      <p class="calculator-disclaimer">{disclaimer}</p>
+    </div>
+
+    <aside class="result-panel" id="resultPanel" data-status="amber" aria-live="polite">
+      <div class="result-status" id="statusLabel">Possible but close to limit</div>
+      <h2 id="resultTitle">Enter your numbers</h2>
+      <p class="result-summary" id="resultSummary">The calculator will estimate loaded vehicle weight, GVM margin, GCM margin and towing margins.</p>
+      <div class="result-metrics">
+        <div class="result-metric"><span>Available payload</span><strong id="availablePayload">0 kg</strong></div>
+        <div class="result-metric"><span>Estimated loaded vehicle weight</span><strong id="loadedVehicle">0 kg</strong></div>
+        <div class="result-metric"><span>Remaining GVM margin</span><strong id="gvmMargin">0 kg</strong></div>
+        <div class="result-metric"><span>Remaining GCM margin</span><strong id="gcmMargin">0 kg</strong></div>
+        <div class="result-metric"><span>Tow capacity margin</span><strong id="towMargin">0 kg</strong></div>
+        <div class="result-metric"><span>Tow ball margin</span><strong id="ballMargin">0 kg</strong></div>
+      </div>
+      <div class="result-recommendation">
+        <strong>ByondRV product recommendation</strong>
+        <p id="recommendation">Manual data required.</p>
+      </div>
+      <ul class="result-notes" id="warningNotes"></ul>
+      <a class="btn-primary" id="sendResult" href="/inquiry-form/?intent=vehicle-suitability">Send this result to ByondRV</a>
+    </aside>
+  </section>
+
+  <section class="authority-section authority-section--dark">
+    <div class="container authority-copy">
+      <h2>How this caravan towing calculator works</h2>
+      <p>
+        The calculator treats tow ball download as load on the vehicle, then checks vehicle GVM, vehicle and caravan combined weight against GCM, caravan ATM against braked towing capacity, and ball download against the entered ball limit.
+      </p>
+      <div class="worked-example">
+        <h3>Worked example</h3>
+        <p>A vehicle weighing 2700kg before passengers and luggage may look strong with 3500kg towing capacity. Add 180kg of passengers, 120kg of accessories, 120kg of luggage and 240kg tow ball download and the loaded vehicle becomes 3360kg. If GVM is 3280kg, the result is red even if the caravan is under the tow rating.</p>
+      </div>
+      <h2>ByondRV caravan recommendation table</h2>
+      <div class="authority-table-wrap">
+        <table class="authority-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Listed ATM / ball guide</th>
+              <th>Typical fit conversation</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map(product => (
+              <tr>
+                <td><a href={new URL(product.url).pathname}>{product.name}</a></td>
+                <td>ATM: {product.atm}<br />Ball: {product.ball}</td>
+                <td>{product.fit}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="container authority-section">
+    <div class="authority-copy">
+      <h2>Caravan towing FAQ</h2>
+      <div class="faq-list">
+        {faqs.map(item => (
+          <details>
+            <summary>{item.q}</summary>
+            <p>{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const form = document.getElementById('towCalculator');
+  const resultPanel = document.getElementById('resultPanel');
+  const fields = ['vehicleName', 'gvm', 'gcm', 'currentWeight', 'towCapacity', 'towBallLimit', 'ballDownload', 'atm', 'gtm', 'passengers', 'accessories', 'luggage'];
+  const byId = (id) => document.getElementById(id);
+  const num = (id) => Number(byId(id)?.value || 0);
+  const fmt = (value) => `${Math.round(value).toLocaleString()} kg`;
+
+  function setText(id, value) {
+    const el = byId(id);
+    if (el) el.textContent = value;
+  }
+
+  function calculateTow() {
+    const vehicleName = byId('vehicleName')?.value || 'your vehicle';
+    const gvm = num('gvm');
+    const gcm = num('gcm');
+    const currentWeight = num('currentWeight');
+    const towCapacity = num('towCapacity');
+    const towBallLimit = num('towBallLimit');
+    const ballDownload = num('ballDownload');
+    const atm = num('atm');
+    const passengers = num('passengers');
+    const accessories = num('accessories');
+    const luggage = num('luggage');
+
+    const availablePayload = gvm - currentWeight;
+    const loadedVehicle = currentWeight + passengers + accessories + luggage + ballDownload;
+    const combinedWeight = loadedVehicle + atm - ballDownload;
+    const gvmMargin = gvm - loadedVehicle;
+    const gcmMargin = gcm - combinedWeight;
+    const towMargin = towCapacity - atm;
+    const ballMargin = towBallLimit - ballDownload;
+    const closeLimit = 150;
+
+    const margins = [gvmMargin, gcmMargin, towMargin, ballMargin];
+    let status = 'green';
+    let statusLabel = 'Looks suitable';
+    let title = 'Looks suitable on this estimate';
+    if (margins.some(value => value < 0)) {
+      status = 'red';
+      statusLabel = 'Not recommended';
+      title = 'Not recommended on this estimate';
+    } else if (margins.some(value => value <= closeLimit)) {
+      status = 'amber';
+      statusLabel = 'Possible but close to limit';
+      title = 'Possible, but close to the limit';
+    }
+
+    const recommendation = status === 'red'
+      ? 'Do not choose a caravan from these numbers without speaking to ByondRV. One or more vehicle, combined, towing or ball limits appear to be exceeded.'
+      : atm <= 2450
+        ? 'Start with the Sunpatch 12C discussion, and confirm the final ATM, ball weight, towbar rating and loaded vehicle weight.'
+        : atm <= 2600
+          ? 'Start with the Sunpatch 15-XC discussion, subject to ByondRV checking your exact vehicle, towbar and loaded weights.'
+          : 'This may require a heavier tow vehicle conversation before considering larger Sunpatch models. Ask ByondRV to review the full towing setup.';
+
+    const notes = [];
+    if (gvmMargin < 0) notes.push(`Estimated loaded vehicle weight is ${fmt(Math.abs(gvmMargin))} over GVM.`);
+    if (gcmMargin < 0) notes.push(`Estimated combined weight is ${fmt(Math.abs(gcmMargin))} over GCM.`);
+    if (towMargin < 0) notes.push(`Estimated caravan ATM is ${fmt(Math.abs(towMargin))} over braked towing capacity.`);
+    if (ballMargin < 0) notes.push(`Estimated tow ball download is ${fmt(Math.abs(ballMargin))} over the entered ball limit.`);
+    if (status === 'amber') notes.push('At least one margin is close. Small changes in water, luggage or accessories may change the result.');
+    notes.push('Check towbar rating, axle limits, tyre ratings and certified weighbridge weights before purchase.');
+
+    resultPanel?.setAttribute('data-status', status);
+    setText('statusLabel', statusLabel);
+    setText('resultTitle', title);
+    setText('resultSummary', `${vehicleName} is estimated at ${fmt(loadedVehicle)} loaded, with a combined towing estimate of ${fmt(combinedWeight)}.`);
+    setText('availablePayload', fmt(availablePayload));
+    setText('loadedVehicle', fmt(loadedVehicle));
+    setText('gvmMargin', fmt(gvmMargin));
+    setText('gcmMargin', fmt(gcmMargin));
+    setText('towMargin', fmt(towMargin));
+    setText('ballMargin', fmt(ballMargin));
+    setText('recommendation', recommendation);
+
+    const warningNotes = byId('warningNotes');
+    if (warningNotes) warningNotes.innerHTML = notes.map(note => `<li>${note}</li>`).join('');
+
+    const message = [
+      'Vehicle Suitability Checker result - caravan towing',
+      `Vehicle: ${vehicleName}`,
+      `Status: ${statusLabel}`,
+      `Available payload: ${fmt(availablePayload)}`,
+      `Estimated loaded vehicle weight: ${fmt(loadedVehicle)}`,
+      `Remaining GVM margin: ${fmt(gvmMargin)}`,
+      `Remaining GCM margin: ${fmt(gcmMargin)}`,
+      `Tow capacity margin: ${fmt(towMargin)}`,
+      `Tow ball margin: ${fmt(ballMargin)}`,
+      `Recommendation: ${recommendation}`
+    ].join('\n');
+    const send = byId('sendResult');
+    if (send) send.setAttribute('href', `/inquiry-form/?intent=vehicle-suitability&message=${encodeURIComponent(message)}`);
+  }
+
+  fields.forEach(id => byId(id)?.addEventListener('input', calculateTow));
+  form?.addEventListener('submit', (event) => event.preventDefault());
+  calculateTow();
+</script>

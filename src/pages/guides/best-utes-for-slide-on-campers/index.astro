@@ -1,0 +1,178 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+const pageUrl = 'https://beyondrv.com.au/guides/best-utes-for-slide-on-campers/';
+const disclaimer = 'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. ByondRV must confirm final suitability before purchase.';
+
+const faqs = [
+  {
+    q: 'Is a dual cab ute suitable for a slide-on camper?',
+    a: 'Some dual cabs may suit a compact slide-on, but many run out of payload or rear axle capacity quickly. Exact variant, tray setup and real loaded weight matter.'
+  },
+  {
+    q: 'Is a space cab or single cab better?',
+    a: 'A space cab or single cab often gives more tray length and payload flexibility, but suitability still depends on the exact vehicle, accessories, axle limits and camper weight.'
+  },
+  {
+    q: 'What information should I send ByondRV?',
+    a: 'Send the vehicle make, model, year, cab style, GVM, axle limits, current weighbridge weight, tray dimensions, accessories and the camper model you are considering.'
+  }
+];
+
+const products = [
+  { name: 'Advent 2150 Hardtop Ute Slide-On Camper', url: 'https://beyondrv.com.au/advent-2150-hardtop-slide-on/', fit: 'Best starting point for many compact ute slide-on conversations.' },
+  { name: 'Advent 2300 Hardtop Ute Slide-On Camper', url: 'https://beyondrv.com.au/advent-2300-hardtop-slide-on/', fit: 'Worth considering when tray length and payload are stronger.' },
+  { name: 'Advent 2450 Hardtop Ute Slide-On Camper', url: 'https://beyondrv.com.au/advent-2450-hardtop-slide-on/', fit: 'Generally needs a more capable tray platform and careful weight checking.' },
+  { name: '7ft Electric Pop-Top Slide-On Camper', url: 'https://beyondrv.com.au/7ft-electric-poptop-slide-on/', fit: 'Useful where a lower travel profile is important, subject to weight and tray fit.' }
+];
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Best Utes for Slide-On Campers',
+    url: pageUrl,
+    description: 'Guide to what makes a ute suitable for a slide-on camper in Australia, including payload, GVM, tray size, axle limits and accessories.'
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(item => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: { '@type': 'Answer', text: item.a }
+    }))
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://beyondrv.com.au/' },
+      { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://beyondrv.com.au/guides/' },
+      { '@type': 'ListItem', position: 3, name: 'Best Utes for Slide-On Campers', item: pageUrl }
+    ]
+  },
+  ...products.map(product => ({
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    url: product.url,
+    brand: { '@type': 'Brand', name: 'ByondRV' },
+    category: 'Slide-on camper'
+  }))
+];
+---
+<BaseLayout
+  title="Best Utes for Slide-On Campers | ByondRV Guide"
+  description="What makes a ute suitable for a slide-on camper in Australia: payload, GVM, tray size, axle limits, accessories, suspension and real weighbridge data."
+  activePath="/vehicle-suitability-checker/"
+  structuredData={schema}
+>
+  <section class="page-hero page-hero--short">
+    <div class="hero-overlay" style="background: rgba(10,10,10,0.48)"></div>
+    <div class="page-hero-content">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Slide-On Camper Guide</span>
+      </div>
+      <h1 class="hero-title">Best Utes for Slide-On Campers</h1>
+      <p class="hero-sub">The best ute is not just the one with the biggest brochure payload. It is the one that still works after real accessories, passengers, tray fit and axle loads are checked.</p>
+    </div>
+  </section>
+
+  <section class="container authority-section">
+    <article class="authority-copy">
+      <h2>What makes a ute suitable?</h2>
+      <p>
+        A good slide-on camper vehicle has enough real payload, enough tray length and width, suitable axle capacity, sensible suspension setup, correctly rated tyres and a tray that supports the camper properly. The exact vehicle variant matters more than the badge on the grille.
+      </p>
+      <ul>
+        <li><strong>Payload:</strong> the ute must carry passengers, accessories, fuel, water, luggage and the loaded camper without exceeding GVM.</li>
+        <li><strong>Tray size:</strong> the camper must physically fit the usable tray or tub area, not just the advertised tray length.</li>
+        <li><strong>Axle limits:</strong> rear axle load is often the hard limit for slide-on camper setups.</li>
+        <li><strong>Accessories:</strong> bull bars, winches, drawers, canopies, long-range tanks and roof racks all reduce payload.</li>
+        <li><strong>Real weight:</strong> a certified weighbridge result is more useful than a brochure tare figure.</li>
+      </ul>
+
+      <h2>Ute styles compared</h2>
+      <div class="authority-table-wrap">
+        <table class="authority-table">
+          <thead>
+            <tr>
+              <th>Ute style</th>
+              <th>Why it can work</th>
+              <th>What to check</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Single cab tray</td>
+              <td>Often gives the best tray length and payload flexibility.</td>
+              <td>Rear axle load, tray construction, camper centre of gravity and final loaded weight.</td>
+            </tr>
+            <tr>
+              <td>Space cab tray</td>
+              <td>Good balance of cab storage, tray length and slide-on practicality.</td>
+              <td>Actual tray length, accessory weight, GVM margin and passenger load.</td>
+            </tr>
+            <tr>
+              <td>Dual cab tray or tub</td>
+              <td>Can work for selected compact campers when the numbers are strong.</td>
+              <td>Payload, rear axle limit, overhang, tray length and how much touring gear is carried.</td>
+            </tr>
+            <tr>
+              <td>Light truck or cab chassis</td>
+              <td>Can provide stronger payload and build flexibility for larger campers.</td>
+              <td>Licensing, dimensions, axle limits, GVM class and intended touring use.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>ByondRV slide-on camper starting points</h2>
+      <div class="authority-table-wrap">
+        <table class="authority-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>When to discuss it</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map(product => (
+              <tr>
+                <td><a href={new URL(product.url).pathname}>{product.name}</a></td>
+                <td>{product.fit}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Worked example: why brochure payload can mislead</h2>
+      <div class="worked-example">
+        <h3>Accessory weight changes everything</h3>
+        <p>A ute may advertise 950kg of payload. After a steel tray, bull bar, winch, drawers, second battery, two passengers and full fuel are allowed for, the real remaining payload can be much lower. That is why a current weighbridge weight is the best starting point before selecting a slide-on camper.</p>
+      </div>
+
+      <p>
+        To check your own numbers, use the <a href="/slide-on-camper-weight-calculator/">slide-on camper weight calculator</a>, then send the result to ByondRV with your tray dimensions and vehicle details.
+      </p>
+      <p class="calculator-disclaimer">{disclaimer}</p>
+    </article>
+  </section>
+
+  <section class="authority-section authority-section--dark">
+    <div class="container authority-copy">
+      <h2>Best utes for slide-on campers FAQ</h2>
+      <div class="faq-list">
+        {faqs.map(item => (
+          <details>
+            <summary>{item.q}</summary>
+            <p>{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
