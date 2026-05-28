@@ -16,7 +16,7 @@ const faqs = [
   },
   {
     q: 'What matters most when towing a caravan?',
-    a: 'You need to check GVM, GCM, braked towing capacity, tow ball download, towbar rating, payload and the real loaded weight of the caravan.'
+    a: 'You need to check GVM, GCM, braked towing capacity, tow ball download, towbar rating, axle limits, tyre ratings, payload and the real loaded weight of the caravan.'
   }
 ];
 
@@ -99,7 +99,25 @@ const schema = [
       <p>
         This checker asks for manual vehicle data first. It does not connect to an external vehicle database yet, because published figures can vary by model year, engine, cab style, tray, towbar and upgrade history.
       </p>
+      <p>
+        Use the lowest applicable rating when figures differ. For towing, that can mean the vehicle rating, towbar rating, tow ball rating, caravan ATM or GCM limit. For carrying a slide-on, it means the vehicle GVM, axle ratings, tyre ratings, tray rating and the real measured loaded weight all matter at the same time.
+      </p>
       <div class="calculator-disclaimer">{disclaimer}</div>
+    </div>
+  </section>
+
+  <section class="container authority-section">
+    <div class="authority-copy">
+      <h2>Official limits this checker is based on</h2>
+      <p>
+        The checker follows Australian weight terms used by government transport guidance. GVM and GCM are manufacturer or approval limits for the vehicle. ATM and GTM are trailer manufacturer limits. Tow ball download is vehicle load, so it affects payload, GVM, rear axle load and tyre load.
+      </p>
+      <ul class="authority-source-list">
+        <li><a href="https://www.infrastructure.gov.au/infrastructure-transport-vehicles/vehicles/road-vehicle-standards-laws/guides-and-resources/rvs-legislation-glossary-terms">Australian Government RVS glossary</a> for ATM and GTM definitions.</li>
+        <li><a href="https://www.infrastructure.gov.au/department/media/publications/vehicle-standards-bulletin-1-revision-6-trailers-aggregate-trailer-mass-45-tonnes-or-less">Vehicle Standards Bulletin 1</a> for low ATM trailer requirements and trailer ratings.</li>
+        <li><a href="https://www.nhvr.gov.au/road-access/mass-and-dimension/mass-limits/manufacturers-mass-limits">NHVR manufacturer mass limits</a> for GVM, GCM and component rating principles.</li>
+        <li><a href="https://www.transport.wa.gov.au/licensing/vehicle/safety-standards-security/gvm-and-gcm-faqs">WA Department of Transport GVM and GCM FAQs</a> for practical towing definitions and the warning that towing capacity may not be usable when the vehicle is loaded.</li>
+      </ul>
     </div>
   </section>
 

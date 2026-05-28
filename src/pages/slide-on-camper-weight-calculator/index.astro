@@ -99,9 +99,9 @@ const schema = [
           <input class="form-input" id="gvm" type="number" min="0" value="3350" />
         </div>
         <div class="form-field">
-          <label class="form-label" for="currentWeight">Current vehicle weight before listed accessories (kg)</label>
+          <label class="form-label" for="currentWeight">Current vehicle weight before listed additions (kg)</label>
           <input class="form-input" id="currentWeight" type="number" min="0" value="2200" />
-          <span class="form-help">If your weighbridge weight already includes accessories, enter 0 for those accessories below.</span>
+          <span class="form-help">Use a current weighbridge weight if possible. If it already includes passengers or accessories, enter 0 for those items below.</span>
         </div>
         <div class="form-field">
           <label class="form-label" for="passengers">Passengers (kg)</label>
@@ -156,6 +156,9 @@ const schema = [
       <h2>How this slide-on camper calculator works</h2>
       <p>
         The calculator starts with your vehicle GVM, subtracts the current vehicle weight, then allows for passengers, accessories, the camper dry weight and the loaded camper weight. It also flags tray dimensions because a ute can have enough payload but still be physically unsuitable.
+      </p>
+      <p>
+        This is a GVM and fit estimate only. Final suitability also depends on axle ratings, tyre ratings, tray or tub rating, mounting method, load distribution, suspension setup and certified weighbridge results.
       </p>
       <div class="worked-example">
         <h3>Worked example</h3>

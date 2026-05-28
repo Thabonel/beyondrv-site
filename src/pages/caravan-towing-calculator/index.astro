@@ -9,7 +9,7 @@ const disclaimer = 'This tool provides an estimate only. Final suitability depen
 const faqs = [
   {
     q: 'Why can a vehicle with 3500kg towing capacity still be unsuitable?',
-    a: 'Because towing capacity is only one limit. You also need to stay within GVM, GCM, tow ball download, towbar rating, axle limits and tyre ratings.'
+    a: 'Because towing capacity is only one limit. A vehicle can be under its braked towing capacity but still exceed GVM, GCM, tow ball download, towbar rating, axle limits or tyre ratings.'
   },
   {
     q: 'What is tow ball download?',
@@ -17,7 +17,7 @@ const faqs = [
   },
   {
     q: 'Should I use ATM or GTM?',
-    a: 'Use ATM to understand the total loaded caravan weight. GTM is the weight carried by the caravan wheels when hitched. Both are useful, but ATM is commonly used against braked towing capacity.'
+    a: 'Use ATM to check the loaded caravan against the vehicle braked towing capacity. Use GTM, or a measured estimate of the weight on the caravan wheels when hitched, for the combined GCM check.'
   }
 ];
 
@@ -103,13 +103,14 @@ const schema = [
           <input class="form-input" id="gcm" type="number" min="0" value="6750" />
         </div>
         <div class="form-field">
-          <label class="form-label" for="currentWeight">Current vehicle weight before listed accessories (kg)</label>
+          <label class="form-label" for="currentWeight">Current vehicle weight before listed additions (kg)</label>
           <input class="form-input" id="currentWeight" type="number" min="0" value="2500" />
-          <span class="form-help">If your weighbridge weight already includes accessories or luggage, enter 0 for those items below.</span>
+          <span class="form-help">Use a current weighbridge weight if possible. If it already includes accessories, luggage or passengers, enter 0 for those items below.</span>
         </div>
         <div class="form-field">
-          <label class="form-label" for="towCapacity">Braked towing capacity (kg)</label>
+          <label class="form-label" for="towCapacity">Braked towing capacity or towbar limit (kg)</label>
           <input class="form-input" id="towCapacity" type="number" min="0" value="3500" />
+          <span class="form-help">Enter the lower figure if your towbar rating is lower than the vehicle braked towing capacity.</span>
         </div>
         <div class="form-field">
           <label class="form-label" for="towBallLimit">Tow ball or towbar ball limit (kg)</label>
@@ -124,8 +125,9 @@ const schema = [
           <input class="form-input" id="atm" type="number" min="0" value="2420" />
         </div>
         <div class="form-field">
-          <label class="form-label" for="gtm">Caravan GTM (kg)</label>
+          <label class="form-label" for="gtm">Caravan GTM or loaded wheel mass (kg)</label>
           <input class="form-input" id="gtm" type="number" min="0" value="2260" />
+          <span class="form-help">Use the plate GTM if checking the rated limit. Use a measured wheel load if checking a real loaded trip.</span>
         </div>
         <div class="form-field">
           <label class="form-label" for="passengers">Passengers in vehicle (kg)</label>
@@ -168,11 +170,11 @@ const schema = [
     <div class="container authority-copy">
       <h2>How this caravan towing calculator works</h2>
       <p>
-        The calculator treats tow ball download as load on the vehicle, then checks vehicle GVM, vehicle and caravan combined weight against GCM, caravan ATM against braked towing capacity, and ball download against the entered ball limit.
+        The calculator treats tow ball download as load on the vehicle, checks the vehicle against GVM, checks the vehicle plus caravan wheel load against GCM, compares caravan ATM against braked towing capacity, and compares ball download against the entered ball limit.
       </p>
       <div class="worked-example">
         <h3>Worked example</h3>
-        <p>A vehicle weighing 2700kg before passengers and luggage may look strong with 3500kg towing capacity. Add 180kg of passengers, 120kg of accessories, 120kg of luggage and 240kg tow ball download and the loaded vehicle becomes 3360kg. If GVM is 3280kg, the result is red even if the caravan is under the tow rating.</p>
+        <p>A vehicle weighing 2700kg before passengers and luggage may look strong with 3500kg towing capacity. Add 180kg of passengers, 120kg of accessories, 120kg of luggage and 240kg tow ball download and the loaded vehicle becomes 3360kg. If GVM is 3280kg, the result is red even if the caravan ATM is under the braked towing rating.</p>
       </div>
       <h2>ByondRV caravan recommendation table</h2>
       <div class="authority-table-wrap">
@@ -235,13 +237,15 @@ const schema = [
     const towBallLimit = num('towBallLimit');
     const ballDownload = num('ballDownload');
     const atm = num('atm');
+    const gtm = num('gtm');
     const passengers = num('passengers');
     const accessories = num('accessories');
     const luggage = num('luggage');
 
     const availablePayload = gvm - currentWeight;
     const loadedVehicle = currentWeight + passengers + accessories + luggage + ballDownload;
-    const combinedWeight = loadedVehicle + atm - ballDownload;
+    const trailerWheelLoad = gtm > 0 ? gtm : Math.max(0, atm - ballDownload);
+    const combinedWeight = loadedVehicle + trailerWheelLoad;
     const gvmMargin = gvm - loadedVehicle;
     const gcmMargin = gcm - combinedWeight;
     const towMargin = towCapacity - atm;
@@ -276,6 +280,7 @@ const schema = [
     if (towMargin < 0) notes.push(`Estimated caravan ATM is ${fmt(Math.abs(towMargin))} over braked towing capacity.`);
     if (ballMargin < 0) notes.push(`Estimated tow ball download is ${fmt(Math.abs(ballMargin))} over the entered ball limit.`);
     if (status === 'amber') notes.push('At least one margin is close. Small changes in water, luggage or accessories may change the result.');
+    notes.push('GCM is estimated from the loaded vehicle, including ball download, plus the entered GTM or loaded caravan wheel mass.');
     notes.push('Check towbar rating, axle limits, tyre ratings and certified weighbridge weights before purchase.');
 
     resultPanel?.setAttribute('data-status', status);
@@ -303,6 +308,7 @@ const schema = [
       `Remaining GCM margin: ${fmt(gcmMargin)}`,
       `Tow capacity margin: ${fmt(towMargin)}`,
       `Tow ball margin: ${fmt(ballMargin)}`,
+      `Caravan wheel load used for GCM: ${fmt(trailerWheelLoad)}`,
       `Recommendation: ${recommendation}`
     ].join('\n');
     const send = byId('sendResult');

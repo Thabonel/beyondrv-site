@@ -9,11 +9,11 @@ const disclaimer = 'This tool provides an estimate only. Final suitability depen
 const faqs = [
   {
     q: 'What is the difference between GVM and GCM?',
-    a: 'GVM is the maximum legal loaded weight of the vehicle. GCM is the maximum legal combined loaded weight of the vehicle and trailer together.'
+    a: 'GVM is the maximum loaded mass of the vehicle specified by the manufacturer or approval authority. GCM is the maximum allowed combination mass of the vehicle and trailer together.'
   },
   {
     q: 'What is the difference between ATM and GTM?',
-    a: 'ATM is the total loaded caravan weight when it is standing on its own. GTM is the weight on the caravan wheels when the caravan is hitched to the vehicle.'
+    a: 'ATM is the total loaded trailer mass including the mass imposed on the tow vehicle. GTM is the mass carried by the trailer wheels when the trailer is coupled to the tow vehicle.'
   },
   {
     q: 'Does tow ball weight count as vehicle payload?',
@@ -88,23 +88,23 @@ const schema = [
           <tbody>
             <tr>
               <td>GVM</td>
-              <td>Maximum loaded weight of the vehicle by itself.</td>
+              <td>Maximum loaded mass of the vehicle as specified by the manufacturer or approval authority.</td>
               <td>Passengers, accessories, luggage, tow ball download and a slide-on camper all use GVM.</td>
             </tr>
             <tr>
               <td>GCM</td>
-              <td>Maximum loaded weight of the vehicle and trailer together.</td>
-              <td>A tow vehicle can be under towing capacity but still over GCM.</td>
+              <td>Maximum allowed combined mass of the loaded vehicle and trailer combination.</td>
+              <td>A tow vehicle can be under braked towing capacity but still over GCM.</td>
             </tr>
             <tr>
               <td>ATM</td>
-              <td>Maximum loaded caravan weight when unhitched and standing on its wheels and jockey wheel.</td>
-              <td>This is commonly compared with braked towing capacity.</td>
+              <td>Maximum loaded trailer mass, including the mass imposed on the tow vehicle through the coupling.</td>
+              <td>This is commonly compared with braked towing capacity and the caravan's own rating.</td>
             </tr>
             <tr>
               <td>GTM</td>
-              <td>Loaded caravan weight carried by the caravan wheels when hitched.</td>
-              <td>Useful for understanding axle and tyre loads on the caravan.</td>
+              <td>Maximum loaded trailer mass carried by the trailer wheels when coupled to the tow vehicle.</td>
+              <td>Useful for checking trailer axle/tyre loading and estimating GCM without double-counting ball download.</td>
             </tr>
             <tr>
               <td>Payload</td>
@@ -129,8 +129,19 @@ const schema = [
       <h2>Worked example: caravan towing</h2>
       <div class="worked-example">
         <h3>GCM and ball weight check</h3>
-        <p>A tow vehicle has 3500kg braked towing capacity, but its GCM is 6000kg. If the loaded vehicle is 3000kg and the loaded caravan is 3200kg, the combination is 6200kg. Even though the caravan is under the tow rating, the combination is over GCM.</p>
+        <p>A tow vehicle has 3500kg braked towing capacity, but its GCM is 6000kg. If the loaded vehicle is 3000kg including tow ball download, and the caravan has 3200kg on its wheels while hitched, the combination is 6200kg. Even though the caravan ATM may be under the tow rating, the combination is over GCM.</p>
       </div>
+
+      <h2>Authoritative Australian sources</h2>
+      <p>
+        These definitions align with Australian government terminology for vehicle and trailer masses. They are still simplified for buyers, so always check the exact compliance plate, manufacturer specifications and weighbridge result for your own setup.
+      </p>
+      <ul class="authority-source-list">
+        <li><a href="https://www.infrastructure.gov.au/infrastructure-transport-vehicles/vehicles/road-vehicle-standards-laws/guides-and-resources/rvs-legislation-glossary-terms">Australian Government RVS glossary</a> for ATM and GTM definitions.</li>
+        <li><a href="https://www.infrastructure.gov.au/department/media/publications/vehicle-standards-bulletin-1-revision-6-trailers-aggregate-trailer-mass-45-tonnes-or-less">Vehicle Standards Bulletin 1</a> for low ATM trailer guidance.</li>
+        <li><a href="https://www.nhvr.gov.au/road-access/mass-and-dimension/mass-limits/manufacturers-mass-limits">NHVR manufacturer mass limits</a> for GVM, GCM and component ratings.</li>
+        <li><a href="https://www.transport.wa.gov.au/licensing/vehicle/safety-standards-security/gvm-and-gcm-faqs">WA Department of Transport GVM and GCM FAQs</a> for practical towing definitions.</li>
+      </ul>
 
       <h2>Use the calculators</h2>
       <p>

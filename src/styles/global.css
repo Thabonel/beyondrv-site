@@ -1154,6 +1154,15 @@ nav.scrolled {
   font-size: 0.86rem;
   line-height: 1.65;
 }
+.authority-source-list {
+  margin: 1rem 0 0;
+  padding-left: 1.2rem;
+  color: #d8d8d8;
+  line-height: 1.75;
+}
+.authority-source-list a {
+  color: var(--orange);
+}
 .result-panel {
   position: sticky;
   top: calc(var(--nav-height) + 1rem);
