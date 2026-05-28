@@ -1,7 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { displayImageUrl } from '../../lib/media';
 
 const pageUrl = 'https://beyondrv.com.au/caravan-towing-calculator/';
+const heroImage = '/images/optimized/products/sunpatch-12c-couples-caravan/01-sunpatch-12c-couples-caravan-hero.webp';
 const disclaimer = 'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. ByondRV must confirm final suitability before purchase.';
 
 const faqs = [
@@ -65,11 +67,14 @@ const schema = [
 <BaseLayout
   title="Caravan Towing Calculator | ByondRV"
   description="Estimate whether your tow vehicle may safely tow a ByondRV caravan using GVM, GCM, braked towing capacity, tow ball download, ATM, GTM and payload."
+  image={heroImage}
   activePath="/vehicle-suitability-checker/"
   structuredData={schema}
 >
   <section class="page-hero page-hero--short">
-    <div class="hero-overlay" style="background: rgba(10,10,10,0.48)"></div>
+    <div class="page-hero-bg" style={`background-image: url('${displayImageUrl(heroImage, 1600)}')`}></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-overlay-bottom"></div>
     <div class="page-hero-content">
       <div class="section-eyebrow">
         <div class="section-eyebrow-line"></div>

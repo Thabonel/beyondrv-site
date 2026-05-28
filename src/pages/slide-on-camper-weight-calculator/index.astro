@@ -1,7 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { displayImageUrl } from '../../lib/media';
 
 const pageUrl = 'https://beyondrv.com.au/slide-on-camper-weight-calculator/';
+const heroImage = '/images/site/homepage-slide-on-campers.webp';
 const disclaimer = 'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. ByondRV must confirm final suitability before purchase.';
 
 const faqs = [
@@ -65,11 +67,14 @@ const schema = [
 <BaseLayout
   title="Slide-On Camper Weight Calculator | ByondRV"
   description="Estimate whether your ute has enough payload, GVM margin and tray size for a ByondRV slide-on camper. Manual Australian calculator for non-technical buyers."
+  image={heroImage}
   activePath="/vehicle-suitability-checker/"
   structuredData={schema}
 >
   <section class="page-hero page-hero--short">
-    <div class="hero-overlay" style="background: rgba(10,10,10,0.48)"></div>
+    <div class="page-hero-bg" style={`background-image: url('${displayImageUrl(heroImage, 1600)}')`}></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-overlay-bottom"></div>
     <div class="page-hero-content">
       <div class="section-eyebrow">
         <div class="section-eyebrow-line"></div>
