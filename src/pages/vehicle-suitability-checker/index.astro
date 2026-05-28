@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const pageUrl = 'https://beyondrv.com.au/vehicle-suitability-checker/';
+const heroImage = '/images/site/vehicle-suitability-hero.jpg';
 const disclaimer = 'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. ByondRV must confirm final suitability before purchase.';
 
 const faqs = [
@@ -49,11 +50,14 @@ const schema = [
 <BaseLayout
   title="Vehicle Suitability Checker | ByondRV Australia"
   description="Check whether your ute may suit a ByondRV slide-on camper or whether your vehicle may tow a ByondRV caravan. Manual Australian GVM, GCM, payload and towing calculator."
+  image={heroImage}
   activePath="/vehicle-suitability-checker/"
   structuredData={schema}
 >
   <section class="page-hero page-hero--short">
-    <div class="hero-overlay" style="background: rgba(10,10,10,0.48)"></div>
+    <div class="page-hero-bg" style={`background-image: url('${heroImage}')`}></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-overlay-bottom"></div>
     <div class="page-hero-content">
       <div class="section-eyebrow">
         <div class="section-eyebrow-line"></div>
