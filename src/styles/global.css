@@ -133,14 +133,14 @@ nav.scrolled {
   position: absolute; inset: 0;
   background: linear-gradient(
     to right,
-    rgba(10,10,10,0.92) 0%,
-    rgba(10,10,10,0.7) 45%,
-    rgba(10,10,10,0.2) 100%
+    rgba(10,10,10,0.46) 0%,
+    rgba(10,10,10,0.35) 45%,
+    rgba(10,10,10,0.1) 100%
   );
 }
 .hero-overlay-bottom {
   position: absolute; bottom: 0; left: 0; right: 0; height: 280px;
-  background: linear-gradient(to top, var(--black) 0%, transparent 100%);
+  background: linear-gradient(to top, rgba(10,10,10,0.5) 0%, transparent 100%);
 }
 
 .hero-content {
@@ -228,7 +228,7 @@ nav.scrolled {
 .page-hero-bg {
   position: absolute; inset: 0;
   background-size: cover; background-position: center; background-repeat: no-repeat;
-  filter: brightness(0.4);
+  filter: brightness(0.7);
 }
 .page-hero-content {
   position: relative; z-index: 2;
