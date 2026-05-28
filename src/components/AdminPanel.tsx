@@ -241,7 +241,7 @@ function slugifyTitle(title: string) {
 
 function adminImageUrl(src: string) {
   if (!src) return '';
-  if (src.startsWith('/images/optimized/')) return src.replace(/\.webp$/, '-480.webp');
+  if (src.startsWith('/images/optimized/')) return src;
   if (src.startsWith('/images/products/')) return src;
   return `/.netlify/images?url=${encodeURIComponent(src)}&w=800&fit=cover`;
 }
