@@ -174,6 +174,19 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
           decoding="async"
           fetchpriority="high"
         />
+        {galleryImages.length > 1 && (
+          <div class="product-gallery-controls" aria-label={`${data.title} gallery navigation`}>
+            <button class="gallery-nav-btn gallery-nav-prev" type="button" aria-label="Previous photo" data-gallery-prev>
+              ‹
+            </button>
+            <span class="gallery-count" aria-live="polite">
+              <span data-gallery-current>1</span> / {galleryImages.length}
+            </span>
+            <button class="gallery-nav-btn gallery-nav-next" type="button" aria-label="Next photo" data-gallery-next>
+              ›
+            </button>
+          </div>
+        )}
       </div>
       {data.gallery.length > 0 && (
         <div class="product-gallery-thumbs">
@@ -369,16 +382,42 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
 </BaseLayout>
 
 <script>
-  document.querySelectorAll<HTMLButtonElement>('.thumb-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const heroImg = document.getElementById('productHeroImg') as HTMLImageElement | null;
-      if (heroImg && btn.dataset.src) {
-        heroImg.src = btn.dataset.src;
-        if (btn.dataset.srcset) heroImg.srcset = btn.dataset.srcset;
-      }
-      document.querySelectorAll('.thumb-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    });
+  const heroImg = document.getElementById('productHeroImg') as HTMLImageElement | null;
+  const thumbButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.thumb-btn'));
+  const galleryCurrent = document.querySelector<HTMLElement>('[data-gallery-current]');
+  let activeGalleryIndex = Math.max(0, thumbButtons.findIndex(btn => btn.classList.contains('active')));
+
+  function showGalleryImage(index: number) {
+    if (!heroImg || thumbButtons.length === 0) return;
+
+    const nextIndex = (index + thumbButtons.length) % thumbButtons.length;
+    const nextButton = thumbButtons[nextIndex];
+    if (!nextButton?.dataset.src) return;
+
+    heroImg.src = nextButton.dataset.src;
+    if (nextButton.dataset.srcset) heroImg.srcset = nextButton.dataset.srcset;
+
+    thumbButtons.forEach(btn => btn.classList.remove('active'));
+    nextButton.classList.add('active');
+    activeGalleryIndex = nextIndex;
+    if (galleryCurrent) galleryCurrent.textContent = String(nextIndex + 1);
+  }
+
+  thumbButtons.forEach((btn, index) => {
+    btn.addEventListener('click', () => showGalleryImage(index));
+  });
+
+  document.querySelector<HTMLButtonElement>('[data-gallery-prev]')?.addEventListener('click', () => {
+    showGalleryImage(activeGalleryIndex - 1);
+  });
+
+  document.querySelector<HTMLButtonElement>('[data-gallery-next]')?.addEventListener('click', () => {
+    showGalleryImage(activeGalleryIndex + 1);
+  });
+
+  document.querySelector<HTMLElement>('.product-gallery-main')?.addEventListener('keydown', event => {
+    if (event.key === 'ArrowLeft') showGalleryImage(activeGalleryIndex - 1);
+    if (event.key === 'ArrowRight') showGalleryImage(activeGalleryIndex + 1);
   });
 
   document.querySelectorAll<HTMLButtonElement>('.faq-question').forEach(btn => {
