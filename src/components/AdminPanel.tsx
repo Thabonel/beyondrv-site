@@ -282,8 +282,8 @@ function isValidYouTubeVideoId(id: string) {
   return /^[a-zA-Z0-9_-]{6,20}$/.test(id);
 }
 
-function youtubeWatchUrl(id?: string) {
-  return id ? `https://www.youtube.com/watch?v=${id}` : '';
+function youtubeWatchUrl(id?: string, startSeconds?: number) {
+  return id ? `https://www.youtube.com/watch?v=${id}${startSeconds ? `&t=${startSeconds}s` : ''}` : '';
 }
 
 function youtubeThumbnailUrl(id?: string) {
@@ -928,7 +928,7 @@ export default function AdminPanel() {
       heroImage: product.heroImage ?? '',
       galleryText: (product.gallery ?? []).join('\n'),
       relatedSlugs: product.relatedSlugs ?? [],
-      youtubeVideoUrl: youtubeWatchUrl(product.youtubeVideo?.id),
+      youtubeVideoUrl: youtubeWatchUrl(product.youtubeVideo?.id, product.youtubeVideo?.startSeconds),
       youtubeVideoTitle: product.youtubeVideo?.title ?? '',
       youtubeVideoDescription: product.youtubeVideo?.description ?? '',
       youtubeVideoThumbnail: product.youtubeVideo?.thumbnail ?? '',
@@ -1033,36 +1033,55 @@ export default function AdminPanel() {
       return;
     }
 
-    const videoInstructions = videoId
-      ? `New youtubeVideo frontmatter:\n` +
-        `id: ${videoId}\n` +
-        `title: ${editProduct.youtubeVideoTitle.trim()}\n` +
-        `description: ${editProduct.youtubeVideoDescription.trim() || 'None'}\n` +
-        `thumbnail: ${editProduct.youtubeVideoThumbnail.trim() || youtubeThumbnailUrl(videoId)}\n` +
-        `uploadDate: ${editProduct.youtubeVideoUploadDate.trim() || 'None'}\n` +
-        `duration: ${editProduct.youtubeVideoDuration.trim() || 'None'}\n` +
-        `transcriptSummary: ${editProduct.youtubeVideoTranscriptSummary.trim() || 'None'}`
-      : `New youtubeVideo frontmatter: None. Remove any existing youtubeVideo block from this product if present.`;
-
     setActiveTab('pending');
-    sendMessage(
-      `Update this existing product using these structured fields only, preserving all specs, SEO fields, and body copy unless the notes explicitly say otherwise.\n\n` +
-      `Product slug: ${editProduct.slug}\n` +
-      `File to read first: src/content/products/${editProduct.slug}.md\n\n` +
-      `New title: ${editProduct.title.trim()}\n` +
-      `New price: ${editProduct.price.trim()}\n` +
-      `New status: ${editProduct.status}\n` +
-      `New onSale: ${editProduct.onSale}\n` +
-      `New featured: ${editProduct.featured}\n` +
-      `New tagline: ${editProduct.tagline.trim()}\n` +
-      `New heroImage: ${editProduct.heroImage.trim()}\n` +
-      `New gallery order, one image per line:\n${gallery.join('\n')}\n\n` +
-      `New relatedSlugs:\n${editProduct.relatedSlugs.length ? editProduct.relatedSlugs.join('\n') : 'None'}\n\n` +
-      `${videoInstructions}\n\n` +
-      `Additional owner notes:\n${editProduct.notes.trim() || 'None'}\n\n` +
-      `Queue one complete-file change for review. Keep the gallery in exactly the order provided, store only the clean YouTube video ID in youtubeVideo.id, and do not invent product specs, image URLs, or video metadata.`
-    );
-    setEditProduct(null);
+    setLoading(true);
+    adminFetch('/.netlify/functions/admin-product-edit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        slug: editProduct.slug,
+        title: editProduct.title.trim(),
+        price: editProduct.price.trim(),
+        status: editProduct.status,
+        onSale: editProduct.onSale,
+        featured: editProduct.featured,
+        tagline: editProduct.tagline.trim(),
+        heroImage: editProduct.heroImage.trim(),
+        gallery,
+        relatedSlugs: editProduct.relatedSlugs,
+        youtubeVideo: videoId
+          ? {
+              url: editProduct.youtubeVideoUrl.trim(),
+              title: editProduct.youtubeVideoTitle.trim(),
+              description: editProduct.youtubeVideoDescription.trim(),
+              thumbnail: editProduct.youtubeVideoThumbnail.trim(),
+              uploadDate: editProduct.youtubeVideoUploadDate.trim(),
+              duration: editProduct.youtubeVideoDuration.trim(),
+              transcriptSummary: editProduct.youtubeVideoTranscriptSummary.trim(),
+            }
+          : null,
+      }),
+    })
+      .then(async res => {
+        if (redirectToLoginIfUnauthorized(res)) return;
+        const data = await res.json() as { pendingChange?: PendingChange; error?: string };
+        if (!res.ok || !data.pendingChange) throw new Error(data.error ?? 'Could not queue product edit');
+        setPending(prev => {
+          const existing = prev.findIndex(change => change.path === data.pendingChange!.path);
+          if (existing >= 0) {
+            const next = [...prev];
+            next[existing] = data.pendingChange!;
+            return next;
+          }
+          return [...prev, data.pendingChange!];
+        });
+        setMessages(prev => [...prev, { role: 'assistant', content: `${editProduct.title.trim()} edit queued. Open Pending to review and deploy it.` }]);
+        setEditProduct(null);
+      })
+      .catch(err => {
+        setMessages(prev => [...prev, { role: 'assistant', content: err instanceof Error ? err.message : 'Could not queue product edit.' }]);
+      })
+      .finally(() => setLoading(false));
   }
 
   function queueNewProduct() {
