@@ -816,6 +816,20 @@ nav.scrolled {
   color: var(--muted); margin-top: 0.25rem;
 }
 
+.about-clean-photo {
+  background: var(--dark);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 0 var(--gutter) 5rem;
+}
+.about-clean-photo img {
+  width: 100%;
+  max-height: 72vh;
+  object-fit: contain;
+  display: block;
+  background: var(--dark);
+}
+
 /* ─── PROCESS ─── */
 .process {
   padding: 8rem var(--gutter);

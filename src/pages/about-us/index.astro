@@ -10,7 +10,7 @@ const schema = {
   "description": "Beyond RV builds slide-on campers, truck campers, and expedition vehicles in Mutdapilly, Queensland. Australian-owned, ADR-compliant builds for serious adventurers."
 };
 const heroImage = '/images/site/about-hero.webp';
-const storyImage = '/images/optimized/products/advent-2150-hardtop-slide-on/03-advent-2150-06-1024x576.webp';
+const storyImage = '/images/site/farmer-dave.webp';
 ---
 <BaseLayout
   title="About Beyond RV | Queensland-Built Slide-On Campers"
@@ -87,6 +87,17 @@ const storyImage = '/images/optimized/products/advent-2150-hardtop-slide-on/03-a
         </div>
       </div>
     </div>
+  </section>
+
+  <section class="about-clean-photo">
+    <img
+      src={displayImageUrl(heroImage, 1600)}
+      srcset={imageSrcSet(heroImage)}
+      sizes="100vw"
+      alt="Beyond RV camper build outside the Mutdapilly workshop"
+      loading="lazy"
+      decoding="async"
+    />
   </section>
 
   <!-- Contact / Location -->
