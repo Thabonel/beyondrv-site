@@ -6,8 +6,20 @@ price: "POA"
 status: "available"
 onSale: false
 featured: false
-heroImage: "/images/optimized/products/expedition/unimog-poptop-camper/01-unimog-01.webp"
-gallery: []
+heroImage: "/images/optimized/products/expedition/unimog-poptop-camper/01-unimog-poptop-15.webp"
+gallery:
+  - "/images/optimized/products/expedition/unimog-poptop-camper/02-unimog-poptop-02.webp"
+  - "/images/optimized/products/expedition/unimog-poptop-camper/03-unimog-poptop-03.webp"
+  - "/images/optimized/products/expedition/unimog-poptop-camper/04-unimog-poptop-04.webp"
+  - "/images/optimized/products/expedition/unimog-poptop-camper/05-unimog-poptop-05.webp"
+  - "/images/optimized/products/expedition/unimog-poptop-camper/06-unimog-poptop-06.webp"
+  - "/images/optimized/products/expedition/unimog-poptop-camper/07-unimog-poptop-07.webp"
+  - "/images/optimized/products/expedition/unimog-poptop-camper/08-unimog-poptop-08.webp"
+  - "/images/optimized/products/expedition/unimog-poptop-camper/09-unimog-poptop-09.webp"
+  - "/images/optimized/products/expedition/unimog-poptop-camper/10-unimog-poptop-10.webp"
+  - "/images/optimized/products/expedition/unimog-poptop-camper/11-unimog-poptop-11.webp"
+  - "/images/optimized/products/expedition/unimog-poptop-camper/12-unimog-poptop-12.webp"
+  - "/images/optimized/products/expedition/unimog-poptop-camper/13-unimog-poptop-13.webp"
 keySpecs:
   - label: "Base"
     value: "Custom made to order"
