@@ -1,45 +1,38 @@
 ---
 title: "Sunpatch 19-XC Hardtop Couples Off-Road Van"
-category: caravan
-tagline: "Bigger, tougher, and coming soon. Register your interest now."
-price: "POA"
-status: coming-soon
-onSale: false
+category: "caravan"
+tagline: "Available for sale now, with final images and additional details coming soon."
+price: "$68,000"
+priceBadge: "IMAGES COMING SOON"
+status: "on-sale"
+onSale: true
 featured: false
-heroImage: "/images/optimized/products/sunpatch-19xc-hardtop-couples-offroad-van/01-sunpatch-15xc-01.webp"
+heroImage: "/images/site/sunpatch-19xc-coming-soon.webp"
 gallery: []
 keySpecs:
-  - label: "Length"
-    value: "~19 ft"
+  - label: "Layout"
+    value: "Couples"
   - label: "Status"
-    value: "Coming Soon"
-  - label: "Construction"
-    value: "Full composite hardtop"
+    value: "Available for sale"
+  - label: "Images"
+    value: "Coming soon"
 specGroups:
-  - group: "Construction Features"
+  - group: "Availability"
     items:
-      - label: "Body"
-        value: "Full composite hardtop"
-      - label: "Length"
-        value: "~19 ft"
-  - group: "Internal Features"
-    items:
-      - label: "Bathroom"
-        value: "Full ensuite"
-      - label: "Kitchen"
-        value: "Expanded — details TBC"
+      - label: "Status"
+        value: "Available for sale"
+      - label: "Images and final details"
+        value: "Coming soon"
 features:
-  - "Hardtop composite construction"
-  - "Full ensuite"
-  - "Expanded kitchen and living space over the 15-XC"
-  - "Details to be confirmed — register your interest below"
+  - "Available for sale"
+  - "Couples hardtop caravan layout"
+  - "Final images and details coming soon"
 relatedSlugs:
+  - "sunpatch-12c-couples-caravan"
   - "sunpatch-15xc-couples-offroad-van"
   - "sunpatch-21xf-hardtop-family-offroad-van"
-seoTitle: "Sunpatch 19-XC Hardtop Couples Off-Road Van | Coming Soon | Beyond RV"
-seoDesc: "The Sunpatch 19-XC is Beyond RV's upcoming hardtop couples off-road van. Register your interest now and be first to know when it launches."
+seoTitle: "Sunpatch 19-XC Hardtop Couples Off-Road Van | Beyond RV"
+seoDesc: "The Sunpatch 19-XC hardtop couples off-road van is available for sale from Beyond RV, with final images and details coming soon."
 ---
 
-The **Sunpatch 19-XC Hardtop** is coming. A bigger, better-equipped evolution of our popular 15-XC — hardtop composite construction, expanded living, and the same go-anywhere off-road capability Beyond RV is known for.
-
-Register your interest below and we'll reach out the moment it's ready.
+The **Sunpatch 19-XC** is available for sale now at $68,000. Final owner-supplied images and additional details are coming soon, so this page is deliberately marked for easy update once those assets arrive.

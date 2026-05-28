@@ -7,7 +7,17 @@ import recentBuildsData from '../data/homepage/recent-builds.json';
 import testimonialsData from '../data/homepage/testimonials.json';
 
 const allProducts = await getCollection('products');
-const featuredProducts = allProducts.filter(p => p.data.featured).slice(0, 4);
+type ProductEntry = typeof allProducts[number];
+const isProduct = (product: ProductEntry | undefined): product is ProductEntry => Boolean(product);
+const featuredOrder = [
+  'advent-2150-hardtop-slide-on',
+  'mercedes-sprinter-motorhome',
+  'sunpatch-15xc-couples-offroad-van',
+  'sunpatch-12c-couples-caravan',
+];
+const featuredProducts = featuredOrder
+  .map(slug => allProducts.find(p => p.slug === slug))
+  .filter(isProduct);
 const visibleRecentBuilds = recentBuildsData
   .filter(build => build.isVisible)
   .sort((a, b) => a.sortOrder - b.sortOrder);
@@ -15,12 +25,12 @@ const visibleTestimonials = testimonialsData
   .filter(testimonial => testimonial.isVisible)
   .sort((a, b) => a.sortOrder - b.sortOrder);
 const rangeImages = {
-  expedition: '/images/optimized/products/expedition/isuzu-nps-poptop-camper/01-isuzu-nps-01.webp',
-  slideOn: '/images/optimized/products/advent-2150-hardtop-slide-on/02-advent-2150-04-1024x576.webp',
-  caravan: '/images/optimized/products/sunpatch-19xc-hardtop-couples-offroad-van/01-sunpatch-15xc-01.webp',
-  custom: '/images/optimized/products/advent-2150-hardtop-slide-on/02-advent-2150-04-1024x576.webp',
+  expedition: '/images/site/homepage-expedition-vehicles.webp',
+  slideOn: '/images/site/homepage-slide-on-campers.webp',
+  caravan: '/images/optimized/products/sunpatch-12c-couples-caravan/01-sunpatch-12c-couples-caravan-hero.webp',
+  custom: '/images/site/homepage-custom-builds.webp',
   story: '/images/optimized/products/expedition/unimog-overlander-camper/02-mog2.webp',
-  expeditionHighlight: '/images/optimized/products/expedition/isuzu-nps-poptop-camper/03-isuzu-nps-04.webp',
+  expeditionHighlight: '/images/site/expedition-hero.webp',
 };
 
 const orgSchema = {
@@ -100,8 +110,8 @@ const websiteSchema = {
 
     <div class="hero-stats">
       <div class="hero-stat">
-        <div class="hero-stat-num">10<span>+</span></div>
-        <div class="hero-stat-label">Years Experience</div>
+          <div class="hero-stat-num">10<span>+</span></div>
+          <div class="hero-stat-label">Years Manufacturing Experience</div>
       </div>
       <div class="hero-stat">
         <div class="hero-stat-num">100<span>%</span></div>
@@ -205,7 +215,7 @@ const websiteSchema = {
         <div class="model-card-content">
           <span class="model-tag">Slide-Ons</span>
           <div class="model-name">Slide-On Campers</div>
-          <div class="model-spec">Advent 2150 · 2300 · 2450 · Pop-tops · Truck campers</div>
+          <div class="model-spec">Advent 2150 · 2300 · 2450 · 7ft electric pop-top</div>
           <a href="/our-slide-on-campers/" class="model-link">Explore Slide-Ons →</a>
         </div>
       </div>
@@ -311,7 +321,7 @@ const websiteSchema = {
         </div>
         <div class="story-num">
           <div class="story-num-val">10+</div>
-          <div class="story-num-label">Years Manufacturing</div>
+          <div class="story-num-label">Years Manufacturing Experience</div>
         </div>
         <div class="story-num">
           <div class="story-num-val">QLD</div>

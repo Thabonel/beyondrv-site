@@ -17,7 +17,22 @@
 
 [[redirects]]
   from   = "/3-5m-truck-camper-cabover/"
-  to     = "/our-slide-on-campers/"
+  to     = "/expedition/3-5m-electric-poptop-cabover-family-camper/"
+  status = 301
+
+[[redirects]]
+  from   = "/expedition/isuzu-nps-cabover-camper/"
+  to     = "/expedition/3-5m-electric-poptop-cabover-family-camper/"
+  status = 301
+
+[[redirects]]
+  from   = "/expedition/isuzu-nps-poptop-camper/"
+  to     = "/expedition/4-7m-hardtop-truck-camper/"
+  status = 301
+
+[[redirects]]
+  from   = "/4-7m-truck-camper/"
+  to     = "/expedition/4-7m-hardtop-truck-camper/"
   status = 301
 
 [[redirects]]

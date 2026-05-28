@@ -1,41 +1,62 @@
 ---
-title: "Sunpatch 12C Couples Caravan"
-category: caravan
-tagline: "Compact couples caravan. Big enough for the long haul."
-price: "$38,500"
-priceBadge: "2 UNITS AVAILABLE"
-status: on-sale
+title: "Sunpatch 12C Couples Off-Road Van"
+category: "caravan"
+tagline: "Compact hardtop couples van for buyers who want a lighter off-road setup."
+price: "$39,999"
+priceBadge: "IMMEDIATE DELIVERY"
+status: "on-sale"
 onSale: true
-featured: false
-heroImage: "/images/optimized/products/sunpatch-12c-couples-caravan/01-sunpatch-12c-28-scaled.webp"
-gallery: []
+featured: true
+heroImage: "/images/optimized/products/sunpatch-12c-couples-caravan/01-sunpatch-12c-couples-caravan-hero.webp"
+gallery:
+  - "/images/optimized/products/sunpatch-12c-couples-caravan/02-6.webp"
+  - "/images/optimized/products/sunpatch-12c-couples-caravan/03-img-0941.webp"
+  - "/images/optimized/products/sunpatch-12c-couples-caravan/04-img-4936.webp"
+  - "/images/optimized/products/sunpatch-12c-couples-caravan/05-img-4938.webp"
+  - "/images/optimized/products/sunpatch-12c-couples-caravan/06-img-4941.webp"
+  - "/images/optimized/products/sunpatch-12c-couples-caravan/07-img-4944.webp"
+  - "/images/optimized/products/sunpatch-12c-couples-caravan/08-img-4946.webp"
+  - "/images/optimized/products/sunpatch-12c-couples-caravan/09-img-4947.webp"
+  - "/images/optimized/products/sunpatch-12c-couples-caravan/10-img-4949.webp"
+  - "/images/optimized/products/sunpatch-12c-couples-caravan/11-img-4973.webp"
+  - "/images/optimized/products/sunpatch-12c-couples-caravan/12-img-4975.webp"
+  - "/images/optimized/products/sunpatch-12c-couples-caravan/13-img-4977.webp"
+  - "/images/optimized/products/sunpatch-12c-couples-caravan/14-img-4978.webp"
+  - "/images/optimized/products/sunpatch-12c-couples-caravan/15-img-4979.webp"
+  - "/images/optimized/products/sunpatch-12c-couples-caravan/16-kitchen.webp"
+  - "/images/optimized/products/sunpatch-12c-couples-caravan/17-wx-camera-1684909619005.webp"
 keySpecs:
-  - label: "Length"
-    value: "12 ft (3.65m)"
-  - label: "Sleeps"
-    value: "2 adults"
-  - label: "Construction"
-    value: "Full composite"
+  - label: "Layout"
+    value: "Couples"
+  - label: "Body"
+    value: "Hardtop off-road caravan"
+  - label: "Price"
+    value: "$39,999"
 specGroups:
+  - group: "Weights"
+    items:
+      - label: "Tare"
+        value: "2000kg"
+      - label: "ATM"
+        value: "2420kg"
+      - label: "Ball weight"
+        value: "160kg"
   - group: "Construction Features"
     items:
       - label: "Body"
-        value: "Full composite"
-      - label: "Body length"
-        value: "~3,650mm"
-      - label: "Build type"
+        value: "Hardtop off-road caravan"
+      - label: "Layout"
         value: "Couples caravan"
 features:
-  - "Compact 12ft footprint"
-  - "Full composite construction"
-  - "Designed for couples"
-  - "2 units available for immediate delivery"
+  - "Compact couples layout"
+  - "Hardtop off-road caravan body"
+  - "Owner-supplied gallery installed"
 relatedSlugs:
   - "sunpatch-15xc-couples-offroad-van"
-seoTitle: "Sunpatch 12C Couples Caravan | In Stock | Beyond RV Queensland"
-seoDesc: "Beyond RV's Sunpatch 12C couples caravan. Full composite, compact 12ft body, 2 units available now at $38,500. Built in Queensland."
+  - "sunpatch-19xc-hardtop-couples-offroad-van"
+  - "sunpatch-21xf-hardtop-family-offroad-van"
+seoTitle: "Sunpatch 12C Couples Off-Road Van | Beyond RV"
+seoDesc: "The Sunpatch 12C is a compact hardtop couples off-road van available from Beyond RV."
 ---
 
-The **Sunpatch 12C** is the entry point to the Sunpatch caravan range — a compact, well-finished couples caravan built on the same full composite principles as the larger 15-XC and 19-XC models.
-
-Two units available for immediate delivery. Contact us to arrange an inspection or discuss fit-out options.
+The **Sunpatch 12C** is the compact couples option in the Beyond RV caravan range, priced at the owner-confirmed $39,999.

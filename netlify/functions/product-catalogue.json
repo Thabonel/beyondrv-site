@@ -1,424 +1,361 @@
 [
   {
-    "slug": "3-5m-poptop-truck-camper",
-    "title": "3.5m Pop-Top Truck Camper",
-    "price": "$49,999",
+    "slug": "3-5m-diy-camper-box-with-cabover-and-underfloor-storage",
+    "title": "3.5m DIY Camper Box with Cabover and Underfloor Storage",
+    "price": "From $38,999",
     "status": "on-sale",
-    "category": "slide-on",
-    "tagline": "Low profile. Big living.",
+    "category": "expedition",
+    "tagline": "Hardtop composite shell for buyers who want to complete their own truck camper fitout.",
     "featured": false,
     "onSale": true,
-    "heroImage": "/images/optimized/products/3-5m-poptop-truck-camper/01-truck-3-5m-box-01-scaled.webp",
+    "heroImage": "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/01-3-5m-diy-camper-box-with-cabover-and-underfloor-storage-hero.webp",
     "gallery": [
-      "/images/optimized/products/3-5m-poptop-truck-camper/02-truck-3-5m-box-06-scaled.webp",
-      "/images/optimized/products/3-5m-poptop-truck-camper/03-truck-3-5m-box-08-scaled.webp",
-      "/images/optimized/products/3-5m-poptop-truck-camper/04-truck-3-5m-box-09-scaled.webp",
-      "/images/optimized/products/3-5m-poptop-truck-camper/05-truck-3-5m-box-11-scaled.webp",
-      "/images/optimized/products/3-5m-poptop-truck-camper/06-truck-3-5m-box-13-scaled.webp",
-      "/images/optimized/products/3-5m-poptop-truck-camper/07-truck-3-5m-box-14-scaled.webp",
-      "/images/optimized/products/3-5m-poptop-truck-camper/08-truck-3-5m-box-16-scaled.webp",
-      "/images/optimized/products/3-5m-poptop-truck-camper/09-truck-3-5m-box-10-scaled.webp",
-      "/images/optimized/products/3-5m-poptop-truck-camper/10-truck-3-5m-box-05-scaled.webp"
+      "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/02-dsc-0140.webp",
+      "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/03-dsc-0141.webp",
+      "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/04-dsc-0142.webp",
+      "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/05-dsc-0143.webp",
+      "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/06-dsc-0144.webp",
+      "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/07-dsc-0145.webp",
+      "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/08-dsc-0146.webp",
+      "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/09-dsc-0148.webp",
+      "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/10-dsc-0149.webp",
+      "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/11-dsc-0150.webp",
+      "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/12-dsc-0151.webp",
+      "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/13-dsc-0153.webp",
+      "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/14-dsc-0154.webp",
+      "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/15-dsc-0155.webp",
+      "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/16-dsc-0156.webp",
+      "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/17-dsc-0158.webp",
+      "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/18-dsc-0161.webp",
+      "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/19-dsc-0162.webp"
     ],
-    "galleryCount": 9,
+    "galleryCount": 18,
     "relatedSlugs": [
-      "7ft-electric-poptop-slide-on"
+      "3-5m-poptop-truck-camper",
+      "expedition/4-7m-hardtop-truck-camper",
+      "expedition/3-5m-electric-poptop-cabover-family-camper"
     ],
     "keySpecs": [
       {
-        "label": "Base length",
-        "value": "3,500mm"
+        "label": "Base",
+        "value": "3.5m"
       },
       {
         "label": "Roof",
-        "value": "Pop-top"
+        "value": "Hardtop"
       },
       {
-        "label": "Construction",
-        "value": "Full composite"
+        "label": "Condition",
+        "value": "Sold as-is"
       }
     ],
-    "description": "The **3.5m Pop-Top Truck Camper** delivers maximum living in a compact package. Pop the roof and you're standing — keep it down and you're aerodynamic. Simple, reliable, purpose-built in Queensland."
+    "description": "The **3.5m DIY Camper Box with Cabover and Underfloor Storage** is a waterproofed composite shell for buyers who want to complete their own truck camper fitout. It is sold as-is: what you see is what you get."
   },
   {
-    "slug": "4-7m-truck-camper",
-    "title": "4.7m Truck Camper",
-    "price": "POA",
-    "status": "available",
-    "category": "slide-on",
-    "tagline": "Serious truck. Serious camper.",
+    "slug": "3-5m-poptop-truck-camper",
+    "title": "Custom 3.5m Electric Pop-Top Truck Camper",
+    "price": "From $49,999",
+    "status": "on-sale",
+    "category": "expedition",
+    "tagline": "Custom 3.5m electric pop-top truck camper currently available from $49,999.",
     "featured": false,
-    "onSale": false,
-    "heroImage": "/images/optimized/products/4-7m-truck-camper/01-20240305-164611-576x1024.webp",
+    "onSale": true,
+    "heroImage": "/images/optimized/products/3-5m-poptop-truck-camper/01-3-5m-poptop-truck-camper-hero.webp",
     "gallery": [
-      "/images/optimized/products/4-7m-truck-camper/02-20240305-164454-1024x576.webp",
-      "/images/optimized/products/4-7m-truck-camper/03-20240305-164356-1024x576.webp",
-      "/images/optimized/products/4-7m-truck-camper/04-20240306-175057-1024x576.webp",
-      "/images/optimized/products/4-7m-truck-camper/05-20240306-175108-576x1024.webp",
-      "/images/optimized/products/4-7m-truck-camper/06-20240306-175246-576x1024.webp",
-      "/images/optimized/products/4-7m-truck-camper/07-20240306-175258-576x1024.webp",
-      "/images/optimized/products/4-7m-truck-camper/08-20240306-175303-576x1024.webp",
-      "/images/optimized/products/4-7m-truck-camper/09-20240306-175312-576x1024.webp",
-      "/images/optimized/products/4-7m-truck-camper/10-20240306-175319-576x1024.webp",
-      "/images/optimized/products/4-7m-truck-camper/11-20240306-175326-576x1024.webp",
-      "/images/optimized/products/4-7m-truck-camper/12-20240306-175329-576x1024.webp",
-      "/images/optimized/products/4-7m-truck-camper/13-20240306-175337-576x1024.webp",
-      "/images/optimized/products/4-7m-truck-camper/14-truck-4-7m-01-1024x678.webp",
-      "/images/optimized/products/4-7m-truck-camper/15-truck-4-7m-04-1024x678.webp",
-      "/images/optimized/products/4-7m-truck-camper/16-truck-4-7m-09-1024x678.webp",
-      "/images/optimized/products/4-7m-truck-camper/17-truck-4-7m-13-1024x678.webp",
-      "/images/optimized/products/4-7m-truck-camper/18-truck-4-7m-20-1024x678.webp",
-      "/images/optimized/products/4-7m-truck-camper/19-truck-4-7m-22-1024x678.webp",
-      "/images/optimized/products/4-7m-truck-camper/20-truck-4-7m-24-1024x678.webp",
-      "/images/optimized/products/4-7m-truck-camper/21-truck-4-7m-28-1024x678.webp"
+      "/images/optimized/products/3-5m-poptop-truck-camper/02-dsc-0001.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/03-dsc-0007.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/04-dsc-0008.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/05-dsc-0010.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/06-dsc-0014.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/07-dsc-0016.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/08-dsc-0018.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/09-dsc-0024.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/10-dsc-0027.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/11-dsc-0034.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/12-dsc-0035.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/13-dsc-0037.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/14-dsc-0038.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/15-dsc-0042.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/16-dsc-0045.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/17-dsc-0047.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/18-dsc-0051.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/19-dsc-0054.webp"
     ],
-    "galleryCount": 20,
+    "galleryCount": 18,
     "relatedSlugs": [
-      "3-5m-poptop-truck-camper"
+      "expedition/3-5m-electric-poptop-cabover-family-camper",
+      "3-5m-diy-camper-box-with-cabover-and-underfloor-storage",
+      "expedition/4-7m-hardtop-truck-camper"
     ],
     "keySpecs": [
       {
-        "label": "Base length",
-        "value": "4,700mm"
-      },
-      {
-        "label": "Construction",
-        "value": "Full composite"
-      },
-      {
-        "label": "Target trucks",
-        "value": "Iveco, Unimog, Isuzu"
-      }
-    ],
-    "description": "The **4.7m Truck Camper** is built for the big rigs — Iveco Eurocargo, Unimog, Isuzu NPS. Full composite construction in a proper live-aboard layout for the travellers who go furthest."
-  },
-  {
-    "slug": "7ft-electric-poptop-slide-on",
-    "title": "7ft Electric Pop-Top Slide-On",
-    "price": "$54,800",
-    "status": "available",
-    "category": "slide-on",
-    "tagline": "Stand-up comfort. Compact footprint.",
-    "featured": false,
-    "onSale": false,
-    "heroImage": "/images/optimized/products/7ft-electric-poptop-slide-on/01-20240924-105534-768x432.webp",
-    "gallery": [
-      "/images/optimized/products/7ft-electric-poptop-slide-on/02-20240924-105432-768x432.webp",
-      "/images/optimized/products/7ft-electric-poptop-slide-on/03-20240924-105439-768x432.webp",
-      "/images/optimized/products/7ft-electric-poptop-slide-on/04-20240924-105823-768x432.webp",
-      "/images/optimized/products/7ft-electric-poptop-slide-on/05-20240924-105445-768x432.webp",
-      "/images/optimized/products/7ft-electric-poptop-slide-on/06-20240924-105813-768x432.webp",
-      "/images/optimized/products/7ft-electric-poptop-slide-on/07-20240924-105454-768x432.webp",
-      "/images/optimized/products/7ft-electric-poptop-slide-on/08-20240924-110355-768x432.webp",
-      "/images/optimized/products/7ft-electric-poptop-slide-on/09-20240924-110155-768x432.webp",
-      "/images/optimized/products/7ft-electric-poptop-slide-on/10-20240924-110413-768x432.webp",
-      "/images/optimized/products/7ft-electric-poptop-slide-on/11-20240924-110410-768x432.webp",
-      "/images/optimized/products/7ft-electric-poptop-slide-on/12-20240924-110401-768x432.webp",
-      "/images/optimized/products/7ft-electric-poptop-slide-on/13-20240924-110143-768x432.webp",
-      "/images/optimized/products/7ft-electric-poptop-slide-on/14-20240924-110531-768x432.webp",
-      "/images/optimized/products/7ft-electric-poptop-slide-on/15-20240924-110525-768x432.webp",
-      "/images/optimized/products/7ft-electric-poptop-slide-on/16-20240924-110549-768x432.webp",
-      "/images/optimized/products/7ft-electric-poptop-slide-on/17-20240924-110553-768x432.webp"
-    ],
-    "galleryCount": 16,
-    "relatedSlugs": [
-      "advent-2150-hardtop-slide-on",
-      "3-5m-poptop-truck-camper"
-    ],
-    "keySpecs": [
-      {
-        "label": "Base length",
-        "value": "4,600mm"
+        "label": "Base",
+        "value": "3.5m"
       },
       {
         "label": "Roof",
         "value": "Electric pop-top"
       },
       {
-        "label": "Ceiling (raised)",
-        "value": "Full standing room"
+        "label": "Price",
+        "value": "From $49,999"
       }
     ],
-    "description": "The **7ft Electric Pop-Top** solves the age-old camper dilemma: low enough on the road, tall enough once you're parked. The electric pop-top rises in seconds and gives you full standing room — no more crouching in your own camp."
+    "description": "The **Custom 3.5m Electric Pop-Top Truck Camper** is an expedition/truck camper product, so it has been moved out of the Slide-Ons category and into Expedition and On Sale."
   },
   {
-    "slug": "advent-2150-hardtop-slide-on",
-    "title": "Advent 2150 Hardtop Slide-On",
-    "price": "$72,000",
-    "status": "on-sale",
+    "slug": "7ft-electric-poptop-slide-on",
+    "title": "7ft Electric Pop-Top Slide-On Camper",
+    "price": "$68,800",
+    "status": "available",
     "category": "slide-on",
-    "tagline": "Compact, capable, and ready to go right now.",
-    "featured": true,
-    "onSale": true,
-    "heroImage": "/images/optimized/products/advent-2150-hardtop-slide-on/01-advent-2150-05-1024x576.webp",
-    "gallery": [
-      "/images/optimized/products/advent-2150-hardtop-slide-on/02-advent-2150-04-1024x576.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/03-advent-2150-06-1024x576.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/04-advent-2150-07-1024x576.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/05-advent-2150-08-1024x576.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/06-advent-2150-11-1024x576.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/07-advent-2150-12-1024x576.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/08-advent-2150-13-1024x576.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/09-advent-2150-14-1024x576.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/10-advent-2150-15-1024x576.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/11-advent-2150-18-1024x576.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/12-advent-2150-19-1024x576.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/13-advent-2150-21-1024x576.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/14-advent-2150-22-1024x576.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/15-advent-2150-23-1024x576.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/16-advent-2150-shower-1024x731.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/17-advent-2150-new-09-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/18-advent-2150-new-21-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/19-advent-2150-new-20-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/20-advent-2150-new-08-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/21-advent-2150-new-18-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/22-advent-2150-new-19-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/23-advent-2150-new-17-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/24-advent-2150-new-03-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/25-advent-2150-new-02-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/26-advent-2150-new-16-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/27-advent-2150-new-14-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/28-advent-2150-new-15-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/29-advent-2150-new-01-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/30-advent-2150-new-05-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/31-advent-2150-new-11-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/32-advent-2150-new-10-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/33-advent-2150-new-04-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/34-advent-2150-new-12-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/35-advent-2150-new-06-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/36-advent-2150-new-07-1024x678.webp",
-      "/images/optimized/products/advent-2150-hardtop-slide-on/37-advent-2150-new-13-1024x678.webp"
-    ],
-    "galleryCount": 36,
+    "tagline": "Electric pop-top slide-on camper for single cab utes.",
+    "featured": false,
+    "onSale": false,
+    "heroImage": "/images/optimized/products/7ft-electric-poptop-slide-on/01-7ft-electric-poptop-slide-on-hero.webp",
+    "gallery": [],
+    "galleryCount": 0,
     "relatedSlugs": [
+      "advent-2150-hardtop-slide-on",
       "advent-2300-hardtop-slide-on",
       "advent-2450-hardtop-slide-on"
     ],
     "keySpecs": [
       {
-        "label": "Base length",
-        "value": "2,150mm"
+        "label": "Base",
+        "value": "2150mm x 2000mm"
       },
       {
-        "label": "Construction",
-        "value": "Full composite"
-      },
-      {
-        "label": "Power",
-        "value": "200Ah lithium"
-      },
-      {
-        "label": "Status",
-        "value": "In Stock"
-      }
-    ],
-    "description": "The **Advent 2150** is the go-anywhere companion for serious ute and mid-size truck owners. At just 2,150mm base length, it's compact enough for tight tracks but packed with everything you need for weeks away.\n\nFull composite construction keeps the weight down without sacrificing durability. The…"
-  },
-  {
-    "slug": "advent-2300-hardtop-slide-on",
-    "title": "Advent 2300 Hardtop Slide-On",
-    "price": "$72,000",
-    "status": "available",
-    "category": "slide-on",
-    "tagline": "The middle ground — serious capability, serious comfort.",
-    "featured": false,
-    "onSale": false,
-    "heroImage": "/images/optimized/products/advent-2300-hardtop-slide-on/01-beyond-rv-2300-advent-series-19-1024x678.webp",
-    "gallery": [
-      "/images/optimized/products/advent-2300-hardtop-slide-on/02-beyond-rv-2300-advent-series-18-1024x678.webp",
-      "/images/optimized/products/advent-2300-hardtop-slide-on/03-beyond-rv-2300-advent-series-08-1024x678.webp",
-      "/images/optimized/products/advent-2300-hardtop-slide-on/04-beyond-rv-2300-advent-series-20-1024x678.webp",
-      "/images/optimized/products/advent-2300-hardtop-slide-on/05-beyond-rv-2300-advent-series-21-1024x678.webp",
-      "/images/optimized/products/advent-2300-hardtop-slide-on/06-beyond-rv-2300-advent-series-09-1024x678.webp",
-      "/images/optimized/products/advent-2300-hardtop-slide-on/07-beyond-rv-2300-advent-series-13-1024x678.webp",
-      "/images/optimized/products/advent-2300-hardtop-slide-on/08-beyond-rv-2300-advent-series-07-1024x678.webp",
-      "/images/optimized/products/advent-2300-hardtop-slide-on/09-beyond-rv-2300-advent-series-06-1024x678.webp",
-      "/images/optimized/products/advent-2300-hardtop-slide-on/10-beyond-rv-2300-advent-series-12-1024x678.webp",
-      "/images/optimized/products/advent-2300-hardtop-slide-on/11-beyond-rv-2300-advent-series-04-1024x678.webp",
-      "/images/optimized/products/advent-2300-hardtop-slide-on/12-beyond-rv-2300-advent-series-10-1024x678.webp",
-      "/images/optimized/products/advent-2300-hardtop-slide-on/13-beyond-rv-2300-advent-series-11-1024x678.webp",
-      "/images/optimized/products/advent-2300-hardtop-slide-on/14-beyond-rv-2300-advent-series-05-1024x678.webp",
-      "/images/optimized/products/advent-2300-hardtop-slide-on/15-beyond-rv-2300-advent-series-01-1024x678.webp",
-      "/images/optimized/products/advent-2300-hardtop-slide-on/16-beyond-rv-2300-advent-series-15-1024x678.webp",
-      "/images/optimized/products/advent-2300-hardtop-slide-on/17-beyond-rv-2300-advent-series-14-1024x678.webp",
-      "/images/optimized/products/advent-2300-hardtop-slide-on/18-beyond-rv-2300-advent-series-16-1024x678.webp",
-      "/images/optimized/products/advent-2300-hardtop-slide-on/19-beyond-rv-2300-advent-series-02-1024x678.webp",
-      "/images/optimized/products/advent-2300-hardtop-slide-on/20-beyond-rv-2300-advent-series-03-1024x678.webp",
-      "/images/optimized/products/advent-2300-hardtop-slide-on/21-beyond-rv-2300-advent-series-17-1024x678.webp"
-    ],
-    "galleryCount": 20,
-    "relatedSlugs": [
-      "advent-2150-hardtop-slide-on",
-      "advent-2450-hardtop-slide-on"
-    ],
-    "keySpecs": [
-      {
-        "label": "Base length",
-        "value": "2,300mm"
-      },
-      {
-        "label": "Construction",
-        "value": "Full composite hardtop"
-      },
-      {
-        "label": "Power",
-        "value": "200Ah lithium"
-      }
-    ],
-    "description": "The **Advent 2300** sits in the sweet spot of the Advent range — more space than the 2150 without the bulk of the 2450. Ideal for ute owners who want genuine live-aboard capability on longer trips."
-  },
-  {
-    "slug": "advent-2450-hardtop-slide-on",
-    "title": "Advent 2450 Hardtop Slide-On",
-    "price": "$72,000",
-    "status": "on-sale",
-    "category": "slide-on",
-    "tagline": "Maximum space. Maximum off-road credibility.",
-    "featured": true,
-    "onSale": true,
-    "heroImage": "/images/optimized/products/advent-2450-hardtop-slide-on/01-advent-2450-01-1024x576.webp",
-    "gallery": [
-      "/images/optimized/products/advent-2450-hardtop-slide-on/02-advent-2450-04-1024x576.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/03-advent-2450-05-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/04-advent-2450-07-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/05-advent-2450-09-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/06-advent-2450-11-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/07-advent-2450-13-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/08-advent-2450-15-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/09-advent-2450-20-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/10-advent-2450-23-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/11-advent-2450-24-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/12-advent-2450-26-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/13-advent-2450-new-05-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/14-advent-2450-new-11-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/15-advent-2450-new-10-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/16-advent-2450-new-04-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/17-advent-2450-new-12-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/18-advent-2450-new-06-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/19-advent-2450-new-07-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/20-advent-2450-new-13-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/21-advent-2450-new-17-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/22-advent-2450-new-03-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/23-advent-2450-new-02-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/24-advent-2450-new-16-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/25-advent-2450-new-14-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/26-advent-2450-new-15-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/27-advent-2450-new-01-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/28-advent-2450-new-18-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/29-advent-2450-new-09-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/30-advent-2450-new-08-1024x678.webp"
-    ],
-    "galleryCount": 29,
-    "relatedSlugs": [
-      "advent-2150-hardtop-slide-on",
-      "advent-2300-hardtop-slide-on"
-    ],
-    "keySpecs": [
-      {
-        "label": "Base length",
-        "value": "2,450mm"
-      },
-      {
-        "label": "Construction",
-        "value": "Full composite hardtop"
-      },
-      {
-        "label": "Power",
-        "value": "200Ah lithium"
-      }
-    ],
-    "description": "The **Advent 2450** is the flagship of the Advent slide-on range. At 2,450mm base, it provides the most interior space available in a composite slide-on that still mounts cleanly on a dual-cab ute."
-  },
-  {
-    "slug": "expedition/isuzu-nps-cabover-camper",
-    "title": "Isuzu NPS Cabover Camper",
-    "price": "POA",
-    "status": "available",
-    "category": "expedition",
-    "tagline": "Truck-based expedition capability. More accessible than Unimog, less compromise.",
-    "featured": false,
-    "onSale": false,
-    "heroImage": "/images/optimized/products/expedition/isuzu-nps-cabover-camper/01-isuzu-nps-03.webp",
-    "gallery": [
-      "/images/optimized/products/expedition/isuzu-nps-cabover-camper/02-isuzu-nps-02.webp",
-      "/images/optimized/products/expedition/isuzu-nps-cabover-camper/03-isuzu-nps-04.webp",
-      "/images/optimized/products/expedition/isuzu-nps-cabover-camper/04-isuzu-nps-06.webp",
-      "/images/optimized/products/expedition/isuzu-nps-cabover-camper/05-isuzu-nps-07.webp",
-      "/images/optimized/products/expedition/isuzu-nps-cabover-camper/06-isuzu-nps-09.webp",
-      "/images/optimized/products/expedition/isuzu-nps-cabover-camper/07-isuzu-nps-10.webp",
-      "/images/optimized/products/expedition/isuzu-nps-cabover-camper/08-isuzu-nps-11.webp",
-      "/images/optimized/products/expedition/isuzu-nps-cabover-camper/09-isuzu-nps-12.webp"
-    ],
-    "galleryCount": 8,
-    "relatedSlugs": [
-      "expedition/isuzu-nps-poptop-camper",
-      "expedition/unimog-overlander-camper"
-    ],
-    "keySpecs": [
-      {
-        "label": "Platform",
-        "value": "Isuzu NPS"
-      },
-      {
-        "label": "Build",
-        "value": "Cabover expedition camper"
-      },
-      {
-        "label": "Drive",
-        "value": "4WD"
-      },
-      {
-        "label": "Price",
-        "value": "POA"
-      }
-    ],
-    "description": "The **Isuzu NPS Cabover** gives you serious expedition capability on a platform you can service anywhere in Australia. Full composite body, cabover design for maximum living space, and the Isuzu NPS's proven 4WD drivetrain."
-  },
-  {
-    "slug": "expedition/isuzu-nps-poptop-camper",
-    "title": "Isuzu NPS Pop-Top Camper",
-    "price": "POA",
-    "status": "available",
-    "category": "expedition",
-    "tagline": "Pop-top freedom on a trusted truck platform.",
-    "featured": false,
-    "onSale": false,
-    "heroImage": "/images/optimized/products/expedition/isuzu-nps-poptop-camper/01-isuzu-nps-01.webp",
-    "gallery": [
-      "/images/optimized/products/expedition/isuzu-nps-poptop-camper/02-isuzu-nps-02.webp",
-      "/images/optimized/products/expedition/isuzu-nps-poptop-camper/03-isuzu-nps-04.webp",
-      "/images/optimized/products/expedition/isuzu-nps-poptop-camper/04-isuzu-nps-05.webp",
-      "/images/optimized/products/expedition/isuzu-nps-poptop-camper/05-isuzu-nps-06.webp",
-      "/images/optimized/products/expedition/isuzu-nps-poptop-camper/06-isuzu-nps-07.webp",
-      "/images/optimized/products/expedition/isuzu-nps-poptop-camper/07-isuzu-nps-08.webp",
-      "/images/optimized/products/expedition/isuzu-nps-poptop-camper/08-isuzu-nps-10.webp",
-      "/images/optimized/products/expedition/isuzu-nps-poptop-camper/09-isuzu-nps-11.webp",
-      "/images/optimized/products/expedition/isuzu-nps-poptop-camper/10-isuzu-nps-12.webp"
-    ],
-    "galleryCount": 9,
-    "relatedSlugs": [
-      "expedition/isuzu-nps-cabover-camper",
-      "expedition/unimog-overlander-camper"
-    ],
-    "keySpecs": [
-      {
-        "label": "Platform",
-        "value": "Isuzu NPS"
+        "label": "Suits",
+        "value": "Single cab utes"
       },
       {
         "label": "Roof",
-        "value": "Pop-top"
-      },
-      {
-        "label": "Drive",
-        "value": "4WD"
-      },
-      {
-        "label": "Price",
-        "value": "POA"
+        "value": "Electric pop-top"
       }
     ],
-    "description": "The **Isuzu NPS Pop-Top** delivers expedition-grade capability with the practicality of a pop-top — standing room when you need it, low highway profile when you don't. Built on the proven Isuzu NPS 4WD."
+    "description": "The **7ft Electric Pop-Top Slide-On** is built for single cab ute owners who want a lower travel profile with standing room once camped."
+  },
+  {
+    "slug": "advent-2150-hardtop-slide-on",
+    "title": "Advent 2150 Hardtop Ute Slide-On Camper",
+    "price": "$72,000",
+    "status": "on-sale",
+    "category": "slide-on",
+    "tagline": "The Advent 2150 is the go-anywhere companion for 4x4 space cab utes and select dual cab ute owners.",
+    "featured": true,
+    "onSale": true,
+    "heroImage": "/images/optimized/products/advent-2150-hardtop-slide-on/01-advent-2150-hardtop-slide-on-hero.webp",
+    "gallery": [
+      "/images/optimized/products/advent-2150-hardtop-slide-on/02-20250801-114510.webp",
+      "/images/optimized/products/advent-2150-hardtop-slide-on/03-20250801-114526.webp",
+      "/images/optimized/products/advent-2150-hardtop-slide-on/04-20250801-114535.webp",
+      "/images/optimized/products/advent-2150-hardtop-slide-on/05-dsc-0220.webp",
+      "/images/optimized/products/advent-2150-hardtop-slide-on/06-dsc-0222.webp",
+      "/images/optimized/products/advent-2150-hardtop-slide-on/07-dsc-0223.webp",
+      "/images/optimized/products/advent-2150-hardtop-slide-on/08-dsc-0225.webp",
+      "/images/optimized/products/advent-2150-hardtop-slide-on/09-dsc-0227.webp",
+      "/images/optimized/products/advent-2150-hardtop-slide-on/10-dsc-0229.webp",
+      "/images/optimized/products/advent-2150-hardtop-slide-on/11-dsc-0230.webp",
+      "/images/optimized/products/advent-2150-hardtop-slide-on/12-dsc-0231.webp",
+      "/images/optimized/products/advent-2150-hardtop-slide-on/13-dsc-0232.webp",
+      "/images/optimized/products/advent-2150-hardtop-slide-on/14-dsc-0233.webp",
+      "/images/optimized/products/advent-2150-hardtop-slide-on/15-dsc-0235.webp",
+      "/images/optimized/products/advent-2150-hardtop-slide-on/16-dsc-0239.webp",
+      "/images/optimized/products/advent-2150-hardtop-slide-on/17-dsc-0240.webp",
+      "/images/optimized/products/advent-2150-hardtop-slide-on/18-dsc-0243.webp",
+      "/images/optimized/products/advent-2150-hardtop-slide-on/19-dsc-0245.webp"
+    ],
+    "galleryCount": 18,
+    "relatedSlugs": [
+      "advent-2300-hardtop-slide-on",
+      "advent-2450-hardtop-slide-on",
+      "7ft-electric-poptop-slide-on"
+    ],
+    "keySpecs": [
+      {
+        "label": "Base",
+        "value": "2150mm x 2000mm"
+      },
+      {
+        "label": "Suits",
+        "value": "Space cab / select dual cab utes"
+      },
+      {
+        "label": "Roof",
+        "value": "Hardtop"
+      }
+    ],
+    "description": "The **Advent 2150** is built for owners who want a compact hardtop slide-on camper matched to a serious 4x4 ute. It keeps the slide-on range focused on ute platforms while giving buyers a ready-to-roll Beyond RV camper at the confirmed owner price."
+  },
+  {
+    "slug": "advent-2300-hardtop-slide-on",
+    "title": "Advent 2300 Hardtop Ute Slide-On Camper",
+    "price": "$75,000",
+    "status": "available",
+    "category": "slide-on",
+    "tagline": "A hardtop ute slide-on camper with extra base length for longer tray setups.",
+    "featured": false,
+    "onSale": false,
+    "heroImage": "/images/optimized/products/advent-2300-hardtop-slide-on/01-advent-2300-hardtop-slide-on-hero.webp",
+    "gallery": [],
+    "galleryCount": 0,
+    "relatedSlugs": [
+      "advent-2150-hardtop-slide-on",
+      "advent-2450-hardtop-slide-on",
+      "7ft-electric-poptop-slide-on"
+    ],
+    "keySpecs": [
+      {
+        "label": "Base",
+        "value": "2300mm x 2000mm"
+      },
+      {
+        "label": "Roof",
+        "value": "Hardtop"
+      },
+      {
+        "label": "Category",
+        "value": "Ute slide-on"
+      }
+    ],
+    "description": "The **Advent 2300** sits in the middle of the Advent hardtop ute slide-on range, giving buyers a longer base while staying within the ute slide-on category."
+  },
+  {
+    "slug": "advent-2450-hardtop-slide-on",
+    "title": "Advent 2450 Hardtop Ute Slide-On Camper",
+    "price": "$77,800",
+    "status": "available",
+    "category": "slide-on",
+    "tagline": "A larger hardtop slide-on designed specifically for single cab ute platforms.",
+    "featured": false,
+    "onSale": false,
+    "heroImage": "/images/optimized/products/advent-2450-hardtop-slide-on/01-advent-2450-hardtop-slide-on-hero.webp",
+    "gallery": [],
+    "galleryCount": 0,
+    "relatedSlugs": [
+      "advent-2150-hardtop-slide-on",
+      "advent-2300-hardtop-slide-on",
+      "7ft-electric-poptop-slide-on"
+    ],
+    "keySpecs": [
+      {
+        "label": "Base",
+        "value": "2450mm x 2000mm"
+      },
+      {
+        "label": "Suits",
+        "value": "Single cab utes"
+      },
+      {
+        "label": "Status",
+        "value": "Build to order"
+      }
+    ],
+    "description": "The **Advent 2450** remains part of the ute slide-on range as a build-to-order model. It is designed for single cab utes and is no longer presented as in-stock or on sale."
+  },
+  {
+    "slug": "expedition/3-5m-electric-poptop-cabover-family-camper",
+    "title": "3.5m Electric Pop-Top Cabover Family Camper w/ Electric Drop Down Bed",
+    "price": "From $140,000",
+    "status": "available",
+    "category": "expedition",
+    "tagline": "Compact 3.5m family truck camper for dual cab Isuzu NPS platforms.",
+    "featured": false,
+    "onSale": false,
+    "heroImage": "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/01-expedition-3-5m-electric-poptop-cabover-family-camper-hero.webp",
+    "gallery": [
+      "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/02-dsc04993.webp",
+      "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/03-dsc04994.webp",
+      "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/04-dsc04996.webp",
+      "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/05-dsc05016.webp",
+      "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/06-dsc05017.webp",
+      "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/07-dsc05028.webp",
+      "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/08-dsc05029.webp",
+      "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/09-dsc05047.webp",
+      "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/10-dsc05051.webp",
+      "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/11-dsc05056.webp",
+      "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/12-dsc05060.webp",
+      "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/13-dsc05069.webp",
+      "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/14-dsc05100.webp",
+      "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/15-dsc05109.webp",
+      "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/16-dsc05111.webp",
+      "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/17-dsc05125.webp",
+      "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/18-dsc05136.webp",
+      "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/19-dsc05137.webp"
+    ],
+    "galleryCount": 18,
+    "relatedSlugs": [
+      "expedition/4-7m-hardtop-truck-camper",
+      "expedition/unimog-overlander-camper",
+      "expedition/unimog-poptop-camper"
+    ],
+    "keySpecs": [
+      {
+        "label": "Base",
+        "value": "3.5m"
+      },
+      {
+        "label": "Platform",
+        "value": "Dual cab Isuzu NPS"
+      },
+      {
+        "label": "Mounting",
+        "value": "Slide-on or permanent"
+      }
+    ],
+    "description": "The **3.5m Electric Pop-Top Cabover Family Camper** is built for families who want a compact expedition camper body on a dual cab Isuzu NPS. It can be configured as a slide-on or a permanently mounted camper."
+  },
+  {
+    "slug": "expedition/4-7m-hardtop-truck-camper",
+    "title": "4.7m Hardtop Truck Camper",
+    "price": "From $98,000",
+    "status": "available",
+    "category": "expedition",
+    "tagline": "Premier couples truck camper for single cab truck or Unimog platforms.",
+    "featured": false,
+    "onSale": false,
+    "heroImage": "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/01-expedition-4-7m-hardtop-truck-camper-hero.webp",
+    "gallery": [
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/02-blue-unimog-2.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/03-dsc-0002.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/04-dsc-0006.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/05-dsc-0015.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/06-dsc-0019.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/07-dsc-0021.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/08-dsc-0025.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/09-dsc-0029.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/10-dsc-0036.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/11-dsc-0048.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/12-dsc-0054.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/13-dsc-0069.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/14-dsc-0090.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/15-dsc-0091.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/16-dsc-0092.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/17-dsc-0094.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/18-dsc03978.webp"
+    ],
+    "galleryCount": 17,
+    "relatedSlugs": [
+      "expedition/3-5m-electric-poptop-cabover-family-camper",
+      "expedition/unimog-overlander-camper",
+      "mercedes-sprinter-motorhome"
+    ],
+    "keySpecs": [
+      {
+        "label": "Base",
+        "value": "4.7m"
+      },
+      {
+        "label": "Roof",
+        "value": "Hardtop"
+      },
+      {
+        "label": "Platform",
+        "value": "Single cab truck or Unimog"
+      }
+    ],
+    "description": "The **4.7m Hardtop Truck Camper** is the premier Beyond RV truck camper option for couples. It can be built for single cab truck platforms or adapted to suit a Unimog, with 2.2m and 2.4m wide configurations available."
   },
   {
     "slug": "expedition/unimog-overlander-camper",
@@ -437,7 +374,7 @@
     "galleryCount": 2,
     "relatedSlugs": [
       "expedition/unimog-poptop-camper",
-      "expedition/isuzu-nps-cabover-camper"
+      "expedition/4-7m-hardtop-truck-camper"
     ],
     "keySpecs": [
       {
@@ -461,257 +398,257 @@
   },
   {
     "slug": "expedition/unimog-poptop-camper",
-    "title": "Unimog Pop-Top Camper",
+    "title": "Empty DIY Unimog Camper Box",
     "price": "POA",
     "status": "available",
     "category": "expedition",
-    "tagline": "Extreme terrain. Standing room when you arrive.",
+    "tagline": "Custom empty camper box for Unimog and similar expedition platforms.",
     "featured": false,
     "onSale": false,
-    "heroImage": "/images/optimized/products/expedition/unimog-poptop-camper/01-unimog-poptop-15.webp",
-    "gallery": [
-      "/images/optimized/products/expedition/unimog-poptop-camper/02-unimog-poptop-02.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/03-unimog-poptop-03.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/04-unimog-poptop-04.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/05-unimog-poptop-05.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/06-unimog-poptop-06.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/07-unimog-poptop-07.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/08-unimog-poptop-08.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/09-unimog-poptop-09.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/10-unimog-poptop-10.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/11-unimog-poptop-11.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/12-unimog-poptop-12.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/13-unimog-poptop-13.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/14-unimog-poptop-14.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/01-unimog-poptop-15.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/15-unimog-poptop-16.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/16-unimog-poptop-17.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/17-unimog-poptop-18.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/18-unimog-poptop-19.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/19-unimog-poptop-20.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/20-unimog-poptop-21.webp",
-      "/images/optimized/products/expedition/unimog-poptop-camper/21-unimog-poptop-22.webp"
-    ],
-    "galleryCount": 21,
+    "heroImage": "/images/optimized/products/expedition/unimog-poptop-camper/01-unimog-01.webp",
+    "gallery": [],
+    "galleryCount": 0,
     "relatedSlugs": [
       "expedition/unimog-overlander-camper",
-      "expedition/isuzu-nps-poptop-camper"
+      "expedition/4-7m-hardtop-truck-camper"
+    ],
+    "keySpecs": [
+      {
+        "label": "Base",
+        "value": "Custom made to order"
+      },
+      {
+        "label": "Roof",
+        "value": "Pop-top or hardtop"
+      },
+      {
+        "label": "Supply",
+        "value": "Flatpack or assembled"
+      }
+    ],
+    "description": "The **Empty DIY Unimog Camper Box** is for buyers who want Beyond RV composite construction as the base for their own expedition fitout. It can be supplied as a hardtop or electric pop-top, either as a flatpack kit or fully assembled box with wiring roughed in."
+  },
+  {
+    "slug": "mercedes-sprinter-motorhome",
+    "title": "Mercedes Sprinter AWD LWB Cab Chassis Motorhome",
+    "price": "$225,000",
+    "status": "on-sale",
+    "category": "expedition",
+    "tagline": "In-stock Mercedes Sprinter AWD LWB cab chassis motorhome, negotiable at $225,000.",
+    "featured": true,
+    "onSale": true,
+    "heroImage": "/images/optimized/products/mercedes-sprinter-motorhome/01-mercedes-sprinter-01.webp",
+    "gallery": [],
+    "galleryCount": 0,
+    "relatedSlugs": [
+      "expedition/4-7m-hardtop-truck-camper",
+      "3-5m-poptop-truck-camper"
     ],
     "keySpecs": [
       {
         "label": "Platform",
-        "value": "Mercedes-Benz Unimog"
+        "value": "Mercedes Sprinter AWD LWB cab chassis"
       },
       {
-        "label": "Roof",
-        "value": "Pop-top"
-      },
-      {
-        "label": "Price",
-        "value": "POA"
-      }
-    ],
-    "description": "The **Unimog Pop-Top** combines the Unimog's unmatched off-road capability with the practicality of a pop-top roof — low profile on the move, full standing room once you've found your spot."
-  },
-  {
-    "slug": "mercedes-sprinter-motorhome",
-    "title": "Mercedes Sprinter Motorhome",
-    "price": "$225,000",
-    "status": "on-sale",
-    "category": "slide-on",
-    "tagline": "The ultimate self-contained adventure vehicle. Custom built on Mercedes Sprinter.",
-    "featured": true,
-    "onSale": true,
-    "heroImage": "/images/optimized/products/mercedes-sprinter-motorhome/01-4-7m-truck-camper-17-scaled.webp",
-    "gallery": [
-      "/images/optimized/products/mercedes-sprinter-motorhome/02-4-7m-truck-camper-03-scaled.webp",
-      "/images/optimized/products/mercedes-sprinter-motorhome/03-4-7m-truck-camper-01-scaled.webp",
-      "/images/optimized/products/mercedes-sprinter-motorhome/04-4-7m-truck-camper-14-scaled.webp",
-      "/images/optimized/products/mercedes-sprinter-motorhome/05-4-7m-truck-camper-16-scaled.webp",
-      "/images/optimized/products/mercedes-sprinter-motorhome/06-4-7m-truck-camper-02-scaled.webp",
-      "/images/optimized/products/mercedes-sprinter-motorhome/07-4-7m-truck-camper-11-scaled.webp",
-      "/images/optimized/products/mercedes-sprinter-motorhome/08-4-7m-truck-camper-07-scaled.webp",
-      "/images/optimized/products/mercedes-sprinter-motorhome/09-4-7m-truck-camper-12-scaled.webp",
-      "/images/optimized/products/mercedes-sprinter-motorhome/10-4-7m-truck-camper-13-scaled.webp",
-      "/images/optimized/products/mercedes-sprinter-motorhome/11-4-7m-truck-camper-06-scaled.webp",
-      "/images/optimized/products/mercedes-sprinter-motorhome/12-4-7m-truck-camper-08-scaled.webp",
-      "/images/optimized/products/mercedes-sprinter-motorhome/13-4-7m-truck-camper-18-scaled.webp"
-    ],
-    "galleryCount": 12,
-    "relatedSlugs": [],
-    "keySpecs": [
-      {
-        "label": "Base vehicle",
-        "value": "Mercedes-Benz Sprinter"
-      },
-      {
-        "label": "Build",
-        "value": "Full custom motorhome"
+        "label": "Status",
+        "value": "In stock"
       },
       {
         "label": "Price",
-        "value": "$225,000"
-      },
-      {
-        "label": "Construction",
-        "value": "Full composite body"
+        "value": "$225,000 negotiable"
       }
     ],
-    "description": "The **Mercedes Sprinter Motorhome** is Beyond RV's flagship build — a complete custom motorhome body on the trusted Mercedes-Benz Sprinter platform. Every component chosen for reliability and comfort on serious Australian roads.\n\nContact us for the full specification sheet and to discuss your…"
+    "description": "The **Mercedes Sprinter AWD LWB Cab Chassis Motorhome** remains in stock and available for immediate delivery at $225,000 negotiable."
   },
   {
     "slug": "sunpatch-12c-couples-caravan",
-    "title": "Sunpatch 12C Couples Caravan",
-    "price": "$38,500",
+    "title": "Sunpatch 12C Couples Off-Road Van",
+    "price": "$39,999",
     "status": "on-sale",
     "category": "caravan",
-    "tagline": "Compact couples caravan. Big enough for the long haul.",
-    "featured": false,
-    "onSale": true,
-    "heroImage": "/images/optimized/products/sunpatch-12c-couples-caravan/01-sunpatch-12c-28-scaled.webp",
-    "gallery": [],
-    "galleryCount": 0,
-    "relatedSlugs": [
-      "sunpatch-15xc-couples-offroad-van"
-    ],
-    "keySpecs": [
-      {
-        "label": "Length",
-        "value": "12 ft (3.65m)"
-      },
-      {
-        "label": "Sleeps",
-        "value": "2 adults"
-      },
-      {
-        "label": "Construction",
-        "value": "Full composite"
-      }
-    ],
-    "description": "The **Sunpatch 12C** is the entry point to the Sunpatch caravan range — a compact, well-finished couples caravan built on the same full composite principles as the larger 15-XC and 19-XC models.\n\nTwo units available for immediate delivery. Contact us to arrange an inspection or discuss fit-out…"
-  },
-  {
-    "slug": "sunpatch-15xc-couples-offroad-van",
-    "title": "Sunpatch 15-XC Couples Off-Road Van",
-    "price": "$78,888",
-    "status": "on-sale",
-    "category": "caravan",
-    "tagline": "The ultimate couples' off-road caravan. Built tough, finished beautifully.",
+    "tagline": "Compact hardtop couples van for buyers who want a lighter off-road setup.",
     "featured": true,
     "onSale": true,
-    "heroImage": "/images/optimized/products/sunpatch-15xc-couples-offroad-van/01-beyond-rv-sunpatch-15-xc-01-768x509.webp",
+    "heroImage": "/images/optimized/products/sunpatch-12c-couples-caravan/01-sunpatch-12c-couples-caravan-hero.webp",
     "gallery": [
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/02-beyond-rv-sunpatch-15-xc-08-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/03-beyond-rv-sunpatch-15-xc-09-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/04-beyond-rv-sunpatch-15-xc-12-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/05-beyond-rv-sunpatch-15-xc-06-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/06-beyond-rv-sunpatch-15-xc-07-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/07-beyond-rv-sunpatch-15-xc-13-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/08-beyond-rv-sunpatch-15-xc-05-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/09-beyond-rv-sunpatch-15-xc-11-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/10-beyond-rv-sunpatch-15-xc-10-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/11-beyond-rv-sunpatch-15-xc-04-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/12-beyond-rv-sunpatch-15-xc-14-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/13-beyond-rv-sunpatch-15-xc-15-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/14-beyond-rv-sunpatch-15-xc-17-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/15-beyond-rv-sunpatch-15-xc-03-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/16-beyond-rv-sunpatch-15-xc-02-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/17-beyond-rv-sunpatch-15-xc-16-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/18-beyond-rv-sunpatch-15-xc-18-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/19-beyond-rv-sunpatch-15-xc-24-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/20-beyond-rv-sunpatch-15-xc-19-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/21-beyond-rv-sunpatch-15-xc-23-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/22-beyond-rv-sunpatch-15-xc-22-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/23-beyond-rv-sunpatch-15-xc-20-768x509.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/24-beyond-rv-sunpatch-15-xc-21-768x509.webp"
+      "/images/optimized/products/sunpatch-12c-couples-caravan/02-6.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/03-img-0941.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/04-img-4936.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/05-img-4938.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/06-img-4941.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/07-img-4944.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/08-img-4946.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/09-img-4947.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/10-img-4949.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/11-img-4973.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/12-img-4975.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/13-img-4977.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/14-img-4978.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/15-img-4979.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/16-kitchen.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/17-wx-camera-1684909619005.webp"
     ],
-    "galleryCount": 23,
+    "galleryCount": 16,
     "relatedSlugs": [
+      "sunpatch-15xc-couples-offroad-van",
       "sunpatch-19xc-hardtop-couples-offroad-van",
       "sunpatch-21xf-hardtop-family-offroad-van"
     ],
     "keySpecs": [
       {
-        "label": "Length",
-        "value": "15 ft (4.57m)"
+        "label": "Layout",
+        "value": "Couples"
       },
       {
-        "label": "TARE",
-        "value": "~1,800 kg"
+        "label": "Body",
+        "value": "Hardtop off-road caravan"
       },
       {
-        "label": "Sleeps",
-        "value": "2 adults"
-      },
-      {
-        "label": "Construction",
-        "value": "Full composite"
+        "label": "Price",
+        "value": "$39,999"
       }
     ],
-    "description": "The **Sunpatch 15-XC** is Beyond RV's most popular couples caravan — and it's easy to see why. Engineered at our Queensland workshop, every 15-XC is built from full composite panels for a lighter, stronger shell that laughs off corrugated outback tracks.\n\nInside, you'll find a fixed queen island…"
+    "description": "The **Sunpatch 12C** is the compact couples option in the Beyond RV caravan range, priced at the owner-confirmed $39,999."
+  },
+  {
+    "slug": "sunpatch-15xc-couples-offroad-van",
+    "title": "Sunpatch 15-XC Couples Off-Road Van",
+    "price": "$63,000",
+    "status": "on-sale",
+    "category": "caravan",
+    "tagline": "Couples off-road van with 240L fresh water and 200Ah battery standard.",
+    "featured": true,
+    "onSale": true,
+    "heroImage": "/images/optimized/products/sunpatch-15xc-couples-offroad-van/01-sunpatch-15xc-couples-offroad-van-hero.webp",
+    "gallery": [
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/02-dsc-0004.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/03-dsc-0006.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/04-dsc-0010.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/05-dsc-0011.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/06-dsc-0014.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/07-dsc-0022.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/08-dsc-0026.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/09-dsc-0028.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/10-dsc-0029.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/11-dsc-0037.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/12-dsc-0043.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/13-dsc-0050.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/14-dsc-0060.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/15-dsc-0066.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/16-dsc-0072.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/17-dsc-0074.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/18-dsc-0086.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/19-dsc-0092.webp"
+    ],
+    "galleryCount": 18,
+    "relatedSlugs": [
+      "sunpatch-12c-couples-caravan",
+      "sunpatch-19xc-hardtop-couples-offroad-van",
+      "sunpatch-21xf-hardtop-family-offroad-van"
+    ],
+    "keySpecs": [
+      {
+        "label": "Tare",
+        "value": "1900kg"
+      },
+      {
+        "label": "ATM",
+        "value": "2500kg"
+      },
+      {
+        "label": "Fresh water",
+        "value": "240L"
+      },
+      {
+        "label": "Battery",
+        "value": "200Ah"
+      }
+    ],
+    "description": "The **Sunpatch 15-XC** is a couples off-road van with the owner-confirmed $63,000 price, 1900kg tare, 2500kg ATM, 240L fresh water and 200Ah standard battery."
   },
   {
     "slug": "sunpatch-19xc-hardtop-couples-offroad-van",
     "title": "Sunpatch 19-XC Hardtop Couples Off-Road Van",
-    "price": "POA",
-    "status": "coming-soon",
+    "price": "$68,000",
+    "status": "on-sale",
     "category": "caravan",
-    "tagline": "Bigger, tougher, and coming soon. Register your interest now.",
+    "tagline": "Available for sale now, with final images and additional details coming soon.",
     "featured": false,
-    "onSale": false,
-    "heroImage": "/images/optimized/products/sunpatch-19xc-hardtop-couples-offroad-van/01-sunpatch-15xc-01.webp",
+    "onSale": true,
+    "heroImage": "/images/site/sunpatch-19xc-coming-soon.webp",
     "gallery": [],
     "galleryCount": 0,
     "relatedSlugs": [
+      "sunpatch-12c-couples-caravan",
       "sunpatch-15xc-couples-offroad-van",
       "sunpatch-21xf-hardtop-family-offroad-van"
     ],
     "keySpecs": [
       {
-        "label": "Length",
-        "value": "~19 ft"
+        "label": "Layout",
+        "value": "Couples"
       },
       {
         "label": "Status",
-        "value": "Coming Soon"
+        "value": "Available for sale"
       },
       {
-        "label": "Construction",
-        "value": "Full composite hardtop"
+        "label": "Images",
+        "value": "Coming soon"
       }
     ],
-    "description": "The **Sunpatch 19-XC Hardtop** is coming. A bigger, better-equipped evolution of our popular 15-XC — hardtop composite construction, expanded living, and the same go-anywhere off-road capability Beyond RV is known for.\n\nRegister your interest below and we'll reach out the moment it's ready."
+    "description": "The **Sunpatch 19-XC** is available for sale now at $68,000. Final owner-supplied images and additional details are coming soon, so this page is deliberately marked for easy update once those assets arrive."
   },
   {
     "slug": "sunpatch-21xf-hardtop-family-offroad-van",
     "title": "Sunpatch 21-XF Hardtop Family Off-Road Van",
-    "price": "POA",
-    "status": "coming-soon",
+    "price": "$73,000",
+    "status": "on-sale",
     "category": "caravan",
-    "tagline": "Family adventure without compromise. Coming soon.",
+    "tagline": "Family hardtop off-road van, currently available with one in stock.",
     "featured": false,
-    "onSale": false,
-    "heroImage": "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/01-sunpatch-15xc-01.webp",
-    "gallery": [],
-    "galleryCount": 0,
+    "onSale": true,
+    "heroImage": "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/01-sunpatch-21xf-hardtop-family-offroad-van-hero.webp",
+    "gallery": [
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/02-20260522-172146.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/03-20260523-113344.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/04-20260523-113404.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/05-20260523-113407.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/06-20260523-113412.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/07-20260523-113417.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/08-20260523-113436.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/09-20260523-113439.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/10-20260523-113442.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/11-20260523-113452.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/12-20260523-113517.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/13-20260523-113520.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/14-20260523-113525.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/15-20260523-113536.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/16-20260523-113540.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/17-20260523-113605.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/18-20260523-113611.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/19-20260523-113627.webp"
+    ],
+    "galleryCount": 18,
     "relatedSlugs": [
+      "sunpatch-12c-couples-caravan",
       "sunpatch-15xc-couples-offroad-van",
       "sunpatch-19xc-hardtop-couples-offroad-van"
     ],
     "keySpecs": [
       {
-        "label": "Length",
-        "value": "~21 ft"
-      },
-      {
         "label": "Sleeps",
-        "value": "Family (TBC)"
+        "value": "5 people"
       },
       {
-        "label": "Status",
-        "value": "Coming Soon"
+        "label": "Stock",
+        "value": "1 in stock"
+      },
+      {
+        "label": "Price",
+        "value": "$73,000"
       }
     ],
-    "description": "The **Sunpatch 21-XF Hardtop** brings Beyond RV's off-road DNA to families who refuse to leave the kids behind. Coming soon — register your interest and be first in the queue."
+    "description": "The **Sunpatch 21-XF** is the family off-road van in the Sunpatch range. Owner clarification sets this product at $73,000, with one in stock and sleeping for five people."
   }
 ]

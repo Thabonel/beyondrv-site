@@ -45,6 +45,7 @@ type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
 type PanelTab = 'dashboard' | 'products' | 'media' | 'homepage' | 'enquiries' | 'knowledge' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
+const MAX_RECENT_BUILDS = 3;
 
 interface YoutubeVideoMeta {
   id?: string;
@@ -567,6 +568,10 @@ function renumber<T extends { sortOrder: number }>(items: T[]) {
   return items.map((item, index) => ({ ...item, sortOrder: index + 1 }));
 }
 
+function limitRecentBuilds(items: RecentBuild[]) {
+  return renumber(orderedItems(items).slice(0, MAX_RECENT_BUILDS));
+}
+
 export default function AdminPanel() {
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: "Hi! I'm the Beyond RV admin assistant. Tell me what you'd like to change on the site." }
@@ -593,7 +598,7 @@ export default function AdminPanel() {
   const [enquiriesStatus, setEnquiriesStatus] = useState('');
   const [leadSaving, setLeadSaving] = useState<string | null>(null);
   const [contactConfig, setContactConfig] = useState<ContactConfig | null>(null);
-  const [recentBuilds, setRecentBuilds] = useState<RecentBuild[]>(renumber(orderedItems(initialRecentBuilds as RecentBuild[])));
+  const [recentBuilds, setRecentBuilds] = useState<RecentBuild[]>(limitRecentBuilds(initialRecentBuilds as RecentBuild[]));
   const [testimonials, setTestimonials] = useState<Testimonial[]>(renumber(orderedItems(initialTestimonials as Testimonial[])));
   const [homepageStatus, setHomepageStatus] = useState('');
   const [loading, setLoading] = useState(false);
@@ -1148,16 +1153,20 @@ export default function AdminPanel() {
   }
 
   function addRecentBuild() {
-    const title = `Recent Build ${recentBuilds.length + 1}`;
-    setRecentBuilds(prev => renumber([
-      ...prev,
-      {
-        ...EMPTY_RECENT_BUILD,
-        id: slugifyTitle(`${title}-${Date.now()}`),
-        title,
-        sortOrder: prev.length + 1,
-      },
-    ]));
+    const title = `Recent Build ${Date.now().toString().slice(-4)}`;
+    setRecentBuilds(prev => {
+      const current = orderedItems(prev);
+      const keep = current.slice(0, Math.max(0, MAX_RECENT_BUILDS - 1));
+      return renumber([
+        {
+          ...EMPTY_RECENT_BUILD,
+          id: slugifyTitle(`${title}-${Date.now()}`),
+          title,
+          sortOrder: 1,
+        },
+        ...keep,
+      ]);
+    });
   }
 
   function addTestimonial() {
@@ -1246,7 +1255,7 @@ export default function AdminPanel() {
       return;
     }
 
-    const cleanBuilds = renumber(orderedItems(recentBuilds)).map(build => ({
+    const cleanBuilds = limitRecentBuilds(recentBuilds).map(build => ({
       ...build,
       id: slugifyTitle(build.id) || slugifyTitle(build.title),
       title: build.title.trim(),
@@ -1706,7 +1715,7 @@ export default function AdminPanel() {
             <div style={{ padding: '1rem', borderBottom: '1px solid #333', display: 'grid', gap: '0.45rem' }}>
               <div style={{ color: '#fff', fontWeight: 700 }}>Homepage Sections</div>
               <p style={{ color: '#888', fontSize: '0.78rem', lineHeight: 1.4, margin: 0 }}>
-                Edit Recent Builds and customer testimonials. Changes are queued as structured JSON files for review before deployment.
+                Edit the 3 homepage recent builds and customer testimonials. Adding a new recent build replaces the oldest one automatically.
               </p>
               {homepageStatus && (
                 <p style={{ color: homepageStatus.startsWith('Fix') ? '#f87' : '#8f8', fontSize: '0.78rem', lineHeight: 1.35, margin: 0 }}>{homepageStatus}</p>
@@ -1715,9 +1724,9 @@ export default function AdminPanel() {
             <div style={{ flex: 1, overflowY: 'auto', padding: '0.75rem', display: 'grid', gap: '0.85rem', alignContent: 'start' }}>
               <section style={{ display: 'grid', gap: '0.55rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
-                  <h3 style={{ margin: 0, color: '#fff', fontSize: '0.9rem' }}>Recent Builds</h3>
+                  <h3 style={{ margin: 0, color: '#fff', fontSize: '0.9rem' }}>Recent Builds ({recentBuilds.length}/{MAX_RECENT_BUILDS})</h3>
                   <button onClick={addRecentBuild} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.38rem 0.55rem', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700 }}>
-                    Add
+                    Add / Replace Oldest
                   </button>
                 </div>
                 {orderedItems(recentBuilds).map((build, index) => (
@@ -2078,6 +2087,7 @@ export default function AdminPanel() {
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Update homepage proof sections</h3>
               <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
                 <li>Open the Homepage tab to edit Recent Builds and customer testimonials.</li>
+                <li>Recent Builds is capped at 3 items. Adding a new recent build places it first and removes the oldest build automatically.</li>
                 <li>For Recent Builds, use a product hero image or paste an approved image path, then update the title, alt text, link, tags, and visibility.</li>
                 <li>Use the arrow buttons to reorder cards. Hidden cards stay in the data file but do not appear on the homepage.</li>
                 <li>For Testimonials, enter only real customer-provided wording. Do not invent names, quotes, or ratings.</li>

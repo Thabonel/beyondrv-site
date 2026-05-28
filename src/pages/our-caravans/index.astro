@@ -4,9 +4,18 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import { displayImageUrl } from '../../lib/media';
 
-const products = (await getCollection('products'))
-  .filter(p => p.data.category === 'caravan')
-  .sort((a, b) => (a.data.status === 'coming-soon' ? 1 : 0) - (b.data.status === 'coming-soon' ? 1 : 0));
+const productOrder = [
+  'sunpatch-12c-couples-caravan',
+  'sunpatch-15xc-couples-offroad-van',
+  'sunpatch-19xc-hardtop-couples-offroad-van',
+  'sunpatch-21xf-hardtop-family-offroad-van',
+];
+const allProducts = await getCollection('products');
+type ProductEntry = typeof allProducts[number];
+const isProduct = (product: ProductEntry | undefined): product is ProductEntry => Boolean(product);
+const products = productOrder
+  .map(slug => allProducts.find(p => p.slug === slug))
+  .filter(isProduct);
 
 const schema = {
   "@context": "https://schema.org",
@@ -41,8 +50,8 @@ const faqSchema = {
     }
   ]
 };
-const heroImage = '/images/optimized/products/sunpatch-15xc-couples-offroad-van/01-beyond-rv-sunpatch-15-xc-01-768x509.webp';
-const ctaImage = '/images/optimized/products/sunpatch-15xc-couples-offroad-van/16-beyond-rv-sunpatch-15-xc-02-768x509.webp';
+const heroImage = '/images/optimized/products/sunpatch-12c-couples-caravan/01-sunpatch-12c-couples-caravan-hero.webp';
+const ctaImage = '/images/optimized/products/sunpatch-15xc-couples-offroad-van/01-sunpatch-15xc-couples-offroad-van-hero.webp';
 ---
 <BaseLayout
   title="Off-Road Caravans | Beyond RV Queensland"

@@ -3,7 +3,22 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProductCard from '../../components/ProductCard.astro';
 
-const products = (await getCollection('products')).filter(p => p.data.onSale);
+const productOrder = [
+  'sunpatch-15xc-couples-offroad-van',
+  'sunpatch-19xc-hardtop-couples-offroad-van',
+  'sunpatch-21xf-hardtop-family-offroad-van',
+  'sunpatch-12c-couples-caravan',
+  'advent-2150-hardtop-slide-on',
+  '3-5m-poptop-truck-camper',
+  '3-5m-diy-camper-box-with-cabover-and-underfloor-storage',
+  'mercedes-sprinter-motorhome',
+];
+const allProducts = await getCollection('products');
+type ProductEntry = typeof allProducts[number];
+const isProduct = (product: ProductEntry | undefined): product is ProductEntry => Boolean(product);
+const products = productOrder
+  .map(slug => allProducts.find(p => p.slug === slug && p.data.onSale))
+  .filter(isProduct);
 ---
 <BaseLayout
   title="On Sale | Current Stock | Beyond RV Queensland"

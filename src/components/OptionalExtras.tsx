@@ -10,15 +10,15 @@ const EXTRAS = [
   {
     category: 'Power & Electrical',
     items: [
-      { id: 'battery',  label: 'Extra battery',                              price: 1300 },
+      { id: 'battery',  label: 'Extra 200Ah battery',                        price: 1500 },
       { id: 'inverter', label: 'Upgrade to 3000W Redarc inverter',           price: 3500 },
-      { id: 'solar',    label: 'Additional 180W solar panel',                price: 400  },
+      { id: 'solar',    label: 'Additional 200W solar panel',                price: 500  },
     ],
   },
   {
     category: 'Heating & Cooling',
     items: [
-      { id: 'heater-aufocus', label: '2KW AuFocus diesel heater supply and install',                    price: 1500 },
+      { id: 'heater-aufocus', label: '2kW AuFocus diesel heater supply and install',                    price: 2000 },
       { id: 'heater-truma',   label: 'Upgrade to Truma Combi D6 diesel air and water heater',          price: 3500 },
     ],
   },
@@ -31,7 +31,13 @@ const EXTRAS = [
   {
     category: 'Water Systems',
     items: [
-      { id: 'greywater', label: '40L greywater tank with 12V sump pump', price: 800 },
+      { id: 'greywater', label: '40L greywater tank with 12V sump pump', price: 1000 },
+    ],
+  },
+  {
+    category: 'Exterior Finish',
+    items: [
+      { id: 'gelcoat-colour', label: 'Custom gel-coat colour matching', price: 3000 },
     ],
   },
   {

@@ -6,9 +6,20 @@ import { displayImageUrl, imageSrcSet } from '../../lib/media';
 
 const products = (await getCollection('products'))
   .filter(p => p.data.category === 'expedition');
+type ProductEntry = typeof products[number];
+const isProduct = (product: ProductEntry | undefined): product is ProductEntry => Boolean(product);
 
 const unimogProducts = products.filter(p => p.slug.includes('unimog'));
-const isuzuProducts = products.filter(p => p.slug.includes('isuzu'));
+const truckBuildOrder = [
+  'expedition/3-5m-electric-poptop-cabover-family-camper',
+  'expedition/4-7m-hardtop-truck-camper',
+  '3-5m-poptop-truck-camper',
+  '3-5m-diy-camper-box-with-cabover-and-underfloor-storage',
+  'mercedes-sprinter-motorhome',
+];
+const truckBuildProducts = truckBuildOrder
+  .map(slug => products.find(p => p.slug === slug))
+  .filter(isProduct);
 
 const schema = {
   "@context": "https://schema.org",
@@ -43,17 +54,18 @@ const faqSchema = {
     }
   ]
 };
-const calloutImage = '/images/optimized/products/expedition/isuzu-nps-poptop-camper/01-isuzu-nps-01.webp';
+const heroImage = '/images/site/expedition-hero.webp';
+const calloutImage = '/images/optimized/products/expedition/4-7m-hardtop-truck-camper/01-expedition-4-7m-hardtop-truck-camper-hero.webp';
 ---
 <BaseLayout
   title="Expedition Vehicles | Unimog & Isuzu Campers | Beyond RV Queensland"
-  description="Beyond RV builds expedition campers on Unimog and Isuzu NPS platforms. For serious overlanders who genuinely leave all roads behind. Custom-built in Queensland."
-  image="/images/site/unimog-hero.jpg"
+  description="Beyond RV builds expedition campers, 4x4 truck campers, Unimog bodies, and Isuzu NPS builds for serious Australian touring. Custom-built in Queensland."
+  image={heroImage}
   activePath="/expedition/"
   structuredData={[schema, faqSchema]}
 >
   <section class="page-hero">
-    <div class="page-hero-bg" style="background-image: url('/images/site/unimog-hero.jpg')"></div>
+    <div class="page-hero-bg" style={`background-image: url('${displayImageUrl(heroImage, 1600)}')`}></div>
     <div class="hero-overlay"></div>
     <div class="hero-overlay-bottom"></div>
     <div class="page-hero-content">
@@ -63,8 +75,8 @@ const calloutImage = '/images/optimized/products/expedition/isuzu-nps-poptop-cam
       </div>
       <h1 class="hero-title">Expedition<br><span class="accent">Range</span></h1>
       <p class="hero-sub">
-        Built for people who go beyond. Unimog and Isuzu NPS platforms with full composite expedition bodies.
-        Custom-built in Queensland for the serious overlander.
+        Built for people who go beyond. 4x4 truck campers, Unimog bodies and Isuzu NPS builds with full composite expedition bodies.
+        Custom-built in Queensland for serious overlanders.
       </p>
     </div>
   </section>
@@ -87,7 +99,7 @@ const calloutImage = '/images/optimized/products/expedition/isuzu-nps-poptop-cam
         src={displayImageUrl(calloutImage, 1200)}
         srcset={imageSrcSet(calloutImage)}
         sizes="(max-width: 900px) 100vw, 50vw"
-        alt="Beyond RV Isuzu NPS expedition camper"
+        alt="Beyond RV 4.7m hardtop truck camper"
         loading="lazy"
         decoding="async"
       />
@@ -116,13 +128,13 @@ const calloutImage = '/images/optimized/products/expedition/isuzu-nps-poptop-cam
     </section>
   )}
 
-  <!-- Isuzu range -->
-  {isuzuProducts.length > 0 && (
+  <!-- Truck builds -->
+  {truckBuildProducts.length > 0 && (
     <section class="container" style="margin-top: 3rem; padding-bottom: 5rem">
-      <h2 class="section-title">Isuzu NPS Builds</h2>
-      <p class="section-sub">Serious expedition capability on a platform you can service at any Isuzu dealer in Australia.</p>
+      <h2 class="section-title">4x4 Truck Builds</h2>
+      <p class="section-sub">Truck campers for couples and families, including the 4.7m hardtop camper that can be made to suit a Unimog.</p>
       <div class="product-grid">
-        {isuzuProducts.map(p => (
+        {truckBuildProducts.map(p => (
           <ProductCard
             title={p.data.title}
             slug={p.slug}
@@ -143,7 +155,7 @@ const calloutImage = '/images/optimized/products/expedition/isuzu-nps-poptop-cam
       <h2>Expedition campers for serious travel</h2>
       <h3>Which platforms work best?</h3>
       <p>
-        Unimog and Isuzu NPS platforms are common choices because they offer real payload, ground clearance,
+        Unimog, Isuzu NPS, Sprinter and similar truck platforms are common choices because they offer real payload, ground clearance,
         and off-road capability. The best platform depends on serviceability, payload, budget, and how remote
         you plan to travel.
       </p>
@@ -154,7 +166,7 @@ const calloutImage = '/images/optimized/products/expedition/isuzu-nps-poptop-cam
         are more important.
       </p>
       <p>
-        If you are comparing an Isuzu, Unimog, Sprinter, or Iveco platform, send the details through the
+        If you are comparing an Isuzu, Unimog, Sprinter, Iveco or other truck platform, send the details through the
         <a href="/inquiry-form/?product=expedition-custom">expedition enquiry form</a>.
       </p>
     </div>

@@ -39,7 +39,7 @@ features:
   - "Custom-built to order — contact us to discuss"
 relatedSlugs:
   - "expedition/unimog-poptop-camper"
-  - "expedition/isuzu-nps-cabover-camper"
+  - "expedition/4-7m-hardtop-truck-camper"
 seoTitle: "Unimog Overlander Camper | Beyond RV Expedition Vehicles Queensland"
 seoDesc: "Beyond RV's Unimog Overlander Camper. Full composite expedition body on the Mercedes-Benz Unimog platform. Built for where roads end."
 ---

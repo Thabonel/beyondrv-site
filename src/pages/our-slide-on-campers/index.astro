@@ -4,13 +4,18 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import { displayImageUrl } from '../../lib/media';
 
-const products = (await getCollection('products'))
-  .filter(p => p.data.category === 'slide-on')
-  .sort((a, b) => {
-    if (a.data.featured && !b.data.featured) return -1;
-    if (!a.data.featured && b.data.featured) return 1;
-    return 0;
-  });
+const productOrder = [
+  'advent-2150-hardtop-slide-on',
+  'advent-2300-hardtop-slide-on',
+  'advent-2450-hardtop-slide-on',
+  '7ft-electric-poptop-slide-on',
+];
+const allProducts = await getCollection('products');
+type ProductEntry = typeof allProducts[number];
+const isProduct = (product: ProductEntry | undefined): product is ProductEntry => Boolean(product);
+const products = productOrder
+  .map(slug => allProducts.find(p => p.slug === slug))
+  .filter(isProduct);
 
 const schema = {
   "@context": "https://schema.org",
@@ -45,11 +50,11 @@ const faqSchema = {
     }
   ]
 };
-const heroImage = '/images/optimized/products/advent-2150-hardtop-slide-on/02-advent-2150-04-1024x576.webp';
+const heroImage = '/images/site/homepage-slide-on-campers.webp';
 ---
 <BaseLayout
-  title="Slide-On Campers for Utes & Trucks | Beyond RV Queensland"
-  description="Beyond RV slide-on campers — hardtop and pop-top for utes, mid-size trucks, and expedition vehicles. The Advent range and more. Built in Queensland."
+  title="Slide-On Campers for Utes | Beyond RV Queensland"
+  description="Beyond RV ute slide-on campers — hardtop and pop-top campers for suitable ute tray platforms. The Advent range and 7ft electric pop-top. Built in Queensland."
   image={heroImage}
   activePath="/our-slide-on-campers/"
   structuredData={[schema, faqSchema]}
@@ -65,7 +70,7 @@ const heroImage = '/images/optimized/products/advent-2150-hardtop-slide-on/02-ad
       </div>
       <h1 class="hero-title">Slide-On Campers</h1>
       <p class="hero-sub">
-        For HiLux, Ranger, D-Max, and serious trucks. Hardtop and pop-top models across multiple size classes.
+        For suitable ute tray platforms. Hardtop and pop-top models across multiple size classes.
         Full composite. Queensland finished.
       </p>
     </div>
@@ -94,8 +99,7 @@ const heroImage = '/images/optimized/products/advent-2150-hardtop-slide-on/02-ad
       <h3>What vehicles can take a slide-on camper?</h3>
       <p>
         The right slide-on depends on tray size, payload, axle limits, suspension setup, and how much water,
-        battery, and gear you want to carry. Beyond RV can help match a camper to utes, tray backs, Iveco,
-        Isuzu, Sprinter, and similar platforms.
+        battery, and gear you want to carry. Beyond RV's Slide-Ons range is dedicated to ute slide-on campers.
       </p>
       <h3>Hardtop or pop-top?</h3>
       <p>
@@ -103,8 +107,8 @@ const heroImage = '/images/optimized/products/advent-2150-hardtop-slide-on/02-ad
         height and wind resistance matter, but you still want standing room at camp.
       </p>
       <p>
-        For unusual tray dimensions or a touring setup that needs more battery, water, or storage, start a
-        <a href="/custom/">custom build enquiry</a>.
+        For truck campers, Unimog bodies, Isuzu NPS builds, or larger expedition bodies, compare the
+        <a href="/expedition/">Expedition range</a>.
       </p>
     </div>
   </section>
