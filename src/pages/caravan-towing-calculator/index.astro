@@ -66,7 +66,7 @@ const schema = [
 ---
 <BaseLayout
   title="Caravan Towing Calculator | ByondRV"
-  description="Estimate whether your tow vehicle may safely tow a ByondRV caravan using GVM, GCM, braked towing capacity, tow ball download, ATM, GTM and payload."
+  description="Estimate whether your tow vehicle may be a candidate for a ByondRV caravan using GVM, GCM, braked towing capacity, tow ball download, ATM, GTM and payload."
   image={heroImage}
   activePath="/vehicle-suitability-checker/"
   structuredData={schema}
@@ -92,74 +92,81 @@ const schema = [
       <form class="checker-form" id="towCalculator">
         <div class="form-field form-field--full">
           <label class="form-label" for="vehicleName">Vehicle</label>
-          <input class="form-input" id="vehicleName" type="text" value="Example: Toyota LandCruiser 300" />
+          <input class="form-input" id="vehicleName" type="text" placeholder="Example: Toyota LandCruiser 300" />
         </div>
         <div class="form-field">
           <label class="form-label" for="gvm">Vehicle GVM (kg)</label>
-          <input class="form-input" id="gvm" type="number" min="0" value="3280" />
+          <input class="form-input" id="gvm" type="number" min="0" placeholder="3280" />
         </div>
         <div class="form-field">
           <label class="form-label" for="gcm">Vehicle GCM (kg)</label>
-          <input class="form-input" id="gcm" type="number" min="0" value="6750" />
+          <input class="form-input" id="gcm" type="number" min="0" placeholder="6750" />
         </div>
         <div class="form-field">
           <label class="form-label" for="currentWeight">Current vehicle weight before listed additions (kg)</label>
-          <input class="form-input" id="currentWeight" type="number" min="0" value="2500" />
+          <input class="form-input" id="currentWeight" type="number" min="0" placeholder="2500" />
           <span class="form-help">Use a current weighbridge weight if possible. If it already includes accessories, luggage or passengers, enter 0 for those items below.</span>
         </div>
         <div class="form-field">
           <label class="form-label" for="towCapacity">Braked towing capacity or towbar limit (kg)</label>
-          <input class="form-input" id="towCapacity" type="number" min="0" value="3500" />
+          <input class="form-input" id="towCapacity" type="number" min="0" placeholder="3500" />
           <span class="form-help">Enter the lower figure if your towbar rating is lower than the vehicle braked towing capacity.</span>
         </div>
         <div class="form-field">
           <label class="form-label" for="towBallLimit">Tow ball or towbar ball limit (kg)</label>
-          <input class="form-input" id="towBallLimit" type="number" min="0" value="350" />
+          <input class="form-input" id="towBallLimit" type="number" min="0" placeholder="350" />
         </div>
         <div class="form-field">
           <label class="form-label" for="ballDownload">Estimated tow ball download (kg)</label>
-          <input class="form-input" id="ballDownload" type="number" min="0" value="160" />
+          <input class="form-input" id="ballDownload" type="number" min="0" placeholder="160" />
         </div>
         <div class="form-field">
-          <label class="form-label" for="atm">Caravan ATM or loaded weight (kg)</label>
-          <input class="form-input" id="atm" type="number" min="0" value="2420" />
+          <label class="form-label" for="atm">Caravan ATM rating (kg)</label>
+          <input class="form-input" id="atm" type="number" min="0" placeholder="2420" />
         </div>
         <div class="form-field">
-          <label class="form-label" for="gtm">Caravan GTM or loaded wheel mass (kg)</label>
-          <input class="form-input" id="gtm" type="number" min="0" value="2260" />
-          <span class="form-help">Use the plate GTM if checking the rated limit. Use a measured wheel load if checking a real loaded trip.</span>
+          <label class="form-label" for="loadedCaravan">Estimated actual loaded caravan weight (kg)</label>
+          <input class="form-input" id="loadedCaravan" type="number" min="0" placeholder="2300" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="gtm">Caravan GTM rating (kg)</label>
+          <input class="form-input" id="gtm" type="number" min="0" placeholder="2260" />
         </div>
         <div class="form-field">
           <label class="form-label" for="passengers">Passengers in vehicle (kg)</label>
-          <input class="form-input" id="passengers" type="number" min="0" value="180" />
+          <input class="form-input" id="passengers" type="number" min="0" placeholder="180" />
         </div>
         <div class="form-field">
           <label class="form-label" for="accessories">Vehicle accessories (kg)</label>
-          <input class="form-input" id="accessories" type="number" min="0" value="80" />
+          <input class="form-input" id="accessories" type="number" min="0" placeholder="80" />
         </div>
         <div class="form-field form-field--full">
           <label class="form-label" for="luggage">Vehicle luggage and touring gear (kg)</label>
-          <input class="form-input" id="luggage" type="number" min="0" value="80" />
+          <input class="form-input" id="luggage" type="number" min="0" placeholder="80" />
         </div>
       </form>
       <p class="calculator-disclaimer">{disclaimer}</p>
     </div>
 
-    <aside class="result-panel" id="resultPanel" data-status="amber" aria-live="polite">
-      <div class="result-status" id="statusLabel">Possible but close to limit</div>
+    <aside class="result-panel" id="resultPanel" data-status="neutral" aria-live="polite">
+      <div class="result-status" id="statusLabel">Enter your numbers to calculate a result.</div>
       <h2 id="resultTitle">Enter your numbers</h2>
-      <p class="result-summary" id="resultSummary">The calculator will estimate loaded vehicle weight, GVM margin, GCM margin and towing margins.</p>
+      <p class="result-summary" id="resultSummary">Enter your numbers to calculate a result.</p>
       <div class="result-metrics">
         <div class="result-metric"><span>Available payload</span><strong id="availablePayload">0 kg</strong></div>
         <div class="result-metric"><span>Estimated loaded vehicle weight</span><strong id="loadedVehicle">0 kg</strong></div>
         <div class="result-metric"><span>Remaining GVM margin</span><strong id="gvmMargin">0 kg</strong></div>
         <div class="result-metric"><span>Remaining GCM margin</span><strong id="gcmMargin">0 kg</strong></div>
         <div class="result-metric"><span>Tow capacity margin</span><strong id="towMargin">0 kg</strong></div>
+        <div class="result-metric"><span>ATM margin</span><strong id="atmMargin">0 kg</strong></div>
+        <div class="result-metric"><span>Estimated caravan axle load</span><strong id="caravanAxleLoad">0 kg</strong></div>
+        <div class="result-metric"><span>GTM margin</span><strong id="gtmMargin">0 kg</strong></div>
         <div class="result-metric"><span>Tow ball margin</span><strong id="ballMargin">0 kg</strong></div>
+        <div class="result-metric"><span>Data quality</span><strong id="dataQuality">Needs review</strong></div>
       </div>
       <div class="result-recommendation">
         <strong>ByondRV product recommendation</strong>
-        <p id="recommendation">Manual data required.</p>
+        <p id="recommendation">Confirm with ByondRV</p>
       </div>
       <ul class="result-notes" id="warningNotes"></ul>
       <a class="btn-primary" id="sendResult" href="/inquiry-form/?intent=vehicle-suitability">Send this result to ByondRV</a>
@@ -170,20 +177,20 @@ const schema = [
     <div class="container authority-copy">
       <h2>How this caravan towing calculator works</h2>
       <p>
-        The calculator treats tow ball download as load on the vehicle, checks the vehicle against GVM, checks the vehicle plus caravan wheel load against GCM, compares caravan ATM against braked towing capacity, and compares ball download against the entered ball limit.
+        The calculator treats tow ball download as load on the vehicle, checks the vehicle against GVM, checks combined loaded vehicle and loaded caravan weight against GCM, compares actual loaded caravan weight against ATM and braked towing capacity, checks estimated caravan axle load against GTM, and compares ball download against the entered ball limit.
       </p>
       <div class="worked-example">
         <h3>Worked example</h3>
         <p>A vehicle weighing 2700kg before passengers and luggage may look strong with 3500kg towing capacity. Add 180kg of passengers, 120kg of accessories, 120kg of luggage and 240kg tow ball download and the loaded vehicle becomes 3360kg. If GVM is 3280kg, the result is red even if the caravan ATM is under the braked towing rating.</p>
       </div>
-      <h2>ByondRV caravan recommendation table</h2>
+      <h2>ByondRV caravan product data table</h2>
       <div class="authority-table-wrap">
         <table class="authority-table">
           <thead>
             <tr>
               <th>Product</th>
               <th>Listed ATM / ball guide</th>
-              <th>Typical fit conversation</th>
+              <th>Data status</th>
             </tr>
           </thead>
           <tbody>
@@ -191,7 +198,7 @@ const schema = [
               <tr>
                 <td><a href={new URL(product.url).pathname}>{product.name}</a></td>
                 <td>ATM: {product.atm}<br />Ball: {product.ball}</td>
-                <td>{product.fit}</td>
+                <td>Confirm with ByondRV</td>
               </tr>
             ))}
           </tbody>
@@ -216,11 +223,14 @@ const schema = [
 </BaseLayout>
 
 <script>
+  import { calculateCaravanSuitability } from '../../lib/vehicleSuitabilityCalculator.js';
+
   const form = document.getElementById('towCalculator');
   const resultPanel = document.getElementById('resultPanel');
-  const fields = ['vehicleName', 'gvm', 'gcm', 'currentWeight', 'towCapacity', 'towBallLimit', 'ballDownload', 'atm', 'gtm', 'passengers', 'accessories', 'luggage'];
+  const fields = ['vehicleName', 'gvm', 'gcm', 'currentWeight', 'towCapacity', 'towBallLimit', 'ballDownload', 'atm', 'loadedCaravan', 'gtm', 'passengers', 'accessories', 'luggage'];
+  let hasStarted = false;
   const byId = (id) => document.getElementById(id);
-  const num = (id) => Number(byId(id)?.value || 0);
+  const value = (id) => byId(id)?.value ?? '';
   const fmt = (value) => `${Math.round(value).toLocaleString()} kg`;
 
   function setText(id, value) {
@@ -228,94 +238,69 @@ const schema = [
     if (el) el.textContent = value;
   }
 
-  function calculateTow() {
-    const vehicleName = byId('vehicleName')?.value || 'your vehicle';
-    const gvm = num('gvm');
-    const gcm = num('gcm');
-    const currentWeight = num('currentWeight');
-    const towCapacity = num('towCapacity');
-    const towBallLimit = num('towBallLimit');
-    const ballDownload = num('ballDownload');
-    const atm = num('atm');
-    const gtm = num('gtm');
-    const passengers = num('passengers');
-    const accessories = num('accessories');
-    const luggage = num('luggage');
-
-    const availablePayload = gvm - currentWeight;
-    const loadedVehicle = currentWeight + passengers + accessories + luggage + ballDownload;
-    const trailerWheelLoad = gtm > 0 ? gtm : Math.max(0, atm - ballDownload);
-    const combinedWeight = loadedVehicle + trailerWheelLoad;
-    const gvmMargin = gvm - loadedVehicle;
-    const gcmMargin = gcm - combinedWeight;
-    const towMargin = towCapacity - atm;
-    const ballMargin = towBallLimit - ballDownload;
-    const closeLimit = 150;
-
-    const margins = [gvmMargin, gcmMargin, towMargin, ballMargin];
-    let status = 'green';
-    let statusLabel = 'Looks suitable';
-    let title = 'Looks suitable on this estimate';
-    if (margins.some(value => value < 0)) {
-      status = 'red';
-      statusLabel = 'Not recommended';
-      title = 'Not recommended on this estimate';
-    } else if (margins.some(value => value <= closeLimit)) {
-      status = 'amber';
-      statusLabel = 'Possible but close to limit';
-      title = 'Possible, but close to the limit';
-    }
-
-    const recommendation = status === 'red'
-      ? 'Do not choose a caravan from these numbers without speaking to ByondRV. One or more vehicle, combined, towing or ball limits appear to be exceeded.'
-      : atm <= 2450
-        ? 'Start with the Sunpatch 12C discussion, and confirm the final ATM, ball weight, towbar rating and loaded vehicle weight.'
-        : atm <= 2600
-          ? 'Start with the Sunpatch 15-XC discussion, subject to ByondRV checking your exact vehicle, towbar and loaded weights.'
-          : 'This may require a heavier tow vehicle conversation before considering larger Sunpatch models. Ask ByondRV to review the full towing setup.';
-
-    const notes = [];
-    if (gvmMargin < 0) notes.push(`Estimated loaded vehicle weight is ${fmt(Math.abs(gvmMargin))} over GVM.`);
-    if (gcmMargin < 0) notes.push(`Estimated combined weight is ${fmt(Math.abs(gcmMargin))} over GCM.`);
-    if (towMargin < 0) notes.push(`Estimated caravan ATM is ${fmt(Math.abs(towMargin))} over braked towing capacity.`);
-    if (ballMargin < 0) notes.push(`Estimated tow ball download is ${fmt(Math.abs(ballMargin))} over the entered ball limit.`);
-    if (status === 'amber') notes.push('At least one margin is close. Small changes in water, luggage or accessories may change the result.');
-    notes.push('GCM is estimated from the loaded vehicle, including ball download, plus the entered GTM or loaded caravan wheel mass.');
-    notes.push('Check towbar rating, axle limits, tyre ratings and certified weighbridge weights before purchase.');
-
-    resultPanel?.setAttribute('data-status', status);
-    setText('statusLabel', statusLabel);
-    setText('resultTitle', title);
-    setText('resultSummary', `${vehicleName} is estimated at ${fmt(loadedVehicle)} loaded, with a combined towing estimate of ${fmt(combinedWeight)}.`);
-    setText('availablePayload', fmt(availablePayload));
-    setText('loadedVehicle', fmt(loadedVehicle));
-    setText('gvmMargin', fmt(gvmMargin));
-    setText('gcmMargin', fmt(gcmMargin));
-    setText('towMargin', fmt(towMargin));
-    setText('ballMargin', fmt(ballMargin));
-    setText('recommendation', recommendation);
-
+  function setNotes(notes) {
     const warningNotes = byId('warningNotes');
     if (warningNotes) warningNotes.innerHTML = notes.map(note => `<li>${note}</li>`).join('');
+  }
+
+  function calculateTow() {
+    const vehicleName = byId('vehicleName')?.value || 'your vehicle';
+    const result = calculateCaravanSuitability({
+      vehicleGvm: value('gvm'),
+      vehicleGcm: value('gcm'),
+      currentVehicleWeight: value('currentWeight'),
+      vehicleBrakedTowingCapacity: value('towCapacity'),
+      vehicleTowBallLimit: value('towBallLimit'),
+      estimatedTowBallDownload: value('ballDownload'),
+      caravanAtmRating: value('atm'),
+      estimatedActualLoadedCaravanWeight: value('loadedCaravan'),
+      caravanGtmRating: value('gtm'),
+      passengerWeight: value('passengers'),
+      accessoryWeight: value('accessories'),
+      luggageWeight: value('luggage')
+    }, { started: hasStarted });
+    const values = result.values ?? {};
+
+    resultPanel?.setAttribute('data-status', result.status);
+    setText('statusLabel', result.statusLabel);
+    setText('resultTitle', result.title);
+    setText('resultSummary', result.summary);
+    setText('availablePayload', values.availablePayload === undefined ? '0 kg' : fmt(values.availablePayload));
+    setText('loadedVehicle', values.estimatedLoadedVehicleWeight === undefined ? '0 kg' : fmt(values.estimatedLoadedVehicleWeight));
+    setText('gvmMargin', values.remainingGvmMargin === undefined ? '0 kg' : fmt(values.remainingGvmMargin));
+    setText('gcmMargin', values.remainingGcmMargin === undefined ? '0 kg' : fmt(values.remainingGcmMargin));
+    setText('towMargin', values.towCapacityMargin === undefined ? '0 kg' : fmt(values.towCapacityMargin));
+    setText('atmMargin', values.atmMargin === undefined ? '0 kg' : fmt(values.atmMargin));
+    setText('caravanAxleLoad', values.estimatedCaravanAxleLoad === undefined ? '0 kg' : fmt(values.estimatedCaravanAxleLoad));
+    setText('gtmMargin', values.gtmMargin === undefined ? '0 kg' : fmt(values.gtmMargin));
+    setText('ballMargin', values.towBallMargin === undefined ? '0 kg' : fmt(values.towBallMargin));
+    setText('dataQuality', result.dataQuality);
+    setText('recommendation', result.recommendation);
+    setNotes(result.notes);
 
     const message = [
       'Vehicle Suitability Checker result - caravan towing',
       `Vehicle: ${vehicleName}`,
-      `Status: ${statusLabel}`,
-      `Available payload: ${fmt(availablePayload)}`,
-      `Estimated loaded vehicle weight: ${fmt(loadedVehicle)}`,
-      `Remaining GVM margin: ${fmt(gvmMargin)}`,
-      `Remaining GCM margin: ${fmt(gcmMargin)}`,
-      `Tow capacity margin: ${fmt(towMargin)}`,
-      `Tow ball margin: ${fmt(ballMargin)}`,
-      `Caravan wheel load used for GCM: ${fmt(trailerWheelLoad)}`,
-      `Recommendation: ${recommendation}`
+      `Status: ${result.statusLabel}`,
+      `Available payload: ${values.availablePayload === undefined ? 'Not calculated' : fmt(values.availablePayload)}`,
+      `Estimated loaded vehicle weight: ${values.estimatedLoadedVehicleWeight === undefined ? 'Not calculated' : fmt(values.estimatedLoadedVehicleWeight)}`,
+      `Remaining GVM margin: ${values.remainingGvmMargin === undefined ? 'Not calculated' : fmt(values.remainingGvmMargin)}`,
+      `Remaining GCM margin: ${values.remainingGcmMargin === undefined ? 'Not calculated' : fmt(values.remainingGcmMargin)}`,
+      `Tow capacity margin: ${values.towCapacityMargin === undefined ? 'Not calculated' : fmt(values.towCapacityMargin)}`,
+      `ATM margin: ${values.atmMargin === undefined ? 'Not calculated' : fmt(values.atmMargin)}`,
+      `Estimated caravan axle load: ${values.estimatedCaravanAxleLoad === undefined ? 'Not calculated' : fmt(values.estimatedCaravanAxleLoad)}`,
+      `GTM margin: ${values.gtmMargin === undefined ? 'Not calculated' : fmt(values.gtmMargin)}`,
+      `Tow ball margin: ${values.towBallMargin === undefined ? 'Not calculated' : fmt(values.towBallMargin)}`,
+      `Data quality: ${result.dataQuality}`,
+      `Recommendation: ${result.recommendation}`
     ].join('\n');
     const send = byId('sendResult');
     if (send) send.setAttribute('href', `/inquiry-form/?intent=vehicle-suitability&message=${encodeURIComponent(message)}`);
   }
 
-  fields.forEach(id => byId(id)?.addEventListener('input', calculateTow));
+  fields.forEach(id => byId(id)?.addEventListener('input', () => {
+    hasStarted = true;
+    calculateTow();
+  }));
   form?.addEventListener('submit', (event) => event.preventDefault());
-  calculateTow();
 </script>

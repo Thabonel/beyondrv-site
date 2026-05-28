@@ -1189,6 +1189,7 @@ nav.scrolled {
 .result-panel[data-status="green"] .result-status { color: #43d17c; }
 .result-panel[data-status="amber"] .result-status { color: #f0b84c; }
 .result-panel[data-status="red"] .result-status { color: #ff6b5f; }
+.result-panel[data-status="neutral"] .result-status { color: rgba(240,235,227,0.72); }
 .result-panel h2 {
   font-family: var(--font-heading);
   font-size: 2rem;

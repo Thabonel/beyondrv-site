@@ -45,6 +45,7 @@ type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
 type PanelTab = 'dashboard' | 'products' | 'media' | 'homepage' | 'enquiries' | 'knowledge' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
+type SuitabilityDataStatus = 'draft' | 'target' | 'confirmed';
 const MAX_RECENT_BUILDS = 3;
 const MAX_UPLOAD_IMAGE_EDGE = 2000;
 const UPLOAD_IMAGE_QUALITY = 0.82;
@@ -87,6 +88,20 @@ interface ProductRecord {
   galleryCount?: number;
   relatedSlugs?: string[];
   youtubeVideo?: YoutubeVideoMeta;
+  suitabilityData?: SuitabilityData;
+}
+
+interface SuitabilityData {
+  status: SuitabilityDataStatus;
+  dryWeightKg?: string;
+  estimatedLoadedWeightKg?: string;
+  requiredTrayLengthMm?: string;
+  requiredTrayWidthMm?: string;
+  centreOfGravityMm?: string;
+  atmKg?: string;
+  gtmKg?: string;
+  towBallWeightKg?: string;
+  notes?: string;
 }
 
 interface NewProductForm {
@@ -125,6 +140,16 @@ interface EditProductForm {
   youtubeVideoUploadDate: string;
   youtubeVideoDuration: string;
   youtubeVideoTranscriptSummary: string;
+  suitabilityStatus: SuitabilityDataStatus;
+  suitabilityDryWeightKg: string;
+  suitabilityEstimatedLoadedWeightKg: string;
+  suitabilityRequiredTrayLengthMm: string;
+  suitabilityRequiredTrayWidthMm: string;
+  suitabilityCentreOfGravityMm: string;
+  suitabilityAtmKg: string;
+  suitabilityGtmKg: string;
+  suitabilityTowBallWeightKg: string;
+  suitabilityNotes: string;
   notes: string;
 }
 
@@ -1034,6 +1059,16 @@ export default function AdminPanel() {
       youtubeVideoUploadDate: product.youtubeVideo?.uploadDate ?? '',
       youtubeVideoDuration: product.youtubeVideo?.duration ?? '',
       youtubeVideoTranscriptSummary: product.youtubeVideo?.transcriptSummary ?? '',
+      suitabilityStatus: product.suitabilityData?.status ?? 'draft',
+      suitabilityDryWeightKg: product.suitabilityData?.dryWeightKg ?? '',
+      suitabilityEstimatedLoadedWeightKg: product.suitabilityData?.estimatedLoadedWeightKg ?? '',
+      suitabilityRequiredTrayLengthMm: product.suitabilityData?.requiredTrayLengthMm ?? '',
+      suitabilityRequiredTrayWidthMm: product.suitabilityData?.requiredTrayWidthMm ?? '',
+      suitabilityCentreOfGravityMm: product.suitabilityData?.centreOfGravityMm ?? '',
+      suitabilityAtmKg: product.suitabilityData?.atmKg ?? '',
+      suitabilityGtmKg: product.suitabilityData?.gtmKg ?? '',
+      suitabilityTowBallWeightKg: product.suitabilityData?.towBallWeightKg ?? '',
+      suitabilityNotes: product.suitabilityData?.notes ?? '',
       notes: '',
     };
   }
@@ -1163,6 +1198,18 @@ export default function AdminPanel() {
               transcriptSummary: editProduct.youtubeVideoTranscriptSummary.trim(),
             }
           : null,
+        suitabilityData: {
+          status: editProduct.suitabilityStatus,
+          dryWeightKg: editProduct.suitabilityDryWeightKg.trim(),
+          estimatedLoadedWeightKg: editProduct.suitabilityEstimatedLoadedWeightKg.trim(),
+          requiredTrayLengthMm: editProduct.suitabilityRequiredTrayLengthMm.trim(),
+          requiredTrayWidthMm: editProduct.suitabilityRequiredTrayWidthMm.trim(),
+          centreOfGravityMm: editProduct.suitabilityCentreOfGravityMm.trim(),
+          atmKg: editProduct.suitabilityAtmKg.trim(),
+          gtmKg: editProduct.suitabilityGtmKg.trim(),
+          towBallWeightKg: editProduct.suitabilityTowBallWeightKg.trim(),
+          notes: editProduct.suitabilityNotes.trim(),
+        },
       }),
     })
       .then(async res => {
@@ -1677,6 +1724,28 @@ export default function AdminPanel() {
                   transcriptSummary={editProduct.youtubeVideoTranscriptSummary}
                   onChange={patch => setEditProduct(p => p && ({ ...p, ...patch }))}
                 />
+                <div style={{ display: 'grid', gap: '0.45rem', border: '1px solid #333', borderRadius: '6px', padding: '0.6rem', background: '#101010' }}>
+                  <div>
+                    <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.78rem' }}>Suitability Checker Data</div>
+                    <div style={{ color: '#777', fontSize: '0.68rem', marginTop: '0.15rem', lineHeight: 1.35 }}>Use draft or target while lighter slide-on weights are being developed. Only confirmed data should later be used for public model matching.</div>
+                  </div>
+                  <select value={editProduct.suitabilityStatus} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityStatus: e.target.value as SuitabilityDataStatus }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
+                    <option value="draft">Draft</option>
+                    <option value="target">Target</option>
+                    <option value="confirmed">Confirmed</option>
+                  </select>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+                    <input value={editProduct.suitabilityDryWeightKg} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityDryWeightKg: e.target.value }))} placeholder="Slide-on dry weight kg" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                    <input value={editProduct.suitabilityEstimatedLoadedWeightKg} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityEstimatedLoadedWeightKg: e.target.value }))} placeholder="Estimated loaded weight kg" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                    <input value={editProduct.suitabilityRequiredTrayLengthMm} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityRequiredTrayLengthMm: e.target.value }))} placeholder="Required tray length mm" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                    <input value={editProduct.suitabilityRequiredTrayWidthMm} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityRequiredTrayWidthMm: e.target.value }))} placeholder="Required tray width mm" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                    <input value={editProduct.suitabilityCentreOfGravityMm} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityCentreOfGravityMm: e.target.value }))} placeholder="Centre of gravity mm" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                    <input value={editProduct.suitabilityAtmKg} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityAtmKg: e.target.value }))} placeholder="Caravan ATM kg" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                    <input value={editProduct.suitabilityGtmKg} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityGtmKg: e.target.value }))} placeholder="Caravan GTM kg" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                    <input value={editProduct.suitabilityTowBallWeightKg} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityTowBallWeightKg: e.target.value }))} placeholder="Loaded tow ball weight kg" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                  </div>
+                  <textarea value={editProduct.suitabilityNotes} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityNotes: e.target.value }))} placeholder="Suitability notes, assumptions, or why data is not confirmed yet" rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
+                </div>
                 <div style={{ display: 'grid', gap: '0.35rem' }}>
                   <div style={{ color: '#aaa', fontSize: '0.74rem', fontWeight: 700 }}>Related Products</div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.3rem', maxHeight: '96px', overflowY: 'auto', border: '1px solid #333', borderRadius: '6px', padding: '0.45rem', background: '#101010' }}>

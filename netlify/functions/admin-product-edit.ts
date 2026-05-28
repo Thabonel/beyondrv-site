@@ -9,6 +9,7 @@ const GITHUB_BRANCH = process.env.GITHUB_BRANCH ?? 'main';
 const API = 'https://api.github.com';
 
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
+type SuitabilityDataStatus = 'draft' | 'target' | 'confirmed';
 
 interface ProductEditPayload {
   slug?: string;
@@ -30,6 +31,18 @@ interface ProductEditPayload {
     duration?: string;
     transcriptSummary?: string;
   } | null;
+  suitabilityData?: {
+    status?: SuitabilityDataStatus;
+    dryWeightKg?: string;
+    estimatedLoadedWeightKg?: string;
+    requiredTrayLengthMm?: string;
+    requiredTrayWidthMm?: string;
+    centreOfGravityMm?: string;
+    atmKg?: string;
+    gtmKg?: string;
+    towBallWeightKg?: string;
+    notes?: string;
+  };
 }
 
 function isSafeProductSlug(slug: string) {
@@ -102,6 +115,23 @@ function cleanString(value = '') {
   return trimmed && trimmed.toLowerCase() !== 'none' ? trimmed : undefined;
 }
 
+function cleanSuitabilityData(value: ProductEditPayload['suitabilityData']) {
+  const status = ['draft', 'target', 'confirmed'].includes(value?.status ?? '') ? value!.status : 'draft';
+  const data = {
+    status,
+    ...(cleanString(value?.dryWeightKg) && { dryWeightKg: cleanString(value?.dryWeightKg) }),
+    ...(cleanString(value?.estimatedLoadedWeightKg) && { estimatedLoadedWeightKg: cleanString(value?.estimatedLoadedWeightKg) }),
+    ...(cleanString(value?.requiredTrayLengthMm) && { requiredTrayLengthMm: cleanString(value?.requiredTrayLengthMm) }),
+    ...(cleanString(value?.requiredTrayWidthMm) && { requiredTrayWidthMm: cleanString(value?.requiredTrayWidthMm) }),
+    ...(cleanString(value?.centreOfGravityMm) && { centreOfGravityMm: cleanString(value?.centreOfGravityMm) }),
+    ...(cleanString(value?.atmKg) && { atmKg: cleanString(value?.atmKg) }),
+    ...(cleanString(value?.gtmKg) && { gtmKg: cleanString(value?.gtmKg) }),
+    ...(cleanString(value?.towBallWeightKg) && { towBallWeightKg: cleanString(value?.towBallWeightKg) }),
+    ...(cleanString(value?.notes) && { notes: cleanString(value?.notes) }),
+  };
+  return data;
+}
+
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
   if (!isAdminAuthorized(event)) return unauthorizedResponse();
@@ -167,6 +197,8 @@ export const handler: Handler = async (event) => {
   } else {
     delete data.youtubeVideo;
   }
+
+  data.suitabilityData = cleanSuitabilityData(payload.suitabilityData);
 
   const content = `---\n${stringify(data, { lineWidth: 0 }).trimEnd()}\n---\n\n${parsed.body.trimStart()}`;
 

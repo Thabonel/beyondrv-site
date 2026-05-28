@@ -13,7 +13,7 @@ const faqs = [
   },
   {
     q: 'Does tray size matter as much as payload?',
-    a: 'Yes. A slide-on camper must suit the physical tray or tub as well as the legal weight limits. Tray length, tray width, centre of gravity and rear overhang all matter.'
+    a: 'Yes. A slide-on camper must suit the physical tray or tub as well as the manufacturer ratings and loaded weight limits. Tray length, tray width, centre of gravity and rear overhang all matter.'
   },
   {
     q: 'Should I use tare weight or weighbridge weight?',
@@ -92,59 +92,94 @@ const schema = [
       <form class="checker-form" id="slideCalculator">
         <div class="form-field form-field--full">
           <label class="form-label" for="vehicleName">Vehicle</label>
-          <input class="form-input" id="vehicleName" type="text" value="Example: Ford Ranger dual cab" />
+          <input class="form-input" id="vehicleName" type="text" placeholder="Example: Ford Ranger dual cab" />
         </div>
         <div class="form-field">
           <label class="form-label" for="gvm">Vehicle GVM (kg)</label>
-          <input class="form-input" id="gvm" type="number" min="0" value="3350" />
+          <input class="form-input" id="gvm" type="number" min="0" placeholder="3350" />
         </div>
         <div class="form-field">
           <label class="form-label" for="currentWeight">Current vehicle weight before listed additions (kg)</label>
-          <input class="form-input" id="currentWeight" type="number" min="0" value="2200" />
+          <input class="form-input" id="currentWeight" type="number" min="0" placeholder="2200" />
           <span class="form-help">Use a current weighbridge weight if possible. If it already includes passengers or accessories, enter 0 for those items below.</span>
         </div>
         <div class="form-field">
           <label class="form-label" for="passengers">Passengers (kg)</label>
-          <input class="form-input" id="passengers" type="number" min="0" value="180" />
+          <input class="form-input" id="passengers" type="number" min="0" placeholder="180" />
         </div>
         <div class="form-field">
           <label class="form-label" for="accessories">Accessories already fitted (kg)</label>
-          <input class="form-input" id="accessories" type="number" min="0" value="80" />
+          <input class="form-input" id="accessories" type="number" min="0" placeholder="80" />
           <span class="form-help">Only include bull bar, winch, canopy, drawers, racks or battery weight not already counted above.</span>
         </div>
         <div class="form-field">
-          <label class="form-label" for="camperDry">Camper dry weight (kg)</label>
-          <input class="form-input" id="camperDry" type="number" min="0" value="650" />
+          <label class="form-label" for="luggageGear">Vehicle luggage and gear (kg)</label>
+          <input class="form-input" id="luggageGear" type="number" min="0" placeholder="120" />
         </div>
         <div class="form-field">
-          <label class="form-label" for="camperLoad">Water, gas, food and camper gear (kg)</label>
-          <input class="form-input" id="camperLoad" type="number" min="0" value="180" />
+          <label class="form-label" for="camperDry">Camper dry weight (kg)</label>
+          <input class="form-input" id="camperDry" type="number" min="0" placeholder="650" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="camperWater">Camper water weight (kg)</label>
+          <input class="form-input" id="camperWater" type="number" min="0" placeholder="80" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="camperGear">Camper gear weight (kg)</label>
+          <input class="form-input" id="camperGear" type="number" min="0" placeholder="100" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="camperOptions">Camper options weight (kg)</label>
+          <input class="form-input" id="camperOptions" type="number" min="0" placeholder="50" />
         </div>
         <div class="form-field">
           <label class="form-label" for="trayLength">Tray or tub usable length (mm)</label>
-          <input class="form-input" id="trayLength" type="number" min="0" value="2150" />
+          <input class="form-input" id="trayLength" type="number" min="0" placeholder="2150" />
         </div>
         <div class="form-field">
           <label class="form-label" for="trayWidth">Tray or tub usable width (mm)</label>
-          <input class="form-input" id="trayWidth" type="number" min="0" value="1850" />
+          <input class="form-input" id="trayWidth" type="number" min="0" placeholder="1850" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="requiredTrayLength">Required tray length (mm)</label>
+          <input class="form-input" id="requiredTrayLength" type="number" min="0" placeholder="2100" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="requiredTrayWidth">Required tray width (mm)</label>
+          <input class="form-input" id="requiredTrayWidth" type="number" min="0" placeholder="1750" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="rearAxleChecked">Rear axle limits checked</label>
+          <input id="rearAxleChecked" type="checkbox" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="tyreRatingsChecked">Tyre ratings checked</label>
+          <input id="tyreRatingsChecked" type="checkbox" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="centreOfGravityChecked">Centre of gravity checked</label>
+          <input id="centreOfGravityChecked" type="checkbox" />
         </div>
       </form>
       <p class="calculator-disclaimer">{disclaimer}</p>
     </div>
 
-    <aside class="result-panel" id="resultPanel" data-status="amber" aria-live="polite">
-      <div class="result-status" id="statusLabel">Possible but close to limit</div>
+    <aside class="result-panel" id="resultPanel" data-status="neutral" aria-live="polite">
+      <div class="result-status" id="statusLabel">Enter your numbers to calculate a result.</div>
       <h2 id="resultTitle">Enter your numbers</h2>
-      <p class="result-summary" id="resultSummary">The calculator will estimate your loaded vehicle weight and remaining GVM margin.</p>
+      <p class="result-summary" id="resultSummary">Enter your numbers to calculate a result.</p>
       <div class="result-metrics">
-        <div class="result-metric"><span>Available payload</span><strong id="availablePayload">0 kg</strong></div>
+        <div class="result-metric"><span>Available payload before camper</span><strong id="availablePayload">0 kg</strong></div>
         <div class="result-metric"><span>Estimated loaded vehicle weight</span><strong id="loadedWeight">0 kg</strong></div>
         <div class="result-metric"><span>Remaining GVM margin</span><strong id="gvmMargin">0 kg</strong></div>
         <div class="result-metric"><span>Estimated loaded camper weight</span><strong id="loadedCamper">0 kg</strong></div>
+        <div class="result-metric"><span>Tray length fit</span><strong id="trayLengthFit">0 mm</strong></div>
+        <div class="result-metric"><span>Tray width fit</span><strong id="trayWidthFit">0 mm</strong></div>
+        <div class="result-metric"><span>Data quality</span><strong id="dataQuality">Needs review</strong></div>
       </div>
       <div class="result-recommendation">
         <strong>ByondRV product recommendation</strong>
-        <p id="recommendation">Manual data required.</p>
+        <p id="recommendation">Confirm with ByondRV</p>
       </div>
       <ul class="result-notes" id="warningNotes"></ul>
       <a class="btn-primary" id="sendResult" href="/inquiry-form/?intent=vehicle-suitability">Send this result to ByondRV</a>
@@ -164,13 +199,13 @@ const schema = [
         <h3>Worked example</h3>
         <p>A ute with 3350kg GVM and a 2400kg current weighbridge weight has 950kg before it reaches GVM. If passengers, accessories and loaded camper weight add 1130kg, the vehicle is estimated at 3530kg loaded. That is 180kg over GVM, so the result is red.</p>
       </div>
-      <h2>ByondRV slide-on recommendation table</h2>
+      <h2>ByondRV slide-on product data table</h2>
       <div class="authority-table-wrap">
         <table class="authority-table">
           <thead>
             <tr>
               <th>Product</th>
-              <th>Typical fit conversation</th>
+              <th>Data status</th>
               <th>Data needed</th>
             </tr>
           </thead>
@@ -178,7 +213,7 @@ const schema = [
             {products.map(product => (
               <tr>
                 <td><a href={new URL(product.url).pathname}>{product.name}</a></td>
-                <td>{product.fit}</td>
+                <td>Confirm with ByondRV</td>
                 <td>{product.dryWeight}, tray size, GVM margin, axle limits and weighbridge result.</td>
               </tr>
             ))}
@@ -204,91 +239,83 @@ const schema = [
 </BaseLayout>
 
 <script>
+  import { calculateSlideOnSuitability } from '../../lib/vehicleSuitabilityCalculator.js';
+
   const form = document.getElementById('slideCalculator');
   const resultPanel = document.getElementById('resultPanel');
-  const fields = ['vehicleName', 'gvm', 'currentWeight', 'passengers', 'accessories', 'camperDry', 'camperLoad', 'trayLength', 'trayWidth'];
+  const fields = ['vehicleName', 'gvm', 'currentWeight', 'passengers', 'accessories', 'luggageGear', 'camperDry', 'camperWater', 'camperGear', 'camperOptions', 'trayLength', 'trayWidth', 'requiredTrayLength', 'requiredTrayWidth', 'rearAxleChecked', 'tyreRatingsChecked', 'centreOfGravityChecked'];
+  let hasStarted = false;
   const byId = (id) => document.getElementById(id);
-  const num = (id) => Number(byId(id)?.value || 0);
+  const value = (id) => byId(id)?.value ?? '';
   const fmt = (value) => `${Math.round(value).toLocaleString()} kg`;
+  const fmtMm = (value) => `${Math.round(value).toLocaleString()} mm`;
 
   function setText(id, value) {
     const el = byId(id);
     if (el) el.textContent = value;
   }
 
-  function calculateSlideOn() {
-    const vehicleName = byId('vehicleName')?.value || 'your vehicle';
-    const gvm = num('gvm');
-    const currentWeight = num('currentWeight');
-    const passengers = num('passengers');
-    const accessories = num('accessories');
-    const camperDry = num('camperDry');
-    const camperLoad = num('camperLoad');
-    const trayLength = num('trayLength');
-    const trayWidth = num('trayWidth');
-    const loadedCamper = camperDry + camperLoad;
-    const availablePayload = gvm - currentWeight;
-    const loadedWeight = currentWeight + passengers + accessories + loadedCamper;
-    const gvmMargin = gvm - loadedWeight;
-    const closeLimit = Math.min(150, gvm * 0.05);
-    const physicalWarning = trayLength < 2100 || trayWidth < 1750;
-
-    let status = 'green';
-    let statusLabel = 'Looks suitable';
-    let title = 'Looks suitable on this estimate';
-    if (gvmMargin < 0 || availablePayload <= 0 || physicalWarning) {
-      status = 'red';
-      statusLabel = 'Not recommended';
-      title = 'Not recommended on this estimate';
-    } else if (gvmMargin <= closeLimit) {
-      status = 'amber';
-      statusLabel = 'Possible but close to limit';
-      title = 'Possible, but close to the limit';
-    }
-
-    const recommendation = gvmMargin < 0
-      ? 'A slide-on camper is not recommended from these numbers. Talk to ByondRV before choosing a model, and arrange current weighbridge figures.'
-      : loadedCamper <= 750 && trayLength >= 2100
-        ? 'Start with the Advent 2150 or 7ft Electric Pop-Top conversation, subject to exact dry weight, tray fit, axle limits and ByondRV confirmation.'
-        : loadedCamper <= 950 && trayLength >= 2300
-          ? 'Your figures may suit a mid-size slide-on discussion such as Advent 2300, subject to exact weights and tray fit.'
-          : 'This looks like a higher-payload vehicle conversation. Ask ByondRV to compare Advent 2450, custom slide-on or expedition options against certified weights.';
-
-    const notes = [];
-    if (gvmMargin < 0) notes.push(`Estimated loaded vehicle weight is ${fmt(Math.abs(gvmMargin))} over GVM.`);
-    if (gvmMargin >= 0 && gvmMargin <= closeLimit) notes.push('The GVM margin is small. Small additions like water, tools or recovery gear may change the result.');
-    if (physicalWarning) notes.push('Tray or tub size looks short or narrow for many slide-on campers. Confirm usable tray dimensions with ByondRV.');
-    notes.push('Final checking must include axle limits, tyre ratings, suspension setup and a certified weighbridge result.');
-
-    resultPanel?.setAttribute('data-status', status);
-    setText('statusLabel', statusLabel);
-    setText('resultTitle', title);
-    setText('resultSummary', `${vehicleName} is estimated at ${fmt(loadedWeight)} loaded against a ${fmt(gvm)} GVM.`);
-    setText('availablePayload', fmt(availablePayload));
-    setText('loadedWeight', fmt(loadedWeight));
-    setText('gvmMargin', fmt(gvmMargin));
-    setText('loadedCamper', fmt(loadedCamper));
-    setText('recommendation', recommendation);
-
+  function setNotes(notes) {
     const warningNotes = byId('warningNotes');
     if (warningNotes) warningNotes.innerHTML = notes.map(note => `<li>${note}</li>`).join('');
+  }
+
+  function calculateSlideOn() {
+    const vehicleName = byId('vehicleName')?.value || 'your vehicle';
+    const result = calculateSlideOnSuitability({
+      vehicleGvm: value('gvm'),
+      currentVehicleWeight: value('currentWeight'),
+      passengerWeight: value('passengers'),
+      accessoryWeight: value('accessories'),
+      luggageOrGearWeight: value('luggageGear'),
+      camperDryWeight: value('camperDry'),
+      camperWaterWeight: value('camperWater'),
+      camperGearWeight: value('camperGear'),
+      camperOptionsWeight: value('camperOptions'),
+      trayLength: value('trayLength'),
+      trayWidth: value('trayWidth'),
+      requiredTrayLength: value('requiredTrayLength'),
+      requiredTrayWidth: value('requiredTrayWidth'),
+      rearAxleChecked: byId('rearAxleChecked')?.checked ?? false,
+      tyreRatingsChecked: byId('tyreRatingsChecked')?.checked ?? false,
+      centreOfGravityChecked: byId('centreOfGravityChecked')?.checked ?? false
+    }, { started: hasStarted });
+    const values = result.values ?? {};
+
+    resultPanel?.setAttribute('data-status', result.status);
+    setText('statusLabel', result.statusLabel);
+    setText('resultTitle', result.title);
+    setText('resultSummary', result.summary);
+    setText('availablePayload', values.availablePayloadBeforeCamper === undefined ? '0 kg' : fmt(values.availablePayloadBeforeCamper));
+    setText('loadedWeight', values.estimatedLoadedVehicleWeight === undefined ? '0 kg' : fmt(values.estimatedLoadedVehicleWeight));
+    setText('gvmMargin', values.remainingGvmMargin === undefined ? '0 kg' : fmt(values.remainingGvmMargin));
+    setText('loadedCamper', values.estimatedLoadedCamperWeight === undefined ? '0 kg' : fmt(values.estimatedLoadedCamperWeight));
+    setText('trayLengthFit', values.trayLengthFit === undefined ? '0 mm' : fmtMm(values.trayLengthFit));
+    setText('trayWidthFit', values.trayWidthFit === undefined ? '0 mm' : fmtMm(values.trayWidthFit));
+    setText('dataQuality', result.dataQuality);
+    setText('recommendation', result.recommendation);
+    setNotes(result.notes);
 
     const message = [
       'Vehicle Suitability Checker result - slide-on camper',
       `Vehicle: ${vehicleName}`,
-      `Status: ${statusLabel}`,
-      `Available payload: ${fmt(availablePayload)}`,
-      `Estimated loaded vehicle weight: ${fmt(loadedWeight)}`,
-      `Remaining GVM margin: ${fmt(gvmMargin)}`,
-      `Estimated loaded camper weight: ${fmt(loadedCamper)}`,
-      `Tray/tub: ${trayLength}mm long x ${trayWidth}mm wide`,
-      `Recommendation: ${recommendation}`
+      `Status: ${result.statusLabel}`,
+      `Available payload before camper: ${values.availablePayloadBeforeCamper === undefined ? 'Not calculated' : fmt(values.availablePayloadBeforeCamper)}`,
+      `Estimated loaded vehicle weight: ${values.estimatedLoadedVehicleWeight === undefined ? 'Not calculated' : fmt(values.estimatedLoadedVehicleWeight)}`,
+      `Remaining GVM margin: ${values.remainingGvmMargin === undefined ? 'Not calculated' : fmt(values.remainingGvmMargin)}`,
+      `Estimated loaded camper weight: ${values.estimatedLoadedCamperWeight === undefined ? 'Not calculated' : fmt(values.estimatedLoadedCamperWeight)}`,
+      `Tray length fit: ${values.trayLengthFit === undefined ? 'Not calculated' : fmtMm(values.trayLengthFit)}`,
+      `Tray width fit: ${values.trayWidthFit === undefined ? 'Not calculated' : fmtMm(values.trayWidthFit)}`,
+      `Data quality: ${result.dataQuality}`,
+      `Recommendation: ${result.recommendation}`
     ].join('\n');
     const send = byId('sendResult');
     if (send) send.setAttribute('href', `/inquiry-form/?intent=vehicle-suitability&message=${encodeURIComponent(message)}`);
   }
 
-  fields.forEach(id => byId(id)?.addEventListener('input', calculateSlideOn));
+  fields.forEach(id => byId(id)?.addEventListener('input', () => {
+    hasStarted = true;
+    calculateSlideOn();
+  }));
   form?.addEventListener('submit', (event) => event.preventDefault());
-  calculateSlideOn();
 </script>
