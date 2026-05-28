@@ -228,14 +228,7 @@ nav.scrolled {
 .page-hero-bg {
   position: absolute; inset: 0;
   background-size: cover; background-position: center; background-repeat: no-repeat;
-  filter: brightness(0.32);
-  transform: scale(1.03);
-}
-.page-hero-bg::after {
-  content: "";
-  position: absolute; inset: 0;
-  background-image: inherit;
-  background-size: contain; background-position: center; background-repeat: no-repeat;
+  filter: brightness(0.4);
 }
 .page-hero-content {
   position: relative; z-index: 2;
@@ -1031,6 +1024,11 @@ nav.scrolled {
 .page-content ul { margin-left: 1.5rem; margin-bottom: 1rem; }
 .page-content li { font-size: 0.92rem; line-height: 1.8; color: rgba(240,235,227,0.75); }
 .page-content a { color: var(--orange); text-decoration: underline; }
+.page-content .btn-primary {
+  color: var(--white);
+  text-decoration: none;
+}
+.page-content .btn-primary:hover { color: var(--white); }
 
 /* ─── 404 ─── */
 .not-found-section {
