@@ -9,7 +9,7 @@ export const handler: Handler = async (event) => {
   }
 
   const key = event.queryStringParameters?.key ?? '';
-  if (!key.startsWith('products/')) {
+  if (!key.startsWith('products/') && !key.startsWith('pages/')) {
     return { statusCode: 400, body: 'Invalid media key' };
   }
 

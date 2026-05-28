@@ -46,6 +46,21 @@ type PanelTab = 'dashboard' | 'products' | 'media' | 'homepage' | 'enquiries' | 
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 const MAX_RECENT_BUILDS = 3;
+const MAX_UPLOAD_IMAGE_EDGE = 2000;
+const UPLOAD_IMAGE_QUALITY = 0.82;
+const MAX_GIF_UPLOAD_BYTES = 4 * 1024 * 1024;
+
+type MediaScope = 'products' | 'pages';
+
+const PAGE_MEDIA_TARGETS = [
+  { slug: 'about', label: 'About page' },
+  { slug: 'homepage', label: 'Homepage' },
+  { slug: 'our-caravans', label: 'Our Caravans page' },
+  { slug: 'our-slide-on-campers', label: 'Slide-Ons page' },
+  { slug: 'expedition', label: 'Expedition page' },
+  { slug: 'on-sale', label: 'On Sale page' },
+  { slug: 'custom', label: 'Custom Builds page' },
+];
 
 interface YoutubeVideoMeta {
   id?: string;
@@ -123,6 +138,7 @@ interface MediaFile {
     filename?: string;
     contentType?: string;
     uploadedAt?: string;
+    scope?: MediaScope;
   };
 }
 
@@ -573,6 +589,18 @@ function limitRecentBuilds(items: RecentBuild[]) {
   return renumber(orderedItems(items).slice(0, MAX_RECENT_BUILDS));
 }
 
+function mediaTargetValue(scope: MediaScope, slug: string) {
+  return `${scope}::${slug}`;
+}
+
+function parseMediaTarget(value: string): { scope: MediaScope; slug: string } {
+  const [scope, ...slugParts] = value.split('::');
+  return {
+    scope: scope === 'pages' ? 'pages' : 'products',
+    slug: slugParts.join('::'),
+  };
+}
+
 export default function AdminPanel() {
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: "Hi! I'm the Beyond RV admin assistant. Tell me what you'd like to change on the site." }
@@ -588,6 +616,7 @@ export default function AdminPanel() {
   const [showNewProductForm, setShowNewProductForm] = useState(false);
   const [editProduct, setEditProduct] = useState<EditProductForm | null>(null);
   const [previewChange, setPreviewChange] = useState<PendingChange | null>(null);
+  const [mediaScope, setMediaScope] = useState<MediaScope>('products');
   const [mediaSlug, setMediaSlug] = useState('');
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [mediaLoading, setMediaLoading] = useState(false);
@@ -645,8 +674,8 @@ export default function AdminPanel() {
 
   useEffect(() => {
     if (!mediaSlug) return;
-    void loadMedia(mediaSlug);
-  }, [mediaSlug]);
+    void loadMedia(mediaSlug, mediaScope);
+  }, [mediaSlug, mediaScope]);
 
   useEffect(() => {
     if (activeTab === 'enquiries') {
@@ -705,18 +734,19 @@ export default function AdminPanel() {
     reader.readAsDataURL(file);
   }
 
-  async function loadMedia(slug = mediaSlug) {
+  async function loadMedia(slug = mediaSlug, scope = mediaScope) {
     if (!slug) return;
     setMediaLoading(true);
     try {
-      const res = await adminFetch(`/.netlify/functions/admin-media?slug=${encodeURIComponent(slug)}`);
+      const params = new URLSearchParams({ scope, slug });
+      const res = await adminFetch(`/.netlify/functions/admin-media?${params.toString()}`);
       if (redirectToLoginIfUnauthorized(res)) return;
       if (!res.ok) throw new Error('Could not load media');
       const data = await res.json() as { files: MediaFile[] };
       setMediaFiles(data.files ?? []);
       setMediaStatus('');
     } catch {
-      setMediaStatus('Could not load media for this product.');
+      setMediaStatus(scope === 'pages' ? 'Could not load media for this page.' : 'Could not load media for this product.');
     } finally {
       setMediaLoading(false);
     }
@@ -790,25 +820,96 @@ export default function AdminPanel() {
     }
   }
 
-  function readFileAsBase64(file: File) {
+  function readBlobAsBase64(blob: Blob) {
     return new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve((reader.result as string).split(',')[1] ?? '');
+      reader.onerror = () => reject(new Error('Could not read image file'));
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  function readFileAsDataUrl(file: File) {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
       reader.onerror = () => reject(new Error('Could not read image file'));
       reader.readAsDataURL(file);
     });
   }
 
+  function loadImageElement(src: string) {
+    return new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error('Could not read image file'));
+      img.src = src;
+    });
+  }
+
+  function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality: number) {
+    return new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, type, quality);
+    });
+  }
+
+  function uploadFilenameFor(file: File, contentType: string) {
+    const baseName = file.name.replace(/\.[^.]+$/, '') || 'image';
+    if (contentType === 'image/webp') return `${baseName}.webp`;
+    if (contentType === 'image/jpeg') return `${baseName}.jpg`;
+    return file.name;
+  }
+
+  async function prepareImageForUpload(file: File) {
+    if (file.type === 'image/gif') {
+      if (file.size > MAX_GIF_UPLOAD_BYTES) {
+        throw new Error('Animated GIF uploads must be 4MB or smaller.');
+      }
+      return {
+        filename: file.name,
+        contentType: file.type,
+        data: await readBlobAsBase64(file),
+      };
+    }
+
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      throw new Error('Unsupported image type.');
+    }
+
+    const img = await loadImageElement(await readFileAsDataUrl(file));
+    const longestEdge = Math.max(img.naturalWidth, img.naturalHeight);
+    const scale = longestEdge > MAX_UPLOAD_IMAGE_EDGE ? MAX_UPLOAD_IMAGE_EDGE / longestEdge : 1;
+    const width = Math.max(1, Math.round(img.naturalWidth * scale));
+    const height = Math.max(1, Math.round(img.naturalHeight * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('Could not prepare image for upload.');
+    context.drawImage(img, 0, 0, width, height);
+
+    let blob = await canvasToBlob(canvas, 'image/webp', UPLOAD_IMAGE_QUALITY);
+    if (!blob) blob = await canvasToBlob(canvas, 'image/jpeg', UPLOAD_IMAGE_QUALITY);
+    if (!blob) throw new Error('Could not prepare image for upload.');
+
+    return {
+      filename: uploadFilenameFor(file, blob.type),
+      contentType: blob.type || 'image/webp',
+      data: await readBlobAsBase64(blob),
+    };
+  }
+
   async function uploadProductImage(slug: string, file: File, alt: string) {
-    const base64 = await readFileAsBase64(file);
+    const prepared = await prepareImageForUpload(file);
     const res = await adminFetch('/.netlify/functions/admin-media-upload', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        scope: 'products',
         slug,
-        filename: file.name,
-        contentType: file.type,
-        data: base64,
+        filename: prepared.filename,
+        contentType: prepared.contentType,
+        data: prepared.data,
         alt,
       }),
     });
@@ -822,37 +923,35 @@ export default function AdminPanel() {
     const file = e.target.files?.[0];
     if (!file || !mediaSlug) return;
     setMediaLoading(true);
-    setMediaStatus('Uploading image...');
+    setMediaStatus('Preparing image...');
 
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try {
-        const base64 = (reader.result as string).split(',')[1];
-        const res = await adminFetch('/.netlify/functions/admin-media-upload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            slug: mediaSlug,
-            filename: file.name,
-            contentType: file.type,
-            data: base64,
-            alt: mediaAlt,
-          }),
-        });
-        if (redirectToLoginIfUnauthorized(res)) return;
-        const data = await res.json() as { error?: string };
-        if (!res.ok) throw new Error(data.error ?? 'Upload failed');
-        setMediaStatus('Image uploaded.');
-        setMediaAlt('');
-        await loadMedia(mediaSlug);
-      } catch (err) {
-        setMediaStatus(err instanceof Error ? err.message : 'Upload failed.');
-      } finally {
-        setMediaLoading(false);
-        if (mediaFileRef.current) mediaFileRef.current.value = '';
-      }
-    };
-    reader.readAsDataURL(file);
+    try {
+      const prepared = await prepareImageForUpload(file);
+      setMediaStatus('Uploading image...');
+      const res = await adminFetch('/.netlify/functions/admin-media-upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          scope: mediaScope,
+          slug: mediaSlug,
+          filename: prepared.filename,
+          contentType: prepared.contentType,
+          data: prepared.data,
+          alt: mediaAlt,
+        }),
+      });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await res.json() as { error?: string };
+      if (!res.ok) throw new Error(data.error ?? 'Upload failed');
+      setMediaStatus('Image uploaded.');
+      setMediaAlt('');
+      await loadMedia(mediaSlug, mediaScope);
+    } catch (err) {
+      setMediaStatus(err instanceof Error ? err.message : 'Upload failed.');
+    } finally {
+      setMediaLoading(false);
+      if (mediaFileRef.current) mediaFileRef.current.value = '';
+    }
   }
 
   async function uploadNewProductMedia(e: React.ChangeEvent<HTMLInputElement>) {
@@ -907,7 +1006,7 @@ export default function AdminPanel() {
       });
       if (redirectToLoginIfUnauthorized(res)) return;
       if (!res.ok) throw new Error('Delete failed');
-      await loadMedia(mediaSlug);
+      await loadMedia(mediaSlug, mediaScope);
       setMediaStatus('Image deleted.');
     } catch {
       setMediaStatus('Could not delete image.');
@@ -940,6 +1039,10 @@ export default function AdminPanel() {
   }
 
   function applyMediaToProduct(url: string, mode: 'hero' | 'gallery') {
+    if (mediaScope !== 'products') {
+      setMediaStatus('Choose a product target before using Hero or Gallery.');
+      return;
+    }
     const product = products.find(item => item.slug === mediaSlug);
     if (!product) return;
     const form = editFormFromProduct(product);
@@ -1674,13 +1777,24 @@ export default function AdminPanel() {
             <div style={{ padding: '1rem', borderBottom: '1px solid #333', display: 'grid', gap: '0.55rem' }}>
               <div style={{ color: '#fff', fontWeight: 700 }}>Media Manager</div>
               <select
-                value={mediaSlug}
-                onChange={e => setMediaSlug(e.target.value)}
+                value={mediaTargetValue(mediaScope, mediaSlug)}
+                onChange={e => {
+                  const target = parseMediaTarget(e.target.value);
+                  setMediaScope(target.scope);
+                  setMediaSlug(target.slug);
+                }}
                 style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.82rem' }}
               >
-                {products.map(product => (
-                  <option key={product.slug} value={product.slug}>{product.title}</option>
-                ))}
+                <optgroup label="Site pages">
+                  {PAGE_MEDIA_TARGETS.map(page => (
+                    <option key={page.slug} value={mediaTargetValue('pages', page.slug)}>{page.label}</option>
+                  ))}
+                </optgroup>
+                <optgroup label="Products">
+                  {products.map(product => (
+                    <option key={product.slug} value={mediaTargetValue('products', product.slug)}>{product.title}</option>
+                  ))}
+                </optgroup>
               </select>
               <input
                 value={mediaAlt}
@@ -1698,13 +1812,13 @@ export default function AdminPanel() {
               <input ref={mediaFileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" style={{ display: 'none' }} onChange={uploadMedia} />
               {mediaStatus && <p style={{ margin: 0, color: mediaStatus.includes('Could') || mediaStatus.includes('failed') || mediaStatus.includes('Unsupported') ? '#f87' : '#8f8', fontSize: '0.78rem' }}>{mediaStatus}</p>}
               <p style={{ margin: 0, color: '#888', fontSize: '0.76rem', lineHeight: 1.35 }}>
-                Uploaded images are stored in Netlify Blobs and can be used as product hero or gallery images without adding files to Git.
+                Use Site pages for About, Homepage, and category-page images. Use Products when an image should become a product hero or gallery image.
               </p>
             </div>
             <div style={{ flex: 1, overflowY: 'auto', padding: '0.75rem', display: 'grid', gap: '0.65rem', alignContent: 'start' }}>
               {mediaLoading && <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>Loading media...</p>}
               {!mediaLoading && mediaFiles.length === 0 && (
-                <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>No uploaded media for this product yet</p>
+                <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>No uploaded media for this {mediaScope === 'pages' ? 'page' : 'product'} yet</p>
               )}
               {!mediaLoading && mediaFiles.map(file => (
                 <div key={file.key} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', overflow: 'hidden' }}>
@@ -1712,12 +1826,20 @@ export default function AdminPanel() {
                   <div style={{ padding: '0.65rem', display: 'grid', gap: '0.45rem' }}>
                     <div style={{ color: '#ddd', fontSize: '0.76rem', overflowWrap: 'anywhere' }}>{file.metadata.filename ?? file.key.split('/').pop()}</div>
                     {file.metadata.alt && <div style={{ color: '#888', fontSize: '0.72rem' }}>{file.metadata.alt}</div>}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.35rem' }}>
-                      <button onClick={() => applyMediaToProduct(file.url, 'hero')} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700 }}>
-                        Hero
-                      </button>
-                      <button onClick={() => applyMediaToProduct(file.url, 'gallery')} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700 }}>
-                        Gallery
+                    <div style={{ display: 'grid', gridTemplateColumns: mediaScope === 'products' ? '1fr 1fr 1fr 1fr' : '1fr 1fr', gap: '0.35rem' }}>
+                      {mediaScope === 'products' && <>
+                        <button onClick={() => applyMediaToProduct(file.url, 'hero')} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700 }}>
+                          Hero
+                        </button>
+                        <button onClick={() => applyMediaToProduct(file.url, 'gallery')} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700 }}>
+                          Gallery
+                        </button>
+                      </>}
+                      <button onClick={() => {
+                        void navigator.clipboard.writeText(file.url);
+                        setMediaStatus('Image URL copied.');
+                      }} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700 }}>
+                        Copy URL
                       </button>
                       <button onClick={() => deleteMedia(file.key)} style={{ background: '#2a1410', color: '#fb923c', border: '1px solid #63301f', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700 }}>
                         Delete

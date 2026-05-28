@@ -3,6 +3,7 @@ import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
 import { getBlobStore } from './blob-store';
 
 const STORE_NAME = 'product-media';
+const ALLOWED_SCOPES = new Set(['products', 'pages']);
 
 function mediaUrl(key: string) {
   return `/media/${key}`;
@@ -33,10 +34,14 @@ export const handler: Handler = async (event) => {
 
   if (event.httpMethod === 'GET') {
     const rawSlug = event.queryStringParameters?.slug ?? '';
+    const rawScope = event.queryStringParameters?.scope ?? 'products';
+    const scope = ALLOWED_SCOPES.has(rawScope) ? rawScope : 'products';
     const slug = safeSlug(rawSlug);
     const prefixes = slug
-      ? [...new Set([`products/${slug}/`, `products/${legacySafeSlug(rawSlug)}/`])]
-      : ['products/'];
+      ? scope === 'products'
+        ? [...new Set([`products/${slug}/`, `products/${legacySafeSlug(rawSlug)}/`])]
+        : [`pages/${slug}/`]
+      : [`${scope}/`];
     const store = getBlobStore(STORE_NAME);
     let blobs: Awaited<ReturnType<typeof store.list>>['blobs'];
     try {
@@ -87,7 +92,7 @@ export const handler: Handler = async (event) => {
     }
 
     const key = payload.key ?? '';
-    if (!key.startsWith('products/')) {
+    if (!key.startsWith('products/') && !key.startsWith('pages/')) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Invalid media key' }) };
     }
 
