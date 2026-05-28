@@ -120,6 +120,11 @@
       "advent-2300-hardtop-slide-on",
       "advent-2450-hardtop-slide-on"
     ],
+    "youtubeVideo": {
+      "id": "itqhYoJK9Dg",
+      "title": "Beyond RV 7ft Electric Pop-Top Slide-On Walkthrough",
+      "description": "Video walkthrough for the Beyond RV 7ft electric pop-top ute camper."
+    },
     "keySpecs": [
       {
         "label": "Base",
@@ -205,6 +210,12 @@
       "advent-2450-hardtop-slide-on",
       "7ft-electric-poptop-slide-on"
     ],
+    "youtubeVideo": {
+      "id": "J95sJbwJSQ8",
+      "title": "Beyond RV Advent 2300 Walkthrough",
+      "description": "Video walkthrough for the Beyond RV Advent 2300 hardtop ute slide-on camper.",
+      "startSeconds": 614
+    },
     "keySpecs": [
       {
         "label": "Base",
@@ -238,6 +249,12 @@
       "advent-2300-hardtop-slide-on",
       "7ft-electric-poptop-slide-on"
     ],
+    "youtubeVideo": {
+      "id": "B8up0wM7f3w",
+      "title": "Beyond RV Advent 2450 Walkthrough",
+      "description": "Video walkthrough for the Beyond RV Advent 2450 hardtop ute slide-on camper.",
+      "startSeconds": 23
+    },
     "keySpecs": [
       {
         "label": "Base",
@@ -290,6 +307,12 @@
       "expedition/unimog-overlander-camper",
       "expedition/unimog-poptop-camper"
     ],
+    "youtubeVideo": {
+      "id": "WFhDPevOLY0",
+      "title": "Beyond RV 3.5m Isuzu NPS Pop-Top Camper Walkthrough",
+      "description": "Video walkthrough for the Beyond RV 3.5m Isuzu NPS pop-top camper with electric drop-down bed.",
+      "startSeconds": 145
+    },
     "keySpecs": [
       {
         "label": "Base",
@@ -341,6 +364,12 @@
       "expedition/unimog-overlander-camper",
       "mercedes-sprinter-motorhome"
     ],
+    "youtubeVideo": {
+      "id": "bA9H6sFGIaE",
+      "title": "Beyond RV 4.7m Truck Camper and Mercedes Sprinter Motorhome Walkthrough",
+      "description": "Video walkthrough for the Beyond RV 4.7m truck camper and Mercedes Sprinter motorhome.",
+      "startSeconds": 9
+    },
     "keySpecs": [
       {
         "label": "Base",
@@ -441,6 +470,12 @@
       "expedition/unimog-overlander-camper",
       "expedition/4-7m-hardtop-truck-camper"
     ],
+    "youtubeVideo": {
+      "id": "dKNu237oVsA",
+      "title": "Beyond RV DIY Pop-Top Unimog Shell Walkthrough",
+      "description": "Video walkthrough for the Beyond RV DIY pop-top Unimog shell.",
+      "startSeconds": 6
+    },
     "keySpecs": [
       {
         "label": "Base",
@@ -486,6 +521,12 @@
       "expedition/4-7m-hardtop-truck-camper",
       "3-5m-poptop-truck-camper"
     ],
+    "youtubeVideo": {
+      "id": "bA9H6sFGIaE",
+      "title": "Beyond RV 4.7m Truck Camper and Mercedes Sprinter Motorhome Walkthrough",
+      "description": "Video walkthrough for the Beyond RV 4.7m truck camper and Mercedes Sprinter motorhome.",
+      "startSeconds": 9
+    },
     "keySpecs": [
       {
         "label": "Platform",
@@ -588,6 +629,12 @@
       "sunpatch-19xc-hardtop-couples-offroad-van",
       "sunpatch-21xf-hardtop-family-offroad-van"
     ],
+    "youtubeVideo": {
+      "id": "u8fwCR5yeJw",
+      "title": "Beyond RV Sunpatch 15-XC Walkthrough",
+      "description": "Video walkthrough for the Beyond RV Sunpatch 15-XC couples off-road van.",
+      "startSeconds": 1157
+    },
     "keySpecs": [
       {
         "label": "Tare",

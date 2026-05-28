@@ -56,6 +56,11 @@ relatedSlugs:
   - "expedition/3-5m-electric-poptop-cabover-family-camper"
   - "expedition/unimog-overlander-camper"
   - "mercedes-sprinter-motorhome"
+youtubeVideo:
+  id: "bA9H6sFGIaE"
+  title: "Beyond RV 4.7m Truck Camper and Mercedes Sprinter Motorhome Walkthrough"
+  description: "Video walkthrough for the Beyond RV 4.7m truck camper and Mercedes Sprinter motorhome."
+  startSeconds: 9
 seoTitle: "4.7m Hardtop Truck Camper | Beyond RV"
 seoDesc: "Beyond RV 4.7m hardtop couples truck camper for single cab truck and Unimog platforms, priced from $98,000."
 ---

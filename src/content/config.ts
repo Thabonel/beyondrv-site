@@ -9,6 +9,7 @@ const youtubeVideo = z.object({
   thumbnail: z.string().optional(),
   uploadDate: z.string().optional(),
   duration: z.string().optional(),
+  startSeconds: z.number().int().nonnegative().optional(),
   transcriptSummary: z.string().optional(),
 });
 

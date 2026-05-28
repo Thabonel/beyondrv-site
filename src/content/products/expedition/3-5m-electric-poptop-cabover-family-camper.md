@@ -55,6 +55,11 @@ relatedSlugs:
   - "expedition/4-7m-hardtop-truck-camper"
   - "expedition/unimog-overlander-camper"
   - "expedition/unimog-poptop-camper"
+youtubeVideo:
+  id: "WFhDPevOLY0"
+  title: "Beyond RV 3.5m Isuzu NPS Pop-Top Camper Walkthrough"
+  description: "Video walkthrough for the Beyond RV 3.5m Isuzu NPS pop-top camper with electric drop-down bed."
+  startSeconds: 145
 seoTitle: "3.5m Electric Pop-Top Cabover Family Camper | Beyond RV"
 seoDesc: "Beyond RV 3.5m electric pop-top cabover family truck camper with electric drop-down bed for dual cab Isuzu NPS platforms."
 ---

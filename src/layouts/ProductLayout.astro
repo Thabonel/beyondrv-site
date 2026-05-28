@@ -42,11 +42,16 @@ const categoryBySlug: Record<ProductCategory, { name: string; url: string }> = {
 };
 const categoryMeta = categoryBySlug[data.category];
 const youtubeVideo: YoutubeVideo | undefined = data.youtubeVideo;
+const youtubeEmbedParams = new URLSearchParams({
+  rel: '0',
+  playsinline: '1',
+});
+if (youtubeVideo?.startSeconds) youtubeEmbedParams.set('start', String(youtubeVideo.startSeconds));
 const youtubeEmbedUrl = youtubeVideo
-  ? `https://www.youtube-nocookie.com/embed/${youtubeVideo.id}?rel=0&playsinline=1`
+  ? `https://www.youtube-nocookie.com/embed/${youtubeVideo.id}?${youtubeEmbedParams.toString()}`
   : '';
 const youtubeWatchUrl = youtubeVideo
-  ? `https://www.youtube.com/watch?v=${youtubeVideo.id}`
+  ? `https://www.youtube.com/watch?v=${youtubeVideo.id}${youtubeVideo.startSeconds ? `&t=${youtubeVideo.startSeconds}s` : ''}`
   : '';
 const youtubeThumbnail = youtubeVideo?.thumbnail
   ?? (youtubeVideo ? `https://i.ytimg.com/vi/${youtubeVideo.id}/maxresdefault.jpg` : '');
@@ -134,7 +139,7 @@ const videoSchema = youtubeVideo
       "thumbnailUrl": youtubeThumbnail,
       ...(youtubeVideo.uploadDate && { "uploadDate": youtubeVideo.uploadDate }),
       ...(youtubeVideo.duration && { "duration": youtubeVideo.duration }),
-      "embedUrl": `https://www.youtube-nocookie.com/embed/${youtubeVideo.id}`,
+      "embedUrl": youtubeEmbedUrl,
       "contentUrl": youtubeWatchUrl,
       "publisher": {
         "@type": "Organization",

@@ -32,6 +32,11 @@ relatedSlugs:
   - "advent-2150-hardtop-slide-on"
   - "advent-2450-hardtop-slide-on"
   - "7ft-electric-poptop-slide-on"
+youtubeVideo:
+  id: "J95sJbwJSQ8"
+  title: "Beyond RV Advent 2300 Walkthrough"
+  description: "Video walkthrough for the Beyond RV Advent 2300 hardtop ute slide-on camper."
+  startSeconds: 614
 seoTitle: "Advent 2300 Hardtop Ute Slide-On Camper | Beyond RV"
 seoDesc: "The Advent 2300 hardtop ute slide-on camper gives buyers a longer 2300mm base in the Beyond RV Advent range."
 ---

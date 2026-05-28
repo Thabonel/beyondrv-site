@@ -54,6 +54,7 @@ interface YoutubeVideoMeta {
   thumbnail?: string;
   uploadDate?: string;
   duration?: string;
+  startSeconds?: number;
   transcriptSummary?: string;
 }
 

@@ -42,6 +42,11 @@ features:
 relatedSlugs:
   - "expedition/4-7m-hardtop-truck-camper"
   - "3-5m-poptop-truck-camper"
+youtubeVideo:
+  id: "bA9H6sFGIaE"
+  title: "Beyond RV 4.7m Truck Camper and Mercedes Sprinter Motorhome Walkthrough"
+  description: "Video walkthrough for the Beyond RV 4.7m truck camper and Mercedes Sprinter motorhome."
+  startSeconds: 9
 seoTitle: "Mercedes Sprinter AWD LWB Cab Chassis Motorhome | Beyond RV"
 seoDesc: "In-stock Mercedes Sprinter AWD LWB cab chassis motorhome available from Beyond RV for $225,000 negotiable."
 ---

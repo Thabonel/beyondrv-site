@@ -48,6 +48,11 @@ features:
 relatedSlugs:
   - "expedition/unimog-overlander-camper"
   - "expedition/4-7m-hardtop-truck-camper"
+youtubeVideo:
+  id: "dKNu237oVsA"
+  title: "Beyond RV DIY Pop-Top Unimog Shell Walkthrough"
+  description: "Video walkthrough for the Beyond RV DIY pop-top Unimog shell."
+  startSeconds: 6
 seoTitle: "Empty DIY Unimog Camper Box | Beyond RV"
 seoDesc: "Beyond RV empty DIY Unimog camper box, available as a flatpack kit or fully assembled box with wiring roughed in."
 ---

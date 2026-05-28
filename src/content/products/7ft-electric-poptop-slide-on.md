@@ -32,6 +32,10 @@ relatedSlugs:
   - "advent-2150-hardtop-slide-on"
   - "advent-2300-hardtop-slide-on"
   - "advent-2450-hardtop-slide-on"
+youtubeVideo:
+  id: "itqhYoJK9Dg"
+  title: "Beyond RV 7ft Electric Pop-Top Slide-On Walkthrough"
+  description: "Video walkthrough for the Beyond RV 7ft electric pop-top ute camper."
 seoTitle: "7ft Electric Pop-Top Slide-On Camper | Beyond RV"
 seoDesc: "Beyond RV 7ft electric pop-top slide-on camper for single cab ute platforms."
 ---

@@ -60,6 +60,11 @@ relatedSlugs:
   - "sunpatch-12c-couples-caravan"
   - "sunpatch-19xc-hardtop-couples-offroad-van"
   - "sunpatch-21xf-hardtop-family-offroad-van"
+youtubeVideo:
+  id: "u8fwCR5yeJw"
+  title: "Beyond RV Sunpatch 15-XC Walkthrough"
+  description: "Video walkthrough for the Beyond RV Sunpatch 15-XC couples off-road van."
+  startSeconds: 1157
 seoTitle: "Sunpatch 15-XC Couples Off-Road Van | Beyond RV"
 seoDesc: "The Sunpatch 15-XC couples off-road van is available from Beyond RV with 240L fresh water and 200Ah battery standard."
 ---

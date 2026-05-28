@@ -39,6 +39,11 @@ relatedSlugs:
   - "advent-2150-hardtop-slide-on"
   - "advent-2300-hardtop-slide-on"
   - "7ft-electric-poptop-slide-on"
+youtubeVideo:
+  id: "B8up0wM7f3w"
+  title: "Beyond RV Advent 2450 Walkthrough"
+  description: "Video walkthrough for the Beyond RV Advent 2450 hardtop ute slide-on camper."
+  startSeconds: 23
 seoTitle: "Advent 2450 Hardtop Ute Slide-On Camper | Beyond RV"
 seoDesc: "The Advent 2450 is a larger hardtop ute slide-on camper designed specifically for single cab ute platforms."
 ---
