@@ -14,6 +14,19 @@ interface Message {
 const SESSION_CAP = 30;
 const TIMEOUT_MS = 15000;
 const FALLBACK_ERROR = "Something went wrong — try again or hit 'Talk to a human'.";
+const EMAIL_PATTERN = /([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/gi;
+
+function renderMessageContent(content: string) {
+  const parts = content.split(EMAIL_PATTERN);
+  return parts.map((part, index) => {
+    if (!part.match(EMAIL_PATTERN)) return part;
+    return (
+      <a key={`${part}-${index}`} href={`mailto:${part}`}>
+        {part}
+      </a>
+    );
+  });
+}
 
 export default function SiteChatWidget({ pageTitle, productSlug, productName }: Props) {
   const initialGreeting = productName
@@ -222,7 +235,7 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
           <div className="chat-messages" role="log" aria-live="polite">
             {messages.map((m, i) => (
               <div key={i} className={`chat-bubble chat-bubble-${m.role}`}>
-                {m.content}
+                {renderMessageContent(m.content)}
               </div>
             ))}
             {loading && (
