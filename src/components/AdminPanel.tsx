@@ -2057,6 +2057,15 @@ export default function AdminPanel() {
               </p>
             </section>
             <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Use forms first, chat second</h3>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Use the structured tabs whenever the change fits a form. Product photos, prices, videos, status, homepage recent builds, testimonials, enquiries, and chatbot knowledge should be handled in their matching tab.</li>
+                <li>Use Admin Chat only for changes that do not have a dedicated form yet, such as changing wording on a page, asking for a redirect, removing a sold product from active listings, or making a one-off content change.</li>
+                <li>Do not use Admin Chat for normal product photo changes. Remove, reorder, add, or set hero photos in Products, then click Queue Edit.</li>
+                <li>After any queued change, open Pending, preview the file, and deploy only when it matches the intended update.</li>
+              </ol>
+            </section>
+            <section>
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Read the dashboard</h3>
               <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
                 <li>Open Dashboard first. It summarises product stock, listed value, recent leads, due follow-ups, email readiness, and pending changes.</li>
@@ -2081,14 +2090,14 @@ export default function AdminPanel() {
             <section>
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Update a product</h3>
               <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
-                <li>Open the Products tab and search for the product, or type the product name directly in chat.</li>
+                <li>Open the Products tab and search for the product.</li>
                 <li>Use Edit to change safe fields like price, status, tagline, sale state, featured state, hero image, gallery order, or related products.</li>
                 <li>Use Gallery Photos to see the images in order. Move photos up or down, remove photos, add a new image path, or set a gallery photo as the hero image.</li>
                 <li>Use Product Video to paste the YouTube URL for a walkthrough. Normal YouTube links, youtu.be links, Shorts links, and embed links are accepted.</li>
                 <li>Add a clear video title. The admin will detect the video ID, show a preview, and queue the video metadata with the product edit.</li>
                 <li>To remove a video from a product, clear the Product Video fields before queueing the edit.</li>
                 <li>Use the notes box for copy or spec changes that need more explanation.</li>
-                <li>Wait for the assistant to read the current product file and queue the proposed change.</li>
+                <li>Click Queue Edit. The edit is sent directly to Pending without using Admin Chat.</li>
                 <li>Open Pending, use Preview to inspect the generated file, and remove anything that looks wrong.</li>
                 <li>Click Deploy. The live site usually updates after the Netlify rebuild completes.</li>
               </ol>
