@@ -7,8 +7,20 @@ priceBadge: "NEGOTIABLE"
 status: "on-sale"
 onSale: true
 featured: true
-heroImage: "/images/optimized/products/mercedes-sprinter-motorhome/01-mercedes-sprinter-01.webp"
-gallery: []
+heroImage: "/images/optimized/products/mercedes-sprinter-motorhome/01-4-7m-truck-camper-17-scaled.webp"
+gallery:
+  - "/images/optimized/products/mercedes-sprinter-motorhome/02-4-7m-truck-camper-03-scaled.webp"
+  - "/images/optimized/products/mercedes-sprinter-motorhome/03-4-7m-truck-camper-01-scaled.webp"
+  - "/images/optimized/products/mercedes-sprinter-motorhome/04-4-7m-truck-camper-14-scaled.webp"
+  - "/images/optimized/products/mercedes-sprinter-motorhome/05-4-7m-truck-camper-16-scaled.webp"
+  - "/images/optimized/products/mercedes-sprinter-motorhome/06-4-7m-truck-camper-02-scaled.webp"
+  - "/images/optimized/products/mercedes-sprinter-motorhome/07-4-7m-truck-camper-11-scaled.webp"
+  - "/images/optimized/products/mercedes-sprinter-motorhome/08-4-7m-truck-camper-07-scaled.webp"
+  - "/images/optimized/products/mercedes-sprinter-motorhome/09-4-7m-truck-camper-12-scaled.webp"
+  - "/images/optimized/products/mercedes-sprinter-motorhome/10-4-7m-truck-camper-13-scaled.webp"
+  - "/images/optimized/products/mercedes-sprinter-motorhome/11-4-7m-truck-camper-06-scaled.webp"
+  - "/images/optimized/products/mercedes-sprinter-motorhome/12-4-7m-truck-camper-08-scaled.webp"
+  - "/images/optimized/products/mercedes-sprinter-motorhome/13-4-7m-truck-camper-18-scaled.webp"
 keySpecs:
   - label: "Platform"
     value: "Mercedes Sprinter AWD LWB cab chassis"
