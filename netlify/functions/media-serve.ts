@@ -1,5 +1,5 @@
-import { getStore } from '@netlify/blobs';
 import type { Handler } from '@netlify/functions';
+import { getBlobStore } from './blob-store';
 
 const STORE_NAME = 'product-media';
 
@@ -13,7 +13,7 @@ export const handler: Handler = async (event) => {
     return { statusCode: 400, body: 'Invalid media key' };
   }
 
-  const store = getStore(STORE_NAME);
+  const store = getBlobStore(STORE_NAME);
   const metadata = await store.getMetadata(key);
   if (!metadata) return { statusCode: 404, body: 'Not Found' };
 

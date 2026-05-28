@@ -1,7 +1,7 @@
-import { getStore } from '@netlify/blobs';
 import type { Handler } from '@netlify/functions';
 import { randomUUID } from 'crypto';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { getBlobStore } from './blob-store';
 
 const STORE_NAME = 'product-media';
 const MAX_BYTES = 12 * 1024 * 1024;
@@ -15,6 +15,14 @@ function safePart(value: string) {
     .slice(0, 120);
 }
 
+function safeSlug(value: string) {
+  return value
+    .split('/')
+    .map(safePart)
+    .filter(Boolean)
+    .join('/');
+}
+
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
   if (!isAdminAuthorized(event)) return unauthorizedResponse();
@@ -26,7 +34,7 @@ export const handler: Handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON' }) };
   }
 
-  const slug = safePart(payload.slug ?? '');
+  const slug = safeSlug(payload.slug ?? '');
   const filename = safePart(payload.filename ?? '');
   const contentType = payload.contentType ?? '';
   const data = payload.data ?? '';
@@ -45,7 +53,7 @@ export const handler: Handler = async (event) => {
   }
 
   const key = `products/${slug}/${Date.now()}-${randomUUID()}-${filename}`;
-  const store = getStore({ name: STORE_NAME, consistency: 'strong' });
+  const store = getBlobStore(STORE_NAME);
   const alt = (payload.alt ?? '').trim().slice(0, 180);
 
   const dataBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);

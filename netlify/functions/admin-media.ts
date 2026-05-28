@@ -1,6 +1,6 @@
-import { getStore } from '@netlify/blobs';
 import type { Handler } from '@netlify/functions';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { getBlobStore } from './blob-store';
 
 const STORE_NAME = 'product-media';
 
@@ -8,17 +8,41 @@ function mediaUrl(key: string) {
   return `/media/${key}`;
 }
 
+function safePart(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 120);
+}
+
+function safeSlug(value: string) {
+  return value
+    .split('/')
+    .map(safePart)
+    .filter(Boolean)
+    .join('/');
+}
+
+function legacySafeSlug(value: string) {
+  return safePart(value);
+}
+
 export const handler: Handler = async (event) => {
   if (!isAdminAuthorized(event)) return unauthorizedResponse();
 
-  const store = getStore({ name: STORE_NAME, consistency: 'strong' });
-
   if (event.httpMethod === 'GET') {
-    const slug = event.queryStringParameters?.slug ?? '';
-    const prefix = slug ? `products/${slug}/` : 'products/';
+    const rawSlug = event.queryStringParameters?.slug ?? '';
+    const slug = safeSlug(rawSlug);
+    const prefixes = slug
+      ? [...new Set([`products/${slug}/`, `products/${legacySafeSlug(rawSlug)}/`])]
+      : ['products/'];
+    const store = getBlobStore(STORE_NAME);
     let blobs: Awaited<ReturnType<typeof store.list>>['blobs'];
     try {
-      ({ blobs } = await store.list({ prefix }));
+      const results = await Promise.all(prefixes.map((prefix) => store.list({ prefix })));
+      const byKey = new Map(results.flatMap((result) => result.blobs).map((blob) => [blob.key, blob]));
+      blobs = [...byKey.values()];
     } catch (error) {
       console.warn('admin-media: media store unavailable', error);
       return {
@@ -54,6 +78,7 @@ export const handler: Handler = async (event) => {
   }
 
   if (event.httpMethod === 'DELETE') {
+    const store = getBlobStore(STORE_NAME);
     let payload: { key?: string };
     try {
       payload = JSON.parse(event.body ?? '{}');
