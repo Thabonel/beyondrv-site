@@ -227,9 +227,15 @@ nav.scrolled {
 .page-hero--short { min-height: 35vh; }
 .page-hero-bg {
   position: absolute; inset: 0;
+  background-size: cover; background-position: center; background-repeat: no-repeat;
+  filter: brightness(0.32);
+  transform: scale(1.03);
+}
+.page-hero-bg::after {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: inherit;
   background-size: contain; background-position: center; background-repeat: no-repeat;
-  background-color: var(--dark);
-  filter: brightness(0.4);
 }
 .page-hero-content {
   position: relative; z-index: 2;
