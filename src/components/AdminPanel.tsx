@@ -47,6 +47,7 @@ type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 type SuitabilityDataStatus = 'draft' | 'target' | 'confirmed';
 type EnquirySourceType = 'website_form' | 'manual_email' | 'phone_call' | 'facebook' | 'instagram' | 'referral' | 'walk_in' | 'other';
+type EnquiryQueueFilter = 'active' | 'needs-response' | 'follow-up-due' | 'hot' | 'all';
 const MAX_RECENT_BUILDS = 3;
 const MAX_UPLOAD_IMAGE_EDGE = 2000;
 const UPLOAD_IMAGE_QUALITY = 0.82;
@@ -470,6 +471,52 @@ function calculateAdminLeadReminders(enquiries: EnquiryRecord[]): LeadReminderSu
   return summary;
 }
 
+function enquiryQueueDate(enquiry: EnquiryRecord) {
+  const date = new Date(enquiry.received_at ?? enquiry.submittedAt);
+  return Number.isNaN(date.getTime()) ? new Date(0) : date;
+}
+
+function isClosedEnquiry(enquiry: EnquiryRecord) {
+  return isClosedLeadStatus(reminderStatus(enquiry));
+}
+
+function hasCustomerResponse(enquiry: EnquiryRecord) {
+  return Boolean(enquiry.leadStatus?.firstResponseAt || enquiry.leadStatus?.lastContactedAt || isRepliedOrBeyond(reminderStatus(enquiry)));
+}
+
+function isFollowUpDue(enquiry: EnquiryRecord) {
+  if (isClosedEnquiry(enquiry)) return false;
+  const value = enquiry.leadStatus?.nextFollowUpDate || enquiry.callback_date || '';
+  if (!value) return false;
+  return value <= reminderTodayKey();
+}
+
+function responseSla(enquiry: EnquiryRecord) {
+  if (isClosedEnquiry(enquiry)) return { label: 'Closed', color: '#777', border: '#444', rank: 0 };
+  if (hasCustomerResponse(enquiry)) return { label: 'Responded', color: '#8f8', border: '#1a3a1a', rank: 1 };
+
+  const ageHours = (Date.now() - enquiryQueueDate(enquiry).getTime()) / 36e5;
+  if (ageHours >= 24) return { label: 'Response overdue', color: '#f87171', border: '#3a1010', rank: 5 };
+  if (ageHours >= 12) return { label: 'Due today', color: '#fb923c', border: '#63301f', rank: 4 };
+  return { label: 'Awaiting response', color: '#facc15', border: '#4a3a10', rank: 3 };
+}
+
+function queueRank(enquiry: EnquiryRecord) {
+  const sla = responseSla(enquiry).rank;
+  const followUp = isFollowUpDue(enquiry) ? 6 : 0;
+  const priority = enquiry.leadStatus?.priority === 'hot' ? 2 : enquiry.leadStatus?.priority === 'warm' ? 1 : 0;
+  return followUp + sla + priority;
+}
+
+function matchesQueueFilter(enquiry: EnquiryRecord, filter: EnquiryQueueFilter) {
+  if (filter === 'all') return true;
+  if (filter === 'active') return !isClosedEnquiry(enquiry);
+  if (filter === 'needs-response') return !isClosedEnquiry(enquiry) && !hasCustomerResponse(enquiry);
+  if (filter === 'follow-up-due') return isFollowUpDue(enquiry);
+  if (filter === 'hot') return enquiry.leadStatus?.priority === 'hot' && !isClosedEnquiry(enquiry);
+  return true;
+}
+
 function slugifyTitle(title: string) {
   return title
     .trim()
@@ -860,6 +907,7 @@ export default function AdminPanel() {
   const [manualEnquiryStatus, setManualEnquiryStatus] = useState('');
   const [browserRemindersEnabled, setBrowserRemindersEnabled] = useState(false);
   const [browserReminderStatus, setBrowserReminderStatus] = useState('');
+  const [enquiryQueueFilter, setEnquiryQueueFilter] = useState<EnquiryQueueFilter>('active');
   const [contactConfig, setContactConfig] = useState<ContactConfig | null>(null);
   const [recentBuilds, setRecentBuilds] = useState<RecentBuild[]>(limitRecentBuilds(initialRecentBuilds as RecentBuild[]));
   const [testimonials, setTestimonials] = useState<Testimonial[]>(renumber(orderedItems(initialTestimonials as Testimonial[])));
@@ -1909,6 +1957,20 @@ export default function AdminPanel() {
     ['Quoted leads needing follow-up', leadReminders.quotedNeedsFollowUp],
     ['Manual leads missing follow-up date', leadReminders.manualMissingFollowUp],
   ] as const;
+  const queueCounts = {
+    active: enquiries.filter(enquiry => !isClosedEnquiry(enquiry)).length,
+    needsResponse: enquiries.filter(enquiry => !isClosedEnquiry(enquiry) && !hasCustomerResponse(enquiry)).length,
+    followUpDue: enquiries.filter(isFollowUpDue).length,
+    hot: enquiries.filter(enquiry => enquiry.leadStatus?.priority === 'hot' && !isClosedEnquiry(enquiry)).length,
+    all: enquiries.length,
+  };
+  const queuedEnquiries = enquiries
+    .filter(enquiry => matchesQueueFilter(enquiry, enquiryQueueFilter))
+    .sort((a, b) => {
+      const rankDiff = queueRank(b) - queueRank(a);
+      if (rankDiff) return rankDiff;
+      return enquiryQueueDate(b).getTime() - enquiryQueueDate(a).getTime();
+    });
 
   return (
     <>
@@ -2599,12 +2661,37 @@ export default function AdminPanel() {
             <div style={{ flex: 1, overflowY: 'auto', padding: '0.75rem', display: 'grid', gap: '0.65rem', alignContent: 'start' }}>
               {enquiriesStatus && <p style={{ color: '#fb923c', fontSize: '0.85rem', lineHeight: 1.45 }}>{enquiriesStatus}</p>}
               {enquiriesLoading && <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>Loading enquiries...</p>}
+              {!enquiriesLoading && enquiries.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+                  {[
+                    ['active', `Active ${queueCounts.active}`],
+                    ['needs-response', `Needs response ${queueCounts.needsResponse}`],
+                    ['follow-up-due', `Follow-up due ${queueCounts.followUpDue}`],
+                    ['hot', `Hot ${queueCounts.hot}`],
+                    ['all', `All ${queueCounts.all}`],
+                  ].map(([value, label]) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setEnquiryQueueFilter(value as EnquiryQueueFilter)}
+                      style={{ background: enquiryQueueFilter === value ? '#E8540A' : '#222', border: enquiryQueueFilter === value ? 'none' : '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.38rem 0.5rem', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700 }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
               {!enquiriesLoading && enquiries.length === 0 && (
                 <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>
                   No stored enquiries yet. Email notifications may still have been sent.
                 </p>
               )}
-              {!enquiriesLoading && enquiries.map(enquiry => (
+              {!enquiriesLoading && enquiries.length > 0 && queuedEnquiries.length === 0 && (
+                <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>
+                  No enquiries match this queue filter.
+                </p>
+              )}
+              {!enquiriesLoading && queuedEnquiries.map(enquiry => (
                 <div
                   key={enquiry.id}
                   ref={node => {
@@ -2614,8 +2701,13 @@ export default function AdminPanel() {
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center' }}>
                     <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.88rem' }}>{enquiry.name || 'Unnamed enquiry'}</div>
-                    <div style={{ color: enquiry.manual_entry ? '#fb923c' : '#aaa', border: enquiry.manual_entry ? '1px solid #63301f' : '1px solid #444', borderRadius: '999px', padding: '0.18rem 0.45rem', fontSize: '0.68rem', whiteSpace: 'nowrap' }}>
-                      {SOURCE_LABELS[enquiry.source_type ?? 'website_form']}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', justifyContent: 'flex-end' }}>
+                      <div style={{ color: responseSla(enquiry).color, border: `1px solid ${responseSla(enquiry).border}`, borderRadius: '999px', padding: '0.18rem 0.45rem', fontSize: '0.68rem', whiteSpace: 'nowrap' }}>
+                        {responseSla(enquiry).label}
+                      </div>
+                      <div style={{ color: enquiry.manual_entry ? '#fb923c' : '#aaa', border: enquiry.manual_entry ? '1px solid #63301f' : '1px solid #444', borderRadius: '999px', padding: '0.18rem 0.45rem', fontSize: '0.68rem', whiteSpace: 'nowrap' }}>
+                        {SOURCE_LABELS[enquiry.source_type ?? 'website_form']}
+                      </div>
                     </div>
                   </div>
                   <div style={{ color: '#aaa', fontSize: '0.76rem' }}>
