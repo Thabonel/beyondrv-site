@@ -13,8 +13,8 @@ export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'GET') return { statusCode: 405, body: 'Method Not Allowed' };
   if (!isAdminAuthorized(event)) return unauthorizedResponse();
 
-  const store = getBlobStore(STORE_NAME);
   try {
+    const store = getBlobStore(STORE_NAME);
     const { blobs } = await store.list();
     const recent = blobs
       .sort((a, b) => b.key.localeCompare(a.key))

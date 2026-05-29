@@ -783,8 +783,8 @@ export default function AdminPanel() {
       const res = await adminFetch('/.netlify/functions/admin-enquiries');
       if (redirectToLoginIfUnauthorized(res)) return;
       if (!res.ok) throw new Error('Could not load enquiries');
-      const data = await res.json() as { enquiries: EnquiryRecord[]; storageReady?: boolean; warning?: string };
-      setEnquiries(data.enquiries.filter(Boolean) ?? []);
+      const data = await res.json() as { enquiries?: EnquiryRecord[]; storageReady?: boolean; warning?: string };
+      setEnquiries(Array.isArray(data.enquiries) ? data.enquiries.filter(Boolean) : []);
       setEnquiriesStatus(data.warning ?? '');
     } catch {
       setEnquiriesStatus('Could not load recent enquiries.');
