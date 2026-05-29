@@ -49,7 +49,6 @@ export function getBlobStore(name: string): Store {
   if (hasBlobsContext()) {
     return getStore({
       name,
-      consistency: 'strong',
     });
   }
 
@@ -58,7 +57,6 @@ export function getBlobStore(name: string): Store {
   if (siteID && token) {
     return getStore({
       name,
-      consistency: 'strong',
       siteID,
       token,
     });

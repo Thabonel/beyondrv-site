@@ -24,11 +24,11 @@ export const handler: Handler = async (event) => {
     const statusStore = getBlobStore(LEAD_STATUS_STORE);
     const enquiries = await Promise.all(
       recent.map(async (blob) => {
-        const data = await store.get(blob.key, { type: 'json', consistency: 'strong' }) as { id?: string; callback_date?: string; submittedAt?: string } | null;
+        const data = await store.get(blob.key, { type: 'json' }) as { id?: string; callback_date?: string; submittedAt?: string } | null;
         if (!data?.id) return data;
         let leadStatus = null;
         try {
-          leadStatus = await statusStore.get(leadKey(data.id), { type: 'json', consistency: 'strong' });
+          leadStatus = await statusStore.get(leadKey(data.id), { type: 'json' });
         } catch {
           leadStatus = null;
         }

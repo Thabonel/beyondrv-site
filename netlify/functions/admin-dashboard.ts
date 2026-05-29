@@ -106,7 +106,7 @@ async function getAllJson<T>(storeName: string) {
     const records = await Promise.all(
       blobs.map(async (blob) => {
         try {
-          return await store.get(blob.key, { type: 'json', consistency: 'strong' }) as T | null;
+          return await store.get(blob.key, { type: 'json' }) as T | null;
         } catch {
           return null;
         }
@@ -129,7 +129,7 @@ async function getLeadStatuses(enquiries: EnquiryRecord[]) {
     const entries = await Promise.all(
       enquiries.map(async (enquiry) => {
         try {
-          const status = await store.get(leadKey(enquiry.id), { type: 'json', consistency: 'strong' }) as LeadStatusRecord | null;
+          const status = await store.get(leadKey(enquiry.id), { type: 'json' }) as LeadStatusRecord | null;
           return [enquiry.id, status] as const;
         } catch {
           return [enquiry.id, null] as const;

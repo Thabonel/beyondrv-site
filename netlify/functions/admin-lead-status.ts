@@ -46,7 +46,7 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    const leadStatus = await store.get(leadKey(enquiryId), { type: 'json', consistency: 'strong' });
+    const leadStatus = await store.get(leadKey(enquiryId), { type: 'json' });
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
