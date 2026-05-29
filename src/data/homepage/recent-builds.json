@@ -1,17 +1,18 @@
 [
   {
     "id": "advent-2150-mutdapilly",
-    "title": "Advent 2150 Build",
-    "image": "/images/optimized/products/advent-2150-hardtop-slide-on/02-advent-2150-04-1024x576.webp",
-    "alt": "Advent 2150 slide-on build at Beyond RV in Mutdapilly Queensland",
+    "title": "3.5m Electric Pop-Top Cabover Family Camper w/ Electric Drop Down Bed",
+    "image": "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/01-expedition-3-5m-electric-poptop-cabover-family-camper-hero.webp",
+    "alt": "3.5m Electric Pop-Top Cabover Family Camper w/ Electric Drop Down Bed build at Beyond RV",
     "tags": [
       "Finished in Mutdapilly, Queensland",
       "Electrical, cabinetry & compliance completed locally",
       "ADR certified"
     ],
-    "link": "https://beyondrv-au.netlify.app/expedition/3-5m-electric-poptop-cabover-family-camper/",
+    "link": "/expedition/3-5m-electric-poptop-cabover-family-camper/",
     "isVisible": true,
-    "sortOrder": 1
+    "sortOrder": 1,
+    "productSlug": "expedition/3-5m-electric-poptop-cabover-family-camper"
   },
   {
     "id": "unimog-u1700l-expedition",
