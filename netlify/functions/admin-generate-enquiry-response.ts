@@ -96,8 +96,16 @@ export const handler: Handler = async (event) => {
   const promptData = {
     customer: {
       firstName: firstName(clean(enquiry.name, 120)),
+      sourceType: clean(enquiry.source_type, 80),
       productInterest: clean(enquiry.product_interest, 240),
+      enquiryIntent: clean(enquiry.enquiry_intent, 120),
+      emailSubject: clean(enquiry.email_subject, 240),
       message: clean(enquiry.message, 2500),
+      mainQuestions: clean(enquiry.main_questions, 1500),
+      vehicleDetails: clean(enquiry.vehicle_details, 1000),
+      budgetNotes: clean(enquiry.budget_notes, 1000),
+      timeline: clean(enquiry.timeline, 1000),
+      sourceNote: clean(enquiry.source_note, 1000),
       callbackDate: clean(enquiry.callback_date, 80),
       callbackTime: clean(enquiry.callback_time, 80),
       referralSource: clean(enquiry.referral_source_self_reported, 120),

@@ -198,6 +198,8 @@ export const handler: Handler = async (event) => {
   const record = {
     ...enquiry,
     id,
+    source_type: 'website_form',
+    manual_entry: false,
     submittedAt,
     userAgent: event.headers['user-agent'] ?? '',
     ip: event.headers['x-nf-client-connection-ip'] ?? event.headers['client-ip'] ?? '',

@@ -46,6 +46,7 @@ type PanelTab = 'dashboard' | 'products' | 'media' | 'homepage' | 'enquiries' | 
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 type SuitabilityDataStatus = 'draft' | 'target' | 'confirmed';
+type EnquirySourceType = 'website_form' | 'manual_email' | 'phone_call' | 'facebook' | 'instagram' | 'referral' | 'walk_in' | 'other';
 const MAX_RECENT_BUILDS = 3;
 const MAX_UPLOAD_IMAGE_EDGE = 2000;
 const UPLOAD_IMAGE_QUALITY = 0.82;
@@ -170,11 +171,24 @@ interface MediaFile {
 interface EnquiryRecord {
   id: string;
   submittedAt: string;
+  received_at?: string;
   name: string;
   email: string;
   phone: string;
   message: string;
+  source_type?: EnquirySourceType;
+  manual_entry?: boolean;
+  createdBy?: string;
+  email_subject?: string;
+  email_body?: string;
+  conversation_summary?: string;
+  main_questions?: string;
+  vehicle_details?: string;
+  budget_notes?: string;
+  timeline?: string;
+  source_note?: string;
   product_interest?: string;
+  enquiry_intent?: string;
   callback_date?: string;
   callback_time?: string;
   referral_source_self_reported?: string;
@@ -190,6 +204,27 @@ interface EnquiryRecord {
     lastContactedAt?: string;
     updatedAt?: string;
   };
+}
+
+interface ManualEnquiryForm {
+  source_type: Exclude<EnquirySourceType, 'website_form'>;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  email_subject: string;
+  email_body: string;
+  product_interest: string;
+  enquiry_intent: string;
+  source_note: string;
+  received_at: string;
+  notes: string;
+  conversation_summary: string;
+  main_questions: string;
+  vehicle_details: string;
+  budget_notes: string;
+  timeline: string;
+  priority: NonNullable<NonNullable<EnquiryRecord['leadStatus']>['priority']>;
+  nextFollowUpDate: string;
 }
 
 interface ContactConfig {
@@ -274,6 +309,45 @@ const EMPTY_TESTIMONIAL: Testimonial = {
   rating: 5,
   isVisible: false,
   sortOrder: 1,
+};
+
+function localDateTimeValue(date = new Date()) {
+  const offsetMs = date.getTimezoneOffset() * 60_000;
+  return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16);
+}
+
+function emptyManualEnquiryForm(): ManualEnquiryForm {
+  return {
+    source_type: 'manual_email',
+    customer_name: '',
+    customer_email: '',
+    customer_phone: '',
+    email_subject: '',
+    email_body: '',
+    product_interest: '',
+    enquiry_intent: '',
+    source_note: '',
+    received_at: localDateTimeValue(),
+    notes: '',
+    conversation_summary: '',
+    main_questions: '',
+    vehicle_details: '',
+    budget_notes: '',
+    timeline: '',
+    priority: 'warm',
+    nextFollowUpDate: '',
+  };
+}
+
+const SOURCE_LABELS: Record<EnquirySourceType, string> = {
+  website_form: 'Website form',
+  manual_email: 'Manual email',
+  phone_call: 'Phone call',
+  facebook: 'Facebook',
+  instagram: 'Instagram',
+  referral: 'Referral',
+  walk_in: 'Walk-in',
+  other: 'Other source',
 };
 
 function slugifyTitle(title: string) {
@@ -659,6 +733,11 @@ export default function AdminPanel() {
   const [responseDrafts, setResponseDrafts] = useState<Record<string, string>>({});
   const [responseGenerating, setResponseGenerating] = useState<string | null>(null);
   const [responseStatuses, setResponseStatuses] = useState<Record<string, string>>({});
+  const [showManualEnquiryForm, setShowManualEnquiryForm] = useState(false);
+  const [manualEnquiryMode, setManualEnquiryMode] = useState<'manual_email' | 'phone_call'>('manual_email');
+  const [manualEnquiry, setManualEnquiry] = useState<ManualEnquiryForm>(() => emptyManualEnquiryForm());
+  const [manualEnquirySaving, setManualEnquirySaving] = useState(false);
+  const [manualEnquiryStatus, setManualEnquiryStatus] = useState('');
   const [contactConfig, setContactConfig] = useState<ContactConfig | null>(null);
   const [recentBuilds, setRecentBuilds] = useState<RecentBuild[]>(limitRecentBuilds(initialRecentBuilds as RecentBuild[]));
   const [testimonials, setTestimonials] = useState<Testimonial[]>(renumber(orderedItems(initialTestimonials as Testimonial[])));
@@ -809,6 +888,63 @@ export default function AdminPanel() {
       setContactConfig(data);
     } catch {
       setContactConfig(null);
+    }
+  }
+
+  function setManualMode(mode: 'manual_email' | 'phone_call') {
+    setManualEnquiryMode(mode);
+    setManualEnquiry(prev => ({
+      ...prev,
+      source_type: mode,
+      email_subject: mode === 'manual_email' ? prev.email_subject : '',
+      email_body: mode === 'manual_email' ? prev.email_body : '',
+      conversation_summary: mode === 'phone_call' ? prev.conversation_summary : '',
+    }));
+    setManualEnquiryStatus('');
+  }
+
+  function updateManualEnquiry(patch: Partial<ManualEnquiryForm>) {
+    setManualEnquiry(prev => ({ ...prev, ...patch }));
+  }
+
+  async function saveManualEnquiry() {
+    setManualEnquirySaving(true);
+    setManualEnquiryStatus('');
+    try {
+      const payload = {
+        ...manualEnquiry,
+        source_type: manualEnquiryMode === 'manual_email' ? 'manual_email' : manualEnquiry.source_type,
+      };
+      const res = await adminFetch('/.netlify/functions/admin-manual-enquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await res.json() as { enquiry?: EnquiryRecord; error?: string };
+      if (!res.ok || !data.enquiry) throw new Error(data.error ?? 'Could not save manual enquiry');
+
+      const leadStatus = {
+        enquiryId: data.enquiry.id,
+        status: 'new' as const,
+        priority: manualEnquiry.priority,
+        notes: manualEnquiry.notes,
+        nextFollowUpDate: manualEnquiry.nextFollowUpDate,
+        outcomeReason: '' as const,
+        firstResponseAt: '',
+        lastContactedAt: '',
+        updatedAt: data.enquiry.submittedAt,
+      };
+      setEnquiries(prev => [{ ...data.enquiry!, leadStatus }, ...prev]);
+      setManualEnquiry(emptyManualEnquiryForm());
+      setManualEnquiryMode('manual_email');
+      setShowManualEnquiryForm(false);
+      setEnquiriesStatus('');
+      setManualEnquiryStatus('Manual enquiry saved.');
+    } catch (err) {
+      setManualEnquiryStatus(err instanceof Error ? err.message : 'Could not save manual enquiry.');
+    } finally {
+      setManualEnquirySaving(false);
     }
   }
 
@@ -2092,19 +2228,134 @@ export default function AdminPanel() {
                 <div style={{ color: '#fff', fontWeight: 700 }}>Recent Enquiries</div>
                 <div style={{ color: '#888', fontSize: '0.76rem', marginTop: '0.2rem' }}>Stored contact form submissions</div>
               </div>
-              <button
-                onClick={loadEnquiries}
-                disabled={enquiriesLoading}
-                style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: 'pointer', fontWeight: 700 }}
-              >
-                Refresh
-              </button>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', justifyContent: 'flex-end' }}>
+                <button
+                  onClick={() => {
+                    setShowManualEnquiryForm(prev => !prev);
+                    setManualEnquiryStatus('');
+                  }}
+                  style={{ background: '#E8540A', border: 'none', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: 'pointer', fontWeight: 700 }}
+                >
+                  Add Manual Enquiry
+                </button>
+                <button
+                  onClick={loadEnquiries}
+                  disabled={enquiriesLoading}
+                  style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: 'pointer', fontWeight: 700 }}
+                >
+                  Refresh
+                </button>
+              </div>
             </div>
             {contactConfig && (
               <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #333', background: contactConfig.ready ? '#102416' : '#2a1410', color: contactConfig.ready ? '#8f8' : '#fb923c', fontSize: '0.78rem', lineHeight: 1.45 }}>
                 {contactConfig.ready
                   ? `Email notifications are configured for ${contactConfig.toEmail}.`
                   : `Email notifications need setup. Missing: ${contactConfig.missing.join(', ')}.`}
+              </div>
+            )}
+            {showManualEnquiryForm && (
+              <div style={{ borderBottom: '1px solid #333', background: '#151515', padding: '0.85rem 1rem', display: 'grid', gap: '0.65rem' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem' }}>Add manual enquiry</div>
+                    <div style={{ color: '#888', fontSize: '0.74rem', marginTop: '0.15rem' }}>No email is sent. The record is saved into Recent Enquiries.</div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.35rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => setManualMode('manual_email')}
+                      style={{ background: manualEnquiryMode === 'manual_email' ? '#E8540A' : '#222', border: manualEnquiryMode === 'manual_email' ? 'none' : '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.42rem 0.55rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
+                    >
+                      Paste Email Enquiry
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setManualMode('phone_call')}
+                      style={{ background: manualEnquiryMode === 'phone_call' ? '#E8540A' : '#222', border: manualEnquiryMode === 'phone_call' ? 'none' : '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.42rem 0.55rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
+                    >
+                      Add Phone Conversation
+                    </button>
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.45rem' }}>
+                  {manualEnquiryMode === 'phone_call' && (
+                    <select
+                      value={manualEnquiry.source_type}
+                      onChange={e => updateManualEnquiry({ source_type: e.target.value as ManualEnquiryForm['source_type'] })}
+                      style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }}
+                    >
+                      <option value="phone_call">Phone call</option>
+                      <option value="facebook">Facebook</option>
+                      <option value="instagram">Instagram</option>
+                      <option value="referral">Referral</option>
+                      <option value="walk_in">Walk-in</option>
+                      <option value="other">Other</option>
+                    </select>
+                  )}
+                  <input value={manualEnquiry.customer_name} onChange={e => updateManualEnquiry({ customer_name: e.target.value })} placeholder="Customer name" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                  <input value={manualEnquiry.customer_email} onChange={e => updateManualEnquiry({ customer_email: e.target.value })} placeholder="Customer email" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                  <input value={manualEnquiry.customer_phone} onChange={e => updateManualEnquiry({ customer_phone: e.target.value })} placeholder="Customer phone" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                  <input value={manualEnquiry.product_interest} onChange={e => updateManualEnquiry({ product_interest: e.target.value })} placeholder="Product interest" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                  <input value={manualEnquiry.enquiry_intent} onChange={e => updateManualEnquiry({ enquiry_intent: e.target.value })} placeholder="Intent, e.g. quote" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                  <input type="datetime-local" value={manualEnquiry.received_at} onChange={e => updateManualEnquiry({ received_at: e.target.value })} style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                </div>
+                {manualEnquiryMode === 'manual_email' ? (
+                  <div style={{ display: 'grid', gap: '0.45rem' }}>
+                    <input value={manualEnquiry.email_subject} onChange={e => updateManualEnquiry({ email_subject: e.target.value })} placeholder="Email subject" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                    <textarea
+                      value={manualEnquiry.email_body}
+                      onChange={e => updateManualEnquiry({ email_body: e.target.value })}
+                      placeholder="Paste the full email enquiry"
+                      rows={7}
+                      style={{ resize: 'vertical', background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem', fontSize: '0.78rem', lineHeight: 1.45 }}
+                    />
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gap: '0.45rem' }}>
+                    <textarea value={manualEnquiry.conversation_summary} onChange={e => updateManualEnquiry({ conversation_summary: e.target.value })} placeholder="Conversation summary" rows={4} style={{ resize: 'vertical', background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem', fontSize: '0.78rem', lineHeight: 1.45 }} />
+                    <textarea value={manualEnquiry.main_questions} onChange={e => updateManualEnquiry({ main_questions: e.target.value })} placeholder="Main questions" rows={2} style={{ resize: 'vertical', background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem', fontSize: '0.78rem', lineHeight: 1.45 }} />
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.45rem' }}>
+                      <input value={manualEnquiry.vehicle_details} onChange={e => updateManualEnquiry({ vehicle_details: e.target.value })} placeholder="Vehicle details" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                      <input value={manualEnquiry.budget_notes} onChange={e => updateManualEnquiry({ budget_notes: e.target.value })} placeholder="Budget notes" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                      <input value={manualEnquiry.timeline} onChange={e => updateManualEnquiry({ timeline: e.target.value })} placeholder="Timeline" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                    </div>
+                  </div>
+                )}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.45rem' }}>
+                  <select value={manualEnquiry.priority} onChange={e => updateManualEnquiry({ priority: e.target.value as ManualEnquiryForm['priority'] })} style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }}>
+                    <option value="hot">Hot</option>
+                    <option value="warm">Warm</option>
+                    <option value="info-only">Info only</option>
+                    <option value="spam-low-quality">Spam / low quality</option>
+                  </select>
+                  <input type="date" value={manualEnquiry.nextFollowUpDate} onChange={e => updateManualEnquiry({ nextFollowUpDate: e.target.value })} style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                  <input value={manualEnquiry.source_note} onChange={e => updateManualEnquiry({ source_note: e.target.value })} placeholder="Source note" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                </div>
+                <textarea value={manualEnquiry.notes} onChange={e => updateManualEnquiry({ notes: e.target.value })} placeholder="Internal notes" rows={2} style={{ resize: 'vertical', background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem', fontSize: '0.78rem', lineHeight: 1.45 }} />
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '0.45rem', alignItems: 'center' }}>
+                  <div style={{ color: manualEnquiryStatus.includes('saved') ? '#8f8' : '#fb923c', fontSize: '0.76rem' }}>{manualEnquiryStatus}</div>
+                  <div style={{ display: 'flex', gap: '0.4rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowManualEnquiryForm(false);
+                        setManualEnquiryStatus('');
+                      }}
+                      style={{ background: '#222', border: '1px solid #444', color: '#aaa', borderRadius: '6px', padding: '0.48rem 0.65rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.76rem' }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={saveManualEnquiry}
+                      disabled={manualEnquirySaving}
+                      style={{ background: '#E8540A', border: 'none', color: '#fff', borderRadius: '6px', padding: '0.48rem 0.65rem', cursor: manualEnquirySaving ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.76rem' }}
+                    >
+                      {manualEnquirySaving ? 'Saving...' : 'Save Manual Enquiry'}
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
             <div style={{ flex: 1, overflowY: 'auto', padding: '0.75rem', display: 'grid', gap: '0.65rem', alignContent: 'start' }}>
@@ -2117,20 +2368,37 @@ export default function AdminPanel() {
               )}
               {!enquiriesLoading && enquiries.map(enquiry => (
                 <div key={enquiry.id} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', padding: '0.75rem', display: 'grid', gap: '0.4rem' }}>
-                  <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.88rem' }}>{enquiry.name}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center' }}>
+                    <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.88rem' }}>{enquiry.name || 'Unnamed enquiry'}</div>
+                    <div style={{ color: enquiry.manual_entry ? '#fb923c' : '#aaa', border: enquiry.manual_entry ? '1px solid #63301f' : '1px solid #444', borderRadius: '999px', padding: '0.18rem 0.45rem', fontSize: '0.68rem', whiteSpace: 'nowrap' }}>
+                      {SOURCE_LABELS[enquiry.source_type ?? 'website_form']}
+                    </div>
+                  </div>
                   <div style={{ color: '#aaa', fontSize: '0.76rem' }}>
-                    {new Date(enquiry.submittedAt).toLocaleString()} · {enquiry.product_interest || 'General enquiry'}
+                    {new Date(enquiry.received_at ?? enquiry.submittedAt).toLocaleString()} · {enquiry.product_interest || 'General enquiry'}
                   </div>
                   <div style={{ display: 'grid', gap: '0.2rem', fontSize: '0.78rem' }}>
-                    <a href={`tel:${enquiry.phone}`} style={{ color: '#E8540A', textDecoration: 'none' }}>{enquiry.phone}</a>
-                    <a href={`mailto:${enquiry.email}`} style={{ color: '#E8540A', textDecoration: 'none' }}>{enquiry.email}</a>
+                    {enquiry.phone && <a href={`tel:${enquiry.phone}`} style={{ color: '#E8540A', textDecoration: 'none' }}>{enquiry.phone}</a>}
+                    {enquiry.email && <a href={`mailto:${enquiry.email}`} style={{ color: '#E8540A', textDecoration: 'none' }}>{enquiry.email}</a>}
                   </div>
+                  {enquiry.email_subject && (
+                    <div style={{ color: '#ccc', fontSize: '0.76rem' }}>Subject: {enquiry.email_subject}</div>
+                  )}
                   {(enquiry.callback_date || enquiry.callback_time) && (
                     <div style={{ color: '#ccc', fontSize: '0.76rem' }}>
                       Callback: {[enquiry.callback_date, enquiry.callback_time].filter(Boolean).join(' ')}
                     </div>
                   )}
                   <div style={{ color: '#ddd', fontSize: '0.78rem', lineHeight: 1.45, whiteSpace: 'pre-wrap' }}>{enquiry.message}</div>
+                  {(enquiry.main_questions || enquiry.vehicle_details || enquiry.budget_notes || enquiry.timeline || enquiry.source_note) && (
+                    <div style={{ color: '#aaa', fontSize: '0.74rem', lineHeight: 1.45, display: 'grid', gap: '0.1rem' }}>
+                      {enquiry.main_questions && <div>Main questions: {enquiry.main_questions}</div>}
+                      {enquiry.vehicle_details && <div>Vehicle: {enquiry.vehicle_details}</div>}
+                      {enquiry.budget_notes && <div>Budget: {enquiry.budget_notes}</div>}
+                      {enquiry.timeline && <div>Timeline: {enquiry.timeline}</div>}
+                      {enquiry.source_note && <div>Source note: {enquiry.source_note}</div>}
+                    </div>
+                  )}
                   {enquiry.referral_source_self_reported && (
                     <div style={{ color: '#777', fontSize: '0.72rem' }}>
                       Heard about us: {enquiry.referral_source_self_reported}{enquiry.referral_source_other ? ` - ${enquiry.referral_source_other}` : ''}

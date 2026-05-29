@@ -17,14 +17,16 @@ export const handler: Handler = async (event) => {
   try {
     const store = getBlobStore(STORE_NAME);
     const { blobs } = await store.list();
-    const recent = blobs
-      .sort((a, b) => b.key.localeCompare(a.key))
+    const statusStore = getBlobStore(LEAD_STATUS_STORE);
+    const records = (await Promise.all(
+      blobs.map(async (blob) => store.get(blob.key, { type: 'json' }) as Promise<{ id?: string; callback_date?: string; submittedAt?: string; received_at?: string } | null>)
+    ))
+      .filter((record): record is { id: string; callback_date?: string; submittedAt?: string; received_at?: string } => Boolean(record?.id))
+      .sort((a, b) => (b.received_at ?? b.submittedAt ?? '').localeCompare(a.received_at ?? a.submittedAt ?? ''))
       .slice(0, 50);
 
-    const statusStore = getBlobStore(LEAD_STATUS_STORE);
     const enquiries = await Promise.all(
-      recent.map(async (blob) => {
-        const data = await store.get(blob.key, { type: 'json' }) as { id?: string; callback_date?: string; submittedAt?: string } | null;
+      records.map(async (data) => {
         if (!data?.id) return data;
         let leadStatus = null;
         try {
