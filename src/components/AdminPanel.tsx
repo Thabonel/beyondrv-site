@@ -206,6 +206,29 @@ interface EnquiryRecord {
   };
 }
 
+interface LeadReminderItem {
+  id: string;
+  enquiryId: string;
+  type: string;
+  customerName: string;
+  productInterest: string;
+  submittedAt: string;
+  status: string;
+  priority: string;
+  nextFollowUpDate: string;
+  reason: string;
+}
+
+interface LeadReminderSummary {
+  newUnreplied: LeadReminderItem[];
+  hotLeads: LeadReminderItem[];
+  followUpsDueToday: LeadReminderItem[];
+  overdueFollowUps: LeadReminderItem[];
+  quotedNeedsFollowUp: LeadReminderItem[];
+  manualMissingFollowUp: LeadReminderItem[];
+  total: number;
+}
+
 interface ManualEnquiryForm {
   source_type: Exclude<EnquirySourceType, 'website_form'>;
   customer_name: string;
@@ -349,6 +372,103 @@ const SOURCE_LABELS: Record<EnquirySourceType, string> = {
   walk_in: 'Walk-in',
   other: 'Other source',
 };
+
+function reminderTodayKey(date = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Australia/Brisbane',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function reminderStatus(enquiry: EnquiryRecord) {
+  return (enquiry.leadStatus?.status ?? 'new').toLowerCase();
+}
+
+function reminderPriority(enquiry: EnquiryRecord) {
+  return (enquiry.leadStatus?.priority ?? 'warm').toLowerCase();
+}
+
+function isClosedLeadStatus(status: string) {
+  return ['won', 'lost', 'spam'].includes(status);
+}
+
+function isRepliedOrBeyond(status: string) {
+  return ['contacted', 'replied', 'called', 'qualified', 'quoted', 'follow-up-scheduled', 'won', 'lost'].includes(status);
+}
+
+function daysSinceReminderDate(value?: string) {
+  if (!value) return 0;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? 0 : (Date.now() - date.getTime()) / 86_400_000;
+}
+
+function reminderItem(enquiry: EnquiryRecord, type: string, reason: string): LeadReminderItem {
+  return {
+    id: `${enquiry.id}:${type}`,
+    enquiryId: enquiry.id,
+    type,
+    customerName: enquiry.name || 'Unnamed lead',
+    productInterest: enquiry.product_interest || 'General enquiry',
+    submittedAt: enquiry.received_at || enquiry.submittedAt || '',
+    status: reminderStatus(enquiry),
+    priority: reminderPriority(enquiry),
+    nextFollowUpDate: enquiry.leadStatus?.nextFollowUpDate || enquiry.callback_date || '',
+    reason,
+  };
+}
+
+function calculateAdminLeadReminders(enquiries: EnquiryRecord[]): LeadReminderSummary {
+  const today = reminderTodayKey();
+  const summary: LeadReminderSummary = {
+    newUnreplied: [],
+    hotLeads: [],
+    followUpsDueToday: [],
+    overdueFollowUps: [],
+    quotedNeedsFollowUp: [],
+    manualMissingFollowUp: [],
+    total: 0,
+  };
+
+  for (const enquiry of enquiries) {
+    const status = reminderStatus(enquiry);
+    const priority = reminderPriority(enquiry);
+    const firstResponseAt = enquiry.leadStatus?.firstResponseAt ?? '';
+    const followUpDate = enquiry.leadStatus?.nextFollowUpDate || enquiry.callback_date || '';
+
+    if (status === 'new' && !firstResponseAt) {
+      summary.newUnreplied.push(reminderItem(enquiry, 'new-unreplied', 'New enquiry has not been replied to.'));
+    }
+    if (priority === 'hot' && !isRepliedOrBeyond(status) && !firstResponseAt) {
+      summary.hotLeads.push(reminderItem(enquiry, 'hot-unreplied', 'Hot lead needs a reply.'));
+    }
+    if (followUpDate === today && !isClosedLeadStatus(status)) {
+      summary.followUpsDueToday.push(reminderItem(enquiry, 'follow-up-due-today', 'Follow-up is due today.'));
+    }
+    if (followUpDate && followUpDate < today && !isClosedLeadStatus(status)) {
+      summary.overdueFollowUps.push(reminderItem(enquiry, 'follow-up-overdue', 'Follow-up is overdue.'));
+    }
+    if (status === 'quoted' && daysSinceReminderDate(enquiry.leadStatus?.lastContactedAt || enquiry.leadStatus?.updatedAt) >= 3) {
+      summary.quotedNeedsFollowUp.push(reminderItem(enquiry, 'quoted-needs-follow-up', 'Quoted lead has not been contacted recently.'));
+    }
+    if (['phone_call', 'manual_email'].includes(enquiry.source_type ?? 'website_form') && !followUpDate && !isClosedLeadStatus(status)) {
+      summary.manualMissingFollowUp.push(reminderItem(enquiry, 'manual-missing-follow-up', 'Manual lead is missing a follow-up date.'));
+    }
+  }
+
+  summary.total = [
+    summary.newUnreplied,
+    summary.hotLeads,
+    summary.followUpsDueToday,
+    summary.overdueFollowUps,
+    summary.quotedNeedsFollowUp,
+    summary.manualMissingFollowUp,
+  ].reduce((count, section) => count + section.length, 0);
+  return summary;
+}
 
 function slugifyTitle(title: string) {
   return title
@@ -738,6 +858,8 @@ export default function AdminPanel() {
   const [manualEnquiry, setManualEnquiry] = useState<ManualEnquiryForm>(() => emptyManualEnquiryForm());
   const [manualEnquirySaving, setManualEnquirySaving] = useState(false);
   const [manualEnquiryStatus, setManualEnquiryStatus] = useState('');
+  const [browserRemindersEnabled, setBrowserRemindersEnabled] = useState(false);
+  const [browserReminderStatus, setBrowserReminderStatus] = useState('');
   const [contactConfig, setContactConfig] = useState<ContactConfig | null>(null);
   const [recentBuilds, setRecentBuilds] = useState<RecentBuild[]>(limitRecentBuilds(initialRecentBuilds as RecentBuild[]));
   const [testimonials, setTestimonials] = useState<Testimonial[]>(renumber(orderedItems(initialTestimonials as Testimonial[])));
@@ -750,6 +872,8 @@ export default function AdminPanel() {
   const fileRef = useRef<HTMLInputElement>(null);
   const mediaFileRef = useRef<HTMLInputElement>(null);
   const newProductFileRef = useRef<HTMLInputElement>(null);
+  const enquiryRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const notifiedReminderIds = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -794,6 +918,29 @@ export default function AdminPanel() {
       void loadContactConfig();
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    if (!browserRemindersEnabled || activeTab !== 'enquiries' || typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+    const reminders = calculateAdminLeadReminders(enquiries);
+    const candidates = [
+      ...reminders.hotLeads,
+      ...reminders.followUpsDueToday,
+      ...reminders.overdueFollowUps,
+    ];
+    for (const reminder of candidates) {
+      if (notifiedReminderIds.current.has(reminder.id)) continue;
+      notifiedReminderIds.current.add(reminder.id);
+      const title = reminder.type === 'hot-unreplied'
+        ? `Hot lead needs reply: ${reminder.customerName}`
+        : reminder.type === 'follow-up-due-today'
+          ? `Follow-up due today: ${reminder.customerName}`
+          : `Overdue follow-up: ${reminder.customerName}`;
+      new Notification(title, {
+        body: `${reminder.productInterest}. ${reminder.reason}`,
+        tag: reminder.id,
+      });
+    }
+  }, [activeTab, browserRemindersEnabled, enquiries]);
 
   async function sendMessage(text: string) {
     if (!text.trim() || loading) return;
@@ -889,6 +1036,31 @@ export default function AdminPanel() {
     } catch {
       setContactConfig(null);
     }
+  }
+
+  async function enableBrowserLeadReminders() {
+    if (typeof Notification === 'undefined') {
+      setBrowserReminderStatus('Browser notifications are not supported in this browser.');
+      return;
+    }
+    if (Notification.permission === 'denied') {
+      setBrowserReminderStatus('Browser notifications are blocked in this browser.');
+      return;
+    }
+    const permission = Notification.permission === 'granted'
+      ? 'granted'
+      : await Notification.requestPermission();
+    if (permission === 'granted') {
+      setBrowserRemindersEnabled(true);
+      setBrowserReminderStatus('Browser notifications are enabled while this page is open.');
+    } else {
+      setBrowserRemindersEnabled(false);
+      setBrowserReminderStatus('Browser notifications were not enabled.');
+    }
+  }
+
+  function openEnquiry(enquiryId: string) {
+    enquiryRefs.current[enquiryId]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   function setManualMode(mode: 'manual_email' | 'phone_call') {
@@ -1723,6 +1895,20 @@ export default function AdminPanel() {
       .toLowerCase()
       .includes(q);
   });
+  const leadReminders = calculateAdminLeadReminders(enquiries);
+  const browserReminderCandidates = [
+    ...leadReminders.hotLeads,
+    ...leadReminders.followUpsDueToday,
+    ...leadReminders.overdueFollowUps,
+  ];
+  const leadReminderSections = [
+    ['New unreplied enquiries', leadReminders.newUnreplied],
+    ['Hot unreplied leads', leadReminders.hotLeads],
+    ['Follow-ups due today', leadReminders.followUpsDueToday],
+    ['Overdue follow-ups', leadReminders.overdueFollowUps],
+    ['Quoted leads needing follow-up', leadReminders.quotedNeedsFollowUp],
+    ['Manual leads missing follow-up date', leadReminders.manualMissingFollowUp],
+  ] as const;
 
   return (
     <>
@@ -2254,6 +2440,58 @@ export default function AdminPanel() {
                   : `Email notifications need setup. Missing: ${contactConfig.missing.join(', ')}.`}
               </div>
             )}
+            <div style={{ padding: '0.85rem 1rem', borderBottom: '1px solid #333', background: '#151515', display: 'grid', gap: '0.65rem' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '0.55rem', alignItems: 'center' }}>
+                <div>
+                  <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem' }}>Needs Attention</div>
+                  <div style={{ color: leadReminders.total ? '#fb923c' : '#8f8', fontSize: '0.74rem', marginTop: '0.15rem' }}>
+                    {leadReminders.total ? `${leadReminders.total} reminder${leadReminders.total === 1 ? '' : 's'} across recent enquiries.` : 'No recent lead reminders.'}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={enableBrowserLeadReminders}
+                  disabled={browserRemindersEnabled}
+                  style={{ background: browserRemindersEnabled ? '#102416' : '#222', border: browserRemindersEnabled ? '1px solid #1a3a1a' : '1px solid #444', color: browserRemindersEnabled ? '#8f8' : '#fff', borderRadius: '6px', padding: '0.42rem 0.55rem', cursor: browserRemindersEnabled ? 'default' : 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
+                >
+                  {browserRemindersEnabled ? 'Browser Alerts On' : 'Enable Browser Alerts'}
+                </button>
+              </div>
+              {browserReminderStatus && (
+                <div style={{ color: '#aaa', fontSize: '0.72rem', lineHeight: 1.45 }}>
+                  {browserReminderStatus}{browserReminderCandidates.length ? ` High-value reminders ready: ${browserReminderCandidates.length}.` : ''}
+                </div>
+              )}
+              {leadReminders.total > 0 && (
+                <div style={{ display: 'grid', gap: '0.55rem' }}>
+                  {leadReminderSections.filter(([, items]) => items.length > 0).map(([title, items]) => (
+                    <div key={title} style={{ display: 'grid', gap: '0.35rem' }}>
+                      <div style={{ color: '#ddd', fontSize: '0.74rem', fontWeight: 700 }}>{title}</div>
+                      {items.slice(0, 4).map(reminder => (
+                        <div key={reminder.id} style={{ background: '#111', border: '1px solid #333', borderRadius: '6px', padding: '0.5rem', display: 'grid', gap: '0.3rem' }}>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '0.4rem' }}>
+                            <div style={{ color: '#fff', fontSize: '0.78rem', fontWeight: 700 }}>{reminder.customerName}</div>
+                            <button
+                              type="button"
+                              onClick={() => openEnquiry(reminder.enquiryId)}
+                              style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.24rem 0.4rem', cursor: 'pointer', fontSize: '0.68rem', fontWeight: 700 }}
+                            >
+                              Open
+                            </button>
+                          </div>
+                          <div style={{ color: '#aaa', fontSize: '0.72rem', lineHeight: 1.4 }}>
+                            {reminder.productInterest} · {reminder.reason}
+                          </div>
+                          <div style={{ color: '#777', fontSize: '0.68rem', lineHeight: 1.4 }}>
+                            {reminder.submittedAt ? new Date(reminder.submittedAt).toLocaleDateString() : 'No enquiry date'} · status: {reminder.status} · priority: {reminder.priority}{reminder.nextFollowUpDate ? ` · follow-up: ${reminder.nextFollowUpDate}` : ''}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             {showManualEnquiryForm && (
               <div style={{ borderBottom: '1px solid #333', background: '#151515', padding: '0.85rem 1rem', display: 'grid', gap: '0.65rem' }}>
                 <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center' }}>
@@ -2367,7 +2605,13 @@ export default function AdminPanel() {
                 </p>
               )}
               {!enquiriesLoading && enquiries.map(enquiry => (
-                <div key={enquiry.id} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', padding: '0.75rem', display: 'grid', gap: '0.4rem' }}>
+                <div
+                  key={enquiry.id}
+                  ref={node => {
+                    enquiryRefs.current[enquiry.id] = node;
+                  }}
+                  style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', padding: '0.75rem', display: 'grid', gap: '0.4rem' }}
+                >
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center' }}>
                     <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.88rem' }}>{enquiry.name || 'Unnamed enquiry'}</div>
                     <div style={{ color: enquiry.manual_entry ? '#fb923c' : '#aaa', border: enquiry.manual_entry ? '1px solid #63301f' : '1px solid #444', borderRadius: '999px', padding: '0.18rem 0.45rem', fontSize: '0.68rem', whiteSpace: 'nowrap' }}>
