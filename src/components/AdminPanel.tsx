@@ -204,6 +204,16 @@ interface EnquiryRecord {
     firstResponseAt?: string;
     lastContactedAt?: string;
     updatedAt?: string;
+    aiClassification?: {
+      suggestedPriority?: 'hot' | 'warm' | 'info-only' | 'spam-low-quality';
+      intent?: string;
+      urgency?: string;
+      productInterest?: string;
+      missingDetails?: string[];
+      reason?: string;
+      nextBestAction?: string;
+      generatedAt?: string;
+    };
   };
 }
 
@@ -900,6 +910,8 @@ export default function AdminPanel() {
   const [responseDrafts, setResponseDrafts] = useState<Record<string, string>>({});
   const [responseGenerating, setResponseGenerating] = useState<string | null>(null);
   const [responseStatuses, setResponseStatuses] = useState<Record<string, string>>({});
+  const [classificationSaving, setClassificationSaving] = useState<string | null>(null);
+  const [classificationStatuses, setClassificationStatuses] = useState<Record<string, string>>({});
   const [showManualEnquiryForm, setShowManualEnquiryForm] = useState(false);
   const [manualEnquiryMode, setManualEnquiryMode] = useState<'manual_email' | 'phone_call'>('manual_email');
   const [manualEnquiry, setManualEnquiry] = useState<ManualEnquiryForm>(() => emptyManualEnquiryForm());
@@ -1240,6 +1252,37 @@ export default function AdminPanel() {
     } finally {
       setResponseGenerating(null);
     }
+  }
+
+  async function classifyEnquiry(enquiry: EnquiryRecord) {
+    setClassificationSaving(enquiry.id);
+    setClassificationStatuses(prev => ({ ...prev, [enquiry.id]: 'Classifying lead...' }));
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-classify-enquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enquiryId: enquiry.id }),
+      });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await res.json() as { leadStatus?: EnquiryRecord['leadStatus']; error?: string };
+      if (!res.ok || !data.leadStatus) throw new Error(data.error ?? 'Could not classify lead');
+      setEnquiries(prev => prev.map(item => item.id === enquiry.id ? { ...item, leadStatus: data.leadStatus } : item));
+      setClassificationStatuses(prev => ({ ...prev, [enquiry.id]: 'Lead classification saved. Review before applying any changes.' }));
+    } catch (err) {
+      setClassificationStatuses(prev => ({
+        ...prev,
+        [enquiry.id]: err instanceof Error ? err.message : 'Could not classify lead.',
+      }));
+    } finally {
+      setClassificationSaving(null);
+    }
+  }
+
+  async function applyClassificationPriority(enquiry: EnquiryRecord) {
+    const suggestedPriority = enquiry.leadStatus?.aiClassification?.suggestedPriority;
+    if (!suggestedPriority) return;
+    const saved = await saveLeadStatus(enquiry, { priority: suggestedPriority });
+    if (saved) setClassificationStatuses(prev => ({ ...prev, [enquiry.id]: 'Suggested priority applied.' }));
   }
 
   async function copyEnquiryResponse(enquiry: EnquiryRecord) {
@@ -2821,6 +2864,40 @@ export default function AdminPanel() {
                     {leadSaving === enquiry.id && (
                       <div style={{ color: '#777', fontSize: '0.72rem' }}>Saving lead status...</div>
                     )}
+                    <div style={{ borderTop: '1px solid #303030', paddingTop: '0.5rem', display: 'grid', gap: '0.4rem' }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center' }}>
+                        <button
+                          type="button"
+                          onClick={() => classifyEnquiry(enquiry)}
+                          disabled={classificationSaving === enquiry.id}
+                          style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.42rem 0.55rem', cursor: classificationSaving === enquiry.id ? 'wait' : 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
+                        >
+                          {enquiry.leadStatus?.aiClassification ? 'Reclassify Lead' : 'Classify Lead'}
+                        </button>
+                        {enquiry.leadStatus?.aiClassification?.suggestedPriority && (
+                          <button
+                            type="button"
+                            onClick={() => applyClassificationPriority(enquiry)}
+                            disabled={leadSaving === enquiry.id}
+                            style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.42rem 0.55rem', cursor: leadSaving === enquiry.id ? 'wait' : 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
+                          >
+                            Apply Suggested Priority
+                          </button>
+                        )}
+                      </div>
+                      {enquiry.leadStatus?.aiClassification && (
+                        <div style={{ background: '#111', border: '1px solid #333', borderRadius: '6px', padding: '0.5rem', color: '#ccc', fontSize: '0.72rem', lineHeight: 1.45, display: 'grid', gap: '0.12rem' }}>
+                          <div style={{ color: '#fff', fontWeight: 700 }}>AI classification</div>
+                          <div>Priority: {enquiry.leadStatus.aiClassification.suggestedPriority ?? 'Not sure'} · urgency: {enquiry.leadStatus.aiClassification.urgency ?? 'Not sure'} · intent: {enquiry.leadStatus.aiClassification.intent ?? 'Not sure'}</div>
+                          {enquiry.leadStatus.aiClassification.reason && <div>Reason: {enquiry.leadStatus.aiClassification.reason}</div>}
+                          {enquiry.leadStatus.aiClassification.nextBestAction && <div>Next action: {enquiry.leadStatus.aiClassification.nextBestAction}</div>}
+                          {Boolean(enquiry.leadStatus.aiClassification.missingDetails?.length) && <div>Missing: {enquiry.leadStatus.aiClassification.missingDetails?.join(', ')}</div>}
+                        </div>
+                      )}
+                      {classificationStatuses[enquiry.id] && (
+                        <div style={{ color: '#aaa', fontSize: '0.72rem', lineHeight: 1.45 }}>{classificationStatuses[enquiry.id]}</div>
+                      )}
+                    </div>
                   </div>
                   <div style={{ borderTop: '1px solid #303030', marginTop: '0.25rem', paddingTop: '0.55rem', display: 'grid', gap: '0.45rem' }}>
                     {(enquiry.leadStatus?.firstResponseAt || enquiry.leadStatus?.lastContactedAt) && (
