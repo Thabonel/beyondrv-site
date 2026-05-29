@@ -71,6 +71,16 @@ interface DashboardData {
   };
   traffic: { source: string; sessions: number; enquiries: number; conversionRate: string }[];
   funnel: { label: string; count: number; dropOff?: string }[];
+  marketingInsights: {
+    status: 'ready' | 'fallback' | 'unavailable';
+    message: string;
+    items: {
+      title: string;
+      recommendation: string;
+      evidence: string;
+      priority: 'high' | 'medium' | 'low';
+    }[];
+  };
   chat: {
     topTopics: { topic: string; count: number }[];
     recent: {
@@ -329,6 +339,28 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
             {data.productInterest.unknownProductEnquiries > 0 && (
               <p style={{ margin: 0, color: '#888', fontSize: '0.72rem' }}>{data.productInterest.unknownProductEnquiries} enquiries could not be matched to a specific product.</p>
+            )}
+          </Panel>
+
+          <Panel title="Marketing Insights">
+            {data.marketingInsights.items.length === 0 ? (
+              <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No marketing insights available yet.</p>
+            ) : (
+              <div style={{ display: 'grid', gap: '0.55rem' }}>
+                {data.marketingInsights.message && (
+                  <p style={{ margin: 0, color: '#888', fontSize: '0.72rem', lineHeight: 1.4 }}>{data.marketingInsights.message}</p>
+                )}
+                {data.marketingInsights.items.map((insight) => (
+                  <div key={`${insight.title}-${insight.evidence}`} style={{ borderBottom: '1px solid #252525', paddingBottom: '0.55rem', display: 'grid', gap: '0.25rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center' }}>
+                      <div style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 800 }}>{insight.title}</div>
+                      <StatusPill status={insight.priority === 'high' ? 'blocker' : insight.priority === 'medium' ? 'warning' : 'ready'} />
+                    </div>
+                    <div style={{ color: '#ddd', fontSize: '0.74rem', lineHeight: 1.4 }}>{insight.recommendation}</div>
+                    <div style={{ color: '#888', fontSize: '0.68rem', lineHeight: 1.35 }}>{insight.evidence}</div>
+                  </div>
+                ))}
+              </div>
             )}
           </Panel>
 

@@ -1,4 +1,5 @@
 import type { Handler } from '@netlify/functions';
+import OpenAI from 'openai';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
 import { connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 import catalogue from './product-catalogue.json';
@@ -10,6 +11,9 @@ const POSTHOG_PROJECT_ID = process.env.POSTHOG_PROJECT_ID;
 const POSTHOG_BASE = POSTHOG_PROJECT_ID
   ? `https://app.posthog.com/api/projects/${POSTHOG_PROJECT_ID}/query/`
   : '';
+const openAiKey = process.env.OPENAI_API_KEY;
+const openAiClient = openAiKey ? new OpenAI({ apiKey: openAiKey }) : null;
+const INSIGHTS_MODEL = process.env.OPENAI_MARKETING_INSIGHTS_MODEL ?? process.env.OPENAI_ADMIN_MODEL ?? 'gpt-5-mini';
 
 type LeadStatusValue = 'new' | 'contacted' | 'quoted' | 'won' | 'lost' | 'spam';
 
@@ -49,6 +53,13 @@ interface LeadStatusRecord {
   notes?: string;
   nextFollowUpDate?: string;
   updatedAt: string;
+}
+
+interface MarketingInsight {
+  title: string;
+  recommendation: string;
+  evidence: string;
+  priority: 'high' | 'medium' | 'low';
 }
 
 function leadKey(enquiryId: string) {
@@ -297,6 +308,181 @@ async function loadAnalytics(days: number, products: ProductRecord[]) {
   }
 }
 
+function ruleBasedMarketingInsights({
+  productPerformance,
+  unknownProductEnquiries,
+  analytics,
+}: {
+  productPerformance: Array<{
+    title: string;
+    status: string;
+    onSale: boolean;
+    enquiries30Days: number;
+    totalEnquiries: number;
+    pageViews: number;
+    conversionRate: string;
+    flags: string[];
+  }>;
+  unknownProductEnquiries: number;
+  analytics: Awaited<ReturnType<typeof loadAnalytics>>;
+}) {
+  const insights: MarketingInsight[] = [];
+  const hotProducts = productPerformance
+    .filter(product => product.enquiries30Days > 0)
+    .sort((a, b) => b.enquiries30Days - a.enquiries30Days)
+    .slice(0, 3);
+  const viewedNoLead = productPerformance
+    .filter(product => product.pageViews >= 20 && product.enquiries30Days === 0 && product.status !== 'coming-soon')
+    .sort((a, b) => b.pageViews - a.pageViews)
+    .slice(0, 3);
+  const lowConversion = productPerformance
+    .filter(product => product.pageViews >= 20 && Number(product.conversionRate) < 1 && product.status !== 'coming-soon')
+    .sort((a, b) => b.pageViews - a.pageViews)
+    .slice(0, 3);
+
+  if (hotProducts.length) {
+    insights.push({
+      title: 'Promote products already drawing enquiries',
+      recommendation: `Put ${hotProducts.map(product => product.title).join(', ')} into social posts, email follow-ups, or homepage proof points this week.`,
+      evidence: hotProducts.map(product => `${product.title}: ${product.enquiries30Days} enquiries`).join('; '),
+      priority: 'high',
+    });
+  }
+
+  if (viewedNoLead.length) {
+    insights.push({
+      title: 'Fix high-traffic products with no leads',
+      recommendation: `Review the call-to-action, photos, pricing clarity, and fitment copy for ${viewedNoLead.map(product => product.title).join(', ')}.`,
+      evidence: viewedNoLead.map(product => `${product.title}: ${product.pageViews} views and 0 enquiries`).join('; '),
+      priority: 'high',
+    });
+  }
+
+  if (lowConversion.length) {
+    insights.push({
+      title: 'Improve product page conversion',
+      recommendation: `Add sharper enquiry prompts and objection-handling copy to ${lowConversion.map(product => product.title).join(', ')}.`,
+      evidence: lowConversion.map(product => `${product.title}: ${product.conversionRate}% page-to-lead`).join('; '),
+      priority: 'medium',
+    });
+  }
+
+  const bestSources = analytics.sources
+    .filter(source => source.enquiries > 0)
+    .sort((a, b) => Number(b.conversionRate) - Number(a.conversionRate))
+    .slice(0, 2);
+  if (bestSources.length) {
+    insights.push({
+      title: 'Lean into converting traffic sources',
+      recommendation: `Prioritise follow-up content and posting cadence for ${bestSources.map(source => source.source).join(' and ')}.`,
+      evidence: bestSources.map(source => `${source.source}: ${source.enquiries} leads at ${source.conversionRate}%`).join('; '),
+      priority: 'medium',
+    });
+  }
+
+  if (unknownProductEnquiries > 0) {
+    insights.push({
+      title: 'Reduce general enquiry ambiguity',
+      recommendation: 'Add clearer product selection prompts and common use-case language so more enquiries map to a specific model.',
+      evidence: `${unknownProductEnquiries} enquiries could not be matched to a product.`,
+      priority: 'low',
+    });
+  }
+
+  if (analytics.chat.topTopics.length) {
+    const topics = analytics.chat.topTopics.slice(0, 3).map(topic => topic.topic).join(', ');
+    insights.push({
+      title: 'Turn chatbot questions into page content',
+      recommendation: `Create or improve FAQ copy around ${topics} to answer buying questions before enquiry.`,
+      evidence: analytics.chat.topTopics.slice(0, 3).map(topic => `${topic.topic}: ${topic.count}`).join('; '),
+      priority: 'medium',
+    });
+  }
+
+  return insights.slice(0, 6);
+}
+
+async function aiMarketingInsights(input: {
+  days: number;
+  ruleInsights: MarketingInsight[];
+  productPerformance: Array<{
+    title: string;
+    category: string;
+    status: string;
+    onSale: boolean;
+    enquiries30Days: number;
+    totalEnquiries: number;
+    pageViews: number;
+    conversionRate: string;
+    flags: string[];
+  }>;
+  traffic: { source: string; sessions: number; enquiries: number; conversionRate: string }[];
+  funnel: { label: string; count: number; dropOff?: string }[];
+  chatTopics: { topic: string; count: number }[];
+}) {
+  if (!openAiClient) return { status: 'unavailable', message: 'OpenAI is not configured for marketing insights.', items: input.ruleInsights };
+
+  const sanitized = {
+    days: input.days,
+    ruleInsights: input.ruleInsights,
+    products: input.productPerformance
+      .map(product => ({
+        title: product.title,
+        category: product.category,
+        status: product.status,
+        onSale: product.onSale,
+        enquiries30Days: product.enquiries30Days,
+        totalEnquiries: product.totalEnquiries,
+        pageViews: product.pageViews,
+        conversionRate: product.conversionRate,
+        flags: product.flags,
+      }))
+      .slice(0, 20),
+    traffic: input.traffic.slice(0, 8),
+    funnel: input.funnel,
+    chatTopics: input.chatTopics.slice(0, 8),
+  };
+
+  try {
+    const response = await openAiClient.responses.create({
+      model: INSIGHTS_MODEL,
+      instructions: `You advise Beyond RV's owner on practical marketing actions.
+
+Use only the aggregate, non-PII data provided.
+Return JSON only:
+{
+  "items": [
+    {
+      "title": "short title",
+      "recommendation": "specific practical action",
+      "evidence": "short metric-based evidence",
+      "priority": "high" | "medium" | "low"
+    }
+  ]
+}
+
+Rules:
+- Do not mention customer names, emails, phone numbers, or raw messages.
+- Do not invent traffic sources, product demand, prices, or stock status.
+- Keep recommendations suitable for a small Australian RV business.
+- Prefer actions the owner can take this week.
+- Return 3 to 6 items.`,
+      input: `AGGREGATE MARKETING DATA:\n${JSON.stringify(sanitized, null, 2)}`,
+      max_output_tokens: 1000,
+    });
+    const match = response.output_text.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('Marketing insight response was not JSON.');
+    const parsed = JSON.parse(match[0]) as { items?: MarketingInsight[] };
+    const items = Array.isArray(parsed.items) && parsed.items.length ? parsed.items.slice(0, 6) : input.ruleInsights;
+    return { status: 'ready', message: '', items };
+  } catch (error) {
+    console.warn('admin-dashboard: marketing insight generation failed', {
+      error: error instanceof Error ? { name: error.name, message: error.message } : { name: 'UnknownError' },
+    });
+    return { status: 'fallback', message: 'AI marketing insights could not be generated, so rule-based insights are shown.', items: input.ruleInsights };
+  }
+}
+
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'GET') return { statusCode: 405, body: 'Method Not Allowed' };
   if (!isAdminAuthorized(event)) return unauthorizedResponse();
@@ -377,11 +563,24 @@ export const handler: Handler = async (event) => {
         (product.onSale || product.status === 'on-sale') && recentEnquiries.length === 0 && 'On sale with no recent enquiries',
         !product.heroImage && 'Missing hero image',
         (product.galleryCount ?? product.gallery?.length ?? 0) < 3 && 'Low photo count',
-      ].filter(Boolean),
+      ].filter((flag): flag is string => typeof flag === 'string'),
     };
   });
 
   const unknownProductEnquiries = enquiries.filter((enquiry) => !matchProduct(enquiry, products)).length;
+  const ruleInsights = ruleBasedMarketingInsights({
+    productPerformance,
+    unknownProductEnquiries,
+    analytics,
+  });
+  const marketingInsights = await aiMarketingInsights({
+    days,
+    ruleInsights,
+    productPerformance,
+    traffic: analytics.sources,
+    funnel: analytics.funnel,
+    chatTopics: analytics.chat.topTopics,
+  });
   const weakListings = products
     .filter((product) => !product.heroImage || (product.galleryCount ?? product.gallery?.length ?? 0) < 3)
     .map((product) => ({
@@ -448,6 +647,7 @@ export const handler: Handler = async (event) => {
       },
       traffic: analytics.sources,
       funnel: analytics.funnel,
+      marketingInsights,
       analytics: {
         status: analytics.status,
         message: analytics.message,
