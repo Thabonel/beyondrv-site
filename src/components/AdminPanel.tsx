@@ -184,6 +184,8 @@ interface EnquiryRecord {
     status: 'new' | 'contacted' | 'quoted' | 'won' | 'lost' | 'spam';
     notes?: string;
     nextFollowUpDate?: string;
+    firstResponseAt?: string;
+    lastContactedAt?: string;
     updatedAt?: string;
   };
 }
@@ -652,6 +654,9 @@ export default function AdminPanel() {
   const [enquiriesLoading, setEnquiriesLoading] = useState(false);
   const [enquiriesStatus, setEnquiriesStatus] = useState('');
   const [leadSaving, setLeadSaving] = useState<string | null>(null);
+  const [responseDrafts, setResponseDrafts] = useState<Record<string, string>>({});
+  const [responseGenerating, setResponseGenerating] = useState<string | null>(null);
+  const [responseStatuses, setResponseStatuses] = useState<Record<string, string>>({});
   const [contactConfig, setContactConfig] = useState<ContactConfig | null>(null);
   const [recentBuilds, setRecentBuilds] = useState<RecentBuild[]>(limitRecentBuilds(initialRecentBuilds as RecentBuild[]));
   const [testimonials, setTestimonials] = useState<Testimonial[]>(renumber(orderedItems(initialTestimonials as Testimonial[])));
@@ -814,6 +819,8 @@ export default function AdminPanel() {
       status: 'new' as const,
       notes: '',
       nextFollowUpDate: enquiry.callback_date ?? '',
+      firstResponseAt: '',
+      lastContactedAt: '',
       updatedAt: enquiry.submittedAt,
     };
     const next = { ...current, ...patch, enquiryId: enquiry.id };
@@ -828,6 +835,8 @@ export default function AdminPanel() {
           status: next.status,
           notes: next.notes ?? '',
           nextFollowUpDate: next.nextFollowUpDate ?? '',
+          firstResponseAt: next.firstResponseAt ?? '',
+          lastContactedAt: next.lastContactedAt ?? '',
         }),
       });
       if (redirectToLoginIfUnauthorized(res)) return;
@@ -837,12 +846,59 @@ export default function AdminPanel() {
         setEnquiries(prev => prev.map(item => item.id === enquiry.id ? { ...item, leadStatus: data.leadStatus } : item));
       }
       setEnquiriesStatus('');
+      return true;
     } catch (err) {
       setEnquiriesStatus(err instanceof Error ? err.message : 'Could not save lead status.');
       setEnquiries(prev => prev.map(item => item.id === enquiry.id ? { ...item, leadStatus: current } : item));
+      return false;
     } finally {
       setLeadSaving(null);
     }
+  }
+
+  async function generateEnquiryResponse(enquiry: EnquiryRecord) {
+    setResponseGenerating(enquiry.id);
+    setResponseStatuses(prev => ({ ...prev, [enquiry.id]: 'Generating response...' }));
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-generate-enquiry-response', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enquiryId: enquiry.id }),
+      });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await res.json() as { draft?: string; error?: string };
+      if (!res.ok || !data.draft) throw new Error(data.error ?? 'Could not generate response');
+      setResponseDrafts(prev => ({ ...prev, [enquiry.id]: data.draft ?? '' }));
+      setResponseStatuses(prev => ({ ...prev, [enquiry.id]: 'Draft generated. Review before sending.' }));
+    } catch (err) {
+      setResponseStatuses(prev => ({
+        ...prev,
+        [enquiry.id]: err instanceof Error ? err.message : 'Could not generate response.',
+      }));
+    } finally {
+      setResponseGenerating(null);
+    }
+  }
+
+  async function copyEnquiryResponse(enquiry: EnquiryRecord) {
+    const draft = responseDrafts[enquiry.id]?.trim();
+    if (!draft) return;
+    try {
+      await navigator.clipboard.writeText(draft);
+      setResponseStatuses(prev => ({ ...prev, [enquiry.id]: 'Copied. Paste it into your email app before sending.' }));
+    } catch {
+      setResponseStatuses(prev => ({ ...prev, [enquiry.id]: 'Could not copy response.' }));
+    }
+  }
+
+  async function markEnquiryReplied(enquiry: EnquiryRecord) {
+    const now = new Date().toISOString();
+    const saved = await saveLeadStatus(enquiry, {
+      status: 'contacted',
+      firstResponseAt: enquiry.leadStatus?.firstResponseAt || now,
+      lastContactedAt: now,
+    });
+    if (saved) setResponseStatuses(prev => ({ ...prev, [enquiry.id]: 'Marked as replied.' }));
   }
 
   function readBlobAsBase64(blob: Blob) {
@@ -2105,6 +2161,8 @@ export default function AdminPanel() {
                           enquiryId: enquiry.id,
                           status: item.leadStatus?.status ?? 'new',
                           nextFollowUpDate: item.leadStatus?.nextFollowUpDate ?? item.callback_date ?? '',
+                          firstResponseAt: item.leadStatus?.firstResponseAt ?? '',
+                          lastContactedAt: item.leadStatus?.lastContactedAt ?? '',
                           updatedAt: item.leadStatus?.updatedAt ?? item.submittedAt,
                           notes: e.target.value,
                         },
@@ -2117,6 +2175,50 @@ export default function AdminPanel() {
                     />
                     {leadSaving === enquiry.id && (
                       <div style={{ color: '#777', fontSize: '0.72rem' }}>Saving lead status...</div>
+                    )}
+                  </div>
+                  <div style={{ borderTop: '1px solid #303030', marginTop: '0.25rem', paddingTop: '0.55rem', display: 'grid', gap: '0.45rem' }}>
+                    {(enquiry.leadStatus?.firstResponseAt || enquiry.leadStatus?.lastContactedAt) && (
+                      <div style={{ color: '#777', fontSize: '0.72rem', lineHeight: 1.45 }}>
+                        {enquiry.leadStatus?.firstResponseAt && `First response: ${new Date(enquiry.leadStatus.firstResponseAt).toLocaleString()}`}
+                        {enquiry.leadStatus?.firstResponseAt && enquiry.leadStatus?.lastContactedAt && ' · '}
+                        {enquiry.leadStatus?.lastContactedAt && `Last contacted: ${new Date(enquiry.leadStatus.lastContactedAt).toLocaleString()}`}
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                      <button
+                        onClick={() => generateEnquiryResponse(enquiry)}
+                        disabled={responseGenerating === enquiry.id}
+                        style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: responseGenerating === enquiry.id ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.76rem' }}
+                      >
+                        {responseDrafts[enquiry.id] ? 'Regenerate' : 'Generate Response'}
+                      </button>
+                      {responseDrafts[enquiry.id] && (
+                        <button
+                          onClick={() => copyEnquiryResponse(enquiry)}
+                          style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.76rem' }}
+                        >
+                          Copy Response
+                        </button>
+                      )}
+                      <button
+                        onClick={() => markEnquiryReplied(enquiry)}
+                        disabled={leadSaving === enquiry.id}
+                        style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: leadSaving === enquiry.id ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.76rem' }}
+                      >
+                        Mark as Replied
+                      </button>
+                    </div>
+                    {responseDrafts[enquiry.id] && (
+                      <textarea
+                        value={responseDrafts[enquiry.id]}
+                        onChange={e => setResponseDrafts(prev => ({ ...prev, [enquiry.id]: e.target.value }))}
+                        rows={8}
+                        style={{ resize: 'vertical', background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem', fontSize: '0.78rem', lineHeight: 1.45 }}
+                      />
+                    )}
+                    {responseStatuses[enquiry.id] && (
+                      <div style={{ color: '#aaa', fontSize: '0.72rem', lineHeight: 1.45 }}>{responseStatuses[enquiry.id]}</div>
                     )}
                   </div>
                 </div>

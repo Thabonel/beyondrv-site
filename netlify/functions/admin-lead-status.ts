@@ -56,6 +56,8 @@ export const handler: Handler = async (event) => {
           status: 'new',
           notes: '',
           nextFollowUpDate: '',
+          firstResponseAt: '',
+          lastContactedAt: '',
           updatedAt: '',
         },
       }),
@@ -77,6 +79,8 @@ export const handler: Handler = async (event) => {
   const status = clean(body.status, 40);
   const notes = clean(body.notes, 4000);
   const nextFollowUpDate = clean(body.nextFollowUpDate, 40);
+  const firstResponseAt = clean(body.firstResponseAt, 80);
+  const lastContactedAt = clean(body.lastContactedAt, 80);
 
   if (!enquiryId) {
     return {
@@ -94,11 +98,21 @@ export const handler: Handler = async (event) => {
     };
   }
 
+  let existing: Record<string, unknown> | null = null;
+  try {
+    existing = await store.get(leadKey(enquiryId), { type: 'json' }) as Record<string, unknown> | null;
+  } catch {
+    existing = null;
+  }
+
   const leadStatus = {
+    ...existing,
     enquiryId,
     status,
     notes,
     nextFollowUpDate,
+    firstResponseAt: firstResponseAt || (typeof existing?.firstResponseAt === 'string' ? existing.firstResponseAt : ''),
+    lastContactedAt: lastContactedAt || (typeof existing?.lastContactedAt === 'string' ? existing.lastContactedAt : ''),
     updatedAt: new Date().toISOString(),
   };
 

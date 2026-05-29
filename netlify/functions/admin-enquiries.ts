@@ -39,6 +39,8 @@ export const handler: Handler = async (event) => {
             status: 'new',
             notes: '',
             nextFollowUpDate: data.callback_date ?? '',
+            firstResponseAt: '',
+            lastContactedAt: '',
             updatedAt: data.submittedAt ?? '',
           },
         };
