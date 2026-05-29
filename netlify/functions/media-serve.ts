@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { getBlobStore } from './blob-store';
+import { connectBlobStore, getBlobStore } from './blob-store';
 
 const STORE_NAME = 'product-media';
 
@@ -7,6 +7,7 @@ export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'GET' && event.httpMethod !== 'HEAD') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
+  connectBlobStore(event);
 
   const key = event.queryStringParameters?.key ?? '';
   if (!key.startsWith('products/') && !key.startsWith('pages/')) {

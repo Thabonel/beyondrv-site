@@ -1,6 +1,6 @@
 import type { Handler } from '@netlify/functions';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
-import { getBlobStore } from './blob-store';
+import { connectBlobStore, getBlobStore } from './blob-store';
 
 const STORE_NAME = 'product-media';
 const ALLOWED_SCOPES = new Set(['products', 'pages']);
@@ -31,6 +31,7 @@ function legacySafeSlug(value: string) {
 
 export const handler: Handler = async (event) => {
   if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  connectBlobStore(event);
 
   if (event.httpMethod === 'GET') {
     const rawSlug = event.queryStringParameters?.slug ?? '';

@@ -1,6 +1,6 @@
-import { getStore } from '@netlify/blobs';
 import type { Handler } from '@netlify/functions';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { connectBlobStore, getBlobStore } from './blob-store';
 import catalogue from './product-catalogue.json';
 
 const ENQUIRY_STORE = 'customer-enquiries';
@@ -101,7 +101,7 @@ function matchProduct(enquiry: EnquiryRecord, products: ProductRecord[]) {
 
 async function getAllJson<T>(storeName: string) {
   try {
-    const store = getStore({ name: storeName, consistency: 'strong' });
+    const store = getBlobStore(storeName);
     const { blobs } = await store.list();
     const records = await Promise.all(
       blobs.map(async (blob) => {
@@ -122,7 +122,7 @@ async function getAllJson<T>(storeName: string) {
 async function getLeadStatuses(enquiries: EnquiryRecord[]) {
   if (enquiries.length === 0) return new Map<string, LeadStatusRecord | null>();
   try {
-    const store = getStore({ name: LEAD_STATUS_STORE, consistency: 'strong' });
+    const store = getBlobStore(LEAD_STATUS_STORE);
     const entries = await Promise.all(
       enquiries.map(async (enquiry) => {
         try {
@@ -294,6 +294,7 @@ async function loadAnalytics(days: number, products: ProductRecord[]) {
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'GET') return { statusCode: 405, body: 'Method Not Allowed' };
   if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  connectBlobStore(event);
 
   const range = event.queryStringParameters?.range ?? '30';
   const days = ['7', '30', '90'].includes(range) ? Number(range) : 30;

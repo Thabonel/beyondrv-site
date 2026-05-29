@@ -1,6 +1,6 @@
 import type { Handler } from '@netlify/functions';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
-import { getBlobStore } from './blob-store';
+import { connectBlobStore, getBlobStore } from './blob-store';
 
 const STORE_NAME = 'customer-enquiries';
 const LEAD_STATUS_STORE = 'customer-lead-status';
@@ -12,6 +12,7 @@ function leadKey(enquiryId: string) {
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'GET') return { statusCode: 405, body: 'Method Not Allowed' };
   if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  connectBlobStore(event);
 
   try {
     const store = getBlobStore(STORE_NAME);
