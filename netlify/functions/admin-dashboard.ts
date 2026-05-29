@@ -15,7 +15,7 @@ const openAiKey = process.env.OPENAI_API_KEY;
 const openAiClient = openAiKey ? new OpenAI({ apiKey: openAiKey }) : null;
 const INSIGHTS_MODEL = process.env.OPENAI_MARKETING_INSIGHTS_MODEL ?? process.env.OPENAI_ADMIN_MODEL ?? 'gpt-5-mini';
 
-type LeadStatusValue = 'new' | 'contacted' | 'quoted' | 'won' | 'lost' | 'spam';
+type LeadStatusValue = 'new' | 'contacted' | 'replied' | 'called' | 'qualified' | 'quoted' | 'follow-up-scheduled' | 'won' | 'lost' | 'spam';
 
 interface ProductRecord {
   slug: string;
@@ -538,7 +538,7 @@ export const handler: Handler = async (event) => {
     .sort((a, b) => String(a.leadStatus.nextFollowUpDate).localeCompare(String(b.leadStatus.nextFollowUpDate)))
     .slice(0, 10);
 
-  const byLeadStatus = ['new', 'contacted', 'quoted', 'won', 'lost', 'spam'].map((status) => ({
+  const byLeadStatus = ['new', 'contacted', 'replied', 'called', 'qualified', 'quoted', 'follow-up-scheduled', 'won', 'lost', 'spam'].map((status) => ({
     status,
     count: leadRecords.filter((enquiry) => enquiry.leadStatus.status === status).length,
   }));

@@ -1,4 +1,5 @@
 import type { Handler } from '@netlify/functions';
+import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
 import { connectBlobStore, getBlobStore } from './blob-store';
 import {
   DEFAULT_TIMEZONE,
@@ -19,6 +20,10 @@ const DEFAULT_FROM_EMAIL = 'Beyond RV Website <enquiries@beyondrv.com.au>';
 
 function logKey(date: string) {
   return `daily-summary/${date}.json`;
+}
+
+function isScheduledInvocation(event: Parameters<Handler>[0]) {
+  return event.headers['x-nf-event'] === 'schedule';
 }
 
 function escapeHtml(value: string) {
@@ -84,6 +89,8 @@ async function sendSummaryEmail(text: string, html: string) {
 }
 
 export const handler: Handler = async (event) => {
+  if (!isScheduledInvocation(event) && !isAdminAuthorized(event)) return unauthorizedResponse();
+
   const blobRuntimeSource = connectBlobStore(event);
   const date = todayKey(new Date(), process.env.LEAD_REMINDER_TIMEZONE || DEFAULT_TIMEZONE);
 

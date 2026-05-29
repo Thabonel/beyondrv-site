@@ -5,7 +5,7 @@ type HealthStatus = 'ready' | 'warning' | 'blocker' | 'unavailable' | 'error';
 
 interface LeadStatus {
   enquiryId: string;
-  status: 'new' | 'contacted' | 'quoted' | 'won' | 'lost' | 'spam';
+  status: 'new' | 'contacted' | 'replied' | 'called' | 'qualified' | 'quoted' | 'follow-up-scheduled' | 'won' | 'lost' | 'spam';
   notes?: string;
   nextFollowUpDate?: string;
   updatedAt?: string;
@@ -111,7 +111,11 @@ const STATUS_COLOUR: Record<string, string> = {
   error: '#f87171',
   new: '#f87171',
   contacted: '#fb923c',
+  replied: '#fb923c',
+  called: '#fb923c',
+  qualified: '#60a5fa',
   quoted: '#60a5fa',
+  'follow-up-scheduled': '#60a5fa',
   won: '#4ade80',
   lost: '#888',
   spam: '#777',

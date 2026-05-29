@@ -9,6 +9,9 @@ const client = openAiKey ? new OpenAI({ apiKey: openAiKey }) : null;
 const CLASSIFY_MODEL = process.env.OPENAI_ADMIN_CLASSIFY_MODEL ?? process.env.OPENAI_ADMIN_MODEL ?? 'gpt-5-mini';
 const ENQUIRY_STORE = 'customer-enquiries';
 const LEAD_STATUS_STORE = 'customer-lead-status';
+const VALID_PRIORITIES = new Set(['hot', 'warm', 'info-only', 'spam-low-quality']);
+const VALID_INTENTS = new Set(['quote', 'availability', 'fitment', 'finance', 'support', 'research', 'other']);
+const VALID_URGENCY = new Set(['high', 'medium', 'low']);
 
 function clean(value: unknown, max = 4000) {
   return typeof value === 'string' ? value.trim().slice(0, max) : '';
@@ -22,6 +25,17 @@ function parseJsonObject(text: string) {
   const match = text.match(/\{[\s\S]*\}/);
   if (!match) throw new Error('Classification response was not JSON.');
   return JSON.parse(match[0]) as Record<string, unknown>;
+}
+
+function cleanEnum(value: unknown, allowed: Set<string>, fallback: string) {
+  const cleaned = clean(value, 80);
+  return allowed.has(cleaned) ? cleaned : fallback;
+}
+
+function cleanStringArray(value: unknown, maxItems = 5) {
+  return Array.isArray(value)
+    ? value.map(item => clean(item, 120)).filter(Boolean).slice(0, maxItems)
+    : [];
 }
 
 export const handler: Handler = async (event) => {
@@ -131,7 +145,16 @@ Rules:
       max_output_tokens: 700,
     });
 
-    const classification = parseJsonObject(response.output_text.trim());
+    const rawClassification = parseJsonObject(response.output_text.trim());
+    const classification = {
+      suggestedPriority: cleanEnum(rawClassification.suggestedPriority, VALID_PRIORITIES, 'warm'),
+      intent: cleanEnum(rawClassification.intent, VALID_INTENTS, 'other'),
+      urgency: cleanEnum(rawClassification.urgency, VALID_URGENCY, 'medium'),
+      productInterest: clean(rawClassification.productInterest, 160) || clean(enquiry.product_interest, 160) || 'General enquiry',
+      missingDetails: cleanStringArray(rawClassification.missingDetails),
+      reason: clean(rawClassification.reason, 280),
+      nextBestAction: clean(rawClassification.nextBestAction, 280),
+    };
     const statusStore = getBlobStore(LEAD_STATUS_STORE);
     const existing = leadStatus ?? {
       enquiryId,
