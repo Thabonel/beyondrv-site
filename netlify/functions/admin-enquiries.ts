@@ -1,6 +1,6 @@
 import type { Handler } from '@netlify/functions';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
-import { connectBlobStore, getBlobStore } from './blob-store';
+import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 
 const STORE_NAME = 'customer-enquiries';
 const LEAD_STATUS_STORE = 'customer-lead-status';
@@ -12,7 +12,7 @@ function leadKey(enquiryId: string) {
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'GET') return { statusCode: 405, body: 'Method Not Allowed' };
   if (!isAdminAuthorized(event)) return unauthorizedResponse();
-  connectBlobStore(event);
+  const blobRuntimeSource = connectBlobStore(event);
 
   try {
     const store = getBlobStore(STORE_NAME);
@@ -51,14 +51,19 @@ export const handler: Handler = async (event) => {
       body: JSON.stringify({ enquiries, storageReady: true }),
     };
   } catch (error) {
-    console.warn('admin-enquiries: enquiry store unavailable', error);
+    const safeError = safeBlobStoreError(error);
+    console.warn('admin-enquiries: enquiry store unavailable', {
+      store: STORE_NAME,
+      blobRuntimeSource,
+      error: safeError,
+    });
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         enquiries: [],
         storageReady: false,
-        warning: 'Enquiry email is working, but the admin backup store is not configured yet.',
+        warning: `Enquiry email is working, but the admin backup store is unavailable: ${blobStoreUserMessage(error)}`,
       }),
     };
   }

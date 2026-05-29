@@ -1,6 +1,6 @@
 import type { Handler } from '@netlify/functions';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
-import { connectBlobStore, getBlobStore } from './blob-store';
+import { connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 import catalogue from './product-catalogue.json';
 
 const ENQUIRY_STORE = 'customer-enquiries';
@@ -114,7 +114,10 @@ async function getAllJson<T>(storeName: string) {
     );
     return records.filter(Boolean) as T[];
   } catch (error) {
-    console.warn(`admin-dashboard: ${storeName} unavailable`, error);
+    console.warn(`admin-dashboard: ${storeName} unavailable`, {
+      store: storeName,
+      error: safeBlobStoreError(error),
+    });
     return [];
   }
 }
@@ -135,7 +138,10 @@ async function getLeadStatuses(enquiries: EnquiryRecord[]) {
     );
     return new Map(entries);
   } catch (error) {
-    console.warn('admin-dashboard: lead status store unavailable', error);
+    console.warn('admin-dashboard: lead status store unavailable', {
+      store: LEAD_STATUS_STORE,
+      error: safeBlobStoreError(error),
+    });
     return new Map<string, LeadStatusRecord | null>();
   }
 }

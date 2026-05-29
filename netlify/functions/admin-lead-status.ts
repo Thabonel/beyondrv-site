@@ -1,6 +1,6 @@
 import type { Handler } from '@netlify/functions';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
-import { connectBlobStore, getBlobStore } from './blob-store';
+import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 
 const STORE_NAME = 'customer-lead-status';
 const VALID_STATUSES = new Set(['new', 'contacted', 'quoted', 'won', 'lost', 'spam']);
@@ -18,9 +18,23 @@ export const handler: Handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
   if (!isAdminAuthorized(event)) return unauthorizedResponse();
-  connectBlobStore(event);
+  const blobRuntimeSource = connectBlobStore(event);
 
-  const store = getBlobStore(STORE_NAME);
+  let store: ReturnType<typeof getBlobStore>;
+  try {
+    store = getBlobStore(STORE_NAME);
+  } catch (error) {
+    console.warn('admin-lead-status: lead status store unavailable', {
+      store: STORE_NAME,
+      blobRuntimeSource,
+      error: safeBlobStoreError(error),
+    });
+    return {
+      statusCode: 503,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: blobStoreUserMessage(error) }),
+    };
+  }
 
   if (event.httpMethod === 'GET') {
     const enquiryId = clean(event.queryStringParameters?.enquiryId, 240);
