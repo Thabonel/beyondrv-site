@@ -245,23 +245,36 @@ const schema = [
   const resultPanel = document.getElementById('resultPanel');
   const fields = ['vehicleName', 'gvm', 'currentWeight', 'passengers', 'accessories', 'luggageGear', 'camperDry', 'camperWater', 'camperGear', 'camperOptions', 'trayLength', 'trayWidth', 'requiredTrayLength', 'requiredTrayWidth', 'rearAxleChecked', 'tyreRatingsChecked', 'centreOfGravityChecked'];
   let hasStarted = false;
-  const byId = (id) => document.getElementById(id);
-  const value = (id) => byId(id)?.value ?? '';
-  const fmt = (value) => `${Math.round(value).toLocaleString()} kg`;
-  const fmtMm = (value) => `${Math.round(value).toLocaleString()} mm`;
+  const byId = (id: string) => document.getElementById(id);
+  const inputById = (id: string) => document.getElementById(id) as HTMLInputElement | null;
+  const value = (id: string) => inputById(id)?.value ?? '';
+  const fmt = (value: number) => `${Math.round(value).toLocaleString()} kg`;
+  const fmtMm = (value: number) => `${Math.round(value).toLocaleString()} mm`;
+  type SlideOnResultValues = {
+    availablePayloadBeforeCamper?: number;
+    estimatedLoadedVehicleWeight?: number;
+    remainingGvmMargin?: number;
+    estimatedLoadedCamperWeight?: number;
+    trayLengthFit?: number;
+    trayWidthFit?: number;
+  };
+  const kgOrZero = (value?: number) => value === undefined ? '0 kg' : fmt(value);
+  const mmOrZero = (value?: number) => value === undefined ? '0 mm' : fmtMm(value);
+  const kgOrNotCalculated = (value?: number) => value === undefined ? 'Not calculated' : fmt(value);
+  const mmOrNotCalculated = (value?: number) => value === undefined ? 'Not calculated' : fmtMm(value);
 
-  function setText(id, value) {
+  function setText(id: string, value: string) {
     const el = byId(id);
     if (el) el.textContent = value;
   }
 
-  function setNotes(notes) {
+  function setNotes(notes: string[]) {
     const warningNotes = byId('warningNotes');
-    if (warningNotes) warningNotes.innerHTML = notes.map(note => `<li>${note}</li>`).join('');
+    if (warningNotes) warningNotes.innerHTML = notes.map((note: string) => `<li>${note}</li>`).join('');
   }
 
   function calculateSlideOn() {
-    const vehicleName = byId('vehicleName')?.value || 'your vehicle';
+    const vehicleName = inputById('vehicleName')?.value || 'your vehicle';
     const result = calculateSlideOnSuitability({
       vehicleGvm: value('gvm'),
       currentVehicleWeight: value('currentWeight'),
@@ -276,22 +289,22 @@ const schema = [
       trayWidth: value('trayWidth'),
       requiredTrayLength: value('requiredTrayLength'),
       requiredTrayWidth: value('requiredTrayWidth'),
-      rearAxleChecked: byId('rearAxleChecked')?.checked ?? false,
-      tyreRatingsChecked: byId('tyreRatingsChecked')?.checked ?? false,
-      centreOfGravityChecked: byId('centreOfGravityChecked')?.checked ?? false
+      rearAxleChecked: inputById('rearAxleChecked')?.checked ?? false,
+      tyreRatingsChecked: inputById('tyreRatingsChecked')?.checked ?? false,
+      centreOfGravityChecked: inputById('centreOfGravityChecked')?.checked ?? false
     }, { started: hasStarted });
-    const values = result.values ?? {};
+    const values: SlideOnResultValues = 'values' in result ? result.values : {};
 
     resultPanel?.setAttribute('data-status', result.status);
     setText('statusLabel', result.statusLabel);
     setText('resultTitle', result.title);
     setText('resultSummary', result.summary);
-    setText('availablePayload', values.availablePayloadBeforeCamper === undefined ? '0 kg' : fmt(values.availablePayloadBeforeCamper));
-    setText('loadedWeight', values.estimatedLoadedVehicleWeight === undefined ? '0 kg' : fmt(values.estimatedLoadedVehicleWeight));
-    setText('gvmMargin', values.remainingGvmMargin === undefined ? '0 kg' : fmt(values.remainingGvmMargin));
-    setText('loadedCamper', values.estimatedLoadedCamperWeight === undefined ? '0 kg' : fmt(values.estimatedLoadedCamperWeight));
-    setText('trayLengthFit', values.trayLengthFit === undefined ? '0 mm' : fmtMm(values.trayLengthFit));
-    setText('trayWidthFit', values.trayWidthFit === undefined ? '0 mm' : fmtMm(values.trayWidthFit));
+    setText('availablePayload', kgOrZero(values.availablePayloadBeforeCamper));
+    setText('loadedWeight', kgOrZero(values.estimatedLoadedVehicleWeight));
+    setText('gvmMargin', kgOrZero(values.remainingGvmMargin));
+    setText('loadedCamper', kgOrZero(values.estimatedLoadedCamperWeight));
+    setText('trayLengthFit', mmOrZero(values.trayLengthFit));
+    setText('trayWidthFit', mmOrZero(values.trayWidthFit));
     setText('dataQuality', result.dataQuality);
     setText('recommendation', result.recommendation);
     setNotes(result.notes);
@@ -300,12 +313,12 @@ const schema = [
       'Vehicle Suitability Checker result - slide-on camper',
       `Vehicle: ${vehicleName}`,
       `Status: ${result.statusLabel}`,
-      `Available payload before camper: ${values.availablePayloadBeforeCamper === undefined ? 'Not calculated' : fmt(values.availablePayloadBeforeCamper)}`,
-      `Estimated loaded vehicle weight: ${values.estimatedLoadedVehicleWeight === undefined ? 'Not calculated' : fmt(values.estimatedLoadedVehicleWeight)}`,
-      `Remaining GVM margin: ${values.remainingGvmMargin === undefined ? 'Not calculated' : fmt(values.remainingGvmMargin)}`,
-      `Estimated loaded camper weight: ${values.estimatedLoadedCamperWeight === undefined ? 'Not calculated' : fmt(values.estimatedLoadedCamperWeight)}`,
-      `Tray length fit: ${values.trayLengthFit === undefined ? 'Not calculated' : fmtMm(values.trayLengthFit)}`,
-      `Tray width fit: ${values.trayWidthFit === undefined ? 'Not calculated' : fmtMm(values.trayWidthFit)}`,
+      `Available payload before camper: ${kgOrNotCalculated(values.availablePayloadBeforeCamper)}`,
+      `Estimated loaded vehicle weight: ${kgOrNotCalculated(values.estimatedLoadedVehicleWeight)}`,
+      `Remaining GVM margin: ${kgOrNotCalculated(values.remainingGvmMargin)}`,
+      `Estimated loaded camper weight: ${kgOrNotCalculated(values.estimatedLoadedCamperWeight)}`,
+      `Tray length fit: ${mmOrNotCalculated(values.trayLengthFit)}`,
+      `Tray width fit: ${mmOrNotCalculated(values.trayWidthFit)}`,
       `Data quality: ${result.dataQuality}`,
       `Recommendation: ${result.recommendation}`
     ].join('\n');

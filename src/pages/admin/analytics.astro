@@ -7,7 +7,11 @@ import AnalyticsDashboard from '../../components/AnalyticsDashboard';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Beyond RV Analytics</title>
+    <meta name="description" content="Private Beyond RV analytics dashboard for reviewing website enquiries and traffic." />
     <meta name="robots" content="noindex, nofollow" />
+    <link rel="canonical" href="https://beyondrv.com.au/admin/analytics/" />
+    <meta property="og:title" content="Beyond RV Analytics" />
+    <meta property="og:description" content="Private Beyond RV analytics dashboard." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
     <style>
@@ -26,9 +30,14 @@ import AnalyticsDashboard from '../../components/AnalyticsDashboard';
       nav a:hover { color: #fff; }
       nav a.active { color: #fff; background: #1a1a1a; }
       main { overflow-y: auto; height: calc(100vh - 60px); }
+      .sr-only {
+        position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+        overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+      }
     </style>
   </head>
   <body>
+    <h1 class="sr-only">Beyond RV Analytics</h1>
     <header>
       <div style="display:flex;align-items:center;gap:1.5rem">
         <img src="/images/site/admin-logo.png" alt="Beyond RV" width="48" height="36" loading="eager" decoding="async" />

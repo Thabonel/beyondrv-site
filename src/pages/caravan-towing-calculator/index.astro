@@ -229,22 +229,36 @@ const schema = [
   const resultPanel = document.getElementById('resultPanel');
   const fields = ['vehicleName', 'gvm', 'gcm', 'currentWeight', 'towCapacity', 'towBallLimit', 'ballDownload', 'atm', 'loadedCaravan', 'gtm', 'passengers', 'accessories', 'luggage'];
   let hasStarted = false;
-  const byId = (id) => document.getElementById(id);
-  const value = (id) => byId(id)?.value ?? '';
-  const fmt = (value) => `${Math.round(value).toLocaleString()} kg`;
+  const byId = (id: string) => document.getElementById(id);
+  const inputById = (id: string) => document.getElementById(id) as HTMLInputElement | null;
+  const value = (id: string) => inputById(id)?.value ?? '';
+  const fmt = (value: number) => `${Math.round(value).toLocaleString()} kg`;
+  type CaravanResultValues = {
+    availablePayload?: number;
+    estimatedLoadedVehicleWeight?: number;
+    remainingGvmMargin?: number;
+    remainingGcmMargin?: number;
+    towCapacityMargin?: number;
+    atmMargin?: number;
+    estimatedCaravanAxleLoad?: number;
+    gtmMargin?: number;
+    towBallMargin?: number;
+  };
+  const kgOrZero = (value?: number) => value === undefined ? '0 kg' : fmt(value);
+  const kgOrNotCalculated = (value?: number) => value === undefined ? 'Not calculated' : fmt(value);
 
-  function setText(id, value) {
+  function setText(id: string, value: string) {
     const el = byId(id);
     if (el) el.textContent = value;
   }
 
-  function setNotes(notes) {
+  function setNotes(notes: string[]) {
     const warningNotes = byId('warningNotes');
-    if (warningNotes) warningNotes.innerHTML = notes.map(note => `<li>${note}</li>`).join('');
+    if (warningNotes) warningNotes.innerHTML = notes.map((note: string) => `<li>${note}</li>`).join('');
   }
 
   function calculateTow() {
-    const vehicleName = byId('vehicleName')?.value || 'your vehicle';
+    const vehicleName = inputById('vehicleName')?.value || 'your vehicle';
     const result = calculateCaravanSuitability({
       vehicleGvm: value('gvm'),
       vehicleGcm: value('gcm'),
@@ -259,21 +273,21 @@ const schema = [
       accessoryWeight: value('accessories'),
       luggageWeight: value('luggage')
     }, { started: hasStarted });
-    const values = result.values ?? {};
+    const values: CaravanResultValues = 'values' in result ? result.values : {};
 
     resultPanel?.setAttribute('data-status', result.status);
     setText('statusLabel', result.statusLabel);
     setText('resultTitle', result.title);
     setText('resultSummary', result.summary);
-    setText('availablePayload', values.availablePayload === undefined ? '0 kg' : fmt(values.availablePayload));
-    setText('loadedVehicle', values.estimatedLoadedVehicleWeight === undefined ? '0 kg' : fmt(values.estimatedLoadedVehicleWeight));
-    setText('gvmMargin', values.remainingGvmMargin === undefined ? '0 kg' : fmt(values.remainingGvmMargin));
-    setText('gcmMargin', values.remainingGcmMargin === undefined ? '0 kg' : fmt(values.remainingGcmMargin));
-    setText('towMargin', values.towCapacityMargin === undefined ? '0 kg' : fmt(values.towCapacityMargin));
-    setText('atmMargin', values.atmMargin === undefined ? '0 kg' : fmt(values.atmMargin));
-    setText('caravanAxleLoad', values.estimatedCaravanAxleLoad === undefined ? '0 kg' : fmt(values.estimatedCaravanAxleLoad));
-    setText('gtmMargin', values.gtmMargin === undefined ? '0 kg' : fmt(values.gtmMargin));
-    setText('ballMargin', values.towBallMargin === undefined ? '0 kg' : fmt(values.towBallMargin));
+    setText('availablePayload', kgOrZero(values.availablePayload));
+    setText('loadedVehicle', kgOrZero(values.estimatedLoadedVehicleWeight));
+    setText('gvmMargin', kgOrZero(values.remainingGvmMargin));
+    setText('gcmMargin', kgOrZero(values.remainingGcmMargin));
+    setText('towMargin', kgOrZero(values.towCapacityMargin));
+    setText('atmMargin', kgOrZero(values.atmMargin));
+    setText('caravanAxleLoad', kgOrZero(values.estimatedCaravanAxleLoad));
+    setText('gtmMargin', kgOrZero(values.gtmMargin));
+    setText('ballMargin', kgOrZero(values.towBallMargin));
     setText('dataQuality', result.dataQuality);
     setText('recommendation', result.recommendation);
     setNotes(result.notes);
@@ -282,15 +296,15 @@ const schema = [
       'Vehicle Suitability Checker result - caravan towing',
       `Vehicle: ${vehicleName}`,
       `Status: ${result.statusLabel}`,
-      `Available payload: ${values.availablePayload === undefined ? 'Not calculated' : fmt(values.availablePayload)}`,
-      `Estimated loaded vehicle weight: ${values.estimatedLoadedVehicleWeight === undefined ? 'Not calculated' : fmt(values.estimatedLoadedVehicleWeight)}`,
-      `Remaining GVM margin: ${values.remainingGvmMargin === undefined ? 'Not calculated' : fmt(values.remainingGvmMargin)}`,
-      `Remaining GCM margin: ${values.remainingGcmMargin === undefined ? 'Not calculated' : fmt(values.remainingGcmMargin)}`,
-      `Tow capacity margin: ${values.towCapacityMargin === undefined ? 'Not calculated' : fmt(values.towCapacityMargin)}`,
-      `ATM margin: ${values.atmMargin === undefined ? 'Not calculated' : fmt(values.atmMargin)}`,
-      `Estimated caravan axle load: ${values.estimatedCaravanAxleLoad === undefined ? 'Not calculated' : fmt(values.estimatedCaravanAxleLoad)}`,
-      `GTM margin: ${values.gtmMargin === undefined ? 'Not calculated' : fmt(values.gtmMargin)}`,
-      `Tow ball margin: ${values.towBallMargin === undefined ? 'Not calculated' : fmt(values.towBallMargin)}`,
+      `Available payload: ${kgOrNotCalculated(values.availablePayload)}`,
+      `Estimated loaded vehicle weight: ${kgOrNotCalculated(values.estimatedLoadedVehicleWeight)}`,
+      `Remaining GVM margin: ${kgOrNotCalculated(values.remainingGvmMargin)}`,
+      `Remaining GCM margin: ${kgOrNotCalculated(values.remainingGcmMargin)}`,
+      `Tow capacity margin: ${kgOrNotCalculated(values.towCapacityMargin)}`,
+      `ATM margin: ${kgOrNotCalculated(values.atmMargin)}`,
+      `Estimated caravan axle load: ${kgOrNotCalculated(values.estimatedCaravanAxleLoad)}`,
+      `GTM margin: ${kgOrNotCalculated(values.gtmMargin)}`,
+      `Tow ball margin: ${kgOrNotCalculated(values.towBallMargin)}`,
       `Data quality: ${result.dataQuality}`,
       `Recommendation: ${result.recommendation}`
     ].join('\n');

@@ -7,7 +7,11 @@ import AdminPanel from '../components/AdminPanel';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Beyond RV Admin</title>
+    <meta name="description" content="Private Beyond RV administration area for managing site content and product information." />
     <meta name="robots" content="noindex, nofollow" />
+    <link rel="canonical" href="https://beyondrv.com.au/admin/" />
+    <meta property="og:title" content="Beyond RV Admin" />
+    <meta property="og:description" content="Private Beyond RV administration area." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
     <style>
@@ -20,9 +24,14 @@ import AdminPanel from '../components/AdminPanel';
       }
       header img { height: 36px; }
       header span { color: #888; font-size: 0.85rem; }
+      .sr-only {
+        position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+        overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+      }
     </style>
   </head>
   <body>
+    <h1 class="sr-only">Beyond RV Admin</h1>
     <header>
       <div style="display:flex;align-items:center;gap:1.5rem">
         <img src="/images/site/admin-logo.png" alt="Beyond RV" width="48" height="36" loading="eager" decoding="async" />
