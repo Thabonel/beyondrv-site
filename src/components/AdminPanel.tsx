@@ -181,9 +181,11 @@ interface EnquiryRecord {
   referral_source_other?: string;
   leadStatus?: {
     enquiryId: string;
-    status: 'new' | 'contacted' | 'quoted' | 'won' | 'lost' | 'spam';
+    status: 'new' | 'contacted' | 'replied' | 'called' | 'qualified' | 'quoted' | 'follow-up-scheduled' | 'won' | 'lost' | 'spam';
+    priority?: 'hot' | 'warm' | 'info-only' | 'spam-low-quality';
     notes?: string;
     nextFollowUpDate?: string;
+    outcomeReason?: '' | 'too-expensive' | 'wrong-vehicle' | 'no-payload' | 'bought-elsewhere' | 'just-researching' | 'no-response' | 'timing-not-right' | 'other';
     firstResponseAt?: string;
     lastContactedAt?: string;
     updatedAt?: string;
@@ -817,8 +819,10 @@ export default function AdminPanel() {
     const current = enquiry.leadStatus ?? {
       enquiryId: enquiry.id,
       status: 'new' as const,
+      priority: 'warm' as const,
       notes: '',
       nextFollowUpDate: enquiry.callback_date ?? '',
+      outcomeReason: '',
       firstResponseAt: '',
       lastContactedAt: '',
       updatedAt: enquiry.submittedAt,
@@ -833,8 +837,10 @@ export default function AdminPanel() {
         body: JSON.stringify({
           enquiryId: enquiry.id,
           status: next.status,
+          priority: next.priority ?? 'warm',
           notes: next.notes ?? '',
           nextFollowUpDate: next.nextFollowUpDate ?? '',
+          outcomeReason: next.outcomeReason ?? '',
           firstResponseAt: next.firstResponseAt ?? '',
           lastContactedAt: next.lastContactedAt ?? '',
         }),
@@ -2140,7 +2146,11 @@ export default function AdminPanel() {
                       >
                         <option value="new">New</option>
                         <option value="contacted">Contacted</option>
+                        <option value="replied">Replied</option>
+                        <option value="called">Called</option>
+                        <option value="qualified">Qualified</option>
                         <option value="quoted">Quoted</option>
+                        <option value="follow-up-scheduled">Follow-up scheduled</option>
                         <option value="won">Won</option>
                         <option value="lost">Lost</option>
                         <option value="spam">Spam</option>
@@ -2153,6 +2163,35 @@ export default function AdminPanel() {
                         style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }}
                       />
                     </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+                      <select
+                        value={enquiry.leadStatus?.priority ?? 'warm'}
+                        onChange={e => saveLeadStatus(enquiry, { priority: e.target.value as NonNullable<EnquiryRecord['leadStatus']>['priority'] })}
+                        disabled={leadSaving === enquiry.id}
+                        style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }}
+                      >
+                        <option value="hot">Hot</option>
+                        <option value="warm">Warm</option>
+                        <option value="info-only">Info only</option>
+                        <option value="spam-low-quality">Spam / low quality</option>
+                      </select>
+                      <select
+                        value={enquiry.leadStatus?.outcomeReason ?? ''}
+                        onChange={e => saveLeadStatus(enquiry, { outcomeReason: e.target.value as NonNullable<EnquiryRecord['leadStatus']>['outcomeReason'] })}
+                        disabled={leadSaving === enquiry.id}
+                        style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }}
+                      >
+                        <option value="">Outcome reason</option>
+                        <option value="too-expensive">Too expensive</option>
+                        <option value="wrong-vehicle">Wrong vehicle</option>
+                        <option value="no-payload">No payload</option>
+                        <option value="bought-elsewhere">Bought elsewhere</option>
+                        <option value="just-researching">Just researching</option>
+                        <option value="no-response">No response</option>
+                        <option value="timing-not-right">Timing not right</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
                     <textarea
                       value={enquiry.leadStatus?.notes ?? ''}
                       onChange={e => setEnquiries(prev => prev.map(item => item.id === enquiry.id ? {
@@ -2160,7 +2199,9 @@ export default function AdminPanel() {
                         leadStatus: {
                           enquiryId: enquiry.id,
                           status: item.leadStatus?.status ?? 'new',
+                          priority: item.leadStatus?.priority ?? 'warm',
                           nextFollowUpDate: item.leadStatus?.nextFollowUpDate ?? item.callback_date ?? '',
+                          outcomeReason: item.leadStatus?.outcomeReason ?? '',
                           firstResponseAt: item.leadStatus?.firstResponseAt ?? '',
                           lastContactedAt: item.leadStatus?.lastContactedAt ?? '',
                           updatedAt: item.leadStatus?.updatedAt ?? item.submittedAt,

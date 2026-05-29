@@ -3,7 +3,9 @@ import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 
 const STORE_NAME = 'customer-lead-status';
-const VALID_STATUSES = new Set(['new', 'contacted', 'quoted', 'won', 'lost', 'spam']);
+const VALID_STATUSES = new Set(['new', 'contacted', 'replied', 'called', 'qualified', 'quoted', 'follow-up-scheduled', 'won', 'lost', 'spam']);
+const VALID_PRIORITIES = new Set(['hot', 'warm', 'info-only', 'spam-low-quality']);
+const VALID_OUTCOME_REASONS = new Set(['', 'too-expensive', 'wrong-vehicle', 'no-payload', 'bought-elsewhere', 'just-researching', 'no-response', 'timing-not-right', 'other']);
 
 function clean(value: unknown, max = 1000) {
   return typeof value === 'string' ? value.trim().slice(0, max) : '';
@@ -56,6 +58,8 @@ export const handler: Handler = async (event) => {
           status: 'new',
           notes: '',
           nextFollowUpDate: '',
+          priority: 'warm',
+          outcomeReason: '',
           firstResponseAt: '',
           lastContactedAt: '',
           updatedAt: '',
@@ -79,6 +83,8 @@ export const handler: Handler = async (event) => {
   const status = clean(body.status, 40);
   const notes = clean(body.notes, 4000);
   const nextFollowUpDate = clean(body.nextFollowUpDate, 40);
+  const priority = clean(body.priority, 40);
+  const outcomeReason = clean(body.outcomeReason, 80);
   const firstResponseAt = clean(body.firstResponseAt, 80);
   const lastContactedAt = clean(body.lastContactedAt, 80);
 
@@ -98,6 +104,22 @@ export const handler: Handler = async (event) => {
     };
   }
 
+  if (priority && !VALID_PRIORITIES.has(priority)) {
+    return {
+      statusCode: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Invalid lead priority' }),
+    };
+  }
+
+  if (!VALID_OUTCOME_REASONS.has(outcomeReason)) {
+    return {
+      statusCode: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Invalid outcome reason' }),
+    };
+  }
+
   let existing: Record<string, unknown> | null = null;
   try {
     existing = await store.get(leadKey(enquiryId), { type: 'json' }) as Record<string, unknown> | null;
@@ -111,6 +133,8 @@ export const handler: Handler = async (event) => {
     status,
     notes,
     nextFollowUpDate,
+    priority: priority || (typeof existing?.priority === 'string' ? existing.priority : 'warm'),
+    outcomeReason,
     firstResponseAt: firstResponseAt || (typeof existing?.firstResponseAt === 'string' ? existing.firstResponseAt : ''),
     lastContactedAt: lastContactedAt || (typeof existing?.lastContactedAt === 'string' ? existing.lastContactedAt : ''),
     updatedAt: new Date().toISOString(),
