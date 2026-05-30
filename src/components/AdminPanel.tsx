@@ -42,12 +42,25 @@ interface PendingChange {
 }
 
 type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
-type PanelTab = 'dashboard' | 'products' | 'media' | 'homepage' | 'enquiries' | 'knowledge' | 'pending';
+type PanelTab = 'dashboard' | 'products' | 'orders' | 'media' | 'homepage' | 'enquiries' | 'knowledge' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 type SuitabilityDataStatus = 'draft' | 'target' | 'confirmed';
 type EnquirySourceType = 'website_form' | 'manual_email' | 'phone_call' | 'facebook' | 'instagram' | 'referral' | 'walk_in' | 'other';
 type EnquiryQueueFilter = 'active' | 'needs-response' | 'follow-up-due' | 'hot' | 'all';
+type OrderType = 'standard_model' | 'one_off_stock' | 'demo_unit' | 'used_stock' | 'custom_build';
+type OrderStatus =
+  | 'enquiry'
+  | 'deposit_received'
+  | 'ordered_from_factory'
+  | 'in_china_production'
+  | 'awaiting_shipping'
+  | 'in_transit'
+  | 'arrived_mutdapilly'
+  | 'local_fitout'
+  | 'ready_for_handover'
+  | 'delivered'
+  | 'cancelled';
 const MAX_RECENT_BUILDS = 3;
 const MAX_UPLOAD_IMAGE_EDGE = 2000;
 const UPLOAD_IMAGE_QUALITY = 0.82;
@@ -217,6 +230,30 @@ interface EnquiryRecord {
   };
 }
 
+interface OrderRecord {
+  id: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  productSlug: string;
+  productTitle: string;
+  productCategory: string;
+  sourceEnquiryId?: string;
+  orderType: OrderType;
+  status: OrderStatus;
+  depositPaid: boolean;
+  factoryOrderDate: string;
+  expectedArrivalDate: string;
+  expectedHandoverDate: string;
+  nextActionDate: string;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+}
+
+type OrderForm = Omit<OrderRecord, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'> & { id?: string };
+
 interface LeadReminderItem {
   id: string;
   enquiryId: string;
@@ -383,6 +420,120 @@ const SOURCE_LABELS: Record<EnquirySourceType, string> = {
   walk_in: 'Walk-in',
   other: 'Other source',
 };
+
+const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
+  enquiry: 'Enquiry',
+  deposit_received: 'Deposit received',
+  ordered_from_factory: 'Ordered from factory',
+  in_china_production: 'In China production',
+  awaiting_shipping: 'Awaiting shipping',
+  in_transit: 'In transit',
+  arrived_mutdapilly: 'Arrived Mutdapilly',
+  local_fitout: 'Local fitout',
+  ready_for_handover: 'Ready for handover',
+  delivered: 'Delivered',
+  cancelled: 'Cancelled',
+};
+
+const ORDER_TYPE_LABELS: Record<OrderType, string> = {
+  standard_model: 'Standard model',
+  one_off_stock: 'One-off stock',
+  demo_unit: 'Demo unit',
+  used_stock: 'Used stock',
+  custom_build: 'Custom build',
+};
+
+const ORDER_STATUS_GROUPS: OrderStatus[] = [
+  'deposit_received',
+  'ordered_from_factory',
+  'in_china_production',
+  'awaiting_shipping',
+  'in_transit',
+  'arrived_mutdapilly',
+  'local_fitout',
+  'ready_for_handover',
+  'enquiry',
+  'delivered',
+  'cancelled',
+];
+
+function emptyOrderForm(): OrderForm {
+  return {
+    customerName: '',
+    customerEmail: '',
+    customerPhone: '',
+    productSlug: '',
+    productTitle: '',
+    productCategory: '',
+    sourceEnquiryId: '',
+    orderType: 'standard_model',
+    status: 'deposit_received',
+    depositPaid: false,
+    factoryOrderDate: '',
+    expectedArrivalDate: '',
+    expectedHandoverDate: '',
+    nextActionDate: '',
+    notes: '',
+  };
+}
+
+function orderTypeForProduct(product: ProductRecord): OrderType {
+  return product.onSale || product.status === 'on-sale' ? 'one_off_stock' : 'standard_model';
+}
+
+function orderFormFromProduct(product: ProductRecord): OrderForm {
+  return {
+    ...emptyOrderForm(),
+    productSlug: product.slug,
+    productTitle: product.title,
+    productCategory: String(product.category ?? ''),
+    orderType: orderTypeForProduct(product),
+  };
+}
+
+function orderFormFromEnquiry(enquiry: EnquiryRecord, products: ProductRecord[]): OrderForm {
+  const product = products.find(item => item.title === enquiry.product_interest || item.slug === enquiry.product_interest);
+  return {
+    ...emptyOrderForm(),
+    customerName: enquiry.name ?? '',
+    customerEmail: enquiry.email ?? '',
+    customerPhone: enquiry.phone ?? '',
+    productSlug: product?.slug ?? '',
+    productTitle: product?.title ?? enquiry.product_interest ?? '',
+    productCategory: product?.category ? String(product.category) : '',
+    sourceEnquiryId: enquiry.id,
+    orderType: product ? orderTypeForProduct(product) : 'standard_model',
+    status: enquiry.leadStatus?.status === 'won' ? 'deposit_received' : 'enquiry',
+    depositPaid: enquiry.leadStatus?.status === 'won',
+    nextActionDate: enquiry.leadStatus?.nextFollowUpDate ?? '',
+    notes: enquiry.leadStatus?.notes ?? '',
+  };
+}
+
+function orderFormFromRecord(order: OrderRecord): OrderForm {
+  return {
+    id: order.id,
+    customerName: order.customerName ?? '',
+    customerEmail: order.customerEmail ?? '',
+    customerPhone: order.customerPhone ?? '',
+    productSlug: order.productSlug ?? '',
+    productTitle: order.productTitle ?? '',
+    productCategory: order.productCategory ?? '',
+    sourceEnquiryId: order.sourceEnquiryId ?? '',
+    orderType: order.orderType ?? 'standard_model',
+    status: order.status ?? 'enquiry',
+    depositPaid: Boolean(order.depositPaid),
+    factoryOrderDate: order.factoryOrderDate ?? '',
+    expectedArrivalDate: order.expectedArrivalDate ?? '',
+    expectedHandoverDate: order.expectedHandoverDate ?? '',
+    nextActionDate: order.nextActionDate ?? '',
+    notes: order.notes ?? '',
+  };
+}
+
+function isOrderStatusError(status: string) {
+  return /\b(add|could|invalid|missing|unavailable|failed|not found)\b/i.test(status);
+}
 
 function reminderTodayKey(date = new Date()) {
   const parts = new Intl.DateTimeFormat('en-CA', {
@@ -846,6 +997,15 @@ function redirectToLoginIfUnauthorized(res: Response) {
   return false;
 }
 
+async function readAdminJson<T>(res: Response, fallbackError: string): Promise<T> {
+  const text = await res.text();
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    throw new Error(fallbackError);
+  }
+}
+
 function makePendingChange(path: string, content: string, description: string): PendingChange {
   return {
     path,
@@ -896,6 +1056,11 @@ export default function AdminPanel() {
   const [newProduct, setNewProduct] = useState<NewProductForm>(EMPTY_PRODUCT_FORM);
   const [showNewProductForm, setShowNewProductForm] = useState(false);
   const [editProduct, setEditProduct] = useState<EditProductForm | null>(null);
+  const [orders, setOrders] = useState<OrderRecord[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersStatus, setOrdersStatus] = useState('');
+  const [orderSaving, setOrderSaving] = useState(false);
+  const [orderForm, setOrderForm] = useState<OrderForm | null>(null);
   const [previewChange, setPreviewChange] = useState<PendingChange | null>(null);
   const [mediaScope, setMediaScope] = useState<MediaScope>('products');
   const [mediaSlug, setMediaSlug] = useState('');
@@ -977,6 +1142,12 @@ export default function AdminPanel() {
     if (activeTab === 'enquiries') {
       void loadEnquiries();
       void loadContactConfig();
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab === 'orders' || activeTab === 'products') {
+      void loadOrders();
     }
   }, [activeTab]);
 
@@ -1096,6 +1267,74 @@ export default function AdminPanel() {
       setContactConfig(data);
     } catch {
       setContactConfig(null);
+    }
+  }
+
+  async function loadOrders() {
+    setOrdersLoading(true);
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-orders');
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await readAdminJson<{ orders?: OrderRecord[]; error?: string }>(res, 'Orders are unavailable in this environment.');
+      if (!res.ok) throw new Error(data.error ?? 'Could not load orders');
+      setOrders(Array.isArray(data.orders) ? data.orders.filter(Boolean) : []);
+      setOrdersStatus('');
+    } catch (err) {
+      setOrdersStatus(err instanceof Error ? err.message : 'Could not load orders.');
+    } finally {
+      setOrdersLoading(false);
+    }
+  }
+
+  function startProductOrder(product: ProductRecord, status: OrderStatus = 'deposit_received') {
+    setOrderForm({ ...orderFormFromProduct(product), status, depositPaid: status !== 'enquiry' });
+    setActiveTab('orders');
+    setOrdersStatus('');
+  }
+
+  function startEnquiryOrder(enquiry: EnquiryRecord) {
+    setOrderForm(orderFormFromEnquiry(enquiry, products));
+    setActiveTab('orders');
+    setOrdersStatus('');
+  }
+
+  async function saveOrder() {
+    if (!orderForm) return;
+    const missing = [
+      !orderForm.customerName.trim() && 'customer name',
+      !orderForm.productTitle.trim() && 'product',
+    ].filter(Boolean);
+    if (missing.length) {
+      setOrdersStatus(`Add ${missing.join(' and ')} before saving.`);
+      return;
+    }
+
+    setOrderSaving(true);
+    try {
+      const method = orderForm.id ? 'PATCH' : 'POST';
+      const res = await adminFetch('/.netlify/functions/admin-orders', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderForm),
+      });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await readAdminJson<{ order?: OrderRecord; error?: string }>(res, 'Orders are unavailable in this environment.');
+      if (!res.ok || !data.order) throw new Error(data.error ?? 'Could not save order');
+      setOrders(prev => {
+        const existing = prev.findIndex(order => order.id === data.order!.id);
+        if (existing >= 0) {
+          const next = [...prev];
+          next[existing] = data.order!;
+          return next;
+        }
+        return [data.order!, ...prev];
+      });
+      setOrderForm(null);
+      setOrdersStatus('Order saved.');
+    } catch (err) {
+      setOrdersStatus(err instanceof Error ? err.message : 'Could not save order.');
+    } finally {
+      setOrderSaving(false);
     }
   }
 
@@ -2015,6 +2254,11 @@ export default function AdminPanel() {
       if (rankDiff) return rankDiff;
       return enquiryQueueDate(b).getTime() - enquiryQueueDate(a).getTime();
     });
+  const activeOrderCounts = orders.reduce<Record<string, number>>((counts, order) => {
+    if (!order.productSlug || ['delivered', 'cancelled'].includes(order.status)) return counts;
+    counts[order.productSlug] = (counts[order.productSlug] ?? 0) + 1;
+    return counts;
+  }, {});
 
   return (
     <>
@@ -2037,8 +2281,8 @@ export default function AdminPanel() {
             </button>
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderBottom: '1px solid #333' }}>
-          {(['dashboard', 'products', 'media', 'homepage', 'enquiries', 'knowledge', 'pending'] as PanelTab[]).map(tab => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', borderBottom: '1px solid #333' }}>
+          {(['dashboard', 'products', 'orders', 'media', 'homepage', 'enquiries', 'knowledge', 'pending'] as PanelTab[]).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -2108,8 +2352,9 @@ export default function AdminPanel() {
                       <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem', lineHeight: 1.25 }}>{product.title}</div>
                       <div style={{ color: '#aaa', fontSize: '0.74rem' }}>
                         {product.price} · {product.category} · {product.status} · {product.galleryCount ?? 0} photos
+                        {activeOrderCounts[product.slug] ? ` · ${activeOrderCounts[product.slug]} active order${activeOrderCounts[product.slug] === 1 ? '' : 's'}` : ''}
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.35rem' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: product.onSale || product.status === 'on-sale' ? '1fr 1fr 1fr' : '1fr 1fr', gap: '0.35rem' }}>
                         <button
                           onClick={() => startStructuredEdit(product)}
                           style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
@@ -2117,11 +2362,19 @@ export default function AdminPanel() {
                           Edit
                         </button>
                         <button
-                          onClick={() => requestProductUpdate(product, `This product has sold. Remove it from active product listings and make sure the old URL redirects to ${product.category === 'caravan' ? '/our-caravans/' : product.category === 'expedition' ? '/expedition/' : '/our-slide-on-campers/'}.`)}
+                          onClick={() => startProductOrder(product, 'deposit_received')}
+                          style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
+                        >
+                          Order
+                        </button>
+                        {(product.onSale || product.status === 'on-sale') && (
+                        <button
+                          onClick={() => requestProductUpdate(product, `This one-off sale product has sold. Remove it from active product listings and make sure the old URL redirects to ${product.category === 'caravan' ? '/our-caravans/' : product.category === 'expedition' ? '/expedition/' : '/our-slide-on-campers/'}. Do not remove standard product-line models unless they are one-off sale stock.`)}
                           style={{ background: '#2a1410', color: '#fb923c', border: '1px solid #63301f', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
                         >
                           Sold
                         </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -2290,6 +2543,67 @@ export default function AdminPanel() {
                 </button>
               </div>
             </div>}
+          </div>
+        )}
+
+        {activeTab === 'orders' && (
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '1rem', borderBottom: '1px solid #333', display: 'grid', gap: '0.55rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
+                <div>
+                  <div style={{ color: '#fff', fontWeight: 700 }}>Orders & Stock</div>
+                  <div style={{ color: '#888', fontSize: '0.76rem', marginTop: '0.15rem' }}>Track ordered units from deposit through factory, shipping, local fitout, and handover.</div>
+                </div>
+                <button
+                  onClick={() => setOrderForm(emptyOrderForm())}
+                  style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.46rem 0.7rem', cursor: 'pointer', fontWeight: 700 }}
+                >
+                  Add Order
+                </button>
+              </div>
+              {ordersStatus && <div style={{ color: isOrderStatusError(ordersStatus) ? '#fb923c' : '#8f8', fontSize: '0.78rem' }}>{ordersStatus}</div>}
+            </div>
+            <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.75rem', display: 'grid', gap: '0.75rem', alignContent: 'start' }}>
+              {ordersLoading && <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>Loading orders...</p>}
+              {!ordersLoading && orders.length === 0 && !orderForm && !isOrderStatusError(ordersStatus) && (
+                <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center', marginTop: '1rem' }}>No orders yet. Create one from a product, an enquiry, or the Add Order button.</p>
+              )}
+              {ORDER_STATUS_GROUPS.map(status => {
+                const group = orders.filter(order => order.status === status);
+                if (!group.length) return null;
+                return (
+                  <section key={status} style={{ display: 'grid', gap: '0.45rem' }}>
+                    <div style={{ color: '#aaa', fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{ORDER_STATUS_LABELS[status]} ({group.length})</div>
+                    {group.map(order => (
+                      <div key={order.id} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', padding: '0.7rem', display: 'grid', gap: '0.45rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.65rem' }}>
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.88rem', lineHeight: 1.25 }}>{order.customerName || 'Unnamed customer'}</div>
+                            <div style={{ color: '#aaa', fontSize: '0.76rem', marginTop: '0.14rem' }}>{order.productTitle || 'Product not set'}</div>
+                          </div>
+                          <button
+                            onClick={() => setOrderForm(orderFormFromRecord(order))}
+                            style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.38rem 0.55rem', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700 }}
+                          >
+                            Edit
+                          </button>
+                        </div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', color: '#bbb', fontSize: '0.72rem' }}>
+                          <span style={{ border: '1px solid #444', borderRadius: '999px', padding: '0.16rem 0.42rem' }}>{ORDER_TYPE_LABELS[order.orderType] ?? order.orderType}</span>
+                          {order.depositPaid && <span style={{ border: '1px solid #1a3a1a', color: '#8f8', borderRadius: '999px', padding: '0.16rem 0.42rem' }}>Deposit paid</span>}
+                          {order.nextActionDate && <span style={{ border: '1px solid #63301f', color: '#fb923c', borderRadius: '999px', padding: '0.16rem 0.42rem' }}>Next: {order.nextActionDate}</span>}
+                          {order.expectedArrivalDate && <span style={{ border: '1px solid #444', borderRadius: '999px', padding: '0.16rem 0.42rem' }}>ETA: {order.expectedArrivalDate}</span>}
+                        </div>
+                        <div style={{ color: '#777', fontSize: '0.72rem' }}>
+                          {[order.customerPhone, order.customerEmail].filter(Boolean).join(' · ') || 'No contact details saved'}
+                        </div>
+                        {order.notes && <div style={{ color: '#ccc', fontSize: '0.76rem', lineHeight: 1.4, whiteSpace: 'pre-wrap' }}>{order.notes}</div>}
+                      </div>
+                    ))}
+                  </section>
+                );
+              })}
+            </div>
           </div>
         )}
 
@@ -2876,6 +3190,12 @@ export default function AdminPanel() {
                     )}
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
                       <button
+                        onClick={() => startEnquiryOrder(enquiry)}
+                        style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.76rem' }}
+                      >
+                        Convert to Order
+                      </button>
+                      <button
                         onClick={() => generateEnquiryResponse(enquiry)}
                         disabled={responseGenerating === enquiry.id}
                         style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: responseGenerating === enquiry.id ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.76rem' }}
@@ -3075,6 +3395,96 @@ export default function AdminPanel() {
         </div>
       </div>
     )}
+    {orderForm && (
+      <div
+        role="dialog"
+        aria-modal="true"
+        style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.72)', zIndex: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
+      >
+        <div style={{ width: 'min(780px, 100%)', maxHeight: '90vh', overflowY: 'auto', background: '#111', color: '#fff', border: '1px solid #333', borderRadius: '8px', boxShadow: '0 24px 80px rgba(0,0,0,0.45)' }}>
+          <div style={{ position: 'sticky', top: 0, background: '#111', borderBottom: '1px solid #333', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+            <div>
+              <h2 style={{ margin: 0, fontSize: '1.05rem' }}>{orderForm.id ? 'Edit Order' : 'Add Order'}</h2>
+              <div style={{ color: '#888', fontSize: '0.76rem', marginTop: '0.15rem' }}>Keep this lightweight: customer, product, status, dates, and the next action.</div>
+            </div>
+            <button
+              onClick={() => setOrderForm(null)}
+              style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.4rem 0.65rem', cursor: 'pointer' }}
+            >
+              Close
+            </button>
+          </div>
+          <div style={{ padding: '1rem', display: 'grid', gap: '0.6rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+              <input value={orderForm.customerName} onChange={e => setOrderForm(p => p && ({ ...p, customerName: e.target.value }))} placeholder="Customer name" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.52rem', fontSize: '0.82rem' }} />
+              <input value={orderForm.customerPhone} onChange={e => setOrderForm(p => p && ({ ...p, customerPhone: e.target.value }))} placeholder="Phone" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.52rem', fontSize: '0.82rem' }} />
+            </div>
+            <input value={orderForm.customerEmail} onChange={e => setOrderForm(p => p && ({ ...p, customerEmail: e.target.value }))} placeholder="Email" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.52rem', fontSize: '0.82rem' }} />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+              <select
+                value={orderForm.productSlug}
+                onChange={e => {
+                  const product = products.find(item => item.slug === e.target.value);
+                  setOrderForm(p => p && ({
+                    ...p,
+                    productSlug: product?.slug ?? '',
+                    productTitle: product?.title ?? p.productTitle,
+                    productCategory: product?.category ? String(product.category) : p.productCategory,
+                    orderType: product ? orderTypeForProduct(product) : p.orderType,
+                  }));
+                }}
+                style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.52rem', fontSize: '0.82rem' }}
+              >
+                <option value="">Choose product</option>
+                {products.map(product => (
+                  <option key={product.slug} value={product.slug}>{product.title}</option>
+                ))}
+              </select>
+              <input value={orderForm.productTitle} onChange={e => setOrderForm(p => p && ({ ...p, productTitle: e.target.value }))} placeholder="Product / custom build" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.52rem', fontSize: '0.82rem' }} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
+              <select value={orderForm.orderType} onChange={e => setOrderForm(p => p && ({ ...p, orderType: e.target.value as OrderType }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.52rem', fontSize: '0.82rem' }}>
+                {Object.entries(ORDER_TYPE_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+              </select>
+              <select value={orderForm.status} onChange={e => setOrderForm(p => p && ({ ...p, status: e.target.value as OrderStatus }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.52rem', fontSize: '0.82rem' }}>
+                {Object.entries(ORDER_STATUS_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+              </select>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#ddd', fontSize: '0.8rem', border: '1px solid #333', borderRadius: '6px', padding: '0.52rem', background: '#101010' }}>
+                <input type="checkbox" checked={orderForm.depositPaid} onChange={e => setOrderForm(p => p && ({ ...p, depositPaid: e.target.checked }))} />
+                Deposit paid
+              </label>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
+              <label style={{ display: 'grid', gap: '0.25rem', color: '#888', fontSize: '0.7rem' }}>
+                Factory order
+                <input type="date" value={orderForm.factoryOrderDate} onChange={e => setOrderForm(p => p && ({ ...p, factoryOrderDate: e.target.value }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+              </label>
+              <label style={{ display: 'grid', gap: '0.25rem', color: '#888', fontSize: '0.7rem' }}>
+                Expected arrival
+                <input type="date" value={orderForm.expectedArrivalDate} onChange={e => setOrderForm(p => p && ({ ...p, expectedArrivalDate: e.target.value }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+              </label>
+              <label style={{ display: 'grid', gap: '0.25rem', color: '#888', fontSize: '0.7rem' }}>
+                Handover
+                <input type="date" value={orderForm.expectedHandoverDate} onChange={e => setOrderForm(p => p && ({ ...p, expectedHandoverDate: e.target.value }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+              </label>
+              <label style={{ display: 'grid', gap: '0.25rem', color: '#888', fontSize: '0.7rem' }}>
+                Next action
+                <input type="date" value={orderForm.nextActionDate} onChange={e => setOrderForm(p => p && ({ ...p, nextActionDate: e.target.value }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+              </label>
+            </div>
+            <textarea value={orderForm.notes} onChange={e => setOrderForm(p => p && ({ ...p, notes: e.target.value }))} placeholder="Short notes: factory order number, fitout tasks, customer preferences, delivery constraints" rows={4} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem', fontSize: '0.82rem', lineHeight: 1.4 }} />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+              <button onClick={() => setOrderForm(null)} style={{ background: '#222', color: '#aaa', border: '1px solid #444', borderRadius: '6px', padding: '0.62rem', cursor: 'pointer', fontWeight: 700 }}>
+                Cancel
+              </button>
+              <button onClick={saveOrder} disabled={orderSaving} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.62rem', cursor: orderSaving ? 'wait' : 'pointer', fontWeight: 700 }}>
+                {orderSaving ? 'Saving...' : 'Save Order'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
     {showHelp && (
       <div
         role="dialog"
@@ -3180,10 +3590,10 @@ export default function AdminPanel() {
             <section>
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Remove or sell a product</h3>
               <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
-                <li>Open the Products tab and click Sold on the matching product.</li>
-                <li>Confirm whether it should be removed from listings or kept as coming soon.</li>
-                <li>The assistant should remove it from active product content and make sure old links redirect to a relevant category page.</li>
-                <li>Review the pending product and redirect changes before deploying.</li>
+                <li>For normal product-line models, use Order to create an order record. Do not remove the product page just because one unit sold.</li>
+                <li>For one-off on-sale, demo, or used stock, use Sold only when the listing should be removed from active sale pages.</li>
+                <li>Use Orders to track deposit, factory production, shipping, Mutdapilly fitout, handover, and the next owner action.</li>
+                <li>Review any pending product or redirect changes before deploying.</li>
               </ol>
             </section>
             <section>

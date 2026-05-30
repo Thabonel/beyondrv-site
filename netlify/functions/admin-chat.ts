@@ -137,7 +137,8 @@ RULES:
 - For homepage Recent Builds, update src/data/homepage/recent-builds.json instead of editing homepage markup
 - For testimonials, update src/data/homepage/testimonials.json; never invent customer quotes, customer names, or ratings
 - Preserve valid JSON, existing IDs, sortOrder, and isVisible fields unless the owner explicitly asks to change them
-- For sold products, prefer removing the product from active listings and adding/confirming a redirect instead of creating an unsupported "sold" status
+- Standard product-line models stay listed when a unit sells; use the Orders admin tab to track customer orders and stock movement
+- Remove a sold product from active listings only for one-off on-sale, demo, or used stock items, and add/confirm a redirect when removing a page
 - For product videos, store YouTube data in a youtubeVideo frontmatter object. Store only the clean video ID in youtubeVideo.id, not the full URL. Preserve or remove the whole youtubeVideo block exactly as instructed by the owner.
 - For images, the current UI can describe intended image changes but cannot upload full image files into the repository
 - Be concise and friendly
