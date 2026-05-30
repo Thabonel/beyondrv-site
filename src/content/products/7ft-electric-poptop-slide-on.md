@@ -7,7 +7,23 @@ status: "available"
 onSale: false
 featured: false
 heroImage: "/images/optimized/products/7ft-electric-poptop-slide-on/01-7ft-electric-poptop-slide-on-hero.webp"
-gallery: []
+gallery:
+  - "/images/optimized/products/7ft-electric-poptop-slide-on/02-20240924-105432-768x432.webp"
+  - "/images/optimized/products/7ft-electric-poptop-slide-on/03-20240924-105439-768x432.webp"
+  - "/images/optimized/products/7ft-electric-poptop-slide-on/04-20240924-105823-768x432.webp"
+  - "/images/optimized/products/7ft-electric-poptop-slide-on/05-20240924-105445-768x432.webp"
+  - "/images/optimized/products/7ft-electric-poptop-slide-on/06-20240924-105813-768x432.webp"
+  - "/images/optimized/products/7ft-electric-poptop-slide-on/07-20240924-105454-768x432.webp"
+  - "/images/optimized/products/7ft-electric-poptop-slide-on/08-20240924-110355-768x432.webp"
+  - "/images/optimized/products/7ft-electric-poptop-slide-on/09-20240924-110155-768x432.webp"
+  - "/images/optimized/products/7ft-electric-poptop-slide-on/10-20240924-110413-768x432.webp"
+  - "/images/optimized/products/7ft-electric-poptop-slide-on/11-20240924-110410-768x432.webp"
+  - "/images/optimized/products/7ft-electric-poptop-slide-on/12-20240924-110401-768x432.webp"
+  - "/images/optimized/products/7ft-electric-poptop-slide-on/13-20240924-110143-768x432.webp"
+  - "/images/optimized/products/7ft-electric-poptop-slide-on/14-20240924-110531-768x432.webp"
+  - "/images/optimized/products/7ft-electric-poptop-slide-on/15-20240924-110525-768x432.webp"
+  - "/images/optimized/products/7ft-electric-poptop-slide-on/16-20240924-110549-768x432.webp"
+  - "/images/optimized/products/7ft-electric-poptop-slide-on/17-20240924-110553-768x432.webp"
 keySpecs:
   - label: "Base"
     value: "2150mm x 2000mm"
