@@ -889,6 +889,7 @@ export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState<PanelTab>('dashboard');
   const [knowledgeInput, setKnowledgeInput] = useState('');
   const [showHelp, setShowHelp] = useState(false);
+  const [showChatDrawer, setShowChatDrawer] = useState(false);
   const [products, setProducts] = useState<ProductRecord[]>([]);
   const [productFilter, setProductFilter] = useState('');
   const [productsLoading, setProductsLoading] = useState(true);
@@ -2017,63 +2018,25 @@ export default function AdminPanel() {
 
   return (
     <>
-    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', height: 'calc(100vh - 60px)', gap: '1rem', padding: '1rem', fontFamily: 'inherit' }}>
-      {/* Chat panel */}
-      <div style={{ minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333' }}>
-        <div style={{ padding: '1rem', borderBottom: '1px solid #333', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
-          <span>Admin Chat</span>
-          <button
-            onClick={() => setShowHelp(true)}
-            style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.4rem 0.65rem', cursor: 'pointer', fontWeight: 600 }}
-          >
-            Help
-          </button>
+    <div style={{ height: 'calc(100vh - 60px)', padding: '1rem', fontFamily: 'inherit' }}>
+      <div style={{ minWidth: 0, minHeight: 0, height: '100%', display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333' }}>
+        <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
+          <div style={{ color: '#fff', fontWeight: 800 }}>Admin Tools</div>
+          <div style={{ display: 'flex', gap: '0.45rem' }}>
+            <button
+              onClick={() => setShowChatDrawer(true)}
+              style={{ background: '#E8540A', border: 'none', color: '#fff', borderRadius: '6px', padding: '0.42rem 0.65rem', cursor: 'pointer', fontWeight: 700 }}
+            >
+              Chat
+            </button>
+            <button
+              onClick={() => setShowHelp(true)}
+              style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.42rem 0.65rem', cursor: 'pointer', fontWeight: 700 }}
+            >
+              Help
+            </button>
+          </div>
         </div>
-        <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          {messages.map((m, i) => (
-            <div key={i} style={{
-              alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
-              maxWidth: '80%',
-              background: m.role === 'user' ? '#E8540A' : '#222',
-              color: '#fff',
-              padding: '0.6rem 0.9rem',
-              borderRadius: '8px',
-              fontSize: '0.9rem',
-              lineHeight: 1.5,
-              whiteSpace: 'pre-wrap',
-            }}>
-              {m.content}
-            </div>
-          ))}
-          {loading && (
-            <div style={{ alignSelf: 'flex-start', color: '#888', fontSize: '0.85rem' }}>Thinking…</div>
-          )}
-          <div ref={bottomRef} />
-        </div>
-        <div style={{ display: 'flex', gap: '0.5rem', padding: '0.75rem', borderTop: '1px solid #333' }}>
-          <button
-            onClick={() => fileRef.current?.click()}
-            style={{ background: '#222', border: '1px solid #444', color: '#aaa', borderRadius: '6px', padding: '0 0.75rem', cursor: 'pointer', fontSize: '1.1rem' }}
-            title="Upload image"
-          >📎</button>
-          <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
-          <input
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage(input)}
-            placeholder="Type a change… (Enter to send)"
-            style={{ flex: 1, background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem 0.75rem', fontSize: '0.9rem', outline: 'none' }}
-          />
-          <button
-            onClick={() => sendMessage(input)}
-            disabled={loading || !input.trim()}
-            style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0 1rem', cursor: 'pointer', fontWeight: 600 }}
-          >→</button>
-        </div>
-      </div>
-
-      {/* Admin tools panel */}
-      <div style={{ minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderBottom: '1px solid #333' }}>
           {(['dashboard', 'products', 'media', 'homepage', 'enquiries', 'knowledge', 'pending'] as PanelTab[]).map(tab => (
             <button
@@ -3048,6 +3011,66 @@ export default function AdminPanel() {
         )}
       </div>
     </div>
+    {showChatDrawer && (
+      <div
+        role="dialog"
+        aria-modal="true"
+        style={{ position: 'fixed', inset: 0, zIndex: 45, background: 'rgba(0,0,0,0.52)', display: 'flex', justifyContent: 'flex-end' }}
+      >
+        <div style={{ width: 'min(520px, 100%)', height: '100%', background: '#111', borderLeft: '1px solid #333', display: 'flex', flexDirection: 'column', boxShadow: '-24px 0 80px rgba(0,0,0,0.45)' }}>
+          <div style={{ padding: '1rem', borderBottom: '1px solid #333', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
+            <span>Admin Chat</span>
+            <button
+              onClick={() => setShowChatDrawer(false)}
+              style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.4rem 0.65rem', cursor: 'pointer', fontWeight: 600 }}
+            >
+              Close
+            </button>
+          </div>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {messages.map((m, i) => (
+              <div key={i} style={{
+                alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
+                maxWidth: '86%',
+                background: m.role === 'user' ? '#E8540A' : '#222',
+                color: '#fff',
+                padding: '0.6rem 0.9rem',
+                borderRadius: '8px',
+                fontSize: '0.9rem',
+                lineHeight: 1.5,
+                whiteSpace: 'pre-wrap',
+              }}>
+                {m.content}
+              </div>
+            ))}
+            {loading && (
+              <div style={{ alignSelf: 'flex-start', color: '#888', fontSize: '0.85rem' }}>Thinking...</div>
+            )}
+            <div ref={bottomRef} />
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem', padding: '0.75rem', borderTop: '1px solid #333' }}>
+            <button
+              onClick={() => fileRef.current?.click()}
+              style={{ background: '#222', border: '1px solid #444', color: '#aaa', borderRadius: '6px', padding: '0 0.75rem', cursor: 'pointer', fontSize: '1.1rem' }}
+              title="Upload image"
+            >+</button>
+            <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
+            <input
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage(input)}
+              placeholder="Type a change... (Enter to send)"
+              style={{ flex: 1, background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem 0.75rem', fontSize: '0.9rem', outline: 'none', minWidth: 0 }}
+            />
+            <button
+              onClick={() => sendMessage(input)}
+              disabled={loading || !input.trim()}
+              style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0 1rem', cursor: loading || !input.trim() ? 'not-allowed' : 'pointer', fontWeight: 600 }}
+            >Send</button>
+          </div>
+        </div>
+      </div>
+    )}
     {showHelp && (
       <div
         role="dialog"
