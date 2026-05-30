@@ -535,6 +535,10 @@ function isOrderStatusError(status: string) {
   return /\b(add|could|invalid|missing|unavailable|failed|not found)\b/i.test(status);
 }
 
+function isAdminWarningStatus(status: string) {
+  return /\b(could|failed|unsupported|unavailable|missing|invalid|not configured|netlify blobs)\b/i.test(status);
+}
+
 function reminderTodayKey(date = new Date()) {
   const parts = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Australia/Brisbane',
@@ -1231,10 +1235,10 @@ export default function AdminPanel() {
       const params = new URLSearchParams({ scope, slug });
       const res = await adminFetch(`/.netlify/functions/admin-media?${params.toString()}`);
       if (redirectToLoginIfUnauthorized(res)) return;
-      if (!res.ok) throw new Error('Could not load media');
-      const data = await res.json() as { files: MediaFile[] };
+      const data = await res.json() as { files: MediaFile[]; storageReady?: boolean; warning?: string };
+      if (!res.ok) throw new Error(data.warning ?? 'Could not load media');
       setMediaFiles(data.files ?? []);
-      setMediaStatus('');
+      setMediaStatus(data.warning ?? '');
     } catch {
       setMediaStatus(scope === 'pages' ? 'Could not load media for this page.' : 'Could not load media for this product.');
     } finally {
@@ -2645,7 +2649,7 @@ export default function AdminPanel() {
                 Upload Image
               </button>
               <input ref={mediaFileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" style={{ display: 'none' }} onChange={uploadMedia} />
-              {mediaStatus && <p style={{ margin: 0, color: mediaStatus.includes('Could') || mediaStatus.includes('failed') || mediaStatus.includes('Unsupported') ? '#f87' : '#8f8', fontSize: '0.78rem' }}>{mediaStatus}</p>}
+              {mediaStatus && <p style={{ margin: 0, color: isAdminWarningStatus(mediaStatus) ? '#f87' : '#8f8', fontSize: '0.78rem' }}>{mediaStatus}</p>}
               <p style={{ margin: 0, color: '#888', fontSize: '0.76rem', lineHeight: 1.35 }}>
                 Use Site pages for About, Homepage, and category-page images. Use Products when an image should become a product hero or gallery image.
               </p>

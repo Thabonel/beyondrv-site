@@ -1,7 +1,7 @@
 import type { Handler } from '@netlify/functions';
 import { randomUUID } from 'crypto';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
-import { connectBlobStore, getBlobStore } from './blob-store';
+import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 
 const STORE_NAME = 'product-media';
 const MAX_BYTES = 12 * 1024 * 1024;
@@ -27,7 +27,7 @@ function safeSlug(value: string) {
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
   if (!isAdminAuthorized(event)) return unauthorizedResponse();
-  connectBlobStore(event);
+  const blobConnection = connectBlobStore(event);
 
   let payload: { scope?: string; slug?: string; filename?: string; contentType?: string; data?: string; alt?: string };
   try {
@@ -56,7 +56,21 @@ export const handler: Handler = async (event) => {
   }
 
   const key = `${scope}/${slug}/${Date.now()}-${randomUUID()}-${filename}`;
-  const store = getBlobStore(STORE_NAME);
+  let store: ReturnType<typeof getBlobStore>;
+  try {
+    store = getBlobStore(STORE_NAME);
+  } catch (error) {
+    console.warn('admin-media-upload: media store unavailable', {
+      store: STORE_NAME,
+      blobConnection,
+      error: safeBlobStoreError(error),
+    });
+    return {
+      statusCode: 503,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: blobStoreUserMessage(error) }),
+    };
+  }
   const alt = (payload.alt ?? '').trim().slice(0, 180);
 
   const dataBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
@@ -73,11 +87,15 @@ export const handler: Handler = async (event) => {
       },
     });
   } catch (error) {
-    console.error('admin-media-upload: failed to store media', error);
+    console.warn('admin-media-upload: failed to store media', {
+      store: STORE_NAME,
+      blobConnection,
+      error: safeBlobStoreError(error),
+    });
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Could not store image. Check the Netlify media storage setup.' }),
+      body: JSON.stringify({ error: blobStoreUserMessage(error) }),
     };
   }
 

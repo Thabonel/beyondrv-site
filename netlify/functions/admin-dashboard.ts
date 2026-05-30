@@ -62,6 +62,8 @@ interface MarketingInsight {
   priority: 'high' | 'medium' | 'low';
 }
 
+const VALID_MARKETING_PRIORITIES = new Set(['high', 'medium', 'low']);
+
 function leadKey(enquiryId: string) {
   return `lead-status/${encodeURIComponent(enquiryId)}.json`;
 }
@@ -90,6 +92,30 @@ function productPath(product: ProductRecord) {
 
 function normalise(value = '') {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+function cleanInsightString(value: unknown, max = 240) {
+  return typeof value === 'string' ? value.trim().replace(/\s+/g, ' ').slice(0, max) : '';
+}
+
+function validateMarketingInsights(value: unknown) {
+  if (!value || typeof value !== 'object' || !Array.isArray((value as { items?: unknown }).items)) return [];
+  return (value as { items: unknown[] }).items
+    .map((item) => {
+      if (!item || typeof item !== 'object') return null;
+      const raw = item as Record<string, unknown>;
+      const priority = cleanInsightString(raw.priority, 20);
+      if (!VALID_MARKETING_PRIORITIES.has(priority)) return null;
+      const insight = {
+        title: cleanInsightString(raw.title, 120),
+        recommendation: cleanInsightString(raw.recommendation, 320),
+        evidence: cleanInsightString(raw.evidence, 220),
+        priority: priority as MarketingInsight['priority'],
+      };
+      return insight.title && insight.recommendation && insight.evidence ? insight : null;
+    })
+    .filter((item): item is MarketingInsight => Boolean(item))
+    .slice(0, 6);
 }
 
 function matchProduct(enquiry: EnquiryRecord, products: ProductRecord[]) {
@@ -468,18 +494,60 @@ Rules:
 - Prefer actions the owner can take this week.
 - Return 3 to 6 items.`,
       input: `AGGREGATE MARKETING DATA:\n${JSON.stringify(sanitized, null, 2)}`,
+      text: {
+        format: {
+          type: 'json_schema',
+          name: 'marketing_insights',
+          strict: true,
+          schema: {
+            type: 'object',
+            additionalProperties: false,
+            required: ['items'],
+            properties: {
+              items: {
+                type: 'array',
+                minItems: 3,
+                maxItems: 6,
+                items: {
+                  type: 'object',
+                  additionalProperties: false,
+                  required: ['title', 'recommendation', 'evidence', 'priority'],
+                  properties: {
+                    title: { type: 'string', maxLength: 120 },
+                    recommendation: { type: 'string', maxLength: 320 },
+                    evidence: { type: 'string', maxLength: 220 },
+                    priority: { type: 'string', enum: ['high', 'medium', 'low'] },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
       max_output_tokens: 1000,
     });
-    const match = response.output_text.match(/\{[\s\S]*\}/);
-    if (!match) throw new Error('Marketing insight response was not JSON.');
-    const parsed = JSON.parse(match[0]) as { items?: MarketingInsight[] };
-    const items = Array.isArray(parsed.items) && parsed.items.length ? parsed.items.slice(0, 6) : input.ruleInsights;
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(response.output_text);
+    } catch {
+      throw new Error('model_returned_invalid_json');
+    }
+    const items = validateMarketingInsights(parsed);
+    if (!items.length) throw new Error('model_returned_no_valid_insights');
     return { status: 'ready', message: '', items };
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown OpenAI error';
+    const fallbackReason = /model|unsupported|not found|does not exist|invalid_request_error/i.test(message)
+      ? 'AI insights fell back because the configured marketing model is unavailable.'
+      : /invalid_json|no_valid_insights/i.test(message)
+        ? 'AI insights fell back because the model returned invalid JSON.'
+        : 'AI insights fell back because the OpenAI request failed.';
     console.warn('admin-dashboard: marketing insight generation failed', {
+      model: INSIGHTS_MODEL,
+      reason: fallbackReason,
       error: error instanceof Error ? { name: error.name, message: error.message } : { name: 'UnknownError' },
     });
-    return { status: 'fallback', message: 'AI marketing insights could not be generated, so rule-based insights are shown.', items: input.ruleInsights };
+    return { status: 'fallback', message: fallbackReason, items: input.ruleInsights };
   }
 }
 

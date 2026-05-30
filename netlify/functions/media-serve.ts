@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { connectBlobStore, getBlobStore } from './blob-store';
+import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 
 const STORE_NAME = 'product-media';
 
@@ -7,15 +7,36 @@ export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'GET' && event.httpMethod !== 'HEAD') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
-  connectBlobStore(event);
+  const blobConnection = connectBlobStore(event);
 
   const key = event.queryStringParameters?.key ?? '';
   if (!key.startsWith('products/') && !key.startsWith('pages/')) {
     return { statusCode: 400, body: 'Invalid media key' };
   }
 
-  const store = getBlobStore(STORE_NAME);
-  const metadata = await store.getMetadata(key);
+  let store: ReturnType<typeof getBlobStore>;
+  try {
+    store = getBlobStore(STORE_NAME);
+  } catch (error) {
+    console.warn('media-serve: media store unavailable', {
+      store: STORE_NAME,
+      blobConnection,
+      error: safeBlobStoreError(error),
+    });
+    return { statusCode: 503, body: blobStoreUserMessage(error) };
+  }
+
+  let metadata: Awaited<ReturnType<typeof store.getMetadata>>;
+  try {
+    metadata = await store.getMetadata(key);
+  } catch (error) {
+    console.warn('media-serve: media metadata read failed', {
+      store: STORE_NAME,
+      key,
+      error: safeBlobStoreError(error),
+    });
+    return { statusCode: 503, body: blobStoreUserMessage(error) };
+  }
   if (!metadata) return { statusCode: 404, body: 'Not Found' };
 
   const contentType =
@@ -34,7 +55,17 @@ export const handler: Handler = async (event) => {
     };
   }
 
-  const data = await store.get(key, { type: 'arrayBuffer' });
+  let data: ArrayBuffer | null;
+  try {
+    data = await store.get(key, { type: 'arrayBuffer' });
+  } catch (error) {
+    console.warn('media-serve: media data read failed', {
+      store: STORE_NAME,
+      key,
+      error: safeBlobStoreError(error),
+    });
+    return { statusCode: 503, body: blobStoreUserMessage(error) };
+  }
   if (!data) return { statusCode: 404, body: 'Not Found' };
 
   return {

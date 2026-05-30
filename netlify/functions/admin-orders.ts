@@ -101,7 +101,7 @@ export const handler: Handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
   if (!isAdminAuthorized(event)) return unauthorizedResponse();
-  const blobRuntimeSource = connectBlobStore(event);
+  const blobConnection = connectBlobStore(event);
 
   let store: ReturnType<typeof getBlobStore>;
   try {
@@ -109,7 +109,7 @@ export const handler: Handler = async (event) => {
   } catch (error) {
     console.warn('admin-orders: order store unavailable', {
       store: STORE_NAME,
-      blobRuntimeSource,
+      blobConnection,
       error: safeBlobStoreError(error),
     });
     return {
@@ -136,7 +136,7 @@ export const handler: Handler = async (event) => {
     } catch (error) {
       console.warn('admin-orders: order read failed', {
         store: STORE_NAME,
-        blobRuntimeSource,
+        blobConnection,
         error: safeBlobStoreError(error),
       });
       return {

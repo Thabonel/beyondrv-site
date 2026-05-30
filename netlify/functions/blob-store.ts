@@ -3,6 +3,12 @@ import type { HandlerEvent } from '@netlify/functions';
 
 type BlobRuntimeSource = 'event.blobs' | 'NETLIFY_BLOBS_CONTEXT' | 'explicit-env' | 'missing';
 
+export interface BlobStoreConnection {
+  source: BlobRuntimeSource;
+  connected: boolean;
+  missing: string[];
+}
+
 export class BlobStoreConfigurationError extends Error {
   code = 'BLOB_STORE_CONFIGURATION_ERROR';
   runtimeSource: BlobRuntimeSource;
@@ -15,6 +21,8 @@ export class BlobStoreConfigurationError extends Error {
     this.missing = missing;
   }
 }
+
+let lambdaBlobsConnected = false;
 
 function hasBlobsContext() {
   return Boolean(
@@ -30,23 +38,35 @@ function getExplicitConfig() {
   };
 }
 
-export function connectBlobStore(event: HandlerEvent) {
+function missingConfig() {
+  const { siteID, token } = getExplicitConfig();
+  return [
+    !siteID && 'NETLIFY_BLOBS_CONTEXT or event.blobs or NETLIFY_BLOBS_SITE_ID/NETLIFY_SITE_ID/SITE_ID',
+    !token && 'NETLIFY_BLOBS_CONTEXT or event.blobs or NETLIFY_BLOBS_TOKEN/NETLIFY_AUTH_TOKEN',
+  ].filter(Boolean) as string[];
+}
+
+export function connectBlobStore(event: HandlerEvent): BlobStoreConnection {
   const lambdaEvent = event as HandlerEvent & { blobs?: string };
   if (typeof lambdaEvent.blobs === 'string') {
     const headers = Object.fromEntries(
       Object.entries(event.headers).filter((entry): entry is [string, string] => typeof entry[1] === 'string')
     );
     connectLambda({ blobs: lambdaEvent.blobs, headers });
-    return 'event.blobs' as const;
+    lambdaBlobsConnected = true;
+    return { source: 'event.blobs', connected: true, missing: [] };
   }
-  if (hasBlobsContext()) return 'NETLIFY_BLOBS_CONTEXT' as const;
+  lambdaBlobsConnected = false;
+  if (hasBlobsContext()) return { source: 'NETLIFY_BLOBS_CONTEXT', connected: true, missing: [] };
 
   const { siteID, token } = getExplicitConfig();
-  return siteID && token ? 'explicit-env' as const : 'missing' as const;
+  return siteID && token
+    ? { source: 'explicit-env', connected: true, missing: [] }
+    : { source: 'missing', connected: false, missing: missingConfig() };
 }
 
 export function getBlobStore(name: string): Store {
-  if (hasBlobsContext()) {
+  if (lambdaBlobsConnected || hasBlobsContext()) {
     return getStore({
       name,
     });
@@ -62,10 +82,7 @@ export function getBlobStore(name: string): Store {
     });
   }
 
-  const missing = [
-    !siteID && 'NETLIFY_BLOBS_CONTEXT or event.blobs or NETLIFY_BLOBS_SITE_ID/NETLIFY_SITE_ID/SITE_ID',
-    !token && 'NETLIFY_BLOBS_CONTEXT or event.blobs or NETLIFY_BLOBS_TOKEN/NETLIFY_AUTH_TOKEN',
-  ].filter(Boolean) as string[];
+  const missing = missingConfig();
 
   throw new BlobStoreConfigurationError(
     `Netlify Blobs is not configured for store "${name}". Missing ${missing.join(' and ')}.`,
