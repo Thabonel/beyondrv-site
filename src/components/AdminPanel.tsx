@@ -2394,7 +2394,11 @@ export default function AdminPanel() {
                 </div>
                 {orderedItems(recentBuilds).map((build, index) => (
                   <div key={build.id} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', padding: '0.7rem', display: 'grid', gap: '0.45rem' }}>
-                    {build.image && <img src={adminImageUrl(build.image)} alt="" style={{ width: '100%', height: '110px', objectFit: 'cover', borderRadius: '4px' }} />}
+                    {build.image && (
+                      <div style={{ width: '180px', maxWidth: '100%', height: '120px', background: '#0b0b0b', border: '1px solid #303030', borderRadius: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                        <img src={adminImageUrl(build.image)} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                      </div>
+                    )}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '0.35rem', alignItems: 'center' }}>
                       <input value={build.title} onChange={e => updateRecentBuild(build.id, { title: e.target.value })} placeholder="Build title" style={{ minWidth: 0, background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.45rem', fontSize: '0.76rem' }} />
                       <button onClick={() => moveRecentBuild(build.id, -1)} disabled={index === 0} style={{ background: '#222', color: index === 0 ? '#555' : '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: index === 0 ? 'not-allowed' : 'pointer' }}>↑</button>
