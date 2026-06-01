@@ -1,7 +1,7 @@
 ---
 title: Sunpatch 15-XC Couples Off-Road Van
 category: caravan
-tagline: Couples off-road van with 240L fresh water and 200Ah battery standard.
+tagline: Couples off-road van with 240L fresh water and 150Ah lithium battery.
 price: $63,000
 priceBadge: IMMEDIATE DELIVERY
 status: on-sale
@@ -34,26 +34,120 @@ keySpecs:
   - label: Fresh water
     value: 240L
   - label: Battery
-    value: 200Ah
+    value: 150Ah
 specGroups:
-  - group: Weights
+  - group: Dimensions and Weight
     items:
+      - label: Overall dimensions
+        value: 6110mm x 2200mm x 2840mm (L x W x H)
       - label: Tare
         value: 1900kg
       - label: ATM
         value: 2500kg
+      - label: GTM
+        value: 2300kg
+      - label: Ball weight
+        value: 180kg
   - group: Electrical
     items:
+      - label: Solar
+        value: 3 x 100W solar panels
       - label: Battery
-        value: 200Ah
+        value: 150Ah lithium ion battery with Bluetooth smart connectivity
+      - label: Inverter
+        value: 2000W pure sine wave inverter
+      - label: Charging
+        value: DC DC battery charger
+      - label: Outlets
+        value: 240V power points, 12V power sockets and 12V USB phone chargers throughout
+      - label: "Lighting"
+        value: LED lightbars throughout exterior and ample interior lighting
+      - label: "Entertainment"
+        value: 24 inch HDTV with antenna, internal and external speakers, reading lights beside bed
+      - label: "Appliances"
+        value: Microwave, 175L twin door compressor fridge, 3kg front loading washing machine, twin burner induction cooktop and LED rangehood
+      - label: Fans
+        value: 2 x 12V marine fans
+      - label: Certification
+        value: Australian compliant wiring and fittings with Australian electrical certification
   - group: Water System
     items:
       - label: Fresh water
         value: 240L
+      - label: Grey water
+        value: 120L
+      - label: Water pump
+        value: 12V water pump
+      - label: Hot water
+        value: Truma Ultrarapid gas/electric hot water system
+      - label: Town water
+        value: Town water pressure inlets
+  - group: Gas
+    items:
+      - label: Bayonet
+        value: External gas bayonet for outdoor kitchen
+      - label: Bottle storage
+        value: 1 x 9kg gas bottle holder
+      - label: Certification
+        value: Australian gas certification
+  - group: Construction Features
+    items:
+      - label: Body
+        value: Full composite construction with 29mm thick sandwich panels with PVC frame
+      - label: Base and ceiling
+        value: Welded aluminium base and welded aluminium ceiling with insulation
+      - label: Chassis
+        value: 6 inch thick hot dipped galvanised chassis and drawbar
+      - label: Suspension
+        value: Heavy duty independent coil suspension with dual shock absorbers
+      - label: Windows
+        value: Double glazed windows with integrated blind and screen
+      - label: Jockey wheel
+        value: Heavy duty jockey wheel
+      - label: Wheels
+        value: 16 inch all terrain tyres plus spare all terrain tyre and rim
+      - label: Brakes
+        value: 10 inch electric brakes with Brake Safe
+  - group: External Features
+    items:
+      - label: Entry
+        value: Foldout entry steps, entry grab rail and entry door with flyscreen and bin attached
+      - label: Awning
+        value: Electric rollout awning
+      - label: Picnic table
+        value: Fold down picnic table
+      - label: Outdoor kitchen
+        value: Dometic stainless steel pullout kitchen with 2 burner gas stove, stainless steel sink and tap
+      - label: "Storage"
+        value: Storage hatches throughout and toolbox with dual slide-out tray
+      - label: "External power"
+        value: External 240V powerpoint
+      - label: "Shower"
+        value: External hot/cold shower
+      - label: "Recovery and hitch"
+        value: Jerry can holders, heavy duty jockey wheel, D035 off-road hitch with handbrake and 4 drop-down stabilising legs
+  - group: Internal Features
+    items:
+      - label: Finish
+        value: High quality modern finish
+      - label: Bathroom
+        value: Shower/toilet combination with stainless steel shower tray, shower head, sink with tap and cassette toilet
+      - label: Cabinetry
+        value: Quality European cabinetry hardware with marine cabinetry locks
+      - label: Kitchen
+        value: Laminate kitchen benchtop
+      - label: "Dining"
+        value: Laminate dining table with cafe style dining and seating
+      - label: "Upholstery"
+        value: High quality fabric upholstery
+      - label: "Bed"
+        value: High quality queen sized innerspring mattress with skylight above bed
+      - label: "Convenience"
+        value: Cup holders installed near bed
 features:
   - Couples off-road layout
   - 240L fresh water
-  - 200Ah battery standard
+  - 150Ah lithium battery
   - Owner-supplied gallery installed
 relatedSlugs:
   - sunpatch-12c-couples-caravan
@@ -65,9 +159,9 @@ youtubeVideo:
   description: Video walkthrough for the Beyond RV Sunpatch 15-XC couples off-road van.
   startSeconds: 1157
 seoTitle: Sunpatch 15-XC Couples Off-Road Van | Beyond RV
-seoDesc: The Sunpatch 15-XC couples off-road van is available from Beyond RV with 240L fresh water and 200Ah battery standard.
+seoDesc: The Sunpatch 15-XC couples off-road van is available from Beyond RV with 240L fresh water and a 150Ah lithium battery.
 suitabilityData:
   status: draft
 ---
 
-The **Sunpatch 15-XC** is a couples off-road van with the owner-confirmed $63,000 price, 1900kg tare, 2500kg ATM, 240L fresh water and 200Ah standard battery.
+The **Sunpatch 15-XC** is a couples off-road van with the owner-confirmed $63,000 price, 1900kg tare, 2500kg ATM, 240L fresh water and a 150Ah lithium battery.
