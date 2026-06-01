@@ -29,90 +29,102 @@ keySpecs:
   - label: Price
     value: $225,000 negotiable
 specGroups:
-  - group: Vehicle Information
+  - group: "Vehicle Information"
     items:
-      - label: Make
-        value: Mercedes-Benz 90715523-AFA
-      - label: Model
-        value: Sprinter VS30 519 LWB CC 5.0T RWD EU VI E
-      - label: Year
-        value: 2022
-      - label: Seat pack
-        value: Genuine Mercedes-Benz Comfort Seat Pack
-      - label: Multimedia
-        value: MBUX multimedia system with 10.25-inch display
-      - label: Drive
-        value: All Wheel Drive - torque on demand
-      - label: Weight variant
-        value: 5500kg
-      - label: Main tank
-        value: 93L
-      - label: Trailer plug
-        value: 7 pin trailer plug
-  - group: Availability
-    items:
-      - label: Stock
-        value: In stock and available for immediate delivery
-      - label: Price
-        value: $225,000 negotiable
-  - group: Build & Construction
+      - label: "Make"
+        value: "Mercedes-Benz 90715523-AFA"
+      - label: "Model"
+        value: "Sprinter VS30 519 LWB CC 5.0T RWD EU VI E"
+      - label: "Year"
+        value: "2022"
+      - label: "Seat pack"
+        value: "Genuine Mercedes-Benz Comfort Seat Pack"
+      - label: "Multimedia"
+        value: "MBUX multimedia system with 10.25-inch display"
+      - label: "Drive"
+        value: "All Wheel Drive - torque on demand"
+      - label: "Weight variant"
+        value: "5500kg"
+      - label: "Main tank"
+        value: "93L"
+  - group: "Build and Construction"
     items:
       - label: "Floor plan"
-        value: 4700mm floor plan
+        value: "4700mm floor plan"
       - label: "Shell"
-        value: 100% wood-free shell construction
+        value: "100% wood-free shell construction"
       - label: "Floor"
-        value: 17mm infused one piece floor
+        value: "17mm infused one-piece floor"
       - label: "Walls"
-        value: 29mm fiberglass sandwich walls with built-in PVC frame
+        value: "29mm fibreglass sandwich walls with built-in PVC frame"
       - label: "Roof"
-        value: 55mm fiberglass alloy roof, fully insulated
+        value: "55mm fibreglass alloy roof, fully insulated"
+      - label: "Vehicle connection"
+        value: "7 pin trailer plug"
       - label: "Warranty"
-        value: 5 years manufacturer's warranty
-  - group: Internal Features
+        value: "5 years manufacturer warranty"
+  - group: "Internal Features"
     items:
       - label: "Bed"
-        value: Rear raised queen size bed with high quality queen size innerspring mattress
+        value: "Rear raised queen size bed with high quality queen size innerspring mattress"
       - label: "Lounge"
-        value: Cafe style lounge
+        value: "Cafe style lounge"
       - label: "Bathroom"
-        value: Combined shower and toilet
+        value: "Combined shower and toilet"
       - label: "Cabinetry"
-        value: Quality cabinetry with overhead cabinets, gas struts and marine style locks
+        value: "Quality cabinetry throughout with overhead cabinets, gas struts and marine style locks"
       - label: "Kitchen"
-        value: Internal kitchenette with Laminex benchtop, induction cooktop, stainless steel sink with glass lid and LED rangehood
+        value: "Internal kitchenette with Laminex benchtop, induction cooktop, stainless steel sink with glass lid and LED rangehood"
       - label: "Flooring"
-        value: Quality vinyl flooring
-  - group: Electrical System
-    items:
-      - label: "Battery"
-        value: 400Ah lithium battery with Bluetooth connectivity
-      - label: "Anderson plug"
-        value: 50amp Anderson plug
-      - label: "Solar"
-        value: 720W solar with MPPT controller
-      - label: "Fridge"
-        value: 175L twin door fridge/freezer
-      - label: "Appliances"
-        value: Microwave and 2.5kg washing machine
-      - label: "Lighting"
-        value: LED lighting throughout
-      - label: "Entertainment"
-        value: Bluetooth radio with 4 speakers
-  - group: Plumbing & Climate Control
-    items:
-      - label: "Heating"
-        value: Diesel heater air/hot water combination
-      - label: "Bathroom"
-        value: Combined shower and toilet
-      - label: "External shower"
-        value: External shower with hot and cold water
-  - group: External Features
+        value: "Quality vinyl flooring with underlay"
+      - label: "Upholstery"
+        value: "High quality synthetic leather upholstery"
+      - label: "Skylight"
+        value: "700mm x 500mm skylight with privacy and flyscreen above bed"
+  - group: "External Features"
     items:
       - label: "Entry door"
-        value: Quality RV entry door with security screen
+        value: "Quality RV flush mounted entry door with garbage bin and flyscreen"
       - label: "Windows"
-        value: Double glazed windows
+        value: "Flush mounted double glazed windows with privacy and flyscreen"
+      - label: "Hatches"
+        value: "Quality access hatch doors with triple rubber seal"
+      - label: "Lighting"
+        value: "LED lightbars throughout door side, off side and rear"
+  - group: "Electrical"
+    items:
+      - label: "Battery"
+        value: "200Ah lithium-ion battery with Bluetooth smart connectivity"
+      - label: "Battery management"
+        value: "Smart battery management charging system"
+      - label: "Solar"
+        value: "2 x 190W solar panels with MPPT solar regulator"
+      - label: "Entertainment"
+        value: "TV antenna, 24 inch smart TV and Bluetooth touch screen stereo with Apple and Android CarPlay"
+      - label: "Appliances"
+        value: "Microwave oven and Sanjo 175L twin door 12V compressor fridge/freezer"
+      - label: "Ventilation"
+        value: "2-way exhaust fan and 12V Sirocco fans for dinette and bed area"
+      - label: "Lighting"
+        value: "Cool white LED lighting and LED lights inside all storage compartments"
+      - label: "Certification"
+        value: "Australian compliant wiring and fittings"
+  - group: "Plumbing"
+    items:
+      - label: "Heating and hot water"
+        value: "Diesel heater air/hot water combination unit"
+      - label: "Water pump"
+        value: "12V water pump"
+      - label: "Fresh water"
+        value: "200L fresh water tank"
+      - label: "Tank monitoring"
+        value: "Independent water level indicator for all tanks"
+      - label: "Toilet"
+        value: "Sanjo cassette toilet"
+      - label: "Shower"
+        value: "Stainless steel shower tray"
+      - label: "Washing machine"
+        value: "2.5kg front loading washing machine"
 features:
   - Mercedes Sprinter AWD LWB cab chassis
   - Immediate delivery

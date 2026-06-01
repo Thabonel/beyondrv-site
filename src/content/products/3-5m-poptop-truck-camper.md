@@ -34,84 +34,102 @@ keySpecs:
   - label: Price
     value: From $49,999
 specGroups:
-  - group: Dimensions
+  - group: "Dimensions"
     items:
-      - label: Base length
-        value: 3.5m
-      - label: Roof
-        value: Electric pop-top
-      - label: Build type
-        value: Custom truck camper
-  - group: Build & Construction
-    items:
-      - label: "Body"
-        value: Full composite construction
+      - label: "Floor plan"
+        value: "3550mm x 2200mm"
       - label: "Roof"
-        value: Electric pop-top roof with remote control
-      - label: "Jack legs"
-        value: 4 x 12V electric jack legs
-      - label: "Entry"
-        value: Quality RV flush mounted entry door with security door and flyscreen
-      - label: "Windows"
-        value: Double glazed windows with privacy screen and flyscreen
-      - label: "Lighting"
-        value: LED lightbars throughout door side, off side and rear
-  - group: Internal Features
+        value: "Electric pop-top"
+      - label: "Build type"
+        value: "Combined shower/toilet truck camper"
+  - group: "Internal Features"
     items:
       - label: "Bed"
-        value: Rear raised east/west queen size bed with high quality queen size innerspring mattress
+        value: "Rear raised east/west queen size bed with high quality queen size innerspring mattress"
       - label: "Lounge"
-        value: Cafe style lounge with height adjustable table
+        value: "Cafe style lounge with height-adjustable table"
       - label: "Bathroom"
-        value: Combined shower and toilet
+        value: "Combined shower and toilet"
       - label: "Cabinetry"
-        value: Quality cabinetry with marine style locks and overhead cabinet with gas struts
+        value: "Quality cabinetry throughout with overhead cabinet gas struts and marine style locks"
       - label: "Kitchen"
-        value: Internal kitchenette with Laminex benchtop, twin burner gas cooktop, stainless steel sink with glass lid and LED rangehood
+        value: "Internal kitchenette with Laminex benchtop, twin burner gas cooktop, stainless steel sink with glass lid and LED rangehood"
       - label: "Flooring"
-        value: Quality vinyl flooring with underlay
+        value: "Quality vinyl flooring with underlay"
       - label: "Upholstery"
-        value: High quality synthetic leather upholstery
-  - group: Electrical System
+        value: "High quality synthetic leather upholstery"
+  - group: "External Features"
+    items:
+      - label: "Entry door"
+        value: "Quality RV flush mounted entry door with detachable security door and flyscreen"
+      - label: "Windows"
+        value: "Flush mounted double glazed windows with privacy and flyscreen"
+      - label: "Hatches"
+        value: "Quality access hatch doors with triple rubber seal"
+      - label: "Lighting"
+        value: "LED lightbars throughout door side, off side and rear"
+      - label: "Outdoor cooking"
+        value: "External pullout BBQ with stainless steel sink and gas bayonet"
+      - label: "Jack legs"
+        value: "4 x 12V electric jack legs"
+      - label: "Awning"
+        value: "Electric awning included"
+      - label: "External fridge"
+        value: "External 30L drawer fridge"
+  - group: "Electrical"
     items:
       - label: "Battery"
-        value: 200Ah lithium-ion battery with Bluetooth smart connectivity
+        value: "200Ah lithium-ion battery with Bluetooth smart connectivity"
+      - label: "Battery management"
+        value: "Redarc BMS30 charging system"
+      - label: "Inverter"
+        value: "2000W Redarc inverter"
       - label: "Solar"
-        value: Solar controller with solar panels
-      - label: "Charging"
-        value: DC/DC charger via Anderson plug
-      - label: "Air conditioning"
-        value: Air conditioning unit
-      - label: "Fridge"
-        value: 110L Dometic compressor fridge/freezer plus 30L external Engel drawer fridge
+        value: "2 x 200W solar panels"
       - label: "Entertainment"
-        value: Bluetooth radio entertainment system with 4 speakers
-      - label: "Outlets"
-        value: Double-pole power points throughout
-      - label: "Fans"
-        value: 12V marine fans
-  - group: Plumbing System
+        value: "TV antenna, 24 inch smart TV and Bluetooth radio with Apple and Android CarPlay plus speakers"
+      - label: "Appliances"
+        value: "Microwave oven and Dometic 110L 12V compressor fridge/freezer"
+      - label: "Ventilation"
+        value: "2-way exhaust fan with LED for bathroom and bed areas"
+      - label: "Air conditioning"
+        value: "12V ducted air conditioning unit"
+      - label: "Lighting"
+        value: "Cool white LED lighting and LED lights inside all storage compartments"
+      - label: "Certification"
+        value: "Australian compliant wiring and fittings"
+  - group: "Plumbing and Gas"
     items:
+      - label: "Heating and hot water"
+        value: "Diesel air/hot water heater combination unit"
       - label: "Water pump"
-        value: 12V water pump
-      - label: "External shower"
-        value: External hot and cold shower
-      - label: "Hot water"
-        value: Truma Ultrarapid gas/electric hot water system
-      - label: "Bathroom"
-        value: Combined shower toilet with stainless steel shower base
-      - label: "Gas"
-        value: Australian gas certification
-  - group: External Features
+        value: "12V water pump"
+      - label: "Water tanks"
+        value: "Inbuilt fresh water and grey water tanks"
+      - label: "Tank monitoring"
+        value: "Independent water level indicator for all tanks"
+      - label: "Toilet"
+        value: "Cassette toilet"
+      - label: "Shower"
+        value: "Wood shower mat"
+      - label: "Certification"
+        value: "QLD gas certification"
+  - group: "Build and Construction"
     items:
-      - label: "BBQ"
-        value: External pullout BBQ with stainless steel sink and gas bayonet
-      - label: "Entry"
-        value: Entry steps and grab handle
-      - label: "Hatches"
-        value: Quality access hatch doors with triple rubber seal
-      - label: "Fridge"
-        value: External 30L drawer fridge
+      - label: "Shell"
+        value: "100% wood-free shell construction"
+      - label: "Floor"
+        value: "17mm infused one-piece floor"
+      - label: "Walls"
+        value: "29mm fibreglass sandwich walls with built-in PVC frame"
+      - label: "Roof"
+        value: "55mm fibreglass alloy roof, fully insulated"
+      - label: "Roof lift"
+        value: "12V electric roof lifting mechanism with control switch"
+      - label: "Vehicle connection"
+        value: "7 pin trailer plug"
+      - label: "Warranty"
+        value: "5 years manufacturer warranty"
 features:
   - Electric pop-top configuration
   - Custom truck camper body

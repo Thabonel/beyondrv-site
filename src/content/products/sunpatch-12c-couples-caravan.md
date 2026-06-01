@@ -31,114 +31,112 @@ keySpecs:
   - label: Price
     value: $39,999
 specGroups:
-  - group: Dimensions and Weight
+  - group: "Dimensions and Weight"
     items:
-      - label: Overall dimensions
-        value: 5550mm x 2050mm x 2750mm
-      - label: Ball weight
-        value: 160kg
-      - label: ATM
-        value: 2420kg
-      - label: GTM
-        value: 2260kg
-      - label: Tare
-        value: 2000kg
-  - group: Water System
+      - label: "Overall dimensions"
+        value: "5550mm x 2050mm x 2750mm"
+      - label: "Ball weight"
+        value: "160kg"
+      - label: "ATM"
+        value: "2420kg"
+      - label: "GTM"
+        value: "2260kg"
+      - label: "Tare"
+        value: "2000kg"
+  - group: "Internal Features"
     items:
-      - label: Fresh water
-        value: 195 litre water tank
-      - label: Grey water
-        value: 115 litre grey water tank
-      - label: Drawbar tap
-        value: Gravity fed tap on drawbar
-      - label: Pressurised water
-        value: Pressure water to ensuite, internal and external kitchen
-      - label: Filling
-        value: Lockable water tank filler point and town water connection
-  - group: Electrical
+      - label: "Bed"
+        value: "Fold-out queen size bed with foam mattress"
+      - label: "Cabinetry"
+        value: "Quality cabinetry throughout with locking latches and spring-loaded hinges"
+      - label: "Dining"
+        value: "360-degree swivel dinette table with leatherette upholstery"
+      - label: "Climate"
+        value: "Dometic reverse-cycle air conditioner with 3600W compressor cooling capacity"
+      - label: "Ensuite ventilation"
+        value: "Two-way fan in ensuite with LED lights"
+      - label: "Skylight"
+        value: "Skylight with LED lights"
+      - label: "Safety"
+        value: "Smoke alarm and fire extinguisher"
+      - label: "Bathroom"
+        value: "Ensuite bathroom with hot and cold shower and Thetford cassette toilet"
+      - label: "Bunk"
+        value: "Bunk bed with foam mattress"
+  - group: "External Features"
     items:
-      - label: Inverter
-        value: 2000 watt inverter
-      - label: Solar
-        value: 300W solar panels
-      - label: Battery
-        value: 1 x 100Ah lithium-ion battery
-      - label: Lighting
-        value: Ample LED lighting throughout including reading lights and external lighting
-      - label: Outlets
-        value: 240V, 12V and USB ports throughout
-      - label: Stereo
-        value: Bluetooth stereo
-      - label: Certification
-        value: Australian compliant wiring and fittings with Australian electrical certification
-  - group: Gas
-    items:
-      - label: Certification
-        value: Australian gas certification
-      - label: Bottle storage
-        value: Enclosed 2 x 9kg gas bottle holders
-      - label: Gas plumbing
-        value: Gas plumbed to external kitchen and hot water system
-      - label: BBQ point
-        value: External gas point for BBQ
-  - group: Construction Features
-    items:
-      - label: Body
-        value: Hardtop off-road caravan
-      - label: Layout
-        value: Couples caravan
-      - label: Chassis
-        value: Heavy duty hot dipped chassis and drawbar
-      - label: Hitch
-        value: D035 off-road hitch
-      - label: Suspension
-        value: Independent coil suspension with dual shock absorbers
-      - label: Body construction
-        value: Fibreglass insulated construction with welded aluminium frame
-      - label: Windows
-        value: Double glazed windows with integrated blind and screen
-      - label: Door
-        value: Full length door with integrated security screen
-      - label: Protection
-        value: Stone protector on drawbar and checker plate body protection
-      - label: Wheels
-        value: Alloy wheels and mud terrain tyres
-  - group: External Features
-    items:
-      - label: Awning
-        value: Electric roll out awning
+      - label: "Awning"
+        value: "Electric awning"
       - label: "Entry"
-        value: Slide out step and grab handle at entrance door
-      - label: Outdoor kitchen
-        value: Stainless steel kitchen with 4 burner stove, sink and drying rack with hot and cold water
-      - label: Storage
-        value: Pantry, cutlery drawer, storage drawer and storage with slide out for BBQ or generator
-      - label: External outlets
-        value: External 240V power, 12V power and TV point
-      - label: Shower
-        value: External hot and cold shower
-      - label: Spare
-        value: Spare mud terrain tyre with alloy rim mounted on rear
-      - label: Annex tracks
-        value: Full length sail track for inflatable annex and driver-side shower annex
-  - group: Internal Features
+        value: "Slide-out step and entrance grab handle"
+      - label: "Picnic table"
+        value: "Picnic table"
+      - label: "Outdoor kitchen"
+        value: "Stainless steel kitchen with 4-burner stove, sink, drying rack, hot and cold water"
+      - label: "Storage"
+        value: "Pantry, cutlery drawer, storage drawer and slide-out storage for BBQ or generator"
+      - label: "External outlets"
+        value: "External 240V power, 12V power and TV point"
+      - label: "External shower"
+        value: "External shower with hot and cold water"
+      - label: "Spare"
+        value: "Spare mud terrain tyre with alloy rim mounted on rear"
+  - group: "Electrical"
     items:
-      - label: Bed
-        value: Fold out queen size bed
-      - label: Cabinetry
-        value: Quality cabinetry with locking latches and spring loaded hinges
-      - label: Dining
-        value: Fully adjustable dinette table with leatherette upholstery
-      - label: Entertainment
-        value: 24 inch high definition TV
-      - label: Air conditioning
-        value: Dometic Ibis 4 air conditioner
-      - label: Hatches
-        value: Two hatches, including fan hatch in ensuite
-      - label: Safety
-        value: Smoke alarm and fire extinguisher
-      - label: Ensuite
-        value: Ensuite bathroom with hot and cold shower and cassette toilet
+      - label: "Battery management"
+        value: "Battery management system"
+      - label: "Inverter"
+        value: "2000W inverter"
+      - label: "Battery"
+        value: "1 x 100Ah lithium-ion smart battery with Bluetooth connectivity"
+      - label: "Lighting"
+        value: "Ample LED lighting throughout plus front external lightbar"
+      - label: "Outlets"
+        value: "240V, 12V, USB ports and cigarette sockets throughout"
+      - label: "Stereo"
+        value: "Bluetooth stereo"
+      - label: "TV"
+        value: "24 inch high definition TV"
+      - label: "Certification"
+        value: "Australian compliant wiring and fittings with Australian electrical certification"
+  - group: "Plumbing and Gas"
+    items:
+      - label: "Fresh water"
+        value: "190L fresh water tank"
+      - label: "Grey water"
+        value: "95L grey water tank"
+      - label: "Water pump"
+        value: "12V water pump"
+      - label: "Hot water"
+        value: "Truma Ultrarapid gas/electric hot water system"
+      - label: "External shower"
+        value: "External shower"
+      - label: "Town water"
+        value: "Town water pressure inlets"
+      - label: "Gas certification"
+        value: "Australian gas certification"
+  - group: "Build and Construction"
+    items:
+      - label: "Chassis"
+        value: "Heavy duty hot dipped chassis and drawbar"
+      - label: "Hitch"
+        value: "D035 off-road hitch"
+      - label: "Suspension"
+        value: "Independent coil suspension with dual shock absorbers"
+      - label: "Body"
+        value: "Fibreglass insulated construction with welded aluminium frame"
+      - label: "Windows"
+        value: "Double glazed windows with integrated blind and screen"
+      - label: "Door"
+        value: "Full length door with integrated security screen"
+      - label: "Protection"
+        value: "Stone protector on drawbar and checker plate body protection"
+      - label: "Gas storage"
+        value: "Internal storage for gas bottles"
+      - label: "Jockey wheel"
+        value: "Heavy duty jockey wheel"
+      - label: "Wheels"
+        value: "Alloy wheels and mud terrain tyres"
 features:
   - Compact couples layout
   - Hardtop off-road caravan body
