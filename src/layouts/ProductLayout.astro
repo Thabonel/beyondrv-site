@@ -55,6 +55,7 @@ const youtubeWatchUrl = youtubeVideo
   : '';
 const youtubeThumbnail = youtubeVideo?.thumbnail
   ?? (youtubeVideo ? `https://i.ytimg.com/vi/${youtubeVideo.id}/maxresdefault.jpg` : '');
+const activeSpecGroups = data.specGroups?.filter((g: SpecGroup) => g.items.length > 0) ?? [];
 
 const priceNum = data.price.replace(/[^0-9.]/g, '');
 const productSchema = {
@@ -290,24 +291,49 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
     </section>
   )}
 
-  {data.specGroups && data.specGroups.length > 0 && (
+  {activeSpecGroups.length > 0 && (
     <section class="product-specs-section container">
-      <h2 class="section-title">Specifications</h2>
-      <div class="spec-groups">
-        {data.specGroups.filter((g: SpecGroup) => g.items.length > 0).map((group: SpecGroup) => (
-          <div class="spec-group">
-            <h3 class="spec-group-title">{group.group}</h3>
-            <table class="specs-table">
-              <tbody>
-                {group.items.map((row: SpecRow) => (
-                  <tr>
-                    <th scope="row">{row.label}</th>
-                    <td>{row.value}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      <div class="specs-heading-row">
+        <div>
+          <div class="section-eyebrow">
+            <div class="section-eyebrow-line"></div>
+            <span class="section-eyebrow-text">Product Details</span>
           </div>
+          <h2 class="section-title">Specifications</h2>
+        </div>
+        <div class="specs-actions" aria-label="Specification section controls">
+          <button class="specs-toggle-btn" type="button" data-specs-expand>Expand all</button>
+          <button class="specs-toggle-btn" type="button" data-specs-collapse>Collapse all</button>
+        </div>
+      </div>
+
+      {data.keySpecs.length > 0 && (
+        <div class="specs-summary-strip" aria-label={`${data.title} key specifications`}>
+          {data.keySpecs.map((s: SpecRow) => (
+            <div class="specs-summary-item">
+              <span class="specs-summary-label">{s.label}</span>
+              <span class="specs-summary-value">{s.value}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div class="spec-accordion">
+        {activeSpecGroups.map((group: SpecGroup, index: number) => (
+          <details class="spec-panel" open={index < 2}>
+            <summary class="spec-panel-summary">
+              <span>{group.group}</span>
+              <span class="spec-panel-count">{group.items.length} specs</span>
+            </summary>
+            <dl class="spec-list">
+              {group.items.map((row: SpecRow) => (
+                <div class="spec-list-row">
+                  <dt>{row.label}</dt>
+                  <dd>{row.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </details>
         ))}
       </div>
     </section>
@@ -315,17 +341,31 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
 
   {(!data.specGroups || data.specGroups.length === 0) && data.specs && data.specs.length > 0 && (
     <section class="product-specs-section container">
-      <h2 class="section-title">Full Specifications</h2>
-      <table class="specs-table">
-        <tbody>
+      <div class="specs-heading-row">
+        <div>
+          <div class="section-eyebrow">
+            <div class="section-eyebrow-line"></div>
+            <span class="section-eyebrow-text">Product Details</span>
+          </div>
+          <h2 class="section-title">Specifications</h2>
+        </div>
+      </div>
+      <div class="spec-accordion">
+        <details class="spec-panel" open>
+          <summary class="spec-panel-summary">
+            <span>Full Specifications</span>
+            <span class="spec-panel-count">{data.specs.length} specs</span>
+          </summary>
+          <dl class="spec-list">
           {data.specs.map((row: SpecRow) => (
-            <tr>
-              <th scope="row">{row.label}</th>
-              <td>{row.value}</td>
-            </tr>
+            <div class="spec-list-row">
+              <dt>{row.label}</dt>
+              <dd>{row.value}</dd>
+            </div>
           ))}
-        </tbody>
-      </table>
+          </dl>
+        </details>
+      </div>
     </section>
   )}
 
@@ -437,6 +477,18 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
         item.classList.add('open');
         btn.setAttribute('aria-expanded', 'true');
       }
+    });
+  });
+
+  const specPanels = Array.from(document.querySelectorAll<HTMLDetailsElement>('.spec-panel'));
+  document.querySelector<HTMLButtonElement>('[data-specs-expand]')?.addEventListener('click', () => {
+    specPanels.forEach(panel => {
+      panel.open = true;
+    });
+  });
+  document.querySelector<HTMLButtonElement>('[data-specs-collapse]')?.addEventListener('click', () => {
+    specPanels.forEach(panel => {
+      panel.open = false;
     });
   });
 </script>
