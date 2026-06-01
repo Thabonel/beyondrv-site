@@ -30,6 +30,7 @@ netlify/functions/manifest.json
 .playwright-mcp/
 
 # Old WordPress/source working assets kept locally, not part of the Astro site
+docs/
 Mercedes Sprinter Motorhome/
  Mercedes Sprinter Motorhome/
 15-XC/
