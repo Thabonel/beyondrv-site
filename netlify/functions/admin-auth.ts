@@ -8,12 +8,15 @@ function getExpectedPassword() {
   return process.env.ADMIN_PASSWORD ?? '';
 }
 
-function getCookieSecret() {
-  return process.env.ADMIN_COOKIE_SECRET || getExpectedPassword();
+function getCookieSecrets() {
+  return Array.from(new Set([
+    process.env.ADMIN_COOKIE_SECRET,
+    getExpectedPassword(),
+  ].filter(Boolean))) as string[];
 }
 
-function sign(value: string) {
-  return createHmac('sha256', getCookieSecret()).update(value).digest('base64url');
+function sign(value: string, secret: string) {
+  return createHmac('sha256', secret).update(value).digest('base64url');
 }
 
 function constantTimeEqual(left: string, right: string) {
@@ -53,7 +56,8 @@ export function isAdminAuthorized(event: HandlerEvent) {
 
 export function createAdminToken() {
   const issuedAt = Date.now().toString();
-  return `${TOKEN_VERSION}.${issuedAt}.${sign(`${TOKEN_VERSION}.${issuedAt}`)}`;
+  const secret = getExpectedPassword();
+  return `${TOKEN_VERSION}.${issuedAt}.${sign(`${TOKEN_VERSION}.${issuedAt}`, secret)}`;
 }
 
 export function isValidAdminToken(token = '') {
@@ -63,7 +67,7 @@ export function isValidAdminToken(token = '') {
   if (!Number.isFinite(timestamp)) return false;
   if (timestamp > Date.now() + 5 * 60 * 1000) return false;
   if (Date.now() - timestamp > 8 * 60 * 60 * 1000) return false;
-  return constantTimeEqual(signature, sign(`${version}.${issuedAt}`));
+  return getCookieSecrets().some((secret) => constantTimeEqual(signature, sign(`${version}.${issuedAt}`, secret)));
 }
 
 export function unauthorizedResponse() {

@@ -42,7 +42,17 @@ export default async function adminGate(request: Request) {
   const expected = Netlify.env.get('ADMIN_PASSWORD');
   const secret = Netlify.env.get('ADMIN_COOKIE_SECRET') || expected;
   const cookies = parseCookies(request.headers.get('cookie') ?? '');
-  const isAllowed = Boolean(expected && secret) && await isValidToken(cookies[COOKIE_NAME] ?? '', secret ?? '');
+  const token = cookies[COOKIE_NAME] ?? '';
+  const secrets = Array.from(new Set([secret, expected].filter(Boolean))) as string[];
+  let isAllowed = false;
+  if (expected) {
+    for (const candidate of secrets) {
+      if (await isValidToken(token, candidate)) {
+        isAllowed = true;
+        break;
+      }
+    }
+  }
 
   if (isAllowed) {
     return;
