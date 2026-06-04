@@ -1060,7 +1060,7 @@ nav.scrolled {
   gap: 6rem; margin-top: 4rem;
   align-items: start;
 }
-.faq-sticky { position: sticky; top: 100px; }
+.faq-sticky { }
 .faq-list { display: flex; flex-direction: column; gap: 0; }
 .faq-item {
   border-bottom: 1px solid var(--border);

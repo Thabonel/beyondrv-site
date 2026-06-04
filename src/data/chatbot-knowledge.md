@@ -63,9 +63,23 @@ Use this file for business knowledge that should guide the public website chatbo
 - If the unit is within a 400km radius and safe to move, the customer may be required to take it to the factory for repair assessment.
 - Australian Consumer Law rights still apply. If asked about exact warranty coverage, recommend contacting Beyond RV for current terms.
 
+## Construction and engineering
+
+- Beyond RV uses full composite construction across all models. Walls are 29mm fibreglass sandwich panels with a built-in PVC frame. Floors are 17mm infused one-piece composite (truck campers) or 25mm honeycomb composite (caravans). Roofs are 55mm fibreglass alloy, fully insulated (truck campers). All shells are 100% timber-free, with no wood or plywood in the structure.
+- Subframes and bases are fully welded aluminium. Caravans use a 6 inch hot dipped galvanised chassis and drawbar.
+- Caravan suspension is independent coil with dual shock absorbers. Caravans use a D035 off-road hitch and 10 inch electric brakes with Brake Safe. Slide-on campers and truck campers have no suspension of their own and rely on the host vehicle.
+- Insulation is provided by the sandwich panel walls, insulated roof, and double glazed windows (caravans). Pop-top models have extra insulated canvas padding. Specific R-values are not published on the site.
+- Waterproofing uses triple rubber seals on access hatches, flush mounted windows and doors, and the fibreglass outer skin is inherently waterproof.
+- Compared to aluminium-framed caravans: Beyond RV uses composite sandwich panels with a PVC frame, not a traditional aluminium stick frame. This avoids thermal bridging and corrosion risk.
+- Compared to timber-framed caravans: Beyond RV is 100% timber-free, so there is no rot risk, lower weight, and no thermal bridging from timber framing.
+- Off-road testing details are not published on the site. If asked, recommend contacting the team.
+- Maintenance requirements are covered in handover documentation. If asked, recommend contacting the team.
+- If a customer asks about construction details not published on the site (panel core material, bonding method, R-values, dust sealing, sourcing of shells), say the information is not publicly listed and suggest contacting the team directly.
+
 ## Chatbot tone and rules
 
 - Be friendly, practical, direct, and Australian in tone.
+- Only answer with information found in the product catalogue or this knowledge file. If you don't know something, say so and suggest contacting the team — never guess.
 - Keep answers short unless the customer asks for detail.
 - If a customer appears ready to buy, suggest using the Talk to a human option so the team can follow up.
 
