@@ -17,6 +17,50 @@ interface AnalyticsData {
   warning?: string;
 }
 
+interface SeoData {
+  range: string;
+  generatedAt: string;
+  technical: {
+    checks: { label: string; status: 'ready' | 'warning' | 'critical'; detail: string }[];
+    robots: {
+      allowsGooglebot: boolean;
+      allowsBingbot: boolean;
+      allowsOpenAI: boolean;
+      allowsClaude: boolean;
+      allowsPerplexity: boolean;
+    };
+    sitemap: {
+      url: string;
+      urls: string[];
+      urlCount: number;
+      hasLastmod: boolean;
+    };
+    samplePages: {
+      url: string;
+      status: number;
+      title: string;
+      description: string;
+      canonical: string;
+      structuredDataBlocks: number;
+      noindex: boolean;
+    }[];
+  };
+  searchConsole: {
+    status: 'ready' | 'warning' | 'critical';
+    message: string;
+    totals: null | {
+      clicks: number;
+      impressions: number;
+      ctr: string;
+      averagePosition: string;
+    };
+    topQueries: { query: string; clicks: number; impressions: number; ctr: string; position: string }[];
+    topPages: { page: string; clicks: number; impressions: number; ctr: string; position: string }[];
+  };
+  bing: { status: 'ready' | 'warning' | 'critical'; message: string };
+  aiSearch: { status: string; message: string };
+}
+
 const PIE_COLORS = ['#E8540A', '#f97316', '#fb923c', '#fed7aa', '#6b7280'];
 
 const RANGE_OPTIONS = [
@@ -59,11 +103,32 @@ function StatCard({ label, value, sub }: { label: string; value: string | number
   );
 }
 
+function StatusPill({ status }: { status: 'ready' | 'warning' | 'critical' | string }) {
+  const color = status === 'ready' ? '#4ade80' : status === 'critical' ? '#f87171' : '#fb923c';
+  return (
+    <span style={{
+      color,
+      border: `1px solid ${color}55`,
+      background: `${color}16`,
+      borderRadius: '999px',
+      padding: '0.16rem 0.48rem',
+      fontSize: '0.68rem',
+      fontWeight: 700,
+      textTransform: 'uppercase',
+    }}>
+      {status}
+    </span>
+  );
+}
+
 export default function AnalyticsDashboard() {
   const [range, setRange] = useState('30');
   const [data, setData] = useState<AnalyticsData | null>(null);
+  const [seoData, setSeoData] = useState<SeoData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [seoLoading, setSeoLoading] = useState(true);
   const [error, setError] = useState('');
+  const [seoError, setSeoError] = useState('');
   const [campaignSource, setCampaignSource] = useState('youtube');
   const [campaignName, setCampaignName] = useState('unimog-video');
   const [campaignPage, setCampaignPage] = useState('https://beyondrv.com.au/our-slide-on-campers/');
@@ -89,6 +154,26 @@ export default function AnalyticsDashboard() {
     return () => controller.abort();
   }, [range]);
 
+  useEffect(() => {
+    const controller = new AbortController();
+    setSeoLoading(true);
+    setSeoError('');
+    adminFetch(`/.netlify/functions/seo-data?range=${range}`, { signal: controller.signal })
+      .then(async r => {
+        if (r.status === 401) {
+          clearAdminToken();
+          window.location.href = '/.netlify/functions/admin-login';
+          return null;
+        }
+        const body = await r.json();
+        if (!r.ok) throw new Error(body.error ?? 'Could not load SEO data');
+        return body as SeoData;
+      })
+      .then((d) => { if (d) setSeoData(d); setSeoLoading(false); })
+      .catch(e => { if (e.name !== 'AbortError') { setSeoError(String(e)); setSeoLoading(false); } });
+    return () => controller.abort();
+  }, [range]);
+
   const card: React.CSSProperties = {
     background: '#111', border: '1px solid #333', borderRadius: '8px', padding: '1.25rem',
   };
@@ -105,6 +190,9 @@ export default function AnalyticsDashboard() {
     fontSize: '0.82rem',
   };
   const trackedUrl = buildTrackedUrl(campaignPage, campaignSource, campaignName);
+  const seoReadyChecks = seoData?.technical.checks.filter(check => check.status === 'ready').length ?? 0;
+  const seoWarningChecks = seoData?.technical.checks.filter(check => check.status === 'warning').length ?? 0;
+  const seoCriticalChecks = seoData?.technical.checks.filter(check => check.status === 'critical').length ?? 0;
 
   if (error) {
     return (
@@ -137,6 +225,7 @@ export default function AnalyticsDashboard() {
           >{opt.label}</button>
         ))}
         {loading && <span style={{ color: '#555', fontSize: '0.8rem', marginLeft: '0.5rem' }}>Loading…</span>}
+        {seoLoading && <span style={{ color: '#555', fontSize: '0.8rem', marginLeft: '0.5rem' }}>Checking SEO…</span>}
       </div>
 
       {/* Loading state */}
@@ -151,6 +240,160 @@ export default function AnalyticsDashboard() {
           {data.warning} Set `POSTHOG_API_KEY` and `POSTHOG_PROJECT_ID` in Netlify to enable live traffic reporting.
         </div>
       )}
+
+      <div style={card}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', alignItems: 'start', marginBottom: '1rem' }}>
+          <div>
+            <div style={sectionTitle}>SEO Performance and Search Health</div>
+            <p style={{ color: '#888', fontSize: '0.82rem', lineHeight: 1.55, margin: 0 }}>
+              Tracks crawl health, sitemap freshness, AI crawler access, page metadata, and Google Search Console data once credentials are configured.
+            </p>
+          </div>
+          {seoData && <span style={{ color: '#555', fontSize: '0.72rem' }}>Updated {new Date(seoData.generatedAt).toLocaleString()}</span>}
+        </div>
+
+        {seoError && (
+          <div style={{ border: '1px solid #7f1d1d', background: '#2a0d0d', color: '#fca5a5', borderRadius: '6px', padding: '0.75rem', fontSize: '0.82rem' }}>
+            Could not load SEO data: {seoError}
+          </div>
+        )}
+
+        {seoLoading && !seoData && (
+          <div style={{ color: '#555', fontSize: '0.85rem' }}>Loading SEO checks…</div>
+        )}
+
+        {seoData && (
+          <div style={{ display: 'grid', gap: '1rem' }}>
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+              <StatCard label="Sitemap URLs" value={seoData.technical.sitemap.urlCount.toLocaleString()} sub={seoData.technical.sitemap.hasLastmod ? 'lastmod present' : 'lastmod missing'} />
+              <StatCard label="Ready Checks" value={seoReadyChecks} sub={`${seoWarningChecks} warnings · ${seoCriticalChecks} critical`} />
+              <StatCard label="Google Clicks" value={seoData.searchConsole.totals?.clicks.toLocaleString() ?? '—'} sub={seoData.searchConsole.status === 'ready' ? `last ${range} days` : 'Search Console not connected'} />
+              <StatCard label="Google CTR" value={seoData.searchConsole.totals?.ctr ?? '—'} sub={seoData.searchConsole.totals ? `avg pos ${seoData.searchConsole.totals.averagePosition}` : 'Search Console not connected'} />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div style={{ background: '#0b0b0b', border: '1px solid #252525', borderRadius: '8px', padding: '1rem' }}>
+                <div style={{ ...sectionTitle, marginBottom: '0.75rem' }}>Technical Checks</div>
+                <div style={{ display: 'grid', gap: '0.65rem' }}>
+                  {seoData.technical.checks.map(check => (
+                    <div key={check.label} style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '0.75rem', alignItems: 'start', borderTop: '1px solid #1d1d1d', paddingTop: '0.65rem' }}>
+                      <div style={{ display: 'grid', gap: '0.25rem' }}>
+                        <span style={{ color: '#ddd', fontSize: '0.78rem', fontWeight: 700 }}>{check.label}</span>
+                        <StatusPill status={check.status} />
+                      </div>
+                      <span style={{ color: '#888', fontSize: '0.78rem', lineHeight: 1.45 }}>{check.detail}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ background: '#0b0b0b', border: '1px solid #252525', borderRadius: '8px', padding: '1rem' }}>
+                <div style={{ ...sectionTitle, marginBottom: '0.75rem' }}>Crawler Access</div>
+                <div style={{ display: 'grid', gap: '0.55rem', color: '#aaa', fontSize: '0.8rem' }}>
+                  {[
+                    ['Googlebot', seoData.technical.robots.allowsGooglebot],
+                    ['Bingbot', seoData.technical.robots.allowsBingbot],
+                    ['OpenAI search', seoData.technical.robots.allowsOpenAI],
+                    ['Claude search', seoData.technical.robots.allowsClaude],
+                    ['Perplexity', seoData.technical.robots.allowsPerplexity],
+                  ].map(([label, ok]) => (
+                    <div key={String(label)} style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', borderTop: '1px solid #1d1d1d', paddingTop: '0.55rem' }}>
+                      <span>{label}</span>
+                      <StatusPill status={ok ? 'ready' : 'warning'} />
+                    </div>
+                  ))}
+                </div>
+                <div style={{ marginTop: '1rem', borderTop: '1px solid #1d1d1d', paddingTop: '0.75rem' }}>
+                  <div style={{ color: '#ddd', fontSize: '0.78rem', fontWeight: 700, marginBottom: '0.3rem' }}>Google Search Console</div>
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.4rem' }}>
+                    <StatusPill status={seoData.searchConsole.status} />
+                    <span style={{ color: '#888', fontSize: '0.76rem', lineHeight: 1.45 }}>{seoData.searchConsole.message}</span>
+                  </div>
+                  <div style={{ color: '#ddd', fontSize: '0.78rem', fontWeight: 700, margin: '0.8rem 0 0.3rem' }}>Bing Webmaster</div>
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <StatusPill status={seoData.bing.status} />
+                    <span style={{ color: '#888', fontSize: '0.76rem', lineHeight: 1.45 }}>{seoData.bing.message}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {seoData.searchConsole.topQueries.length > 0 && (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div style={{ background: '#0b0b0b', border: '1px solid #252525', borderRadius: '8px', padding: '1rem' }}>
+                  <div style={sectionTitle}>Top Google Queries</div>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
+                    <thead>
+                      <tr>
+                        {['Query', 'Clicks', 'Impr.', 'Pos.'].map(label => (
+                          <th key={label} style={{ textAlign: label === 'Query' ? 'left' : 'right', color: '#666', fontWeight: 600, paddingBottom: '0.45rem' }}>{label}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {seoData.searchConsole.topQueries.map(row => (
+                        <tr key={row.query} style={{ borderTop: '1px solid #1d1d1d' }}>
+                          <td style={{ color: '#ccc', padding: '0.42rem 0', maxWidth: '260px' }}>{row.query}</td>
+                          <td style={{ color: '#E8540A', textAlign: 'right', fontWeight: 700 }}>{row.clicks}</td>
+                          <td style={{ color: '#aaa', textAlign: 'right' }}>{row.impressions}</td>
+                          <td style={{ color: '#aaa', textAlign: 'right' }}>{row.position}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div style={{ background: '#0b0b0b', border: '1px solid #252525', borderRadius: '8px', padding: '1rem' }}>
+                  <div style={sectionTitle}>Top Google Landing Pages</div>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
+                    <thead>
+                      <tr>
+                        {['Page', 'Clicks', 'Impr.', 'Pos.'].map(label => (
+                          <th key={label} style={{ textAlign: label === 'Page' ? 'left' : 'right', color: '#666', fontWeight: 600, paddingBottom: '0.45rem' }}>{label}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {seoData.searchConsole.topPages.map(row => (
+                        <tr key={row.page} style={{ borderTop: '1px solid #1d1d1d' }}>
+                          <td style={{ color: '#ccc', padding: '0.42rem 0', maxWidth: '260px', wordBreak: 'break-word' }}>{new URL(row.page).pathname}</td>
+                          <td style={{ color: '#E8540A', textAlign: 'right', fontWeight: 700 }}>{row.clicks}</td>
+                          <td style={{ color: '#aaa', textAlign: 'right' }}>{row.impressions}</td>
+                          <td style={{ color: '#aaa', textAlign: 'right' }}>{row.position}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            <div style={{ background: '#0b0b0b', border: '1px solid #252525', borderRadius: '8px', padding: '1rem' }}>
+              <div style={sectionTitle}>Sample Page Metadata</div>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
+                <thead>
+                  <tr>
+                    {['Page', 'Status', 'Title', 'Schema', 'Index'].map(label => (
+                      <th key={label} style={{ textAlign: label === 'Page' || label === 'Title' ? 'left' : 'right', color: '#666', fontWeight: 600, paddingBottom: '0.45rem' }}>{label}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {seoData.technical.samplePages.map(page => (
+                    <tr key={page.url} style={{ borderTop: '1px solid #1d1d1d' }}>
+                      <td style={{ color: '#ccc', padding: '0.45rem 0' }}>{new URL(page.url).pathname || '/'}</td>
+                      <td style={{ color: page.status === 200 ? '#4ade80' : '#f87171', textAlign: 'right', fontWeight: 700 }}>{page.status}</td>
+                      <td style={{ color: '#aaa', paddingLeft: '0.8rem' }}>{page.title || 'Missing title'}</td>
+                      <td style={{ color: '#aaa', textAlign: 'right' }}>{page.structuredDataBlocks}</td>
+                      <td style={{ color: page.noindex ? '#fb923c' : '#4ade80', textAlign: 'right' }}>{page.noindex ? 'noindex' : 'indexable'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Stat cards */}
       {data && (

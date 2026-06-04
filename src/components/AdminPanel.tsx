@@ -1047,7 +1047,7 @@ function parseMediaTarget(value: string): { scope: MediaScope; slug: string } {
 
 export default function AdminPanel() {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: "Hi! I'm the Beyond RV admin assistant. Tell me what you'd like to change on the site." }
+    { role: 'assistant', content: "Hi! I'm the Beyond RV admin assistant. I can help with site changes, lead follow-ups, and SEO health checks." }
   ]);
   const [input, setInput] = useState('');
   const [activeTab, setActiveTab] = useState<PanelTab>('dashboard');
@@ -3386,6 +3386,25 @@ export default function AdminPanel() {
               Close
             </button>
           </div>
+          <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #252525', display: 'grid', gap: '0.55rem' }}>
+            <div style={{ color: '#777', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 700 }}>Try asking</div>
+            <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
+              {[
+                'Show me weak SEO pages this week',
+                'Find recent enquiries from John',
+                'Show hot leads due for follow-up',
+              ].map(prompt => (
+                <button
+                  key={prompt}
+                  onClick={() => sendMessage(prompt)}
+                  disabled={loading}
+                  style={{ background: '#1a1a1a', border: '1px solid #333', color: '#ccc', borderRadius: '999px', padding: '0.32rem 0.6rem', cursor: loading ? 'not-allowed' : 'pointer', fontSize: '0.74rem' }}
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          </div>
           <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {messages.map((m, i) => (
               <div key={i} style={{
@@ -3418,7 +3437,7 @@ export default function AdminPanel() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage(input)}
-              placeholder="Type a change... (Enter to send)"
+              placeholder="Ask about leads, SEO, or site changes..."
               style={{ flex: 1, background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem 0.75rem', fontSize: '0.9rem', outline: 'none', minWidth: 0 }}
             />
             <button
@@ -3544,12 +3563,13 @@ export default function AdminPanel() {
               </p>
             </section>
             <section>
-              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Use forms first, chat second</h3>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Use chat for questions and safe actions</h3>
               <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
-                <li>Use the structured tabs whenever the change fits a form. Product photos, prices, videos, status, homepage recent builds, testimonials, enquiries, and chatbot knowledge should be handled in their matching tab.</li>
-                <li>Use Admin Chat only for changes that do not have a dedicated form yet, such as changing wording on a page, asking for a redirect, removing a sold product from active listings, or making a one-off content change.</li>
+                <li>Admin Chat can search recent enquiries, update lead status or follow-up dates, check SEO health, and queue site/content changes for review.</li>
+                <li>Use the structured tabs for visual workflows such as product photos, gallery ordering, homepage cards, media uploads, orders, and final Pending deployment review.</li>
+                <li>Use Admin Chat for wording changes, redirects, removing a sold one-off listing, asking what needs attention, checking weak SEO pages, or updating a clear lead follow-up.</li>
                 <li>Do not use Admin Chat for normal product photo changes. Remove, reorder, add, or set hero photos in Products, then click Queue Edit.</li>
-                <li>After any queued change, open Pending, preview the file, and deploy only when it matches the intended update.</li>
+                <li>Lead status changes from chat save immediately. Site file changes from chat still go to Pending and must be previewed before deployment.</li>
               </ol>
             </section>
             <section>

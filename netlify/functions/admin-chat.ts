@@ -2,6 +2,8 @@ import OpenAI from 'openai';
 import type { Handler } from '@netlify/functions';
 import { randomUUID } from 'crypto';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { blobStoreUserMessage, connectBlobStore, getBlobStore } from './blob-store';
+import catalogue from './product-catalogue.json';
 
 const openAiKey = process.env.OPENAI_API_KEY;
 const client = openAiKey ? new OpenAI({ apiKey: openAiKey }) : null;
@@ -11,6 +13,12 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_REPO = process.env.GITHUB_REPO;
 const GITHUB_BRANCH = process.env.GITHUB_BRANCH ?? 'main';
 const API = 'https://api.github.com';
+const ENQUIRY_STORE = 'customer-enquiries';
+const LEAD_STATUS_STORE = 'customer-lead-status';
+const SITE_URL = 'https://beyondrv.com.au';
+const VALID_LEAD_STATUSES = new Set(['new', 'contacted', 'replied', 'called', 'qualified', 'quoted', 'follow-up-scheduled', 'won', 'lost', 'spam']);
+const VALID_LEAD_PRIORITIES = new Set(['hot', 'warm', 'info-only', 'spam-low-quality']);
+const VALID_OUTCOME_REASONS = new Set(['', 'too-expensive', 'wrong-vehicle', 'no-payload', 'bought-elsewhere', 'just-researching', 'no-response', 'timing-not-right', 'other']);
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -46,6 +54,35 @@ export interface PendingChange {
   judgeDecision: JudgeDecision;
   risk_flags: string[];
   escalation_reason?: string;
+}
+
+interface EnquiryRecord {
+  id: string;
+  submittedAt?: string;
+  received_at?: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  message?: string;
+  product_interest?: string;
+  callback_date?: string;
+  callback_time?: string;
+  referral_source_self_reported?: string;
+  referral_utm_source?: string;
+  referral_utm_campaign?: string;
+  leadStatus?: LeadStatusRecord;
+}
+
+interface LeadStatusRecord {
+  enquiryId: string;
+  status: string;
+  notes?: string;
+  nextFollowUpDate?: string;
+  priority?: string;
+  outcomeReason?: string;
+  firstResponseAt?: string;
+  lastContactedAt?: string;
+  updatedAt?: string;
 }
 
 // ─── Risk classification ──────────────────────────────────────────────────────
@@ -132,6 +169,11 @@ ONSALE: true | false (boolean)
 RULES:
 - Always read the file first before proposing changes
 - Never guess at content — ask if you need clarification
+- For operational admin requests, use the dedicated tools before proposing file edits
+- If the owner asks about leads, enquiries, follow-ups, or reminders, use list_enquiries first unless they provide an exact enquiry ID
+- If more than one enquiry matches a requested lead update, do not update anything; list the likely matches and ask which one
+- Lead status writes happen immediately and do not go to Pending Changes
+- If the owner asks about SEO, Google, sitemap, robots, AI search, or weak search pages, use get_seo_health
 - Confirm what you will change before calling propose_change
 - For chatbot knowledge, update src/data/chatbot-knowledge.md with short factual notes; do not add secrets, API keys, or private customer data
 - For homepage Recent Builds, update src/data/homepage/recent-builds.json instead of editing homepage markup
@@ -205,13 +247,264 @@ const tools = [
       required: ['path', 'content', 'description'],
     },
   },
+  {
+    type: 'function',
+    name: 'list_enquiries',
+    description: 'Search or list recent customer enquiries and lead statuses. Use before updating a lead unless the owner provides an exact enquiry ID.',
+    parameters: {
+      type: 'object' as const,
+      properties: {
+        query: { type: 'string', description: 'Optional search text such as customer name, email, phone, product, or message words' },
+        limit: { type: 'number', description: 'Maximum number of records to return, default 8, max 20' },
+      },
+      additionalProperties: false,
+      required: [],
+    },
+  },
+  {
+    type: 'function',
+    name: 'update_lead_status',
+    description: 'Immediately update a lead status, priority, notes, next follow-up date, and outcome reason. Use only when the target enquiry is unambiguous.',
+    parameters: {
+      type: 'object' as const,
+      properties: {
+        enquiry_id: { type: 'string', description: 'Exact enquiry ID to update' },
+        status: { type: 'string', description: 'One of: new, contacted, replied, called, qualified, quoted, follow-up-scheduled, won, lost, spam' },
+        notes: { type: 'string', description: 'Short factual notes to store on the lead' },
+        next_follow_up_date: { type: 'string', description: 'Follow-up date in YYYY-MM-DD format, or blank to clear' },
+        priority: { type: 'string', description: 'One of: hot, warm, info-only, spam-low-quality' },
+        outcome_reason: { type: 'string', description: 'One of: too-expensive, wrong-vehicle, no-payload, bought-elsewhere, just-researching, no-response, timing-not-right, other, or blank' },
+      },
+      additionalProperties: false,
+      required: ['enquiry_id', 'status'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'get_seo_health',
+    description: 'Get current SEO crawl health, sitemap status, robots crawler access, weak page warnings, and content opportunities.',
+    parameters: {
+      type: 'object' as const,
+      properties: {},
+      additionalProperties: false,
+      required: [],
+    },
+  },
 ];
+
+function clean(value: unknown, max = 1000) {
+  return typeof value === 'string' ? value.trim().slice(0, max) : '';
+}
+
+function normalise(value = '') {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+function leadKey(enquiryId: string) {
+  return `lead-status/${encodeURIComponent(enquiryId)}.json`;
+}
+
+function displayDate(value = '') {
+  return value ? value.slice(0, 10) : '';
+}
+
+async function loadEnquiries(limit = 50): Promise<EnquiryRecord[]> {
+  const store = getBlobStore(ENQUIRY_STORE);
+  const statusStore = getBlobStore(LEAD_STATUS_STORE);
+  const { blobs } = await store.list();
+  const records = (await Promise.all(
+    blobs.map(async (blob) => store.get(blob.key, { type: 'json' }) as Promise<EnquiryRecord | null>)
+  ))
+    .filter((record): record is EnquiryRecord => Boolean(record?.id))
+    .sort((a, b) => (b.received_at ?? b.submittedAt ?? '').localeCompare(a.received_at ?? a.submittedAt ?? ''))
+    .slice(0, limit);
+
+  return Promise.all(records.map(async (record) => {
+    let leadStatus: LeadStatusRecord | null = null;
+    try {
+      leadStatus = await statusStore.get(leadKey(record.id), { type: 'json' }) as LeadStatusRecord | null;
+    } catch {
+      leadStatus = null;
+    }
+    return {
+      ...record,
+      leadStatus: leadStatus ?? {
+        enquiryId: record.id,
+        status: 'new',
+        notes: '',
+        nextFollowUpDate: record.callback_date ?? '',
+        priority: 'warm',
+        outcomeReason: '',
+        firstResponseAt: '',
+        lastContactedAt: '',
+        updatedAt: record.submittedAt ?? '',
+      },
+    };
+  }));
+}
+
+function enquirySearchText(enquiry: EnquiryRecord) {
+  return normalise([
+    enquiry.id,
+    enquiry.name,
+    enquiry.email,
+    enquiry.phone,
+    enquiry.product_interest,
+    enquiry.message,
+    enquiry.referral_source_self_reported,
+    enquiry.referral_utm_source,
+    enquiry.referral_utm_campaign,
+  ].filter(Boolean).join(' '));
+}
+
+async function listEnquiriesTool(query: unknown, limitValue: unknown) {
+  const limit = Math.max(1, Math.min(20, typeof limitValue === 'number' ? Math.round(limitValue) : 8));
+  const search = normalise(clean(query, 160));
+  const enquiries = await loadEnquiries(50);
+  const filtered = search
+    ? enquiries.filter((enquiry) => enquirySearchText(enquiry).includes(search))
+    : enquiries;
+
+  return JSON.stringify({
+    count: filtered.length,
+    returned: filtered.slice(0, limit).map((enquiry) => ({
+      id: enquiry.id,
+      name: enquiry.name ?? '',
+      email: enquiry.email ?? '',
+      phone: enquiry.phone ?? '',
+      product_interest: enquiry.product_interest ?? '',
+      submitted: displayDate(enquiry.received_at ?? enquiry.submittedAt),
+      status: enquiry.leadStatus?.status ?? 'new',
+      priority: enquiry.leadStatus?.priority ?? 'warm',
+      nextFollowUpDate: enquiry.leadStatus?.nextFollowUpDate ?? '',
+      notes: enquiry.leadStatus?.notes ?? '',
+      message_preview: clean(enquiry.message, 180),
+    })),
+  });
+}
+
+async function updateLeadStatusTool(input: Record<string, unknown>) {
+  const enquiryId = clean(input.enquiry_id, 240);
+  const status = clean(input.status, 40);
+  const notes = clean(input.notes, 4000);
+  const nextFollowUpDate = clean(input.next_follow_up_date, 40);
+  const priority = clean(input.priority, 40);
+  const outcomeReason = clean(input.outcome_reason, 80);
+
+  if (!enquiryId) return 'Error: enquiry_id is required.';
+  if (!VALID_LEAD_STATUSES.has(status)) return `Error: invalid status "${status}".`;
+  if (priority && !VALID_LEAD_PRIORITIES.has(priority)) return `Error: invalid priority "${priority}".`;
+  if (!VALID_OUTCOME_REASONS.has(outcomeReason)) return `Error: invalid outcome reason "${outcomeReason}".`;
+
+  const enquiries = await loadEnquiries(100);
+  const enquiry = enquiries.find((record) => record.id === enquiryId);
+  if (!enquiry) return `Error: no enquiry found with ID ${enquiryId}. Use list_enquiries first.`;
+
+  const statusStore = getBlobStore(LEAD_STATUS_STORE);
+  let existing: LeadStatusRecord | null = null;
+  try {
+    existing = await statusStore.get(leadKey(enquiryId), { type: 'json' }) as LeadStatusRecord | null;
+  } catch {
+    existing = null;
+  }
+
+  const now = new Date().toISOString();
+  const leadStatus: LeadStatusRecord = {
+    ...existing,
+    enquiryId,
+    status,
+    notes,
+    nextFollowUpDate,
+    priority: priority || existing?.priority || 'warm',
+    outcomeReason,
+    firstResponseAt: existing?.firstResponseAt || (['contacted', 'replied', 'called', 'qualified', 'quoted', 'follow-up-scheduled', 'won'].includes(status) ? now : ''),
+    lastContactedAt: ['contacted', 'replied', 'called', 'qualified', 'quoted', 'follow-up-scheduled', 'won'].includes(status)
+      ? now
+      : existing?.lastContactedAt ?? '',
+    updatedAt: now,
+  };
+
+  await statusStore.setJSON(leadKey(enquiryId), leadStatus);
+
+  return JSON.stringify({
+    ok: true,
+    updated: {
+      enquiry_id: enquiryId,
+      customer: enquiry.name ?? '',
+      product_interest: enquiry.product_interest ?? '',
+      status: leadStatus.status,
+      priority: leadStatus.priority,
+      nextFollowUpDate: leadStatus.nextFollowUpDate,
+      notes: leadStatus.notes,
+      updatedAt: leadStatus.updatedAt,
+    },
+  });
+}
+
+async function fetchText(url: string) {
+  const response = await fetch(url);
+  return { ok: response.ok, status: response.status, text: await response.text() };
+}
+
+function extractUrls(xml: string) {
+  return [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map(match => match[1]?.trim()).filter(Boolean) as string[];
+}
+
+async function getSeoHealthTool() {
+  const [robots, sitemap, llms] = await Promise.all([
+    fetchText(`${SITE_URL}/robots.txt`),
+    fetchText(`${SITE_URL}/sitemap-0.xml`),
+    fetchText(`${SITE_URL}/llms.txt`),
+  ]);
+  const urls = extractUrls(sitemap.text);
+  const products = (catalogue as { products?: Array<{ slug: string; title: string; status?: string; galleryCount?: number; seoTitle?: string; seoDesc?: string }> }).products ?? [];
+  const weakProducts = products
+    .filter(product => (product.galleryCount ?? 0) < 3 || !product.seoTitle || !product.seoDesc)
+    .slice(0, 8)
+    .map(product => ({
+      title: product.title,
+      slug: product.slug,
+      galleryCount: product.galleryCount ?? 0,
+      missingSeoTitle: !product.seoTitle,
+      missingSeoDesc: !product.seoDesc,
+    }));
+
+  return JSON.stringify({
+    generatedAt: new Date().toISOString(),
+    robots: {
+      status: robots.status,
+      allowsGooglebot: /Googlebot/i.test(robots.text),
+      allowsBingbot: /Bingbot/i.test(robots.text),
+      allowsOpenAI: /OAI-SearchBot/i.test(robots.text) && /ChatGPT-User/i.test(robots.text),
+      allowsClaude: /Claude-SearchBot/i.test(robots.text),
+      allowsPerplexity: /PerplexityBot/i.test(robots.text),
+    },
+    sitemap: {
+      status: sitemap.status,
+      urlCount: urls.length,
+      hasLastmod: /<lastmod>/i.test(sitemap.text),
+      sampleUrls: urls.slice(0, 12),
+    },
+    llms: {
+      status: llms.status,
+      available: llms.ok,
+    },
+    weakProducts,
+    recommendedNextActions: [
+      !/<lastmod>/i.test(sitemap.text) ? 'Add sitemap lastmod values.' : '',
+      !/Claude-SearchBot/i.test(robots.text) || !/PerplexityBot/i.test(robots.text) ? 'Add Claude and Perplexity crawler allow rules if AI search visibility is desired.' : '',
+      weakProducts.length ? 'Improve weak product listings with more photos and SEO metadata.' : '',
+      'Check Google Search Console and Bing Webmaster Tools for query/page movement.',
+    ].filter(Boolean),
+  });
+}
 
 // ─── Handler ──────────────────────────────────────────────────────────────────
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
   if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  connectBlobStore(event);
 
   if (!client || !GITHUB_TOKEN || !GITHUB_REPO) {
     return {
@@ -240,6 +533,19 @@ export const handler: Handler = async (event) => {
   // Extract the last user message for judge context
   const lastUserMsg = [...messages].reverse().find(m => m.role === 'user');
   const userRawInput = lastUserMsg?.content ?? '';
+  const brisbaneToday = new Intl.DateTimeFormat('en-AU', {
+    timeZone: 'Australia/Brisbane',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    weekday: 'long',
+  }).format(new Date());
+  const instructions = `${SYSTEM_PROMPT}
+
+CURRENT DATE:
+- Brisbane date today: ${brisbaneToday}
+- When setting follow-up dates, convert relative wording into YYYY-MM-DD before calling update_lead_status.
+- If a relative date is ambiguous, ask the owner to confirm before updating.`;
 
   // Cache of file content the actor has read (for delta-based risk classification)
   const readCache: Record<string, string> = {};
@@ -255,7 +561,7 @@ export const handler: Handler = async (event) => {
   for (let i = 0; i < 10; i++) {
     const response = await client.responses.create({
       model: ADMIN_MODEL,
-      instructions: SYSTEM_PROMPT,
+      instructions,
       tools,
       input: currentInput as never,
       previous_response_id: responseId,
@@ -281,24 +587,28 @@ export const handler: Handler = async (event) => {
 
     for (const call of functionCalls) {
         let result = '';
-        let input: Record<string, string> = {};
+        let input: Record<string, unknown> = {};
         try {
-          input = JSON.parse(call.arguments ?? '{}') as Record<string, string>;
+          input = JSON.parse(call.arguments ?? '{}') as Record<string, unknown>;
         } catch {
           result = 'Error: tool arguments were not valid JSON';
         }
 
         if (!result && call.name === 'read_file') {
-          const content = await githubFetch(input.path);
-          if (content) readCache[input.path] = content;
-          result = content ?? `Error: file not found at ${input.path}`;
+          const path = clean(input.path, 500);
+          const content = await githubFetch(path);
+          if (content) readCache[path] = content;
+          result = content ?? `Error: file not found at ${path}`;
 
         } else if (!result && call.name === 'list_files') {
-          const files = await githubListDir(input.dir);
-          result = files.length ? files.join('\n') : `Error: directory not found at ${input.dir}`;
+          const dir = clean(input.dir, 500);
+          const files = await githubListDir(dir);
+          result = files.length ? files.join('\n') : `Error: directory not found at ${dir}`;
 
         } else if (!result && call.name === 'propose_change') {
-          const { path, content, description } = input;
+          const path = clean(input.path, 500);
+          const content = clean(input.content, 200000);
+          const description = clean(input.description, 500);
 
           // Build proposal
           const proposal: ActionProposal = {
@@ -333,6 +643,24 @@ export const handler: Handler = async (event) => {
           } else {
             // block
             result = `BLOCKED: The safety judge blocked this change. Reason: ${verdict.block_reason}. Rationale: ${verdict.rationale}. Please tell the owner and ask for clarification.`;
+          }
+        } else if (!result && call.name === 'list_enquiries') {
+          try {
+            result = await listEnquiriesTool(input.query, input.limit);
+          } catch (error) {
+            result = `Error: could not load enquiries. ${blobStoreUserMessage(error)}`;
+          }
+        } else if (!result && call.name === 'update_lead_status') {
+          try {
+            result = await updateLeadStatusTool(input);
+          } catch (error) {
+            result = `Error: could not update lead. ${blobStoreUserMessage(error)}`;
+          }
+        } else if (!result && call.name === 'get_seo_health') {
+          try {
+            result = await getSeoHealthTool();
+          } catch (error) {
+            result = `Error: could not check SEO health. ${error instanceof Error ? error.message : String(error)}`;
           }
         } else if (!result) {
           result = `Error: unknown tool ${call.name}`;
