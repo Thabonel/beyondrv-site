@@ -17,6 +17,24 @@ const mobilePages = [
   '/guides/gvm-gcm-atm-gtm-explained/',
 ];
 
+const iphoneWidths = [320, 375, 390, 393, 414, 430];
+
+async function expectNoRootHorizontalPan(page: import('@playwright/test').Page) {
+  const state = await page.evaluate(() => {
+    const viewportWidth = document.documentElement.clientWidth;
+    window.scrollTo(9999, 0);
+    const scrollXAfterPan = window.scrollX;
+    window.scrollTo(0, 0);
+    return {
+      scrollXAfterPan,
+      rootOverflow: Math.max(document.body.scrollWidth, document.documentElement.scrollWidth) - viewportWidth,
+    };
+  });
+
+  expect(state.rootOverflow).toBeLessThanOrEqual(1);
+  expect(state.scrollXAfterPan).toBe(0);
+}
+
 test.describe('mobile layout stability', () => {
   test.use({ viewport: { width: 320, height: 568 } });
 
@@ -30,6 +48,7 @@ test.describe('mobile layout stability', () => {
       });
 
       expect(overflow).toBeLessThanOrEqual(1);
+      await expectNoRootHorizontalPan(page);
     });
   }
 
@@ -91,5 +110,89 @@ test.describe('mobile layout stability', () => {
   test('enquiry form does not show the floating chat launcher on mobile', async ({ page }) => {
     await page.goto('/inquiry-form/');
     await expect(page.locator('.chat-widget')).toHaveCSS('display', 'none');
+  });
+});
+
+test.describe('iPhone width root pan protection', () => {
+  for (const width of iphoneWidths) {
+    test(`homepage cannot be horizontally panned at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto('/');
+      await expectNoRootHorizontalPan(page);
+    });
+
+    test(`mobile header fits at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto('/');
+
+      const header = await page.locator('nav').evaluate((nav) => {
+        const viewportWidth = document.documentElement.clientWidth;
+        const children = Array.from(nav.children).map((child) => {
+          const rect = child.getBoundingClientRect();
+          return {
+            tag: child.tagName.toLowerCase(),
+            className: String((child as HTMLElement).className || ''),
+            left: rect.left,
+            right: rect.right,
+            width: rect.width,
+          };
+        });
+        return {
+          viewportWidth,
+          children,
+        };
+      });
+
+      for (const child of header.children) {
+        if (child.width === 0) continue;
+        expect(child.left, child.className).toBeGreaterThanOrEqual(-1);
+        expect(child.right, child.className).toBeLessThanOrEqual(header.viewportWidth + 1);
+      }
+    });
+
+    test(`closed chat launcher is visible at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto('/');
+      await expectNoRootHorizontalPan(page);
+
+      const launcher = await page.locator('.chat-widget-btn').evaluate((button) => {
+        const rect = button.getBoundingClientRect();
+        return {
+          left: rect.left,
+          right: rect.right,
+          width: rect.width,
+          viewportWidth: document.documentElement.clientWidth,
+        };
+      });
+
+      expect(launcher.width).toBeGreaterThan(0);
+      expect(launcher.left).toBeGreaterThanOrEqual(0);
+      expect(launcher.right).toBeLessThanOrEqual(launcher.viewportWidth);
+    });
+  }
+
+  test('global CSS does not use unsafe layout-level 100vw widths', async ({ page }) => {
+    await page.goto('/');
+
+    const unsafeRules = await page.evaluate(() => {
+      const matches: string[] = [];
+      for (const sheet of Array.from(document.styleSheets)) {
+        let rules: CSSRuleList;
+        try {
+          rules = sheet.cssRules;
+        } catch {
+          continue;
+        }
+        for (const rule of Array.from(rules)) {
+          const text = rule.cssText;
+          if (/\b(?:width|min-width|max-width)\s*:\s*[^;]*\b100vw\b/i.test(text)) {
+            matches.push(text);
+          }
+        }
+      }
+      return matches;
+    });
+
+    expect(unsafeRules).toEqual([]);
   });
 });
