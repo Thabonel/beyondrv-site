@@ -12,7 +12,7 @@ interface Message {
 }
 
 const SESSION_CAP = 30;
-const TIMEOUT_MS = 15000;
+const TIMEOUT_MS = 45000;
 const FALLBACK_ERROR = "Something went wrong — try again or hit 'Talk to a human'.";
 const EMAIL_PATTERN = /([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/gi;
 
