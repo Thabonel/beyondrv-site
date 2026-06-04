@@ -62,31 +62,33 @@
     "onSale": true,
     "heroImage": "/images/optimized/products/3-5m-poptop-truck-camper/01-3-5m-poptop-truck-camper-hero.webp",
     "gallery": [
+      "/images/optimized/products/3-5m-poptop-truck-camper/18-dsc-0051.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/19-dsc-0054.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/16-dsc-0045.webp",
       "/images/optimized/products/3-5m-poptop-truck-camper/02-dsc-0001.webp",
-      "/images/optimized/products/3-5m-poptop-truck-camper/03-dsc-0007.webp",
-      "/images/optimized/products/3-5m-poptop-truck-camper/04-dsc-0008.webp",
-      "/images/optimized/products/3-5m-poptop-truck-camper/05-dsc-0010.webp",
       "/images/optimized/products/3-5m-poptop-truck-camper/06-dsc-0014.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/04-dsc-0008.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/03-dsc-0007.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/05-dsc-0010.webp",
       "/images/optimized/products/3-5m-poptop-truck-camper/07-dsc-0016.webp",
-      "/images/optimized/products/3-5m-poptop-truck-camper/08-dsc-0018.webp",
+      "/images/optimized/products/3-5m-poptop-truck-camper/15-dsc-0042.webp",
       "/images/optimized/products/3-5m-poptop-truck-camper/09-dsc-0024.webp",
       "/images/optimized/products/3-5m-poptop-truck-camper/10-dsc-0027.webp",
       "/images/optimized/products/3-5m-poptop-truck-camper/11-dsc-0034.webp",
       "/images/optimized/products/3-5m-poptop-truck-camper/12-dsc-0035.webp",
       "/images/optimized/products/3-5m-poptop-truck-camper/13-dsc-0037.webp",
       "/images/optimized/products/3-5m-poptop-truck-camper/14-dsc-0038.webp",
-      "/images/optimized/products/3-5m-poptop-truck-camper/15-dsc-0042.webp",
-      "/images/optimized/products/3-5m-poptop-truck-camper/16-dsc-0045.webp",
-      "/images/optimized/products/3-5m-poptop-truck-camper/17-dsc-0047.webp",
-      "/images/optimized/products/3-5m-poptop-truck-camper/18-dsc-0051.webp",
-      "/images/optimized/products/3-5m-poptop-truck-camper/19-dsc-0054.webp"
+      "/images/optimized/products/3-5m-poptop-truck-camper/17-dsc-0047.webp"
     ],
-    "galleryCount": 18,
+    "galleryCount": 17,
     "relatedSlugs": [
       "expedition/3-5m-electric-poptop-cabover-family-camper",
       "3-5m-diy-camper-box-with-cabover-and-underfloor-storage",
       "expedition/4-7m-hardtop-truck-camper"
     ],
+    "suitabilityData": {
+      "status": "draft"
+    },
     "keySpecs": [
       {
         "label": "Base",
@@ -113,8 +115,25 @@
     "featured": false,
     "onSale": false,
     "heroImage": "/images/optimized/products/7ft-electric-poptop-slide-on/01-7ft-electric-poptop-slide-on-hero.webp",
-    "gallery": [],
-    "galleryCount": 0,
+    "gallery": [
+      "/images/optimized/products/7ft-electric-poptop-slide-on/02-20240924-105432-768x432.webp",
+      "/images/optimized/products/7ft-electric-poptop-slide-on/03-20240924-105439-768x432.webp",
+      "/images/optimized/products/7ft-electric-poptop-slide-on/04-20240924-105823-768x432.webp",
+      "/images/optimized/products/7ft-electric-poptop-slide-on/05-20240924-105445-768x432.webp",
+      "/images/optimized/products/7ft-electric-poptop-slide-on/06-20240924-105813-768x432.webp",
+      "/images/optimized/products/7ft-electric-poptop-slide-on/07-20240924-105454-768x432.webp",
+      "/images/optimized/products/7ft-electric-poptop-slide-on/08-20240924-110355-768x432.webp",
+      "/images/optimized/products/7ft-electric-poptop-slide-on/09-20240924-110155-768x432.webp",
+      "/images/optimized/products/7ft-electric-poptop-slide-on/10-20240924-110413-768x432.webp",
+      "/images/optimized/products/7ft-electric-poptop-slide-on/11-20240924-110410-768x432.webp",
+      "/images/optimized/products/7ft-electric-poptop-slide-on/12-20240924-110401-768x432.webp",
+      "/images/optimized/products/7ft-electric-poptop-slide-on/13-20240924-110143-768x432.webp",
+      "/images/optimized/products/7ft-electric-poptop-slide-on/14-20240924-110531-768x432.webp",
+      "/images/optimized/products/7ft-electric-poptop-slide-on/15-20240924-110525-768x432.webp",
+      "/images/optimized/products/7ft-electric-poptop-slide-on/16-20240924-110549-768x432.webp",
+      "/images/optimized/products/7ft-electric-poptop-slide-on/17-20240924-110553-768x432.webp"
+    ],
+    "galleryCount": 16,
     "relatedSlugs": [
       "advent-2150-hardtop-slide-on",
       "advent-2300-hardtop-slide-on",
@@ -128,7 +147,7 @@
     "keySpecs": [
       {
         "label": "Base",
-        "value": "2150mm x 2000mm"
+        "value": "2120mm x 2020mm"
       },
       {
         "label": "Suits",
@@ -203,8 +222,29 @@
     "featured": false,
     "onSale": false,
     "heroImage": "/images/optimized/products/advent-2300-hardtop-slide-on/01-advent-2300-hardtop-slide-on-hero.webp",
-    "gallery": [],
-    "galleryCount": 0,
+    "gallery": [
+      "/images/optimized/products/advent-2300-hardtop-slide-on/02-beyond-rv-2300-advent-series-18-1024x678.webp",
+      "/images/optimized/products/advent-2300-hardtop-slide-on/03-beyond-rv-2300-advent-series-08-1024x678.webp",
+      "/images/optimized/products/advent-2300-hardtop-slide-on/04-beyond-rv-2300-advent-series-20-1024x678.webp",
+      "/images/optimized/products/advent-2300-hardtop-slide-on/05-beyond-rv-2300-advent-series-21-1024x678.webp",
+      "/images/optimized/products/advent-2300-hardtop-slide-on/06-beyond-rv-2300-advent-series-09-1024x678.webp",
+      "/images/optimized/products/advent-2300-hardtop-slide-on/07-beyond-rv-2300-advent-series-13-1024x678.webp",
+      "/images/optimized/products/advent-2300-hardtop-slide-on/08-beyond-rv-2300-advent-series-07-1024x678.webp",
+      "/images/optimized/products/advent-2300-hardtop-slide-on/09-beyond-rv-2300-advent-series-06-1024x678.webp",
+      "/images/optimized/products/advent-2300-hardtop-slide-on/10-beyond-rv-2300-advent-series-12-1024x678.webp",
+      "/images/optimized/products/advent-2300-hardtop-slide-on/11-beyond-rv-2300-advent-series-04-1024x678.webp",
+      "/images/optimized/products/advent-2300-hardtop-slide-on/12-beyond-rv-2300-advent-series-10-1024x678.webp",
+      "/images/optimized/products/advent-2300-hardtop-slide-on/13-beyond-rv-2300-advent-series-11-1024x678.webp",
+      "/images/optimized/products/advent-2300-hardtop-slide-on/14-beyond-rv-2300-advent-series-05-1024x678.webp",
+      "/images/optimized/products/advent-2300-hardtop-slide-on/15-beyond-rv-2300-advent-series-01-1024x678.webp",
+      "/images/optimized/products/advent-2300-hardtop-slide-on/16-beyond-rv-2300-advent-series-15-1024x678.webp",
+      "/images/optimized/products/advent-2300-hardtop-slide-on/17-beyond-rv-2300-advent-series-14-1024x678.webp",
+      "/images/optimized/products/advent-2300-hardtop-slide-on/18-beyond-rv-2300-advent-series-16-1024x678.webp",
+      "/images/optimized/products/advent-2300-hardtop-slide-on/19-beyond-rv-2300-advent-series-02-1024x678.webp",
+      "/images/optimized/products/advent-2300-hardtop-slide-on/20-beyond-rv-2300-advent-series-03-1024x678.webp",
+      "/images/optimized/products/advent-2300-hardtop-slide-on/21-beyond-rv-2300-advent-series-17-1024x678.webp"
+    ],
+    "galleryCount": 20,
     "relatedSlugs": [
       "advent-2150-hardtop-slide-on",
       "advent-2450-hardtop-slide-on",
@@ -242,8 +282,38 @@
     "featured": false,
     "onSale": false,
     "heroImage": "/images/optimized/products/advent-2450-hardtop-slide-on/01-advent-2450-hardtop-slide-on-hero.webp",
-    "gallery": [],
-    "galleryCount": 0,
+    "gallery": [
+      "/images/optimized/products/advent-2450-hardtop-slide-on/02-advent-2450-04-1024x576.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/03-advent-2450-05-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/04-advent-2450-07-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/05-advent-2450-09-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/06-advent-2450-11-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/07-advent-2450-13-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/08-advent-2450-15-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/09-advent-2450-20-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/10-advent-2450-23-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/11-advent-2450-24-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/12-advent-2450-26-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/13-advent-2450-new-05-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/14-advent-2450-new-11-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/15-advent-2450-new-10-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/16-advent-2450-new-04-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/17-advent-2450-new-12-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/18-advent-2450-new-06-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/19-advent-2450-new-07-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/20-advent-2450-new-13-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/21-advent-2450-new-17-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/22-advent-2450-new-03-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/23-advent-2450-new-02-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/24-advent-2450-new-16-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/25-advent-2450-new-14-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/26-advent-2450-new-15-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/27-advent-2450-new-01-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/28-advent-2450-new-18-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/29-advent-2450-new-09-1024x678.webp",
+      "/images/optimized/products/advent-2450-hardtop-slide-on/30-advent-2450-new-08-1024x678.webp"
+    ],
+    "galleryCount": 29,
     "relatedSlugs": [
       "advent-2150-hardtop-slide-on",
       "advent-2300-hardtop-slide-on",
@@ -340,23 +410,23 @@
     "onSale": false,
     "heroImage": "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/01-expedition-4-7m-hardtop-truck-camper-hero.webp",
     "gallery": [
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/18-dsc03978.webp",
       "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/02-blue-unimog-2.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/03-dsc-0002.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/12-dsc-0054.webp",
       "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/04-dsc-0006.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/07-dsc-0021.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/03-dsc-0002.webp",
       "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/05-dsc-0015.webp",
       "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/06-dsc-0019.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/07-dsc-0021.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/08-dsc-0025.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/09-dsc-0029.webp",
       "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/10-dsc-0036.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/09-dsc-0029.webp",
       "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/11-dsc-0048.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/12-dsc-0054.webp",
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/08-dsc-0025.webp",
       "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/13-dsc-0069.webp",
       "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/14-dsc-0090.webp",
       "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/15-dsc-0091.webp",
       "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/16-dsc-0092.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/17-dsc-0094.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/18-dsc03978.webp"
+      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/17-dsc-0094.webp"
     ],
     "galleryCount": 17,
     "relatedSlugs": [
@@ -369,6 +439,9 @@
       "title": "Beyond RV 4.7m Truck Camper and Mercedes Sprinter Motorhome Walkthrough",
       "description": "Video walkthrough for the Beyond RV 4.7m truck camper and Mercedes Sprinter motorhome.",
       "startSeconds": 9
+    },
+    "suitabilityData": {
+      "status": "draft"
     },
     "keySpecs": [
       {
@@ -447,29 +520,16 @@
     "onSale": false,
     "heroImage": "/images/optimized/products/expedition/unimog-overlander-camper/01-unimog-hero.webp",
     "gallery": [
-      "/images/optimized/products/expedition/unimog-overlander-camper/02-mog2.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/03-dsc-0002.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/04-dsc-0006.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/05-dsc-0015.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/06-dsc-0019.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/07-dsc-0021.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/08-dsc-0025.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/09-dsc-0029.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/10-dsc-0036.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/11-dsc-0048.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/12-dsc-0054.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/13-dsc-0069.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/14-dsc-0090.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/15-dsc-0091.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/16-dsc-0092.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/17-dsc-0094.webp",
-      "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/18-dsc03978.webp"
+      "/images/optimized/products/expedition/unimog-overlander-camper/02-mog2.webp"
     ],
-    "galleryCount": 17,
+    "galleryCount": 1,
     "relatedSlugs": [
       "expedition/unimog-poptop-camper",
       "expedition/4-7m-hardtop-truck-camper"
     ],
+    "suitabilityData": {
+      "status": "draft"
+    },
     "keySpecs": [
       {
         "label": "Platform",
@@ -552,18 +612,18 @@
     "onSale": true,
     "heroImage": "/images/optimized/products/mercedes-sprinter-motorhome/01-4-7m-truck-camper-17-scaled.webp",
     "gallery": [
-      "/images/optimized/products/mercedes-sprinter-motorhome/02-4-7m-truck-camper-03-scaled.webp",
-      "/images/optimized/products/mercedes-sprinter-motorhome/03-4-7m-truck-camper-01-scaled.webp",
-      "/images/optimized/products/mercedes-sprinter-motorhome/04-4-7m-truck-camper-14-scaled.webp",
       "/images/optimized/products/mercedes-sprinter-motorhome/05-4-7m-truck-camper-16-scaled.webp",
+      "/images/optimized/products/mercedes-sprinter-motorhome/13-4-7m-truck-camper-18-scaled.webp",
       "/images/optimized/products/mercedes-sprinter-motorhome/06-4-7m-truck-camper-02-scaled.webp",
+      "/images/optimized/products/mercedes-sprinter-motorhome/03-4-7m-truck-camper-01-scaled.webp",
+      "/images/optimized/products/mercedes-sprinter-motorhome/02-4-7m-truck-camper-03-scaled.webp",
       "/images/optimized/products/mercedes-sprinter-motorhome/07-4-7m-truck-camper-11-scaled.webp",
       "/images/optimized/products/mercedes-sprinter-motorhome/08-4-7m-truck-camper-07-scaled.webp",
+      "/images/optimized/products/mercedes-sprinter-motorhome/12-4-7m-truck-camper-08-scaled.webp",
+      "/images/optimized/products/mercedes-sprinter-motorhome/04-4-7m-truck-camper-14-scaled.webp",
       "/images/optimized/products/mercedes-sprinter-motorhome/09-4-7m-truck-camper-12-scaled.webp",
       "/images/optimized/products/mercedes-sprinter-motorhome/10-4-7m-truck-camper-13-scaled.webp",
-      "/images/optimized/products/mercedes-sprinter-motorhome/11-4-7m-truck-camper-06-scaled.webp",
-      "/images/optimized/products/mercedes-sprinter-motorhome/12-4-7m-truck-camper-08-scaled.webp",
-      "/images/optimized/products/mercedes-sprinter-motorhome/13-4-7m-truck-camper-18-scaled.webp"
+      "/images/optimized/products/mercedes-sprinter-motorhome/11-4-7m-truck-camper-06-scaled.webp"
     ],
     "galleryCount": 12,
     "relatedSlugs": [
@@ -575,6 +635,9 @@
       "title": "Beyond RV 4.7m Truck Camper and Mercedes Sprinter Motorhome Walkthrough",
       "description": "Video walkthrough for the Beyond RV 4.7m truck camper and Mercedes Sprinter motorhome.",
       "startSeconds": 9
+    },
+    "suitabilityData": {
+      "status": "draft"
     },
     "keySpecs": [
       {
@@ -603,29 +666,30 @@
     "onSale": true,
     "heroImage": "/images/optimized/products/sunpatch-12c-couples-caravan/01-sunpatch-12c-couples-caravan-hero.webp",
     "gallery": [
-      "/images/optimized/products/sunpatch-12c-couples-caravan/02-6.webp",
       "/images/optimized/products/sunpatch-12c-couples-caravan/03-img-0941.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/13-img-4977.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/15-img-4979.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/14-img-4978.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/11-img-4973.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/17-wx-camera-1684909619005.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/02-6.webp",
       "/images/optimized/products/sunpatch-12c-couples-caravan/04-img-4936.webp",
-      "/images/optimized/products/sunpatch-12c-couples-caravan/05-img-4938.webp",
-      "/images/optimized/products/sunpatch-12c-couples-caravan/06-img-4941.webp",
       "/images/optimized/products/sunpatch-12c-couples-caravan/07-img-4944.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/06-img-4941.webp",
+      "/images/optimized/products/sunpatch-12c-couples-caravan/05-img-4938.webp",
       "/images/optimized/products/sunpatch-12c-couples-caravan/08-img-4946.webp",
       "/images/optimized/products/sunpatch-12c-couples-caravan/09-img-4947.webp",
-      "/images/optimized/products/sunpatch-12c-couples-caravan/10-img-4949.webp",
-      "/images/optimized/products/sunpatch-12c-couples-caravan/11-img-4973.webp",
-      "/images/optimized/products/sunpatch-12c-couples-caravan/12-img-4975.webp",
-      "/images/optimized/products/sunpatch-12c-couples-caravan/13-img-4977.webp",
-      "/images/optimized/products/sunpatch-12c-couples-caravan/14-img-4978.webp",
-      "/images/optimized/products/sunpatch-12c-couples-caravan/15-img-4979.webp",
-      "/images/optimized/products/sunpatch-12c-couples-caravan/16-kitchen.webp",
-      "/images/optimized/products/sunpatch-12c-couples-caravan/17-wx-camera-1684909619005.webp"
+      "/images/optimized/products/sunpatch-12c-couples-caravan/10-img-4949.webp"
     ],
-    "galleryCount": 16,
+    "galleryCount": 14,
     "relatedSlugs": [
       "sunpatch-15xc-couples-offroad-van",
       "sunpatch-19xc-hardtop-couples-offroad-van",
       "sunpatch-21xf-hardtop-family-offroad-van"
     ],
+    "suitabilityData": {
+      "status": "draft"
+    },
     "keySpecs": [
       {
         "label": "Layout",
@@ -648,31 +712,30 @@
     "price": "$63,000",
     "status": "on-sale",
     "category": "caravan",
-    "tagline": "Couples off-road van with 240L fresh water and 200Ah battery standard.",
+    "tagline": "Couples off-road van with 240L fresh water and 200Ah lithium battery.",
     "featured": true,
     "onSale": true,
     "heroImage": "/images/optimized/products/sunpatch-15xc-couples-offroad-van/01-sunpatch-15xc-couples-offroad-van-hero.webp",
     "gallery": [
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/02-dsc-0004.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/03-dsc-0006.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/04-dsc-0010.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/05-dsc-0011.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/06-dsc-0014.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/07-dsc-0022.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/08-dsc-0026.webp",
       "/images/optimized/products/sunpatch-15xc-couples-offroad-van/09-dsc-0028.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/02-dsc-0004.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/08-dsc-0026.webp",
       "/images/optimized/products/sunpatch-15xc-couples-offroad-van/10-dsc-0029.webp",
       "/images/optimized/products/sunpatch-15xc-couples-offroad-van/11-dsc-0037.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/07-dsc-0022.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/06-dsc-0014.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/03-dsc-0006.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/05-dsc-0011.webp",
       "/images/optimized/products/sunpatch-15xc-couples-offroad-van/12-dsc-0043.webp",
       "/images/optimized/products/sunpatch-15xc-couples-offroad-van/13-dsc-0050.webp",
       "/images/optimized/products/sunpatch-15xc-couples-offroad-van/14-dsc-0060.webp",
-      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/15-dsc-0066.webp",
       "/images/optimized/products/sunpatch-15xc-couples-offroad-van/16-dsc-0072.webp",
       "/images/optimized/products/sunpatch-15xc-couples-offroad-van/17-dsc-0074.webp",
+      "/images/optimized/products/sunpatch-15xc-couples-offroad-van/15-dsc-0066.webp",
       "/images/optimized/products/sunpatch-15xc-couples-offroad-van/18-dsc-0086.webp",
       "/images/optimized/products/sunpatch-15xc-couples-offroad-van/19-dsc-0092.webp"
     ],
-    "galleryCount": 18,
+    "galleryCount": 17,
     "relatedSlugs": [
       "sunpatch-12c-couples-caravan",
       "sunpatch-19xc-hardtop-couples-offroad-van",
@@ -683,6 +746,9 @@
       "title": "Beyond RV Sunpatch 15-XC Walkthrough",
       "description": "Video walkthrough for the Beyond RV Sunpatch 15-XC couples off-road van.",
       "startSeconds": 1157
+    },
+    "suitabilityData": {
+      "status": "draft"
     },
     "keySpecs": [
       {
@@ -702,7 +768,7 @@
         "value": "200Ah"
       }
     ],
-    "description": "The **Sunpatch 15-XC** is a couples off-road van with the owner-confirmed $63,000 price, 1900kg tare, 2500kg ATM, 240L fresh water and 200Ah standard battery."
+    "description": "The **Sunpatch 15-XC** is a couples off-road van with the owner-confirmed $63,000 price, 1900kg tare, 2500kg ATM, 240L fresh water and a 200Ah lithium battery."
   },
   {
     "slug": "sunpatch-19xc-hardtop-couples-offroad-van",
@@ -748,24 +814,24 @@
     "onSale": true,
     "heroImage": "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/01-sunpatch-21xf-hardtop-family-offroad-van-hero.webp",
     "gallery": [
-      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/02-20260522-172146.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/19-20260523-113627.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/17-20260523-113605.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/18-20260523-113611.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/13-20260523-113520.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/12-20260523-113517.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/11-20260523-113452.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/10-20260523-113442.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/09-20260523-113439.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/08-20260523-113436.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/16-20260523-113540.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/15-20260523-113536.webp",
       "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/03-20260523-113344.webp",
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/02-20260522-172146.webp",
       "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/04-20260523-113404.webp",
       "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/05-20260523-113407.webp",
       "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/06-20260523-113412.webp",
       "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/07-20260523-113417.webp",
-      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/08-20260523-113436.webp",
-      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/09-20260523-113439.webp",
-      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/10-20260523-113442.webp",
-      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/11-20260523-113452.webp",
-      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/12-20260523-113517.webp",
-      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/13-20260523-113520.webp",
-      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/14-20260523-113525.webp",
-      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/15-20260523-113536.webp",
-      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/16-20260523-113540.webp",
-      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/17-20260523-113605.webp",
-      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/18-20260523-113611.webp",
-      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/19-20260523-113627.webp"
+      "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/14-20260523-113525.webp"
     ],
     "galleryCount": 18,
     "relatedSlugs": [
@@ -773,6 +839,9 @@
       "sunpatch-15xc-couples-offroad-van",
       "sunpatch-19xc-hardtop-couples-offroad-van"
     ],
+    "suitabilityData": {
+      "status": "draft"
+    },
     "keySpecs": [
       {
         "label": "Sleeps",

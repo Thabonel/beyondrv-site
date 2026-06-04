@@ -1052,6 +1052,7 @@ export default function AdminPanel() {
   const [input, setInput] = useState('');
   const [activeTab, setActiveTab] = useState<PanelTab>('dashboard');
   const [knowledgeInput, setKnowledgeInput] = useState('');
+  const [rewriting, setRewriting] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showChatDrawer, setShowChatDrawer] = useState(false);
   const [products, setProducts] = useState<ProductRecord[]>([]);
@@ -1809,6 +1810,27 @@ export default function AdminPanel() {
       `Update the chatbot business knowledge file at src/data/chatbot-knowledge.md with this information. ` +
       `Read the current file first, preserve useful existing notes, and add or update the relevant note clearly without adding private customer data:\n\n${text}`
     );
+  }
+
+  async function handleAIRewrite() {
+    const text = knowledgeInput.trim();
+    if (!text || rewriting) return;
+    setRewriting(true);
+    try {
+      const res = await adminFetch('/.netlify/functions/knowledge-rewrite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await res.json() as { text?: string; error?: string };
+      if (!res.ok) throw new Error(data.error ?? 'Rewrite failed');
+      if (data.text) setKnowledgeInput(data.text);
+    } catch {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, AI rewrite failed. Please try again.' }]);
+    } finally {
+      setRewriting(false);
+    }
   }
 
   function requestProductUpdate(product: ProductRecord, task: string) {
@@ -3253,13 +3275,22 @@ export default function AdminPanel() {
               rows={9}
               style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.65rem', fontSize: '0.84rem', lineHeight: 1.45, outline: 'none' }}
             />
-            <button
-              onClick={queueKnowledgeUpdate}
-              disabled={loading || !knowledgeInput.trim()}
-              style={{ width: '100%', marginTop: '0.6rem', background: knowledgeInput.trim() ? '#E8540A' : '#333', color: knowledgeInput.trim() ? '#fff' : '#666', border: 'none', borderRadius: '6px', padding: '0.65rem', cursor: knowledgeInput.trim() ? 'pointer' : 'not-allowed', fontWeight: 700 }}
-            >
-              Queue Knowledge Update
-            </button>
+            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.6rem' }}>
+              <button
+                onClick={handleAIRewrite}
+                disabled={rewriting || !knowledgeInput.trim()}
+                style={{ flex: 1, background: knowledgeInput.trim() && !rewriting ? '#2563eb' : '#333', color: knowledgeInput.trim() && !rewriting ? '#fff' : '#666', border: 'none', borderRadius: '6px', padding: '0.65rem', cursor: knowledgeInput.trim() && !rewriting ? 'pointer' : 'not-allowed', fontWeight: 700, fontSize: '0.82rem' }}
+              >
+                {rewriting ? 'Rewriting...' : 'AI Rewrite'}
+              </button>
+              <button
+                onClick={queueKnowledgeUpdate}
+                disabled={loading || !knowledgeInput.trim()}
+                style={{ flex: 1, background: knowledgeInput.trim() ? '#E8540A' : '#333', color: knowledgeInput.trim() ? '#fff' : '#666', border: 'none', borderRadius: '6px', padding: '0.65rem', cursor: knowledgeInput.trim() ? 'pointer' : 'not-allowed', fontWeight: 700, fontSize: '0.82rem' }}
+              >
+                Queue Knowledge Update
+              </button>
+            </div>
           </div>
         )}
 
