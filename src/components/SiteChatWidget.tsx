@@ -41,6 +41,7 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   const isCapped = messages.length >= SESSION_CAP;
 
@@ -61,6 +62,25 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
     }
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || !panelRef.current) return;
+    const panel = panelRef.current;
+    const visualViewport = window.visualViewport;
+    if (!visualViewport) return;
+    function adjustForKeyboard() {
+      const offset = window.innerHeight - visualViewport!.height;
+      panel.style.transform = `translateY(-${offset}px)`;
+    }
+    visualViewport.addEventListener('resize', adjustForKeyboard);
+    visualViewport.addEventListener('scroll', adjustForKeyboard);
+    adjustForKeyboard();
+    return () => {
+      visualViewport.removeEventListener('resize', adjustForKeyboard);
+      visualViewport.removeEventListener('scroll', adjustForKeyboard);
+      panel.style.transform = '';
+    };
   }, [isOpen]);
 
   function openPanel() {
@@ -217,6 +237,7 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
 
       {isOpen && (
         <div
+          ref={panelRef}
           className="chat-panel"
           role="dialog"
           aria-label="Beyond RV chat assistant"
