@@ -39,6 +39,7 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isInquiryPage, setIsInquiryPage] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -56,6 +57,10 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
   }, [isOpen]);
 
   useEffect(() => {
+    setIsInquiryPage(window.location.pathname.startsWith('/inquiry-form'));
+  }, []);
+
+  useEffect(() => {
     if (!isOpen) return;
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') setIsOpen(false);
@@ -69,9 +74,12 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
     const panel = panelRef.current;
     const visualViewport = window.visualViewport;
     if (!visualViewport) return;
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    if (!isMobile) return;
     function adjustForKeyboard() {
-      const offset = window.innerHeight - visualViewport!.height;
-      panel.style.transform = `translateY(-${offset}px)`;
+      const keyboardOffset = window.innerHeight - visualViewport!.height;
+      panel.style.height = `${visualViewport!.height}px`;
+      panel.style.transform = keyboardOffset > 80 ? `translateY(${visualViewport!.offsetTop}px)` : '';
     }
     visualViewport.addEventListener('resize', adjustForKeyboard);
     visualViewport.addEventListener('scroll', adjustForKeyboard);
@@ -79,6 +87,7 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
     return () => {
       visualViewport.removeEventListener('resize', adjustForKeyboard);
       visualViewport.removeEventListener('scroll', adjustForKeyboard);
+      panel.style.height = '';
       panel.style.transform = '';
     };
   }, [isOpen]);
@@ -220,7 +229,7 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
   }
 
   return (
-    <div className="chat-widget">
+    <div className={`chat-widget${isOpen ? ' chat-widget-open' : ''}${isInquiryPage ? ' chat-widget-inquiry' : ''}`}>
       <button
         className="chat-widget-btn"
         onClick={togglePanel}
@@ -268,6 +277,7 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
           <div className="chat-input-bar">
             <input
               ref={inputRef}
+              className="chat-input"
               aria-label="Your message"
               value={input}
               onChange={e => setInput(e.target.value)}
