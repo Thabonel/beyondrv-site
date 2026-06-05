@@ -19,7 +19,7 @@ const navLinks = [
     <img src="/images/site/admin-logo.png" alt="Beyond RV logo" width="48" height="36" />
   </a>
 
-  <button class="nav-hamburger" id="navHamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navLinks">
+  <button class="nav-hamburger" id="navHamburger" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navLinks">
     <span></span>
     <span></span>
     <span></span>
@@ -54,6 +54,7 @@ const navLinks = [
   hamburger?.addEventListener('click', () => {
     const isOpen = navLinks?.classList.toggle('open');
     hamburger.setAttribute('aria-expanded', String(!!isOpen));
+    hamburger.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
   });
 
   // Close menu on outside click
@@ -61,6 +62,7 @@ const navLinks = [
     if (!navbar?.contains(e.target as Node)) {
       navLinks?.classList.remove('open');
       hamburger?.setAttribute('aria-expanded', 'false');
+      hamburger?.setAttribute('aria-label', 'Open navigation menu');
     }
   });
 </script>

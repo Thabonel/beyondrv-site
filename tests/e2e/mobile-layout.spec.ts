@@ -150,6 +150,41 @@ test.describe('iPhone width root pan protection', () => {
       }
     });
 
+    test(`hamburger menu opens and closes at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto('/');
+
+      const hamburger = page.locator('#navHamburger');
+      const menu = page.locator('#navLinks');
+
+      await expect(hamburger).toBeVisible();
+      await expect(hamburger).toHaveAttribute('aria-expanded', 'false');
+      await expect(menu).not.toBeVisible();
+
+      await hamburger.click();
+      await expect(hamburger).toHaveAttribute('aria-expanded', 'true');
+      await expect(menu).toBeVisible();
+      await expect(menu.getByRole('link', { name: 'Our Caravans' })).toBeVisible();
+
+      const layout = await menu.evaluate((el) => {
+        const rect = el.getBoundingClientRect();
+        return {
+          top: rect.top,
+          right: rect.right,
+          width: rect.width,
+          viewportWidth: document.documentElement.clientWidth,
+        };
+      });
+
+      expect(layout.top).toBeGreaterThanOrEqual(0);
+      expect(layout.width).toBeLessThanOrEqual(layout.viewportWidth);
+      expect(layout.right).toBeLessThanOrEqual(layout.viewportWidth + 1);
+
+      await hamburger.click();
+      await expect(hamburger).toHaveAttribute('aria-expanded', 'false');
+      await expect(menu).not.toBeVisible();
+    });
+
     test(`closed chat launcher is visible at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 844 });
       await page.goto('/');
