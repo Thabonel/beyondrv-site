@@ -12,6 +12,7 @@ import {
   OWNER_COPILOT_TIMELINE_STORE,
   timelineKey,
 } from './owner-copilot-core';
+import { syncEnquiryToOwnerCopilotRecords } from './owner-copilot-record-sync';
 
 const VALID_LEAD_STATUSES = new Set(['new', 'contacted', 'waiting_on_customer', 'waiting_on_byondrv', 'quote_requested', 'quote_sent', 'warm', 'hot', 'won', 'lost', 'dormant']);
 
@@ -113,6 +114,40 @@ export const handler: Handler = async (event) => {
 
   const type = clean(body.type, 40);
   const now = new Date().toISOString();
+
+  if (type === 'enquiry') {
+    try {
+      const result = await syncEnquiryToOwnerCopilotRecords({
+        id: clean(body.id, 240),
+        sourceEnquiryId: clean(body.sourceEnquiryId, 240),
+        name: clean(body.name, 180),
+        email: clean(body.email, 240),
+        phone: clean(body.phone, 80),
+        message: clean(body.message, 4000),
+        productInterest: clean(body.productInterest, 240),
+        status: clean(body.status, 40),
+        nextFollowUpDate: clean(body.nextFollowUpDate, 40),
+        notes: clean(body.notes, 3000),
+        source: clean(body.source, 80) || 'admin-enquiry-sync',
+        submittedAt: clean(body.submittedAt, 80),
+      });
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ok: true, ...result }),
+      };
+    } catch (error) {
+      console.warn('admin-owner-copilot-records: enquiry sync failed', {
+        blobRuntimeSource,
+        error: safeBlobStoreError(error),
+      });
+      return {
+        statusCode: 503,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: blobStoreUserMessage(error) }),
+      };
+    }
+  }
 
   if (type === 'customer') {
     const name = clean(body.name, 180);

@@ -2,6 +2,7 @@ import type { Handler } from '@netlify/functions';
 import { randomUUID } from 'crypto';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
+import { syncEnquiryToOwnerCopilotRecords } from './owner-copilot-record-sync';
 
 const ENQUIRY_STORE = 'customer-enquiries';
 const LEAD_STATUS_STORE = 'customer-lead-status';
@@ -133,6 +134,28 @@ export const handler: Handler = async (event) => {
         firstResponseAt: '',
         lastContactedAt: '',
         updatedAt: submittedAt,
+      });
+    }
+
+    try {
+      await syncEnquiryToOwnerCopilotRecords({
+        id,
+        sourceEnquiryId: id,
+        name,
+        email,
+        phone,
+        message: record.message,
+        productInterest,
+        status: 'new',
+        nextFollowUpDate,
+        notes: notes || record.source_note || record.conversation_summary || record.email_subject,
+        source: 'manual-enquiry',
+        submittedAt,
+      });
+    } catch (syncError) {
+      console.warn('admin-manual-enquiry: owner copilot record sync failed', {
+        enquiryId: id,
+        error: safeBlobStoreError(syncError),
       });
     }
 

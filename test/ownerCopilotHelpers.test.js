@@ -14,8 +14,20 @@ async function importTs(path) {
   return import(`data:text/javascript;base64,${Buffer.from(transpiled).toString('base64')}`);
 }
 
+async function importTsWithoutImports(path) {
+  const source = readFileSync(path, 'utf8').replace(/import[\s\S]*?from ['"][^'"]+['"];?\n/g, '');
+  const transpiled = ts.transpileModule(source, {
+    compilerOptions: {
+      module: ts.ModuleKind.ES2022,
+      target: ts.ScriptTarget.ES2022,
+    },
+  }).outputText;
+  return import(`data:text/javascript;base64,${Buffer.from(transpiled).toString('base64')}`);
+}
+
 const productKnowledge = await importTs(new URL('../netlify/functions/product-knowledge-core.ts', import.meta.url));
 const ownerCopilot = await importTs(new URL('../netlify/functions/owner-copilot-core.ts', import.meta.url));
+const recordSync = await importTsWithoutImports(new URL('../netlify/functions/owner-copilot-record-sync.ts', import.meta.url));
 
 test('buildProductKnowledgeContext returns grounded product sources with guardrails', () => {
   const context = productKnowledge.buildProductKnowledgeContext({
@@ -92,4 +104,34 @@ test('buildLeadIntelligence de-prioritises lost or stale leads', () => {
   assert.equal(intelligence.score, 0);
   assert.equal(intelligence.urgency, 'lost');
   assert.ok(intelligence.reasons.some((reason) => reason.includes('bought elsewhere')));
+});
+
+test('findMatchingCustomer matches by normalized email first', () => {
+  const match = recordSync.findMatchingCustomer(
+    [
+      { id: 'customer-1', email: 'sales@example.com', phone: '0400 000 000', name: 'Alex Buyer' },
+      { id: 'customer-2', email: 'owner@example.com', phone: '0411 111 111', name: 'Sam Owner' },
+    ],
+    { email: ' OWNER@EXAMPLE.COM ', phone: '', name: '' }
+  );
+
+  assert.equal(match.id, 'customer-2');
+});
+
+test('findMatchingCustomer matches by normalized phone', () => {
+  const match = recordSync.findMatchingCustomer(
+    [{ id: 'customer-1', email: '', phone: '0430-863-819', name: 'Beyond RV' }],
+    { email: '', phone: '0430 863 819', name: '' }
+  );
+
+  assert.equal(match.id, 'customer-1');
+});
+
+test('findMatchingCustomer does not match name alone without a contact method', () => {
+  const match = recordSync.findMatchingCustomer(
+    [{ id: 'customer-1', email: '', phone: '', name: 'Alex Buyer' }],
+    { email: '', phone: '', name: 'Alex Buyer' }
+  );
+
+  assert.equal(match, null);
 });

@@ -42,7 +42,7 @@ interface PendingChange {
 }
 
 type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
-type PanelTab = 'dashboard' | 'products' | 'orders' | 'media' | 'homepage' | 'enquiries' | 'knowledge' | 'pending';
+type PanelTab = 'dashboard' | 'products' | 'orders' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'knowledge' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 type SuitabilityDataStatus = 'draft' | 'target' | 'confirmed';
@@ -253,6 +253,31 @@ interface OrderRecord {
 }
 
 type OrderForm = Omit<OrderRecord, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'> & { id?: string };
+
+interface CopilotCustomerRecord {
+  id: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  notes?: string;
+  source?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface CopilotLeadRecord {
+  id: string;
+  customerId?: string;
+  sourceEnquiryId?: string;
+  productInterest?: string;
+  status?: string;
+  score?: number;
+  nextFollowUpDate?: string;
+  notes?: string;
+  source?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 interface LeadReminderItem {
   id: string;
@@ -1123,6 +1148,10 @@ export default function AdminPanel() {
   const [ordersStatus, setOrdersStatus] = useState('');
   const [orderSaving, setOrderSaving] = useState(false);
   const [orderForm, setOrderForm] = useState<OrderForm | null>(null);
+  const [copilotCustomers, setCopilotCustomers] = useState<CopilotCustomerRecord[]>([]);
+  const [copilotLeads, setCopilotLeads] = useState<CopilotLeadRecord[]>([]);
+  const [copilotRecordsLoading, setCopilotRecordsLoading] = useState(false);
+  const [copilotRecordsStatus, setCopilotRecordsStatus] = useState('');
   const [previewChange, setPreviewChange] = useState<PendingChange | null>(null);
   const [mediaScope, setMediaScope] = useState<MediaScope>('products');
   const [mediaSlug, setMediaSlug] = useState('');
@@ -1220,6 +1249,12 @@ export default function AdminPanel() {
   useEffect(() => {
     if (activeTab === 'orders' || activeTab === 'products') {
       void loadOrders();
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab === 'customers' || activeTab === 'leads') {
+      void loadCopilotRecords();
     }
   }, [activeTab]);
 
@@ -1355,6 +1390,29 @@ export default function AdminPanel() {
       setOrdersStatus(err instanceof Error ? err.message : 'Could not load orders.');
     } finally {
       setOrdersLoading(false);
+    }
+  }
+
+  async function loadCopilotRecords() {
+    setCopilotRecordsLoading(true);
+    setCopilotRecordsStatus('Loading Copilot records...');
+    try {
+      const [customerRes, leadRes] = await Promise.all([
+        adminFetch('/.netlify/functions/admin-owner-copilot-records?type=customers'),
+        adminFetch('/.netlify/functions/admin-owner-copilot-records?type=leads'),
+      ]);
+      if (redirectToLoginIfUnauthorized(customerRes) || redirectToLoginIfUnauthorized(leadRes)) return;
+      const customerData = await readAdminJson<{ customers?: CopilotCustomerRecord[]; error?: string }>(customerRes, 'Could not load customers.');
+      const leadData = await readAdminJson<{ leads?: CopilotLeadRecord[]; error?: string }>(leadRes, 'Could not load leads.');
+      if (!customerRes.ok) throw new Error(customerData.error ?? 'Could not load customers.');
+      if (!leadRes.ok) throw new Error(leadData.error ?? 'Could not load leads.');
+      setCopilotCustomers(Array.isArray(customerData.customers) ? customerData.customers : []);
+      setCopilotLeads(Array.isArray(leadData.leads) ? leadData.leads : []);
+      setCopilotRecordsStatus('');
+    } catch (err) {
+      setCopilotRecordsStatus(err instanceof Error ? err.message : 'Could not load Copilot records.');
+    } finally {
+      setCopilotRecordsLoading(false);
     }
   }
 
@@ -1544,41 +1602,30 @@ export default function AdminPanel() {
     setRecordSyncSaving(enquiry.id);
     setLeadDetailStatus(prev => ({ ...prev, [enquiry.id]: 'Saving customer and lead records...' }));
     try {
-      const customerRes = await adminFetch('/.netlify/functions/admin-owner-copilot-records', {
+      const res = await adminFetch('/.netlify/functions/admin-owner-copilot-records', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          type: 'customer',
+          type: 'enquiry',
+          id: enquiry.id,
+          sourceEnquiryId: enquiry.id,
           name: enquiry.name,
           email: enquiry.email,
           phone: enquiry.phone,
-          notes: enquiry.source_note || enquiry.conversation_summary || '',
-          source: 'enquiry-sync',
-        }),
-      });
-      if (redirectToLoginIfUnauthorized(customerRes)) return;
-      const customerData = await readAdminJson<{ customer?: { id: string }; error?: string }>(customerRes, 'Could not save customer record.');
-      if (!customerRes.ok || !customerData.customer?.id) throw new Error(customerData.error ?? 'Could not save customer record.');
-
-      const leadRes = await adminFetch('/.netlify/functions/admin-owner-copilot-records', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'lead',
-          id: enquiry.id,
-          sourceEnquiryId: enquiry.id,
-          customerId: customerData.customer.id,
           productInterest: enquiry.product_interest,
           status: enquiry.leadStatus?.status === 'quoted' ? 'quote_sent' : enquiry.leadStatus?.status === 'lost' ? 'lost' : enquiry.leadStatus?.status === 'won' ? 'won' : 'new',
           nextFollowUpDate: enquiry.leadStatus?.nextFollowUpDate || '',
           notes: enquiry.leadStatus?.notes || enquiry.message || '',
-          source: 'enquiry-sync',
+          message: enquiry.message,
+          submittedAt: enquiry.received_at || enquiry.submittedAt,
+          source: 'admin-enquiry-sync',
         }),
       });
-      if (redirectToLoginIfUnauthorized(leadRes)) return;
-      const leadData = await readAdminJson<{ lead?: { id: string }; error?: string }>(leadRes, 'Could not save lead record.');
-      if (!leadRes.ok || !leadData.lead?.id) throw new Error(leadData.error ?? 'Could not save lead record.');
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await readAdminJson<{ lead?: { id: string }; customer?: { id: string }; error?: string }>(res, 'Could not save Copilot records.');
+      if (!res.ok || !data.lead?.id || !data.customer?.id) throw new Error(data.error ?? 'Could not save Copilot records.');
       setLeadDetailStatus(prev => ({ ...prev, [enquiry.id]: 'Customer and lead records saved.' }));
+      void loadCopilotRecords();
       if (openLeadDetailId === enquiry.id) await loadLeadDetail(enquiry.id);
     } catch (err) {
       setLeadDetailStatus(prev => ({ ...prev, [enquiry.id]: err instanceof Error ? err.message : 'Could not save Copilot records.' }));
@@ -2624,8 +2671,8 @@ export default function AdminPanel() {
             </button>
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', borderBottom: '1px solid #333' }}>
-          {(['dashboard', 'products', 'orders', 'media', 'homepage', 'enquiries', 'knowledge', 'pending'] as PanelTab[]).map(tab => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, minmax(0, 1fr))', borderBottom: '1px solid #333' }}>
+          {(['dashboard', 'products', 'orders', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'knowledge', 'pending'] as PanelTab[]).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -3758,6 +3805,73 @@ export default function AdminPanel() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {activeTab === 'customers' && (
+          <div style={{ padding: '1rem', overflowY: 'auto', display: 'grid', gap: '0.8rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
+              <div>
+                <div style={{ color: '#fff', fontWeight: 800 }}>Copilot Customers</div>
+                <div style={{ color: '#888', fontSize: '0.76rem', marginTop: '0.2rem' }}>{copilotCustomers.length} normalized customer records</div>
+              </div>
+              <button type="button" onClick={loadCopilotRecords} disabled={copilotRecordsLoading} style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: copilotRecordsLoading ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.76rem' }}>
+                Refresh
+              </button>
+            </div>
+            {copilotRecordsStatus && <div style={{ color: isAdminWarningStatus(copilotRecordsStatus) ? '#fb923c' : '#aaa', fontSize: '0.76rem' }}>{copilotRecordsStatus}</div>}
+            {copilotCustomers.length === 0 && !copilotRecordsLoading ? (
+              <div style={{ color: '#777', fontSize: '0.82rem' }}>No Copilot customers yet. New website and manual enquiries will create them automatically.</div>
+            ) : (
+              copilotCustomers.map(customer => {
+                const leadCount = copilotLeads.filter(lead => lead.customerId === customer.id).length;
+                return (
+                  <div key={customer.id} style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.75rem', display: 'grid', gap: '0.35rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem', alignItems: 'baseline' }}>
+                      <div style={{ color: '#fff', fontWeight: 800 }}>{customer.name || customer.email || customer.phone || 'Unnamed customer'}</div>
+                      <div style={{ color: '#888', fontSize: '0.7rem' }}>{leadCount} lead{leadCount === 1 ? '' : 's'}</div>
+                    </div>
+                    <div style={{ color: '#aaa', fontSize: '0.76rem', lineHeight: 1.45 }}>{[customer.email, customer.phone].filter(Boolean).join(' · ') || 'No contact details saved'}</div>
+                    {customer.notes && <div style={{ color: '#888', fontSize: '0.74rem', lineHeight: 1.45 }}>{customer.notes}</div>}
+                    <div style={{ color: '#666', fontSize: '0.68rem' }}>Source: {customer.source || 'unknown'} · Updated: {customer.updatedAt ? new Date(customer.updatedAt).toLocaleString() : 'Not recorded'}</div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        )}
+
+        {activeTab === 'leads' && (
+          <div style={{ padding: '1rem', overflowY: 'auto', display: 'grid', gap: '0.8rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
+              <div>
+                <div style={{ color: '#fff', fontWeight: 800 }}>Copilot Leads</div>
+                <div style={{ color: '#888', fontSize: '0.76rem', marginTop: '0.2rem' }}>{copilotLeads.length} normalized lead records</div>
+              </div>
+              <button type="button" onClick={loadCopilotRecords} disabled={copilotRecordsLoading} style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: copilotRecordsLoading ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.76rem' }}>
+                Refresh
+              </button>
+            </div>
+            {copilotRecordsStatus && <div style={{ color: isAdminWarningStatus(copilotRecordsStatus) ? '#fb923c' : '#aaa', fontSize: '0.76rem' }}>{copilotRecordsStatus}</div>}
+            {copilotLeads.length === 0 && !copilotRecordsLoading ? (
+              <div style={{ color: '#777', fontSize: '0.82rem' }}>No Copilot leads yet. New website and manual enquiries will create them automatically.</div>
+            ) : (
+              copilotLeads.map(lead => {
+                const customer = copilotCustomers.find(item => item.id === lead.customerId);
+                return (
+                  <div key={lead.id} style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.75rem', display: 'grid', gap: '0.35rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem', alignItems: 'baseline' }}>
+                      <div style={{ color: '#fff', fontWeight: 800 }}>{customer?.name || customer?.email || customer?.phone || 'Unmatched customer'}</div>
+                      <span style={{ color: '#fb923c', border: '1px solid #7c2d12', borderRadius: '999px', padding: '0.1rem 0.45rem', fontSize: '0.66rem', fontWeight: 800, textTransform: 'uppercase' }}>{lead.status || 'new'}</span>
+                    </div>
+                    <div style={{ color: '#aaa', fontSize: '0.76rem', lineHeight: 1.45 }}>Product: {lead.productInterest || 'Not specified'} · Score: {typeof lead.score === 'number' ? lead.score : 0}</div>
+                    {lead.nextFollowUpDate && <div style={{ color: '#fb923c', fontSize: '0.74rem' }}>Next follow-up: {lead.nextFollowUpDate}</div>}
+                    {lead.notes && <div style={{ color: '#888', fontSize: '0.74rem', lineHeight: 1.45 }}>{lead.notes}</div>}
+                    <div style={{ color: '#666', fontSize: '0.68rem' }}>Source: {lead.source || 'unknown'} · Enquiry: {lead.sourceEnquiryId || 'none'} · Updated: {lead.updatedAt ? new Date(lead.updatedAt).toLocaleString() : 'Not recorded'}</div>
+                  </div>
+                );
+              })
+            )}
           </div>
         )}
 

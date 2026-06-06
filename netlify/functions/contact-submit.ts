@@ -1,6 +1,7 @@
 import type { Handler } from '@netlify/functions';
 import { randomUUID } from 'crypto';
 import { connectBlobStore, getBlobStore, safeBlobStoreError, type BlobStoreConnection } from './blob-store';
+import { syncEnquiryToOwnerCopilotRecords } from './owner-copilot-record-sync';
 
 const STORE_NAME = 'customer-enquiries';
 const RESEND_API = 'https://api.resend.com/emails';
@@ -205,13 +206,31 @@ export const handler: Handler = async (event) => {
     ip: event.headers['x-nf-client-connection-ip'] ?? event.headers['client-ip'] ?? '',
   };
 
-  const [storeResult, emailResult] = await Promise.allSettled([
+  const [storeResult, emailResult, copilotSyncResult] = await Promise.allSettled([
     backupEnquiry(id, record, blobRuntimeSource),
     sendEmail(enquiry),
+    syncEnquiryToOwnerCopilotRecords({
+      id,
+      sourceEnquiryId: id,
+      name: enquiry.name,
+      email: enquiry.email,
+      phone: enquiry.phone,
+      message: enquiry.message,
+      productInterest: enquiry.product_interest,
+      status: 'new',
+      nextFollowUpDate: enquiry.callback_date,
+      notes: enquiry.message,
+      source: 'website-form',
+      submittedAt,
+    }),
   ]);
 
   if (storeResult.status === 'rejected') {
     console.error('[contact-submit] enquiry backup failed:', storeResult.reason);
+  }
+
+  if (copilotSyncResult.status === 'rejected') {
+    console.error('[contact-submit] owner copilot sync failed:', safeBlobStoreError(copilotSyncResult.reason));
   }
 
   if (emailResult.status === 'rejected' || !emailResult.value.sent) {
@@ -226,6 +245,7 @@ export const handler: Handler = async (event) => {
         id,
         error: `${reason}. Please call 0430 863 819 if the enquiry is urgent.`,
         enquiryBackedUp: storeResult.status === 'fulfilled' && storeResult.value.backedUp,
+        copilotSynced: copilotSyncResult.status === 'fulfilled',
       }),
     };
   }
@@ -238,6 +258,7 @@ export const handler: Handler = async (event) => {
       id,
       emailSent: true,
       enquiryBackedUp: storeResult.status === 'fulfilled' && storeResult.value.backedUp,
+      copilotSynced: copilotSyncResult.status === 'fulfilled',
     }),
   };
 };
