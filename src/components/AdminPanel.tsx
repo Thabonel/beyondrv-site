@@ -42,7 +42,7 @@ interface PendingChange {
 }
 
 type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
-type PanelTab = 'dashboard' | 'products' | 'orders' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'drafts' | 'audit' | 'knowledge' | 'pending';
+type PanelTab = 'dashboard' | 'products' | 'orders' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'drafts' | 'audit' | 'knowledge' | 'google' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 type SuitabilityDataStatus = 'draft' | 'target' | 'confirmed';
@@ -408,6 +408,27 @@ interface ContactConfig {
   hasResendKey: boolean;
   ready: boolean;
   missing: string[];
+}
+
+interface GoogleIntegrationStatus {
+  state: 'not_configured' | 'not_connected' | 'access_revoked' | 'refresh_failed' | 'token_expired' | 'connected' | 'unavailable';
+  configured: boolean;
+  missing: string[];
+  redirectUri: string;
+  scopes: string[];
+  connectedEmail?: string;
+  connectedAt?: string;
+  expiresAt?: string;
+  lastSyncAt?: string;
+  setupChecklist: string[];
+}
+
+interface GoogleSyncCheck {
+  ready?: boolean;
+  state?: GoogleIntegrationStatus['state'];
+  message?: string;
+  requiredOwnerInputs?: string[];
+  error?: string;
 }
 
 interface RecentBuild {
@@ -1183,6 +1204,10 @@ export default function AdminPanel() {
   const [copilotAuditLogs, setCopilotAuditLogs] = useState<CopilotAuditRecord[]>([]);
   const [copilotOpsLoading, setCopilotOpsLoading] = useState(false);
   const [copilotOpsStatus, setCopilotOpsStatus] = useState('');
+  const [googleStatus, setGoogleStatus] = useState<GoogleIntegrationStatus | null>(null);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [googleMessage, setGoogleMessage] = useState('');
+  const [googleSyncChecks, setGoogleSyncChecks] = useState<Record<'gmail' | 'drive', GoogleSyncCheck | null>>({ gmail: null, drive: null });
   const [previewChange, setPreviewChange] = useState<PendingChange | null>(null);
   const [mediaScope, setMediaScope] = useState<MediaScope>('products');
   const [mediaSlug, setMediaSlug] = useState('');
@@ -1292,6 +1317,12 @@ export default function AdminPanel() {
   useEffect(() => {
     if (activeTab === 'drafts' || activeTab === 'audit') {
       void loadCopilotOps();
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab === 'google') {
+      void loadGoogleStatus();
     }
   }, [activeTab]);
 
@@ -1473,6 +1504,67 @@ export default function AdminPanel() {
       setCopilotOpsStatus(err instanceof Error ? err.message : 'Could not load Copilot activity.');
     } finally {
       setCopilotOpsLoading(false);
+    }
+  }
+
+  async function loadGoogleStatus() {
+    setGoogleLoading(true);
+    setGoogleMessage('Loading Google integration status...');
+    try {
+      const res = await adminFetch('/.netlify/functions/google-oauth-status');
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await readAdminJson<GoogleIntegrationStatus & { error?: string }>(res, 'Could not load Google status.');
+      if (!res.ok) throw new Error(data.error ?? 'Could not load Google status.');
+      setGoogleStatus(data);
+      setGoogleMessage(data.state === 'connected'
+        ? 'Google is connected for read-only Owner Copilot access.'
+        : data.state === 'not_configured'
+          ? 'Google OAuth needs Netlify environment variables before the owner can connect.'
+          : 'Google is not connected yet.');
+    } catch (err) {
+      setGoogleStatus(null);
+      setGoogleMessage(err instanceof Error ? err.message : 'Could not load Google status.');
+    } finally {
+      setGoogleLoading(false);
+    }
+  }
+
+  function connectGoogle() {
+    window.location.href = '/.netlify/functions/google-oauth-start';
+  }
+
+  async function disconnectGoogle() {
+    setGoogleLoading(true);
+    setGoogleMessage('Disconnecting Google...');
+    try {
+      const res = await adminFetch('/.netlify/functions/google-oauth-disconnect', { method: 'POST' });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await readAdminJson<{ ok?: boolean; error?: string }>(res, 'Could not disconnect Google.');
+      if (!res.ok) throw new Error(data.error ?? 'Could not disconnect Google.');
+      setGoogleMessage('Google access was disconnected.');
+      await loadGoogleStatus();
+    } catch (err) {
+      setGoogleMessage(err instanceof Error ? err.message : 'Could not disconnect Google.');
+    } finally {
+      setGoogleLoading(false);
+    }
+  }
+
+  async function checkGoogleSync(kind: 'gmail' | 'drive') {
+    setGoogleLoading(true);
+    setGoogleMessage(`Checking ${kind === 'gmail' ? 'Gmail' : 'Drive'} readiness...`);
+    try {
+      const res = await adminFetch(`/.netlify/functions/google-${kind}-sync`, { method: 'POST' });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await readAdminJson<GoogleSyncCheck>(res, `Could not check ${kind} readiness.`);
+      setGoogleSyncChecks(prev => ({ ...prev, [kind]: data }));
+      setGoogleMessage(data.message || `${kind === 'gmail' ? 'Gmail' : 'Drive'} readiness checked.`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : `Could not check ${kind} readiness.`;
+      setGoogleSyncChecks(prev => ({ ...prev, [kind]: { error: message } }));
+      setGoogleMessage(message);
+    } finally {
+      setGoogleLoading(false);
     }
   }
 
@@ -2733,8 +2825,8 @@ export default function AdminPanel() {
             </button>
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, minmax(0, 1fr))', borderBottom: '1px solid #333' }}>
-          {(['dashboard', 'products', 'orders', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'pending'] as PanelTab[]).map(tab => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(13, minmax(0, 1fr))', borderBottom: '1px solid #333' }}>
+          {(['dashboard', 'products', 'orders', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'pending'] as PanelTab[]).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -4076,6 +4168,79 @@ export default function AdminPanel() {
                   Queue Knowledge Update
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'google' && (
+          <div style={{ padding: '1rem', overflowY: 'auto', display: 'grid', gap: '1rem' }}>
+            <div style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.85rem', display: 'grid', gap: '0.75rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                <div>
+                  <div style={{ color: '#fff', fontWeight: 800 }}>Google Owner Access</div>
+                  <div style={{ color: '#888', fontSize: '0.78rem', marginTop: '0.25rem' }}>Read-only Gmail and Drive foundation for Owner Copilot.</div>
+                </div>
+                <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
+                  <button type="button" onClick={loadGoogleStatus} disabled={googleLoading} style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem 0.65rem', cursor: googleLoading ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.76rem' }}>Refresh</button>
+                  <button type="button" onClick={connectGoogle} disabled={googleLoading || googleStatus?.configured === false} style={{ background: googleStatus?.configured === false ? '#333' : '#E8540A', border: 'none', color: '#fff', borderRadius: '6px', padding: '0.48rem 0.65rem', cursor: googleStatus?.configured === false ? 'not-allowed' : 'pointer', fontWeight: 800, fontSize: '0.76rem' }}>Connect Google</button>
+                  <button type="button" onClick={disconnectGoogle} disabled={googleLoading || googleStatus?.state !== 'connected'} style={{ background: googleStatus?.state === 'connected' ? '#7f1d1d' : '#333', border: 'none', color: '#fff', borderRadius: '6px', padding: '0.48rem 0.65rem', cursor: googleStatus?.state === 'connected' ? 'pointer' : 'not-allowed', fontWeight: 800, fontSize: '0.76rem' }}>Disconnect</button>
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.65rem' }}>
+                <div style={{ background: '#161616', border: '1px solid #303030', borderRadius: '6px', padding: '0.65rem' }}>
+                  <div style={{ color: '#888', fontSize: '0.7rem', textTransform: 'uppercase', fontWeight: 800 }}>Status</div>
+                  <div style={{ color: googleStatus?.state === 'connected' ? '#86efac' : '#fb923c', fontWeight: 900, marginTop: '0.2rem' }}>{(googleStatus?.state || 'unknown').replace(/_/g, ' ')}</div>
+                </div>
+                <div style={{ background: '#161616', border: '1px solid #303030', borderRadius: '6px', padding: '0.65rem' }}>
+                  <div style={{ color: '#888', fontSize: '0.7rem', textTransform: 'uppercase', fontWeight: 800 }}>Connected</div>
+                  <div style={{ color: '#fff', fontWeight: 800, marginTop: '0.2rem' }}>{googleStatus?.connectedEmail || (googleStatus?.connectedAt ? 'Owner account' : 'Not connected')}</div>
+                </div>
+                <div style={{ background: '#161616', border: '1px solid #303030', borderRadius: '6px', padding: '0.65rem' }}>
+                  <div style={{ color: '#888', fontSize: '0.7rem', textTransform: 'uppercase', fontWeight: 800 }}>Token expiry</div>
+                  <div style={{ color: '#fff', fontWeight: 800, marginTop: '0.2rem' }}>{googleStatus?.expiresAt ? new Date(googleStatus.expiresAt).toLocaleString() : 'No token'}</div>
+                </div>
+              </div>
+              {googleMessage && <div style={{ color: isAdminWarningStatus(googleMessage) ? '#fb923c' : '#aaa', fontSize: '0.78rem' }}>{googleMessage}</div>}
+              {Boolean(googleStatus?.missing?.length) && (
+                <div style={{ color: '#fb923c', fontSize: '0.78rem', lineHeight: 1.45 }}>Missing env vars: {googleStatus?.missing.join(', ')}</div>
+              )}
+              <div style={{ display: 'grid', gap: '0.35rem', color: '#aaa', fontSize: '0.76rem', lineHeight: 1.45 }}>
+                <div><strong style={{ color: '#fff' }}>Redirect URI:</strong> {googleStatus?.redirectUri || 'Unavailable'}</div>
+                <div><strong style={{ color: '#fff' }}>Scopes:</strong> {googleStatus?.scopes?.join(', ') || 'Unavailable'}</div>
+              </div>
+            </div>
+
+            <div style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.85rem', display: 'grid', gap: '0.75rem' }}>
+              <div style={{ color: '#fff', fontWeight: 800 }}>Sync Readiness</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.75rem' }}>
+                {(['gmail', 'drive'] as const).map(kind => {
+                  const check = googleSyncChecks[kind];
+                  return (
+                    <div key={kind} style={{ background: '#161616', border: '1px solid #303030', borderRadius: '6px', padding: '0.75rem', display: 'grid', gap: '0.5rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center' }}>
+                        <div style={{ color: '#fff', fontWeight: 800 }}>{kind === 'gmail' ? 'Gmail' : 'Drive'}</div>
+                        <button type="button" onClick={() => checkGoogleSync(kind)} disabled={googleLoading} style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.38rem 0.55rem', cursor: googleLoading ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.72rem' }}>Check</button>
+                      </div>
+                      <div style={{ color: check?.ready ? '#86efac' : '#aaa', fontSize: '0.76rem', lineHeight: 1.45 }}>{check?.message || 'Ready checks will show what the owner still needs to choose before ingestion runs.'}</div>
+                      {Boolean(check?.requiredOwnerInputs?.length) && (
+                        <ul style={{ margin: '0 0 0 1rem', padding: 0, color: '#888', fontSize: '0.72rem', lineHeight: 1.45 }}>
+                          {check?.requiredOwnerInputs?.map(item => <li key={item}>{item}</li>)}
+                        </ul>
+                      )}
+                      {check?.error && <div style={{ color: '#fb923c', fontSize: '0.72rem' }}>{check.error}</div>}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.85rem', display: 'grid', gap: '0.45rem' }}>
+              <div style={{ color: '#fff', fontWeight: 800 }}>Owner Setup Checklist</div>
+              <ul style={{ margin: '0 0 0 1rem', padding: 0, color: '#aaa', fontSize: '0.76rem', lineHeight: 1.5 }}>
+                {(googleStatus?.setupChecklist || [
+                  'Load Google status to see the current setup checklist.',
+                ]).map(item => <li key={item}>{item}</li>)}
+              </ul>
             </div>
           </div>
         )}

@@ -25,10 +25,25 @@ async function importTsWithoutImports(path) {
   return import(`data:text/javascript;base64,${Buffer.from(transpiled).toString('base64')}`);
 }
 
+async function importTsWithoutLocalImports(path) {
+  const source = readFileSync(path, 'utf8')
+    .replace(/from 'crypto'/g, "from 'node:crypto'")
+    .replace(/import \{ getBlobStore, safeBlobStoreError \} from '\.\/blob-store';\n/g, '')
+    .replace(/import \{\n[\s\S]*?\} from '\.\/owner-copilot-core';\n/g, '');
+  const transpiled = ts.transpileModule(source, {
+    compilerOptions: {
+      module: ts.ModuleKind.ES2022,
+      target: ts.ScriptTarget.ES2022,
+    },
+  }).outputText;
+  return import(`data:text/javascript;base64,${Buffer.from(transpiled).toString('base64')}`);
+}
+
 const productKnowledge = await importTs(new URL('../netlify/functions/product-knowledge-core.ts', import.meta.url));
 const ownerCopilot = await importTs(new URL('../netlify/functions/owner-copilot-core.ts', import.meta.url));
 const recordSync = await importTsWithoutImports(new URL('../netlify/functions/owner-copilot-record-sync.ts', import.meta.url));
 const aiGuardrails = await importTs(new URL('../netlify/functions/ai-guardrails-core.ts', import.meta.url));
+const googleOAuth = await importTsWithoutLocalImports(new URL('../netlify/functions/google-oauth-core.ts', import.meta.url));
 
 test('buildProductKnowledgeContext returns grounded product sources with guardrails', () => {
   const context = productKnowledge.buildProductKnowledgeContext({
@@ -151,4 +166,22 @@ test('validateDraftOutput allows cautious owner-confirmation wording', () => {
 
   assert.deepEqual(result.warnings, []);
   assert.deepEqual(result.blockedPhrases, []);
+});
+
+test('Google OAuth token encryption round-trips without exposing plaintext', () => {
+  const encrypted = googleOAuth.encryptSecret('owner-refresh-token', 'test-secret');
+
+  assert.notEqual(encrypted, 'owner-refresh-token');
+  assert.ok(!encrypted.includes('owner-refresh-token'));
+  assert.equal(googleOAuth.decryptSecret(encrypted, 'test-secret'), 'owner-refresh-token');
+  assert.throws(() => googleOAuth.decryptSecret(encrypted, 'wrong-secret'));
+});
+
+test('publicGoogleConnectionState reports setup and connection lifecycle states', () => {
+  assert.equal(googleOAuth.publicGoogleConnectionState(null, ['GOOGLE_OAUTH_CLIENT_ID']), 'not_configured');
+  assert.equal(googleOAuth.publicGoogleConnectionState(null, []), 'not_connected');
+  assert.equal(googleOAuth.publicGoogleConnectionState({ revokedAt: '2026-06-01T00:00:00.000Z' }, []), 'access_revoked');
+  assert.equal(googleOAuth.publicGoogleConnectionState({ refreshFailedAt: '2026-06-01T00:00:00.000Z' }, []), 'refresh_failed');
+  assert.equal(googleOAuth.publicGoogleConnectionState({ expiresAt: '2026-06-01T00:00:00.000Z' }, []), 'token_expired');
+  assert.equal(googleOAuth.publicGoogleConnectionState({ expiresAt: '2999-06-01T00:00:00.000Z' }, []), 'connected');
 });
