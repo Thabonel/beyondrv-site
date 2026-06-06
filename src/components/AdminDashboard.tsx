@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { adminFetch, clearAdminToken } from '../lib/adminApi';
+import { adminFetch, adminJson, clearAdminToken } from '../lib/adminApi';
 
 type HealthStatus = 'ready' | 'warning' | 'blocker' | 'unavailable' | 'error';
 
@@ -22,6 +22,14 @@ interface LeadRecord {
   callback_date?: string;
   callback_time?: string;
   leadStatus: LeadStatus;
+  intelligence?: {
+    score: number;
+    urgency: 'hot' | 'warm' | 'cold' | 'waiting_on_customer' | 'waiting_on_byondrv' | 'dormant' | 'won' | 'lost';
+    reasons: string[];
+    nextAction: string;
+    followUpDueDate: string;
+    waitingOn: 'byondrv' | 'customer' | 'none';
+  };
 }
 
 interface ProductPerformanceRecord {
@@ -60,8 +68,22 @@ interface DashboardData {
     dueToday: number;
     overdue: number;
     byStatus: { status: string; count: number }[];
+    priorityQueue: LeadRecord[];
     followUpQueue: LeadRecord[];
     recent: LeadRecord[];
+  };
+  tasks: {
+    open: number;
+    dueToday: number;
+    overdue: number;
+    recent: {
+      id: string;
+      title: string;
+      dueDate?: string;
+      priority?: string;
+      status?: string;
+      relatedLeadId?: string;
+    }[];
   };
   productPerformance: ProductPerformanceRecord[];
   productInterest: {
@@ -119,6 +141,15 @@ const STATUS_COLOUR: Record<string, string> = {
   won: '#4ade80',
   lost: '#888',
   spam: '#777',
+  hot: '#f87171',
+  warm: '#fb923c',
+  cold: '#888',
+  waiting_on_customer: '#60a5fa',
+  waiting_on_byondrv: '#f87171',
+  dormant: '#777',
+  high: '#f87171',
+  medium: '#fb923c',
+  low: '#4ade80',
 };
 
 function money(value: number) {
@@ -185,7 +216,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
           window.location.href = '/.netlify/functions/admin-login';
           return null;
         }
-        const body = await res.json();
+        const body = await adminJson<DashboardData>(res, 'Could not load dashboard');
         if (!res.ok) throw new Error(body.error ?? 'Could not load dashboard');
         return body as DashboardData;
       })
@@ -255,8 +286,66 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.55rem' }}>
             <StatCard label="Email Delivery" value={data.contact.ready ? 'Ready' : 'Check'} sub={data.contact.ready ? data.contact.toEmail : 'Missing Resend/from email'} tone={data.contact.ready ? 'ready' : 'blocker'} />
-            <StatCard label="Pending Changes" value={pendingCount} sub={pendingCount ? 'Review before deploy' : 'None queued'} tone={pendingCount ? 'warning' : 'ready'} />
+            <StatCard label="Open Tasks" value={data.tasks.open} sub={`${data.tasks.overdue} overdue · ${pendingCount} pending changes`} tone={data.tasks.overdue ? 'blocker' : data.tasks.dueToday ? 'warning' : pendingCount ? 'warning' : 'ready'} />
           </div>
+
+          <Panel title="Today's Owner Priorities">
+            {data.leads.priorityQueue.length === 0 ? (
+              <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No high-priority lead actions detected.</p>
+            ) : (
+              <div style={{ display: 'grid', gap: '0.55rem' }}>
+                {data.leads.priorityQueue.map((lead) => (
+                  <div key={lead.id} style={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '6px', padding: '0.7rem', display: 'grid', gap: '0.42rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '0.7rem', alignItems: 'start' }}>
+                      <div style={{ minWidth: 0 }}>
+                        <strong style={{ color: '#fff', fontSize: '0.84rem' }}>{lead.name || 'Unnamed lead'}</strong>
+                        <div style={{ color: '#aaa', fontSize: '0.72rem', marginTop: '0.15rem' }}>{lead.product_interest || 'General enquiry'}</div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                        <StatusPill status={lead.intelligence?.urgency ?? lead.leadStatus.status} />
+                        {lead.intelligence && (
+                          <span style={{ color: '#fff', background: '#262626', border: '1px solid #3a3a3a', borderRadius: '999px', padding: '0.12rem 0.45rem', fontSize: '0.66rem', fontWeight: 800 }}>
+                            {lead.intelligence.score}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {lead.intelligence && (
+                      <>
+                        <div style={{ color: '#ddd', fontSize: '0.75rem', lineHeight: 1.4 }}>{lead.intelligence.nextAction}</div>
+                        <div style={{ color: '#888', fontSize: '0.68rem', lineHeight: 1.35 }}>{lead.intelligence.reasons.slice(0, 2).join(' ')}</div>
+                        {lead.intelligence.followUpDueDate && (
+                          <div style={{ color: '#fb923c', fontSize: '0.7rem' }}>Follow-up target: {lead.intelligence.followUpDueDate}</div>
+                        )}
+                      </>
+                    )}
+                    <div style={{ display: 'flex', gap: '0.6rem', fontSize: '0.74rem' }}>
+                      {lead.phone && <a href={`tel:${lead.phone}`} style={{ color: '#E8540A' }}>Call</a>}
+                      {lead.email && <a href={`mailto:${lead.email}`} style={{ color: '#E8540A' }}>Email</a>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Panel>
+
+          <Panel title="Owner Copilot Tasks">
+            {data.tasks.recent.length === 0 ? (
+              <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No open Copilot tasks yet.</p>
+            ) : (
+              <div style={{ display: 'grid', gap: '0.45rem' }}>
+                {data.tasks.recent.map((task) => (
+                  <div key={task.id} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '0.6rem', alignItems: 'center', borderBottom: '1px solid #252525', paddingBottom: '0.45rem' }}>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ color: '#fff', fontSize: '0.78rem', fontWeight: 700 }}>{task.title}</div>
+                      <div style={{ color: '#888', fontSize: '0.68rem', marginTop: '0.12rem' }}>{task.dueDate || 'No due date'}</div>
+                    </div>
+                    <StatusPill status={task.priority || 'medium'} />
+                  </div>
+                ))}
+              </div>
+            )}
+          </Panel>
 
           <Panel title="Lead Follow-Up Queue">
             {data.leads.followUpQueue.length === 0 ? (

@@ -277,6 +277,35 @@ interface LeadReminderSummary {
   total: number;
 }
 
+interface OwnerCopilotTask {
+  id: string;
+  title: string;
+  relatedLeadId?: string;
+  relatedCustomerId?: string;
+  dueDate?: string;
+  priority?: 'high' | 'medium' | 'low';
+  status?: 'open' | 'completed' | 'snoozed' | 'cancelled';
+  notes?: string;
+  createdAt?: string;
+  completedAt?: string;
+}
+
+interface OwnerCopilotTimelineEvent {
+  id: string;
+  eventType: string;
+  summary: string;
+  relatedLeadId?: string;
+  relatedTaskId?: string;
+  source?: string;
+  aiGenerated?: boolean;
+  createdAt: string;
+}
+
+interface OwnerCopilotLeadDetail {
+  tasks: OwnerCopilotTask[];
+  timeline: OwnerCopilotTimelineEvent[];
+}
+
 interface ManualEnquiryForm {
   source_type: Exclude<EnquirySourceType, 'website_form'>;
   customer_name: string;
@@ -1091,6 +1120,12 @@ export default function AdminPanel() {
   const [browserRemindersEnabled, setBrowserRemindersEnabled] = useState(false);
   const [browserReminderStatus, setBrowserReminderStatus] = useState('');
   const [enquiryQueueFilter, setEnquiryQueueFilter] = useState<EnquiryQueueFilter>('active');
+  const [openLeadDetailId, setOpenLeadDetailId] = useState<string | null>(null);
+  const [leadDetails, setLeadDetails] = useState<Record<string, OwnerCopilotLeadDetail>>({});
+  const [leadDetailStatus, setLeadDetailStatus] = useState<Record<string, string>>({});
+  const [taskDrafts, setTaskDrafts] = useState<Record<string, { title: string; dueDate: string; priority: 'high' | 'medium' | 'low'; notes: string }>>({});
+  const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({});
+  const [taskSaving, setTaskSaving] = useState<string | null>(null);
   const [contactConfig, setContactConfig] = useState<ContactConfig | null>(null);
   const [recentBuilds, setRecentBuilds] = useState<RecentBuild[]>(limitRecentBuilds(initialRecentBuilds as RecentBuild[]));
   const [testimonials, setTestimonials] = useState<Testimonial[]>(renumber(orderedItems(initialTestimonials as Testimonial[])));
@@ -1366,6 +1401,132 @@ export default function AdminPanel() {
 
   function openEnquiry(enquiryId: string) {
     enquiryRefs.current[enquiryId]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  async function loadLeadDetail(enquiryId: string) {
+    setLeadDetailStatus(prev => ({ ...prev, [enquiryId]: 'Loading lead detail...' }));
+    try {
+      const [taskRes, timelineRes] = await Promise.all([
+        adminFetch(`/.netlify/functions/admin-owner-copilot-tasks?leadId=${encodeURIComponent(enquiryId)}`),
+        adminFetch(`/.netlify/functions/admin-owner-copilot-timeline?leadId=${encodeURIComponent(enquiryId)}`),
+      ]);
+      if (redirectToLoginIfUnauthorized(taskRes) || redirectToLoginIfUnauthorized(timelineRes)) return;
+      const taskData = await readAdminJson<{ tasks?: OwnerCopilotTask[]; error?: string }>(taskRes, 'Could not load lead tasks.');
+      const timelineData = await readAdminJson<{ events?: OwnerCopilotTimelineEvent[]; error?: string }>(timelineRes, 'Could not load lead timeline.');
+      if (!taskRes.ok) throw new Error(taskData.error ?? 'Could not load lead tasks.');
+      if (!timelineRes.ok) throw new Error(timelineData.error ?? 'Could not load lead timeline.');
+      setLeadDetails(prev => ({
+        ...prev,
+        [enquiryId]: {
+          tasks: Array.isArray(taskData.tasks) ? taskData.tasks : [],
+          timeline: Array.isArray(timelineData.events) ? timelineData.events : [],
+        },
+      }));
+      setLeadDetailStatus(prev => ({ ...prev, [enquiryId]: '' }));
+    } catch (err) {
+      setLeadDetailStatus(prev => ({ ...prev, [enquiryId]: err instanceof Error ? err.message : 'Could not load lead detail.' }));
+    }
+  }
+
+  function toggleLeadDetail(enquiry: EnquiryRecord) {
+    const nextId = openLeadDetailId === enquiry.id ? null : enquiry.id;
+    setOpenLeadDetailId(nextId);
+    if (nextId && !leadDetails[nextId]) {
+      setTaskDrafts(prev => ({
+        ...prev,
+        [nextId]: prev[nextId] ?? {
+          title: `Follow up ${enquiry.name || 'lead'}`,
+          dueDate: enquiry.leadStatus?.nextFollowUpDate || enquiry.callback_date || reminderTodayKey(),
+          priority: enquiry.leadStatus?.priority === 'hot' ? 'high' : 'medium',
+          notes: '',
+        },
+      }));
+      void loadLeadDetail(nextId);
+    }
+  }
+
+  async function createLeadTask(enquiry: EnquiryRecord) {
+    const draft = taskDrafts[enquiry.id] ?? { title: '', dueDate: '', priority: 'medium' as const, notes: '' };
+    if (!draft.title.trim()) {
+      setLeadDetailStatus(prev => ({ ...prev, [enquiry.id]: 'Add a task title first.' }));
+      return;
+    }
+    setTaskSaving(enquiry.id);
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-owner-copilot-tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: draft.title,
+          relatedLeadId: enquiry.id,
+          dueDate: draft.dueDate,
+          priority: draft.priority,
+          notes: draft.notes,
+          source: 'admin-lead-detail',
+        }),
+      });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await readAdminJson<{ task?: OwnerCopilotTask; error?: string }>(res, 'Could not create task.');
+      if (!res.ok || !data.task) throw new Error(data.error ?? 'Could not create task.');
+      setTaskDrafts(prev => ({
+        ...prev,
+        [enquiry.id]: { title: '', dueDate: draft.dueDate, priority: draft.priority, notes: '' },
+      }));
+      await loadLeadDetail(enquiry.id);
+      setLeadDetailStatus(prev => ({ ...prev, [enquiry.id]: 'Task created.' }));
+    } catch (err) {
+      setLeadDetailStatus(prev => ({ ...prev, [enquiry.id]: err instanceof Error ? err.message : 'Could not create task.' }));
+    } finally {
+      setTaskSaving(null);
+    }
+  }
+
+  async function completeLeadTask(enquiryId: string, taskId: string) {
+    setTaskSaving(taskId);
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-owner-copilot-tasks', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: taskId, status: 'completed' }),
+      });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await readAdminJson<{ task?: OwnerCopilotTask; error?: string }>(res, 'Could not complete task.');
+      if (!res.ok || !data.task) throw new Error(data.error ?? 'Could not complete task.');
+      await loadLeadDetail(enquiryId);
+      setLeadDetailStatus(prev => ({ ...prev, [enquiryId]: 'Task completed.' }));
+    } catch (err) {
+      setLeadDetailStatus(prev => ({ ...prev, [enquiryId]: err instanceof Error ? err.message : 'Could not complete task.' }));
+    } finally {
+      setTaskSaving(null);
+    }
+  }
+
+  async function addLeadNote(enquiry: EnquiryRecord) {
+    const note = noteDrafts[enquiry.id]?.trim() ?? '';
+    if (!note) {
+      setLeadDetailStatus(prev => ({ ...prev, [enquiry.id]: 'Add a note first.' }));
+      return;
+    }
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-owner-copilot-timeline', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventType: 'note_added',
+          relatedLeadId: enquiry.id,
+          summary: note,
+          source: 'admin-lead-detail',
+        }),
+      });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await readAdminJson<{ event?: OwnerCopilotTimelineEvent; error?: string }>(res, 'Could not save note.');
+      if (!res.ok || !data.event) throw new Error(data.error ?? 'Could not save note.');
+      setNoteDrafts(prev => ({ ...prev, [enquiry.id]: '' }));
+      await loadLeadDetail(enquiry.id);
+      setLeadDetailStatus(prev => ({ ...prev, [enquiry.id]: 'Note added.' }));
+    } catch (err) {
+      setLeadDetailStatus(prev => ({ ...prev, [enquiry.id]: err instanceof Error ? err.message : 'Could not save note.' }));
+    }
   }
 
   function setManualMode(mode: 'manual_email' | 'phone_call') {
@@ -3243,6 +3404,12 @@ export default function AdminPanel() {
                       >
                         Mark as Replied
                       </button>
+                      <button
+                        onClick={() => toggleLeadDetail(enquiry)}
+                        style={{ background: openLeadDetailId === enquiry.id ? '#E8540A' : '#222', border: openLeadDetailId === enquiry.id ? 'none' : '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.76rem' }}
+                      >
+                        {openLeadDetailId === enquiry.id ? 'Hide Details' : 'Details'}
+                      </button>
                     </div>
                     {responseDrafts[enquiry.id] && (
                       <textarea
@@ -3255,6 +3422,119 @@ export default function AdminPanel() {
                     {responseStatuses[enquiry.id] && (
                       <div style={{ color: '#aaa', fontSize: '0.72rem', lineHeight: 1.45 }}>{responseStatuses[enquiry.id]}</div>
                     )}
+                    {openLeadDetailId === enquiry.id && (() => {
+                      const detail = leadDetails[enquiry.id] ?? { tasks: [], timeline: [] };
+                      const taskDraft = taskDrafts[enquiry.id] ?? { title: '', dueDate: '', priority: 'medium' as const, notes: '' };
+                      const openTasks = detail.tasks.filter(task => task.status !== 'completed' && task.status !== 'cancelled');
+                      return (
+                        <div style={{ borderTop: '1px solid #303030', paddingTop: '0.6rem', display: 'grid', gap: '0.6rem' }}>
+                          <div style={{ display: 'grid', gap: '0.45rem', background: '#111', border: '1px solid #333', borderRadius: '6px', padding: '0.6rem' }}>
+                            <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.78rem' }}>Create follow-up task</div>
+                            <input
+                              value={taskDraft.title}
+                              onChange={e => setTaskDrafts(prev => ({ ...prev, [enquiry.id]: { ...taskDraft, title: e.target.value } }))}
+                              placeholder="Task title"
+                              style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }}
+                            />
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '0.4rem' }}>
+                              <input
+                                type="date"
+                                value={taskDraft.dueDate}
+                                onChange={e => setTaskDrafts(prev => ({ ...prev, [enquiry.id]: { ...taskDraft, dueDate: e.target.value } }))}
+                                style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }}
+                              />
+                              <select
+                                value={taskDraft.priority}
+                                onChange={e => setTaskDrafts(prev => ({ ...prev, [enquiry.id]: { ...taskDraft, priority: e.target.value as 'high' | 'medium' | 'low' } }))}
+                                style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem' }}
+                              >
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                              </select>
+                              <button
+                                type="button"
+                                onClick={() => createLeadTask(enquiry)}
+                                disabled={taskSaving === enquiry.id}
+                                style={{ background: '#E8540A', border: 'none', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: taskSaving === enquiry.id ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.76rem', whiteSpace: 'nowrap' }}
+                              >
+                                {taskSaving === enquiry.id ? 'Saving...' : 'Add Task'}
+                              </button>
+                            </div>
+                            <textarea
+                              value={taskDraft.notes}
+                              onChange={e => setTaskDrafts(prev => ({ ...prev, [enquiry.id]: { ...taskDraft, notes: e.target.value } }))}
+                              placeholder="Optional task notes"
+                              rows={2}
+                              style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem', lineHeight: 1.35 }}
+                            />
+                          </div>
+
+                          <div style={{ display: 'grid', gap: '0.45rem' }}>
+                            <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.78rem' }}>Open tasks</div>
+                            {openTasks.length === 0 ? (
+                              <div style={{ color: '#777', fontSize: '0.74rem' }}>No open tasks for this lead.</div>
+                            ) : (
+                              openTasks.map(task => (
+                                <div key={task.id} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '0.5rem', alignItems: 'center', background: '#111', border: '1px solid #333', borderRadius: '6px', padding: '0.5rem' }}>
+                                  <div style={{ minWidth: 0 }}>
+                                    <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.76rem' }}>{task.title}</div>
+                                    <div style={{ color: '#888', fontSize: '0.68rem', marginTop: '0.1rem' }}>{task.dueDate || 'No due date'} · {task.priority || 'medium'}</div>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => completeLeadTask(enquiry.id, task.id)}
+                                    disabled={taskSaving === task.id}
+                                    style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.38rem 0.5rem', cursor: taskSaving === task.id ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.72rem' }}
+                                  >
+                                    Done
+                                  </button>
+                                </div>
+                              ))
+                            )}
+                          </div>
+
+                          <div style={{ display: 'grid', gap: '0.45rem' }}>
+                            <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.78rem' }}>Lead note</div>
+                            <textarea
+                              value={noteDrafts[enquiry.id] ?? ''}
+                              onChange={e => setNoteDrafts(prev => ({ ...prev, [enquiry.id]: e.target.value }))}
+                              placeholder="Log a call note, decision, or customer context"
+                              rows={2}
+                              style={{ resize: 'vertical', background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.76rem', lineHeight: 1.35 }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => addLeadNote(enquiry)}
+                              style={{ justifySelf: 'start', background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.42rem 0.55rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.74rem' }}
+                            >
+                              Add Timeline Note
+                            </button>
+                          </div>
+
+                          <div style={{ display: 'grid', gap: '0.45rem' }}>
+                            <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.78rem' }}>Timeline</div>
+                            {detail.timeline.length === 0 ? (
+                              <div style={{ color: '#777', fontSize: '0.74rem' }}>No timeline events for this lead yet.</div>
+                            ) : (
+                              detail.timeline.map(event => (
+                                <div key={event.id} style={{ borderLeft: '2px solid #E8540A', paddingLeft: '0.55rem', display: 'grid', gap: '0.12rem' }}>
+                                  <div style={{ color: '#fff', fontSize: '0.74rem', fontWeight: 700 }}>{event.summary}</div>
+                                  <div style={{ color: '#777', fontSize: '0.66rem' }}>
+                                    {event.createdAt ? new Date(event.createdAt).toLocaleString() : ''} · {event.eventType.replace(/_/g, ' ')}
+                                    {event.aiGenerated ? ' · AI generated' : ''}
+                                  </div>
+                                </div>
+                              ))
+                            )}
+                          </div>
+
+                          {leadDetailStatus[enquiry.id] && (
+                            <div style={{ color: isAdminWarningStatus(leadDetailStatus[enquiry.id]) ? '#fb923c' : '#aaa', fontSize: '0.72rem', lineHeight: 1.45 }}>{leadDetailStatus[enquiry.id]}</div>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
               ))}

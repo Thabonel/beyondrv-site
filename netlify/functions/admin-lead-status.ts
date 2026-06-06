@@ -1,6 +1,7 @@
 import type { Handler } from '@netlify/functions';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
+import { newOwnerCopilotId, OWNER_COPILOT_TIMELINE_STORE, timelineKey } from './owner-copilot-core';
 
 const STORE_NAME = 'customer-lead-status';
 const VALID_STATUSES = new Set(['new', 'contacted', 'replied', 'called', 'qualified', 'quoted', 'follow-up-scheduled', 'won', 'lost', 'spam']);
@@ -141,6 +142,28 @@ export const handler: Handler = async (event) => {
   };
 
   await store.setJSON(leadKey(enquiryId), leadStatus);
+
+  try {
+    const previousStatus = typeof existing?.status === 'string' ? existing.status : 'new';
+    if (previousStatus !== status) {
+      const timelineStore = getBlobStore(OWNER_COPILOT_TIMELINE_STORE);
+      const timelineId = newOwnerCopilotId('timeline');
+      await timelineStore.setJSON(timelineKey(timelineId), {
+        id: timelineId,
+        eventType: 'status_changed',
+        summary: `Lead status changed from ${previousStatus} to ${status}.`,
+        relatedLeadId: enquiryId,
+        source: 'admin-lead-status',
+        aiGenerated: false,
+        createdAt: leadStatus.updatedAt,
+      });
+    }
+  } catch (timelineError) {
+    console.warn('admin-lead-status: status saved but timeline append failed', {
+      enquiryId,
+      error: safeBlobStoreError(timelineError),
+    });
+  }
 
   return {
     statusCode: 200,

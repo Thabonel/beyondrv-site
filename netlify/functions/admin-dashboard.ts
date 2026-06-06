@@ -2,6 +2,11 @@ import type { Handler } from '@netlify/functions';
 import OpenAI from 'openai';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
 import { connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
+import {
+  buildLeadIntelligence,
+  OWNER_COPILOT_TASK_STORE,
+  type OwnerLeadIntelligence,
+} from './owner-copilot-core';
 import catalogue from './product-catalogue.json';
 
 const ENQUIRY_STORE = 'customer-enquiries';
@@ -50,9 +55,18 @@ interface EnquiryRecord {
 interface LeadStatusRecord {
   enquiryId: string;
   status: LeadStatusValue;
+  priority?: string;
   notes?: string;
   nextFollowUpDate?: string;
+  firstResponseAt?: string;
+  lastContactedAt?: string;
+  outcomeReason?: string;
   updatedAt: string;
+}
+
+interface LeadRecord extends EnquiryRecord {
+  leadStatus: LeadStatusRecord;
+  intelligence: OwnerLeadIntelligence;
 }
 
 interface MarketingInsight {
@@ -180,6 +194,36 @@ async function getLeadStatuses(enquiries: EnquiryRecord[]) {
       error: safeBlobStoreError(error),
     });
     return new Map<string, LeadStatusRecord | null>();
+  }
+}
+
+async function loadTaskSummary() {
+  try {
+    const store = getBlobStore(OWNER_COPILOT_TASK_STORE);
+    const { blobs } = await store.list();
+    const tasks = (await Promise.all(blobs.map(async (blob) => {
+      try {
+        return await store.get(blob.key, { type: 'json' }) as Record<string, unknown> | null;
+      } catch {
+        return null;
+      }
+    }))).filter((task): task is Record<string, unknown> => Boolean(task?.id));
+    const today = todayKey(new Date());
+    return {
+      open: tasks.filter(task => task.status === 'open').length,
+      dueToday: tasks.filter(task => task.status === 'open' && task.dueDate === today).length,
+      overdue: tasks.filter(task => task.status === 'open' && typeof task.dueDate === 'string' && task.dueDate < today).length,
+      recent: tasks
+        .filter(task => task.status === 'open')
+        .sort((a, b) => String(a.dueDate || '9999-12-31').localeCompare(String(b.dueDate || '9999-12-31')))
+        .slice(0, 6),
+    };
+  } catch (error) {
+    console.warn('admin-dashboard: owner copilot task summary unavailable', {
+      store: OWNER_COPILOT_TASK_STORE,
+      error: safeBlobStoreError(error),
+    });
+    return { open: 0, dueToday: 0, overdue: 0, recent: [] as Record<string, unknown>[] };
   }
 }
 
@@ -568,7 +612,10 @@ export const handler: Handler = async (event) => {
     .filter((enquiry) => enquiry?.id && enquiry?.submittedAt)
     .sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));
   const leadStatuses = await getLeadStatuses(enquiries);
-  const analytics = await loadAnalytics(days, products);
+  const [analytics, taskSummary] = await Promise.all([
+    loadAnalytics(days, products),
+    loadTaskSummary(),
+  ]);
 
   const byCategory = new Map<string, { category: string; count: number; value: number }>();
   const byStatus = new Map<string, { status: string; count: number }>();
@@ -586,21 +633,32 @@ export const handler: Handler = async (event) => {
     byStatus.set(product.status, status);
   }
 
-  const leadRecords = enquiries.map((enquiry) => {
+  const leadRecords: LeadRecord[] = enquiries.map((enquiry) => {
     const leadStatus = leadStatuses.get(enquiry.id) ?? null;
+    const mergedStatus = leadStatus ?? {
+      enquiryId: enquiry.id,
+      status: 'new' as LeadStatusValue,
+      notes: '',
+      nextFollowUpDate: enquiry.callback_date || '',
+      updatedAt: enquiry.submittedAt,
+    };
     return {
       ...enquiry,
-      leadStatus: leadStatus ?? {
-        enquiryId: enquiry.id,
-        status: 'new' as LeadStatusValue,
-        notes: '',
-        nextFollowUpDate: enquiry.callback_date || '',
-        updatedAt: enquiry.submittedAt,
-      },
+      leadStatus: mergedStatus,
+      intelligence: buildLeadIntelligence(enquiry, mergedStatus, now),
     };
   });
 
   const activeLeads = leadRecords.filter((enquiry) => !['won', 'lost', 'spam'].includes(enquiry.leadStatus.status));
+  const priorityQueue = activeLeads
+    .filter((lead) => ['hot', 'warm', 'waiting_on_byondrv'].includes(lead.intelligence.urgency) || Boolean(lead.intelligence.followUpDueDate && lead.intelligence.followUpDueDate <= today))
+    .sort((a, b) => {
+      const urgencyRank = { waiting_on_byondrv: 4, hot: 3, warm: 2, cold: 1, waiting_on_customer: 1, dormant: 0, won: 0, lost: 0 } as Record<string, number>;
+      return (urgencyRank[b.intelligence.urgency] ?? 0) - (urgencyRank[a.intelligence.urgency] ?? 0)
+        || b.intelligence.score - a.intelligence.score
+        || String(a.intelligence.followUpDueDate || '9999-12-31').localeCompare(String(b.intelligence.followUpDueDate || '9999-12-31'));
+    })
+    .slice(0, 10);
   const followUpQueue = activeLeads
     .filter((enquiry) => enquiry.leadStatus.nextFollowUpDate && enquiry.leadStatus.nextFollowUpDate <= today)
     .sort((a, b) => String(a.leadStatus.nextFollowUpDate).localeCompare(String(b.leadStatus.nextFollowUpDate)))
@@ -701,9 +759,11 @@ export const handler: Handler = async (event) => {
         dueToday: activeLeads.filter((enquiry) => enquiry.leadStatus.nextFollowUpDate === today).length,
         overdue: activeLeads.filter((enquiry) => enquiry.leadStatus.nextFollowUpDate && enquiry.leadStatus.nextFollowUpDate < today).length,
         byStatus: byLeadStatus,
+        priorityQueue,
         followUpQueue,
         recent: leadRecords.slice(0, 5),
       },
+      tasks: taskSummary,
       productPerformance,
       productInterest: {
         unknownProductEnquiries,

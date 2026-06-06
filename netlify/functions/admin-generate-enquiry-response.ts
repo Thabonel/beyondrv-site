@@ -2,6 +2,12 @@ import OpenAI from 'openai';
 import type { Handler } from '@netlify/functions';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
+import {
+  newOwnerCopilotId,
+  OWNER_COPILOT_AI_ACTION_STORE,
+  OWNER_COPILOT_TIMELINE_STORE,
+  timelineKey,
+} from './owner-copilot-core';
 import catalogue from './product-catalogue.json';
 import chatbotKnowledge from './chatbot-knowledge.json';
 
@@ -17,6 +23,10 @@ function clean(value: unknown, max = 4000) {
 
 function leadKey(enquiryId: string) {
   return `lead-status/${encodeURIComponent(enquiryId)}.json`;
+}
+
+function aiActionKey(actionId: string) {
+  return `ai-actions/${encodeURIComponent(actionId)}.json`;
 }
 
 function firstName(name = '') {
@@ -140,10 +150,44 @@ Rules:
     });
 
     const draft = response.output_text.trim();
+    const generatedAt = new Date().toISOString();
+    const actionId = newOwnerCopilotId('ai_action');
+
+    try {
+      const aiActionStore = getBlobStore(OWNER_COPILOT_AI_ACTION_STORE);
+      await aiActionStore.setJSON(aiActionKey(actionId), {
+        id: actionId,
+        actionType: 'email_draft',
+        relatedLeadId: enquiryId,
+        source: 'admin-generate-enquiry-response',
+        model: RESPONSE_MODEL,
+        approvalState: 'draft',
+        output: draft,
+        warnings: [],
+        createdAt: generatedAt,
+      });
+      const timelineStore = getBlobStore(OWNER_COPILOT_TIMELINE_STORE);
+      const timelineId = newOwnerCopilotId('timeline');
+      await timelineStore.setJSON(timelineKey(timelineId), {
+        id: timelineId,
+        eventType: 'ai_draft_created',
+        summary: 'AI email draft created for owner review.',
+        relatedLeadId: enquiryId,
+        source: 'admin-generate-enquiry-response',
+        aiGenerated: true,
+        createdAt: generatedAt,
+      });
+    } catch (storageError) {
+      console.warn('admin-generate-enquiry-response: draft generated but AI action persistence failed', {
+        enquiryId,
+        error: safeBlobStoreError(storageError),
+      });
+    }
+
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ draft, generatedAt: new Date().toISOString(), warnings: [] }),
+      body: JSON.stringify({ draft, generatedAt, warnings: [], aiActionId: actionId, approvalState: 'draft' }),
     };
   } catch (error) {
     console.error('admin-generate-enquiry-response: OpenAI generation failed', {
