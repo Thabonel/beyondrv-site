@@ -1108,6 +1108,7 @@ export default function AdminPanel() {
   const [enquiriesStatus, setEnquiriesStatus] = useState('');
   const [leadSaving, setLeadSaving] = useState<string | null>(null);
   const [responseDrafts, setResponseDrafts] = useState<Record<string, string>>({});
+  const [responseGrounding, setResponseGrounding] = useState<Record<string, { warnings: string[]; missingFacts: string[]; sources: { title: string; type: string; url?: string; confidence?: number }[] }>>({});
   const [responseGenerating, setResponseGenerating] = useState<string | null>(null);
   const [responseStatuses, setResponseStatuses] = useState<Record<string, string>>({});
   const [classificationSaving, setClassificationSaving] = useState<string | null>(null);
@@ -1646,9 +1647,23 @@ export default function AdminPanel() {
         body: JSON.stringify({ enquiryId: enquiry.id }),
       });
       if (redirectToLoginIfUnauthorized(res)) return;
-      const data = await res.json() as { draft?: string; error?: string };
+      const data = await res.json() as {
+        draft?: string;
+        error?: string;
+        warnings?: string[];
+        missingFacts?: string[];
+        sources?: { title: string; type: string; url?: string; confidence?: number }[];
+      };
       if (!res.ok || !data.draft) throw new Error(data.error ?? 'Could not generate response');
       setResponseDrafts(prev => ({ ...prev, [enquiry.id]: data.draft ?? '' }));
+      setResponseGrounding(prev => ({
+        ...prev,
+        [enquiry.id]: {
+          warnings: Array.isArray(data.warnings) ? data.warnings : [],
+          missingFacts: Array.isArray(data.missingFacts) ? data.missingFacts : [],
+          sources: Array.isArray(data.sources) ? data.sources : [],
+        },
+      }));
       setResponseStatuses(prev => ({ ...prev, [enquiry.id]: 'Draft generated. Review before sending.' }));
     } catch (err) {
       setResponseStatuses(prev => ({
@@ -3418,6 +3433,26 @@ export default function AdminPanel() {
                         rows={8}
                         style={{ resize: 'vertical', background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem', fontSize: '0.78rem', lineHeight: 1.45 }}
                       />
+                    )}
+                    {responseGrounding[enquiry.id] && (
+                      <div style={{ background: '#111', border: '1px solid #333', borderRadius: '6px', padding: '0.55rem', display: 'grid', gap: '0.35rem', color: '#aaa', fontSize: '0.72rem', lineHeight: 1.45 }}>
+                        <div style={{ color: '#fff', fontWeight: 700 }}>Draft grounding</div>
+                        {responseGrounding[enquiry.id].sources.length > 0 && (
+                          <div>
+                            Sources: {responseGrounding[enquiry.id].sources.map(source => source.title).join(', ')}
+                          </div>
+                        )}
+                        {responseGrounding[enquiry.id].missingFacts.length > 0 && (
+                          <div style={{ color: '#fb923c' }}>
+                            Check before sending: {responseGrounding[enquiry.id].missingFacts.join(' ')}
+                          </div>
+                        )}
+                        {responseGrounding[enquiry.id].warnings.length > 0 && (
+                          <div style={{ color: '#fb923c' }}>
+                            Guardrails: {responseGrounding[enquiry.id].warnings.join(' ')}
+                          </div>
+                        )}
+                      </div>
                     )}
                     {responseStatuses[enquiry.id] && (
                       <div style={{ color: '#aaa', fontSize: '0.72rem', lineHeight: 1.45 }}>{responseStatuses[enquiry.id]}</div>
