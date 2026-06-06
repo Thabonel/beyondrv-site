@@ -42,7 +42,7 @@ interface PendingChange {
 }
 
 type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
-type PanelTab = 'dashboard' | 'products' | 'orders' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'knowledge' | 'pending';
+type PanelTab = 'dashboard' | 'products' | 'orders' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'drafts' | 'audit' | 'knowledge' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 type SuitabilityDataStatus = 'draft' | 'target' | 'confirmed';
@@ -279,6 +279,32 @@ interface CopilotLeadRecord {
   updatedAt?: string;
 }
 
+interface CopilotAiActionRecord {
+  id: string;
+  actionType?: string;
+  relatedLeadId?: string;
+  relatedCustomerId?: string;
+  approvalState?: string;
+  output?: string;
+  warnings?: string[];
+  missingFacts?: string[];
+  outputWarnings?: string[];
+  blockedPhrases?: string[];
+  sources?: ProductKnowledgeSourceView[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface CopilotAuditRecord {
+  id: string;
+  action?: string;
+  targetType?: string;
+  targetId?: string;
+  actor?: string;
+  detail?: Record<string, unknown>;
+  createdAt?: string;
+}
+
 interface LeadReminderItem {
   id: string;
   enquiryId: string;
@@ -351,6 +377,7 @@ interface ProductKnowledgeLookupResult {
 interface ResponseGrounding {
   warnings: string[];
   missingFacts: string[];
+  outputWarnings?: string[];
   sources: ProductKnowledgeSourceView[];
 }
 
@@ -1152,6 +1179,10 @@ export default function AdminPanel() {
   const [copilotLeads, setCopilotLeads] = useState<CopilotLeadRecord[]>([]);
   const [copilotRecordsLoading, setCopilotRecordsLoading] = useState(false);
   const [copilotRecordsStatus, setCopilotRecordsStatus] = useState('');
+  const [copilotAiActions, setCopilotAiActions] = useState<CopilotAiActionRecord[]>([]);
+  const [copilotAuditLogs, setCopilotAuditLogs] = useState<CopilotAuditRecord[]>([]);
+  const [copilotOpsLoading, setCopilotOpsLoading] = useState(false);
+  const [copilotOpsStatus, setCopilotOpsStatus] = useState('');
   const [previewChange, setPreviewChange] = useState<PendingChange | null>(null);
   const [mediaScope, setMediaScope] = useState<MediaScope>('products');
   const [mediaSlug, setMediaSlug] = useState('');
@@ -1253,8 +1284,14 @@ export default function AdminPanel() {
   }, [activeTab]);
 
   useEffect(() => {
-    if (activeTab === 'customers' || activeTab === 'leads') {
+    if (activeTab === 'customers' || activeTab === 'leads' || activeTab === 'drafts' || activeTab === 'audit') {
       void loadCopilotRecords();
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab === 'drafts' || activeTab === 'audit') {
+      void loadCopilotOps();
     }
   }, [activeTab]);
 
@@ -1413,6 +1450,29 @@ export default function AdminPanel() {
       setCopilotRecordsStatus(err instanceof Error ? err.message : 'Could not load Copilot records.');
     } finally {
       setCopilotRecordsLoading(false);
+    }
+  }
+
+  async function loadCopilotOps() {
+    setCopilotOpsLoading(true);
+    setCopilotOpsStatus('Loading Copilot activity...');
+    try {
+      const [actionRes, auditRes] = await Promise.all([
+        adminFetch('/.netlify/functions/admin-owner-copilot-ai-actions'),
+        adminFetch('/.netlify/functions/admin-owner-copilot-audit'),
+      ]);
+      if (redirectToLoginIfUnauthorized(actionRes) || redirectToLoginIfUnauthorized(auditRes)) return;
+      const actionData = await readAdminJson<{ actions?: CopilotAiActionRecord[]; error?: string }>(actionRes, 'Could not load drafts.');
+      const auditData = await readAdminJson<{ logs?: CopilotAuditRecord[]; error?: string }>(auditRes, 'Could not load audit logs.');
+      if (!actionRes.ok) throw new Error(actionData.error ?? 'Could not load drafts.');
+      if (!auditRes.ok) throw new Error(auditData.error ?? 'Could not load audit logs.');
+      setCopilotAiActions(Array.isArray(actionData.actions) ? actionData.actions : []);
+      setCopilotAuditLogs(Array.isArray(auditData.logs) ? auditData.logs : []);
+      setCopilotOpsStatus('');
+    } catch (err) {
+      setCopilotOpsStatus(err instanceof Error ? err.message : 'Could not load Copilot activity.');
+    } finally {
+      setCopilotOpsLoading(false);
     }
   }
 
@@ -1804,6 +1864,7 @@ export default function AdminPanel() {
         error?: string;
         warnings?: string[];
         missingFacts?: string[];
+        outputWarnings?: string[];
         sources?: ProductKnowledgeSourceView[];
         aiActionId?: string;
       };
@@ -1815,6 +1876,7 @@ export default function AdminPanel() {
         [enquiry.id]: {
           warnings: Array.isArray(data.warnings) ? data.warnings : [],
           missingFacts: Array.isArray(data.missingFacts) ? data.missingFacts : [],
+          outputWarnings: Array.isArray(data.outputWarnings) ? data.outputWarnings : [],
           sources: Array.isArray(data.sources) ? data.sources : [],
         },
       }));
@@ -2671,8 +2733,8 @@ export default function AdminPanel() {
             </button>
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, minmax(0, 1fr))', borderBottom: '1px solid #333' }}>
-          {(['dashboard', 'products', 'orders', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'knowledge', 'pending'] as PanelTab[]).map(tab => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, minmax(0, 1fr))', borderBottom: '1px solid #333' }}>
+          {(['dashboard', 'products', 'orders', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'pending'] as PanelTab[]).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -3683,6 +3745,11 @@ export default function AdminPanel() {
                             Guardrails: {responseGrounding[enquiry.id].warnings.join(' ')}
                           </div>
                         )}
+                        {Boolean(responseGrounding[enquiry.id].outputWarnings?.length) && (
+                          <div style={{ color: '#f87171' }}>
+                            Draft validation: {responseGrounding[enquiry.id].outputWarnings?.join(' ')}
+                          </div>
+                        )}
                       </div>
                     )}
                     {responseStatuses[enquiry.id] && (
@@ -3871,6 +3938,64 @@ export default function AdminPanel() {
                   </div>
                 );
               })
+            )}
+          </div>
+        )}
+
+        {activeTab === 'drafts' && (
+          <div style={{ padding: '1rem', overflowY: 'auto', display: 'grid', gap: '0.8rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
+              <div>
+                <div style={{ color: '#fff', fontWeight: 800 }}>AI Drafts</div>
+                <div style={{ color: '#888', fontSize: '0.76rem', marginTop: '0.2rem' }}>{copilotAiActions.length} stored AI actions</div>
+              </div>
+              <button type="button" onClick={loadCopilotOps} disabled={copilotOpsLoading} style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: copilotOpsLoading ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.76rem' }}>Refresh</button>
+            </div>
+            {copilotOpsStatus && <div style={{ color: isAdminWarningStatus(copilotOpsStatus) ? '#fb923c' : '#aaa', fontSize: '0.76rem' }}>{copilotOpsStatus}</div>}
+            {copilotAiActions.length === 0 && !copilotOpsLoading ? (
+              <div style={{ color: '#777', fontSize: '0.82rem' }}>No AI drafts stored yet.</div>
+            ) : (
+              copilotAiActions.map(action => {
+                const lead = copilotLeads.find(item => item.id === action.relatedLeadId);
+                const customer = copilotCustomers.find(item => item.id === lead?.customerId || item.id === action.relatedCustomerId);
+                return (
+                  <div key={action.id} style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.75rem', display: 'grid', gap: '0.45rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem', alignItems: 'baseline' }}>
+                      <div style={{ color: '#fff', fontWeight: 800 }}>{customer?.name || customer?.email || action.relatedLeadId || 'AI draft'}</div>
+                      <span style={{ color: '#93c5fd', border: '1px solid #1d4ed8', borderRadius: '999px', padding: '0.1rem 0.45rem', fontSize: '0.66rem', fontWeight: 800, textTransform: 'uppercase' }}>{action.approvalState || 'draft'}</span>
+                    </div>
+                    <div style={{ color: '#aaa', fontSize: '0.76rem', lineHeight: 1.45 }}>{action.output?.slice(0, 600) || 'No draft output saved.'}</div>
+                    {Boolean(action.outputWarnings?.length) && <div style={{ color: '#f87171', fontSize: '0.74rem' }}>Validation: {action.outputWarnings?.join(' ')}</div>}
+                    {Boolean(action.missingFacts?.length) && <div style={{ color: '#fb923c', fontSize: '0.74rem' }}>Check: {action.missingFacts?.join(' ')}</div>}
+                    <div style={{ color: '#666', fontSize: '0.68rem' }}>Lead: {action.relatedLeadId || 'none'} · Created: {action.createdAt ? new Date(action.createdAt).toLocaleString() : 'Not recorded'}</div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        )}
+
+        {activeTab === 'audit' && (
+          <div style={{ padding: '1rem', overflowY: 'auto', display: 'grid', gap: '0.8rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
+              <div>
+                <div style={{ color: '#fff', fontWeight: 800 }}>Audit Log</div>
+                <div style={{ color: '#888', fontSize: '0.76rem', marginTop: '0.2rem' }}>{copilotAuditLogs.length} recent records</div>
+              </div>
+              <button type="button" onClick={loadCopilotOps} disabled={copilotOpsLoading} style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: copilotOpsLoading ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.76rem' }}>Refresh</button>
+            </div>
+            {copilotOpsStatus && <div style={{ color: isAdminWarningStatus(copilotOpsStatus) ? '#fb923c' : '#aaa', fontSize: '0.76rem' }}>{copilotOpsStatus}</div>}
+            {copilotAuditLogs.length === 0 && !copilotOpsLoading ? (
+              <div style={{ color: '#777', fontSize: '0.82rem' }}>No audit logs recorded yet.</div>
+            ) : (
+              copilotAuditLogs.map(log => (
+                <div key={log.id} style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.75rem', display: 'grid', gap: '0.25rem' }}>
+                  <div style={{ color: '#fff', fontWeight: 800 }}>{(log.action || 'audit_event').replace(/_/g, ' ')}</div>
+                  <div style={{ color: '#aaa', fontSize: '0.76rem' }}>Target: {log.targetType || 'unknown'} · {log.targetId || 'none'} · Actor: {log.actor || 'system'}</div>
+                  {log.detail && <div style={{ color: '#888', fontSize: '0.72rem', lineHeight: 1.45 }}>{JSON.stringify(log.detail)}</div>}
+                  <div style={{ color: '#666', fontSize: '0.68rem' }}>{log.createdAt ? new Date(log.createdAt).toLocaleString() : 'No timestamp'}</div>
+                </div>
+              ))
             )}
           </div>
         )}

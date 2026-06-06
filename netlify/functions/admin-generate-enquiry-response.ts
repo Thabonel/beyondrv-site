@@ -9,6 +9,7 @@ import {
   aiActionKey,
   timelineKey,
 } from './owner-copilot-core';
+import { validateDraftOutput } from './ai-guardrails-core';
 import { buildProductKnowledgeContext } from './product-knowledge-core';
 import catalogue from './product-catalogue.json';
 import chatbotKnowledge from './chatbot-knowledge.json';
@@ -18,6 +19,8 @@ const client = openAiKey ? new OpenAI({ apiKey: openAiKey }) : null;
 const RESPONSE_MODEL = process.env.OPENAI_ADMIN_RESPONSE_MODEL ?? process.env.OPENAI_ADMIN_MODEL ?? 'gpt-5-mini';
 const ENQUIRY_STORE = 'customer-enquiries';
 const LEAD_STATUS_STORE = 'customer-lead-status';
+const AI_HOURLY_LIMIT = Number(process.env.OPENAI_ADMIN_HOURLY_LIMIT ?? 20);
+const AI_DAILY_LIMIT = Number(process.env.OPENAI_ADMIN_DAILY_LIMIT ?? 100);
 
 function clean(value: unknown, max = 4000) {
   return typeof value === 'string' ? value.trim().slice(0, max) : '';
@@ -29,6 +32,28 @@ function leadKey(enquiryId: string) {
 
 function firstName(name = '') {
   return name.trim().split(/\s+/)[0] || name.trim();
+}
+
+async function assertAiRateLimit() {
+  const store = getBlobStore(OWNER_COPILOT_AI_ACTION_STORE);
+  const { blobs } = await store.list();
+  const now = Date.now();
+  let hourly = 0;
+  let daily = 0;
+  await Promise.all(blobs.map(async (blob) => {
+    try {
+      const action = await store.get(blob.key, { type: 'json' }) as Record<string, unknown> | null;
+      const createdAt = typeof action?.createdAt === 'string' ? Date.parse(action.createdAt) : NaN;
+      if (!Number.isFinite(createdAt)) return;
+      const ageMs = now - createdAt;
+      if (ageMs <= 3_600_000) hourly += 1;
+      if (ageMs <= 86_400_000) daily += 1;
+    } catch {}
+  }));
+
+  if (hourly >= AI_HOURLY_LIMIT) return `AI draft limit reached: ${AI_HOURLY_LIMIT} requests in the last hour.`;
+  if (daily >= AI_DAILY_LIMIT) return `AI draft limit reached: ${AI_DAILY_LIMIT} requests in the last 24 hours.`;
+  return '';
 }
 
 function findProduct(productInterest = '') {
@@ -100,6 +125,22 @@ export const handler: Handler = async (event) => {
     };
   }
 
+  try {
+    const rateLimitMessage = await assertAiRateLimit();
+    if (rateLimitMessage) {
+      return {
+        statusCode: 429,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: rateLimitMessage }),
+      };
+    }
+  } catch (rateLimitError) {
+    console.warn('admin-generate-enquiry-response: rate limit check unavailable', {
+      enquiryId,
+      error: safeBlobStoreError(rateLimitError),
+    });
+  }
+
   const product = findProduct(clean(enquiry.product_interest, 240));
   const knowledgeContext = buildProductKnowledgeContext({
     query: [
@@ -163,6 +204,7 @@ Rules:
     });
 
     const draft = response.output_text.trim();
+    const draftValidation = validateDraftOutput(draft);
     const generatedAt = new Date().toISOString();
     const actionId = newOwnerCopilotId('ai_action');
 
@@ -178,6 +220,8 @@ Rules:
         output: draft,
         warnings: knowledgeContext.warnings,
         missingFacts: knowledgeContext.missingFacts,
+        outputWarnings: draftValidation.warnings,
+        blockedPhrases: draftValidation.blockedPhrases,
         sources: knowledgeContext.sources.map(source => ({
           id: source.id,
           title: source.title,
@@ -214,6 +258,8 @@ Rules:
         generatedAt,
         warnings: knowledgeContext.warnings,
         missingFacts: knowledgeContext.missingFacts,
+        outputWarnings: draftValidation.warnings,
+        blockedPhrases: draftValidation.blockedPhrases,
         sources: knowledgeContext.sources.map(source => ({
           id: source.id,
           title: source.title,

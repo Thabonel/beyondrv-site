@@ -28,6 +28,7 @@ async function importTsWithoutImports(path) {
 const productKnowledge = await importTs(new URL('../netlify/functions/product-knowledge-core.ts', import.meta.url));
 const ownerCopilot = await importTs(new URL('../netlify/functions/owner-copilot-core.ts', import.meta.url));
 const recordSync = await importTsWithoutImports(new URL('../netlify/functions/owner-copilot-record-sync.ts', import.meta.url));
+const aiGuardrails = await importTs(new URL('../netlify/functions/ai-guardrails-core.ts', import.meta.url));
 
 test('buildProductKnowledgeContext returns grounded product sources with guardrails', () => {
   const context = productKnowledge.buildProductKnowledgeContext({
@@ -134,4 +135,20 @@ test('findMatchingCustomer does not match name alone without a contact method', 
   );
 
   assert.equal(match, null);
+});
+
+test('validateDraftOutput flags unsupported availability and fitment claims', () => {
+  const result = aiGuardrails.validateDraftOutput('This camper is in stock and will fit your Hilux. It is $89,990.');
+
+  assert.ok(result.warnings.some((warning) => warning.includes('availability')));
+  assert.ok(result.warnings.some((warning) => warning.includes('Vehicle suitability')));
+  assert.ok(result.warnings.some((warning) => warning.includes('pricing')));
+  assert.ok(result.blockedPhrases.includes('in stock'));
+});
+
+test('validateDraftOutput allows cautious owner-confirmation wording', () => {
+  const result = aiGuardrails.validateDraftOutput('I will confirm current availability and vehicle suitability before giving you a firm answer.');
+
+  assert.deepEqual(result.warnings, []);
+  assert.deepEqual(result.blockedPhrases, []);
 });
