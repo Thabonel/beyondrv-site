@@ -306,6 +306,29 @@ interface OwnerCopilotLeadDetail {
   timeline: OwnerCopilotTimelineEvent[];
 }
 
+interface ProductKnowledgeSourceView {
+  id?: string;
+  title: string;
+  type: string;
+  url?: string;
+  confidence?: number;
+  facts?: string[];
+}
+
+interface ProductKnowledgeLookupResult {
+  query: string;
+  sources: ProductKnowledgeSourceView[];
+  warnings: string[];
+  missingFacts: string[];
+  groundingRules?: string[];
+}
+
+interface ResponseGrounding {
+  warnings: string[];
+  missingFacts: string[];
+  sources: ProductKnowledgeSourceView[];
+}
+
 interface ManualEnquiryForm {
   source_type: Exclude<EnquirySourceType, 'website_form'>;
   customer_name: string;
@@ -1081,6 +1104,11 @@ export default function AdminPanel() {
   const [input, setInput] = useState('');
   const [activeTab, setActiveTab] = useState<PanelTab>('dashboard');
   const [knowledgeInput, setKnowledgeInput] = useState('');
+  const [knowledgeSearch, setKnowledgeSearch] = useState('');
+  const [knowledgeProduct, setKnowledgeProduct] = useState('');
+  const [knowledgeLookup, setKnowledgeLookup] = useState<ProductKnowledgeLookupResult | null>(null);
+  const [knowledgeLookupStatus, setKnowledgeLookupStatus] = useState('');
+  const [knowledgeLookupLoading, setKnowledgeLookupLoading] = useState(false);
   const [rewriting, setRewriting] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showChatDrawer, setShowChatDrawer] = useState(false);
@@ -1108,9 +1136,12 @@ export default function AdminPanel() {
   const [enquiriesStatus, setEnquiriesStatus] = useState('');
   const [leadSaving, setLeadSaving] = useState<string | null>(null);
   const [responseDrafts, setResponseDrafts] = useState<Record<string, string>>({});
-  const [responseGrounding, setResponseGrounding] = useState<Record<string, { warnings: string[]; missingFacts: string[]; sources: { title: string; type: string; url?: string; confidence?: number }[] }>>({});
+  const [responseGrounding, setResponseGrounding] = useState<Record<string, ResponseGrounding>>({});
+  const [responseActionIds, setResponseActionIds] = useState<Record<string, string>>({});
   const [responseGenerating, setResponseGenerating] = useState<string | null>(null);
   const [responseStatuses, setResponseStatuses] = useState<Record<string, string>>({});
+  const [aiActionSaving, setAiActionSaving] = useState<string | null>(null);
+  const [recordSyncSaving, setRecordSyncSaving] = useState<string | null>(null);
   const [classificationSaving, setClassificationSaving] = useState<string | null>(null);
   const [classificationStatuses, setClassificationStatuses] = useState<Record<string, string>>({});
   const [showManualEnquiryForm, setShowManualEnquiryForm] = useState(false);
@@ -1404,6 +1435,33 @@ export default function AdminPanel() {
     enquiryRefs.current[enquiryId]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
+  async function lookupProductKnowledge() {
+    const query = knowledgeSearch.trim();
+    const productInterest = knowledgeProduct.trim();
+    if (!query && !productInterest) {
+      setKnowledgeLookupStatus('Add a product or question first.');
+      return;
+    }
+    setKnowledgeLookupLoading(true);
+    setKnowledgeLookupStatus('Searching approved product knowledge...');
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-product-knowledge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, productInterest }),
+      });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await readAdminJson<{ context?: ProductKnowledgeLookupResult; error?: string }>(res, 'Could not search product knowledge.');
+      if (!res.ok || !data.context) throw new Error(data.error ?? 'Could not search product knowledge.');
+      setKnowledgeLookup(data.context);
+      setKnowledgeLookupStatus(data.context.sources.length ? 'Approved knowledge found.' : 'No approved source matched this question.');
+    } catch (err) {
+      setKnowledgeLookupStatus(err instanceof Error ? err.message : 'Could not search product knowledge.');
+    } finally {
+      setKnowledgeLookupLoading(false);
+    }
+  }
+
   async function loadLeadDetail(enquiryId: string) {
     setLeadDetailStatus(prev => ({ ...prev, [enquiryId]: 'Loading lead detail...' }));
     try {
@@ -1479,6 +1537,53 @@ export default function AdminPanel() {
       setLeadDetailStatus(prev => ({ ...prev, [enquiry.id]: err instanceof Error ? err.message : 'Could not create task.' }));
     } finally {
       setTaskSaving(null);
+    }
+  }
+
+  async function syncEnquiryToCopilotRecords(enquiry: EnquiryRecord) {
+    setRecordSyncSaving(enquiry.id);
+    setLeadDetailStatus(prev => ({ ...prev, [enquiry.id]: 'Saving customer and lead records...' }));
+    try {
+      const customerRes = await adminFetch('/.netlify/functions/admin-owner-copilot-records', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'customer',
+          name: enquiry.name,
+          email: enquiry.email,
+          phone: enquiry.phone,
+          notes: enquiry.source_note || enquiry.conversation_summary || '',
+          source: 'enquiry-sync',
+        }),
+      });
+      if (redirectToLoginIfUnauthorized(customerRes)) return;
+      const customerData = await readAdminJson<{ customer?: { id: string }; error?: string }>(customerRes, 'Could not save customer record.');
+      if (!customerRes.ok || !customerData.customer?.id) throw new Error(customerData.error ?? 'Could not save customer record.');
+
+      const leadRes = await adminFetch('/.netlify/functions/admin-owner-copilot-records', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'lead',
+          id: enquiry.id,
+          sourceEnquiryId: enquiry.id,
+          customerId: customerData.customer.id,
+          productInterest: enquiry.product_interest,
+          status: enquiry.leadStatus?.status === 'quoted' ? 'quote_sent' : enquiry.leadStatus?.status === 'lost' ? 'lost' : enquiry.leadStatus?.status === 'won' ? 'won' : 'new',
+          nextFollowUpDate: enquiry.leadStatus?.nextFollowUpDate || '',
+          notes: enquiry.leadStatus?.notes || enquiry.message || '',
+          source: 'enquiry-sync',
+        }),
+      });
+      if (redirectToLoginIfUnauthorized(leadRes)) return;
+      const leadData = await readAdminJson<{ lead?: { id: string }; error?: string }>(leadRes, 'Could not save lead record.');
+      if (!leadRes.ok || !leadData.lead?.id) throw new Error(leadData.error ?? 'Could not save lead record.');
+      setLeadDetailStatus(prev => ({ ...prev, [enquiry.id]: 'Customer and lead records saved.' }));
+      if (openLeadDetailId === enquiry.id) await loadLeadDetail(enquiry.id);
+    } catch (err) {
+      setLeadDetailStatus(prev => ({ ...prev, [enquiry.id]: err instanceof Error ? err.message : 'Could not save Copilot records.' }));
+    } finally {
+      setRecordSyncSaving(null);
     }
   }
 
@@ -1652,10 +1757,12 @@ export default function AdminPanel() {
         error?: string;
         warnings?: string[];
         missingFacts?: string[];
-        sources?: { title: string; type: string; url?: string; confidence?: number }[];
+        sources?: ProductKnowledgeSourceView[];
+        aiActionId?: string;
       };
       if (!res.ok || !data.draft) throw new Error(data.error ?? 'Could not generate response');
       setResponseDrafts(prev => ({ ...prev, [enquiry.id]: data.draft ?? '' }));
+      if (data.aiActionId) setResponseActionIds(prev => ({ ...prev, [enquiry.id]: data.aiActionId ?? '' }));
       setResponseGrounding(prev => ({
         ...prev,
         [enquiry.id]: {
@@ -1672,6 +1779,36 @@ export default function AdminPanel() {
       }));
     } finally {
       setResponseGenerating(null);
+    }
+  }
+
+  async function updateResponseActionState(enquiry: EnquiryRecord, approvalState: 'edited' | 'approved' | 'rejected' | 'copied' | 'sent_manually') {
+    const actionId = responseActionIds[enquiry.id];
+    if (!actionId) {
+      setResponseStatuses(prev => ({ ...prev, [enquiry.id]: 'Generate a draft before changing its approval state.' }));
+      return false;
+    }
+    setAiActionSaving(enquiry.id);
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-owner-copilot-ai-actions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: actionId,
+          approvalState,
+          output: responseDrafts[enquiry.id] ?? '',
+        }),
+      });
+      if (redirectToLoginIfUnauthorized(res)) return false;
+      const data = await readAdminJson<{ action?: { approvalState?: string }; error?: string }>(res, 'Could not update draft state.');
+      if (!res.ok || !data.action) throw new Error(data.error ?? 'Could not update draft state.');
+      setResponseStatuses(prev => ({ ...prev, [enquiry.id]: `Draft marked ${approvalState.replace(/_/g, ' ')}.` }));
+      return true;
+    } catch (err) {
+      setResponseStatuses(prev => ({ ...prev, [enquiry.id]: err instanceof Error ? err.message : 'Could not update draft state.' }));
+      return false;
+    } finally {
+      setAiActionSaving(null);
     }
   }
 
@@ -1711,6 +1848,7 @@ export default function AdminPanel() {
     if (!draft) return;
     try {
       await navigator.clipboard.writeText(draft);
+      await updateResponseActionState(enquiry, 'copied');
       setResponseStatuses(prev => ({ ...prev, [enquiry.id]: 'Copied. Paste it into your email app before sending.' }));
     } catch {
       setResponseStatuses(prev => ({ ...prev, [enquiry.id]: 'Could not copy response.' }));
@@ -1724,7 +1862,10 @@ export default function AdminPanel() {
       firstResponseAt: enquiry.leadStatus?.firstResponseAt || now,
       lastContactedAt: now,
     });
-    if (saved) setResponseStatuses(prev => ({ ...prev, [enquiry.id]: 'Marked as replied.' }));
+    if (saved) {
+      if (responseActionIds[enquiry.id]) await updateResponseActionState(enquiry, 'sent_manually');
+      setResponseStatuses(prev => ({ ...prev, [enquiry.id]: 'Marked as replied.' }));
+    }
   }
 
   function readBlobAsBase64(blob: Blob) {
@@ -3407,10 +3548,29 @@ export default function AdminPanel() {
                       {responseDrafts[enquiry.id] && (
                         <button
                           onClick={() => copyEnquiryResponse(enquiry)}
-                          style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.76rem' }}
+                          disabled={aiActionSaving === enquiry.id}
+                          style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: aiActionSaving === enquiry.id ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.76rem' }}
                         >
                           Copy Response
                         </button>
+                      )}
+                      {responseDrafts[enquiry.id] && (
+                        <>
+                          <button
+                            onClick={() => updateResponseActionState(enquiry, 'approved')}
+                            disabled={aiActionSaving === enquiry.id}
+                            style={{ background: '#12331f', border: '1px solid #256d3d', color: '#bbf7d0', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: aiActionSaving === enquiry.id ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.76rem' }}
+                          >
+                            Approve Draft
+                          </button>
+                          <button
+                            onClick={() => updateResponseActionState(enquiry, 'rejected')}
+                            disabled={aiActionSaving === enquiry.id}
+                            style={{ background: '#331515', border: '1px solid #7f1d1d', color: '#fecaca', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: aiActionSaving === enquiry.id ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.76rem' }}
+                          >
+                            Reject Draft
+                          </button>
+                        </>
                       )}
                       <button
                         onClick={() => markEnquiryReplied(enquiry)}
@@ -3425,11 +3585,19 @@ export default function AdminPanel() {
                       >
                         {openLeadDetailId === enquiry.id ? 'Hide Details' : 'Details'}
                       </button>
+                      <button
+                        onClick={() => syncEnquiryToCopilotRecords(enquiry)}
+                        disabled={recordSyncSaving === enquiry.id}
+                        style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: recordSyncSaving === enquiry.id ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.76rem' }}
+                      >
+                        {recordSyncSaving === enquiry.id ? 'Saving...' : 'Save Copilot Records'}
+                      </button>
                     </div>
                     {responseDrafts[enquiry.id] && (
                       <textarea
                         value={responseDrafts[enquiry.id]}
                         onChange={e => setResponseDrafts(prev => ({ ...prev, [enquiry.id]: e.target.value }))}
+                        onBlur={() => updateResponseActionState(enquiry, 'edited')}
                         rows={8}
                         style={{ resize: 'vertical', background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem', fontSize: '0.78rem', lineHeight: 1.45 }}
                       />
@@ -3438,8 +3606,24 @@ export default function AdminPanel() {
                       <div style={{ background: '#111', border: '1px solid #333', borderRadius: '6px', padding: '0.55rem', display: 'grid', gap: '0.35rem', color: '#aaa', fontSize: '0.72rem', lineHeight: 1.45 }}>
                         <div style={{ color: '#fff', fontWeight: 700 }}>Draft grounding</div>
                         {responseGrounding[enquiry.id].sources.length > 0 && (
-                          <div>
-                            Sources: {responseGrounding[enquiry.id].sources.map(source => source.title).join(', ')}
+                          <div style={{ display: 'grid', gap: '0.4rem' }}>
+                            {responseGrounding[enquiry.id].sources.map((source, sourceIndex) => (
+                              <div key={`${source.title}-${sourceIndex}`} style={{ borderTop: sourceIndex ? '1px solid #252525' : 'none', paddingTop: sourceIndex ? '0.35rem' : 0 }}>
+                                <div>
+                                  Source: {source.url ? (
+                                    <a href={source.url} target="_blank" rel="noreferrer" style={{ color: '#93c5fd' }}>{source.title}</a>
+                                  ) : (
+                                    <span style={{ color: '#ddd' }}>{source.title}</span>
+                                  )}
+                                  {typeof source.confidence === 'number' && <span> · {source.confidence}% match</span>}
+                                </div>
+                                {Boolean(source.facts?.length) && (
+                                  <ul style={{ margin: '0.25rem 0 0 1rem', padding: 0, color: '#aaa' }}>
+                                    {source.facts?.slice(0, 4).map((fact, factIndex) => <li key={factIndex}>{fact}</li>)}
+                                  </ul>
+                                )}
+                              </div>
+                            ))}
                           </div>
                         )}
                         {responseGrounding[enquiry.id].missingFacts.length > 0 && (
@@ -3578,33 +3762,81 @@ export default function AdminPanel() {
         )}
 
         {activeTab === 'knowledge' && (
-          <div style={{ padding: '1rem', overflowY: 'auto' }}>
-            <div style={{ color: '#fff', fontWeight: 700, marginBottom: '0.45rem' }}>Chatbot Knowledge</div>
-            <p style={{ color: '#888', fontSize: '0.82rem', lineHeight: 1.45, margin: '0 0 0.7rem' }}>
-              Add facts the website chatbot should know about the business, stock, process, or policies.
-            </p>
-            <textarea
-              value={knowledgeInput}
-              onChange={e => setKnowledgeInput(e.target.value)}
-              placeholder="Example: Customers can inspect campers by appointment at Mutdapilly. Ask them to call first."
-              rows={9}
-              style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.65rem', fontSize: '0.84rem', lineHeight: 1.45, outline: 'none' }}
-            />
-            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.6rem' }}>
-              <button
-                onClick={handleAIRewrite}
-                disabled={rewriting || !knowledgeInput.trim()}
-                style={{ flex: 1, background: knowledgeInput.trim() && !rewriting ? '#2563eb' : '#333', color: knowledgeInput.trim() && !rewriting ? '#fff' : '#666', border: 'none', borderRadius: '6px', padding: '0.65rem', cursor: knowledgeInput.trim() && !rewriting ? 'pointer' : 'not-allowed', fontWeight: 700, fontSize: '0.82rem' }}
-              >
-                {rewriting ? 'Rewriting...' : 'AI Rewrite'}
-              </button>
-              <button
-                onClick={queueKnowledgeUpdate}
-                disabled={loading || !knowledgeInput.trim()}
-                style={{ flex: 1, background: knowledgeInput.trim() ? '#E8540A' : '#333', color: knowledgeInput.trim() ? '#fff' : '#666', border: 'none', borderRadius: '6px', padding: '0.65rem', cursor: knowledgeInput.trim() ? 'pointer' : 'not-allowed', fontWeight: 700, fontSize: '0.82rem' }}
-              >
-                Queue Knowledge Update
-              </button>
+          <div style={{ padding: '1rem', overflowY: 'auto', display: 'grid', gap: '1rem' }}>
+            <div style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.85rem', display: 'grid', gap: '0.65rem' }}>
+              <div style={{ color: '#fff', fontWeight: 800 }}>Approved Product Lookup</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(180px, 0.4fr) auto', gap: '0.5rem' }}>
+                <input
+                  value={knowledgeSearch}
+                  onChange={e => setKnowledgeSearch(e.target.value)}
+                  placeholder="Ask about payload, price, availability, warranty, delivery, features..."
+                  style={{ minWidth: 0, background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem', fontSize: '0.8rem' }}
+                />
+                <input
+                  value={knowledgeProduct}
+                  onChange={e => setKnowledgeProduct(e.target.value)}
+                  placeholder="Optional product"
+                  style={{ minWidth: 0, background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem', fontSize: '0.8rem' }}
+                />
+                <button
+                  type="button"
+                  onClick={lookupProductKnowledge}
+                  disabled={knowledgeLookupLoading || (!knowledgeSearch.trim() && !knowledgeProduct.trim())}
+                  style={{ background: knowledgeSearch.trim() || knowledgeProduct.trim() ? '#E8540A' : '#333', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.55rem 0.75rem', cursor: knowledgeLookupLoading ? 'wait' : 'pointer', fontWeight: 800, fontSize: '0.78rem', whiteSpace: 'nowrap' }}
+                >
+                  {knowledgeLookupLoading ? 'Searching...' : 'Search'}
+                </button>
+              </div>
+              {knowledgeLookupStatus && <div style={{ color: isAdminWarningStatus(knowledgeLookupStatus) ? '#fb923c' : '#aaa', fontSize: '0.74rem' }}>{knowledgeLookupStatus}</div>}
+              {knowledgeLookup && (
+                <div style={{ display: 'grid', gap: '0.65rem', color: '#aaa', fontSize: '0.76rem', lineHeight: 1.45 }}>
+                  {knowledgeLookup.sources.map((source, index) => (
+                    <div key={`${source.title}-${index}`} style={{ background: '#161616', border: '1px solid #303030', borderRadius: '6px', padding: '0.65rem' }}>
+                      <div style={{ color: '#fff', fontWeight: 800 }}>
+                        {source.url ? <a href={source.url} target="_blank" rel="noreferrer" style={{ color: '#93c5fd' }}>{source.title}</a> : source.title}
+                        {typeof source.confidence === 'number' && <span style={{ color: '#888', fontWeight: 600 }}> · {source.confidence}% match</span>}
+                      </div>
+                      {Boolean(source.facts?.length) && (
+                        <ul style={{ margin: '0.4rem 0 0 1rem', padding: 0 }}>
+                          {source.facts?.map((fact, factIndex) => <li key={factIndex}>{fact}</li>)}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                  {knowledgeLookup.missingFacts.length > 0 && <div style={{ color: '#fb923c' }}>Missing facts: {knowledgeLookup.missingFacts.join(' ')}</div>}
+                  {knowledgeLookup.warnings.length > 0 && <div style={{ color: '#fb923c' }}>Guardrails: {knowledgeLookup.warnings.join(' ')}</div>}
+                </div>
+              )}
+            </div>
+
+            <div style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.85rem' }}>
+              <div style={{ color: '#fff', fontWeight: 700, marginBottom: '0.45rem' }}>Chatbot Knowledge</div>
+              <p style={{ color: '#888', fontSize: '0.82rem', lineHeight: 1.45, margin: '0 0 0.7rem' }}>
+                Add facts the website chatbot should know about the business, stock, process, or policies.
+              </p>
+              <textarea
+                value={knowledgeInput}
+                onChange={e => setKnowledgeInput(e.target.value)}
+                placeholder="Example: Customers can inspect campers by appointment at Mutdapilly. Ask them to call first."
+                rows={9}
+                style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.65rem', fontSize: '0.84rem', lineHeight: 1.45, outline: 'none' }}
+              />
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.6rem' }}>
+                <button
+                  onClick={handleAIRewrite}
+                  disabled={rewriting || !knowledgeInput.trim()}
+                  style={{ flex: 1, background: knowledgeInput.trim() && !rewriting ? '#2563eb' : '#333', color: knowledgeInput.trim() && !rewriting ? '#fff' : '#666', border: 'none', borderRadius: '6px', padding: '0.65rem', cursor: knowledgeInput.trim() && !rewriting ? 'pointer' : 'not-allowed', fontWeight: 700, fontSize: '0.82rem' }}
+                >
+                  {rewriting ? 'Rewriting...' : 'AI Rewrite'}
+                </button>
+                <button
+                  onClick={queueKnowledgeUpdate}
+                  disabled={loading || !knowledgeInput.trim()}
+                  style={{ flex: 1, background: knowledgeInput.trim() ? '#E8540A' : '#333', color: knowledgeInput.trim() ? '#fff' : '#666', border: 'none', borderRadius: '6px', padding: '0.65rem', cursor: knowledgeInput.trim() ? 'pointer' : 'not-allowed', fontWeight: 700, fontSize: '0.82rem' }}
+                >
+                  Queue Knowledge Update
+                </button>
+              </div>
             </div>
           </div>
         )}

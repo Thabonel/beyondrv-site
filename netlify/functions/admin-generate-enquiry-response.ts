@@ -6,6 +6,7 @@ import {
   newOwnerCopilotId,
   OWNER_COPILOT_AI_ACTION_STORE,
   OWNER_COPILOT_TIMELINE_STORE,
+  aiActionKey,
   timelineKey,
 } from './owner-copilot-core';
 import { buildProductKnowledgeContext } from './product-knowledge-core';
@@ -24,10 +25,6 @@ function clean(value: unknown, max = 4000) {
 
 function leadKey(enquiryId: string) {
   return `lead-status/${encodeURIComponent(enquiryId)}.json`;
-}
-
-function aiActionKey(actionId: string) {
-  return `ai-actions/${encodeURIComponent(actionId)}.json`;
 }
 
 function firstName(name = '') {
@@ -187,6 +184,7 @@ Rules:
           type: source.type,
           url: source.url ?? '',
           confidence: source.confidence,
+          facts: source.facts,
         })),
         createdAt: generatedAt,
       });
@@ -222,6 +220,7 @@ Rules:
           type: source.type,
           url: source.url ?? '',
           confidence: source.confidence,
+          facts: source.facts,
         })),
         aiActionId: actionId,
         approvalState: 'draft',

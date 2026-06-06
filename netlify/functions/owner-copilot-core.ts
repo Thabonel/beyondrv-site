@@ -2,6 +2,8 @@ export const OWNER_COPILOT_TASK_STORE = 'owner-copilot-tasks';
 export const OWNER_COPILOT_TIMELINE_STORE = 'owner-copilot-timeline-events';
 export const OWNER_COPILOT_AI_ACTION_STORE = 'owner-copilot-ai-actions';
 export const OWNER_COPILOT_AUDIT_STORE = 'owner-copilot-audit-logs';
+export const OWNER_COPILOT_CUSTOMER_STORE = 'owner-copilot-customers';
+export const OWNER_COPILOT_LEAD_STORE = 'owner-copilot-leads';
 
 export type OwnerLeadUrgency = 'hot' | 'warm' | 'cold' | 'waiting_on_customer' | 'waiting_on_byondrv' | 'dormant' | 'won' | 'lost';
 
@@ -226,6 +228,22 @@ export function taskKey(taskId: string) {
 
 export function timelineKey(eventId: string) {
   return `timeline/${encodeURIComponent(eventId)}.json`;
+}
+
+export function customerKey(customerId: string) {
+  return `customers/${encodeURIComponent(customerId)}.json`;
+}
+
+export function leadRecordKey(leadId: string) {
+  return `leads/${encodeURIComponent(leadId)}.json`;
+}
+
+export function aiActionKey(actionId: string) {
+  return `ai-actions/${encodeURIComponent(actionId)}.json`;
+}
+
+export function auditLogKey(auditId: string) {
+  return `audit/${encodeURIComponent(auditId)}.json`;
 }
 
 export function newOwnerCopilotId(prefix: string) {
