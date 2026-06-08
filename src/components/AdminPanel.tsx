@@ -42,7 +42,7 @@ interface PendingChange {
 }
 
 type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
-type PanelTab = 'dashboard' | 'products' | 'orders' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'drafts' | 'audit' | 'knowledge' | 'google' | 'pending';
+type PanelTab = 'dashboard' | 'products' | 'orders' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'drafts' | 'audit' | 'knowledge' | 'google' | 'matches' | 'reports' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 type SuitabilityDataStatus = 'draft' | 'target' | 'confirmed';
@@ -429,6 +429,53 @@ interface GoogleSyncCheck {
   message?: string;
   requiredOwnerInputs?: string[];
   error?: string;
+}
+
+interface CopilotMatchSuggestion {
+  targetType: 'customer' | 'lead';
+  targetId: string;
+  confidence: number;
+  decision: 'auto_link' | 'needs_confirmation' | 'possible_only' | 'do_not_suggest';
+  reasons: string[];
+}
+
+interface GmailThreadRecord {
+  id: string;
+  subject?: string;
+  fromEmail?: string;
+  toEmail?: string;
+  snippet?: string;
+  productInterest?: string;
+  receivedAt?: string;
+  suggestions?: CopilotMatchSuggestion[];
+  matchDecision?: string;
+  linkedTargetType?: string;
+  linkedTargetId?: string;
+}
+
+interface DriveFileRecord {
+  id: string;
+  name?: string;
+  mimeType?: string;
+  webViewLink?: string;
+  folderName?: string;
+  description?: string;
+  productInterest?: string;
+  modifiedAt?: string;
+  suggestions?: CopilotMatchSuggestion[];
+  matchDecision?: string;
+  linkedTargetType?: string;
+  linkedTargetId?: string;
+}
+
+interface WeeklyReportRecord {
+  id: string;
+  periodStart: string;
+  periodEnd: string;
+  generatedAt: string;
+  sections: { title: string; value: number; detail: string }[];
+  recommendations: string[];
+  sourceCounts?: Record<string, number>;
 }
 
 interface RecentBuild {
@@ -1208,6 +1255,13 @@ export default function AdminPanel() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [googleMessage, setGoogleMessage] = useState('');
   const [googleSyncChecks, setGoogleSyncChecks] = useState<Record<'gmail' | 'drive', GoogleSyncCheck | null>>({ gmail: null, drive: null });
+  const [gmailThreads, setGmailThreads] = useState<GmailThreadRecord[]>([]);
+  const [driveFiles, setDriveFiles] = useState<DriveFileRecord[]>([]);
+  const [matchesLoading, setMatchesLoading] = useState(false);
+  const [matchesStatus, setMatchesStatus] = useState('');
+  const [weeklyReports, setWeeklyReports] = useState<WeeklyReportRecord[]>([]);
+  const [reportsLoading, setReportsLoading] = useState(false);
+  const [reportsStatus, setReportsStatus] = useState('');
   const [previewChange, setPreviewChange] = useState<PendingChange | null>(null);
   const [mediaScope, setMediaScope] = useState<MediaScope>('products');
   const [mediaSlug, setMediaSlug] = useState('');
@@ -1323,6 +1377,19 @@ export default function AdminPanel() {
   useEffect(() => {
     if (activeTab === 'google') {
       void loadGoogleStatus();
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab === 'matches') {
+      void loadCopilotRecords();
+      void loadMatchRecords();
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab === 'reports') {
+      void loadWeeklyReports();
     }
   }, [activeTab]);
 
@@ -1565,6 +1632,88 @@ export default function AdminPanel() {
       setGoogleMessage(message);
     } finally {
       setGoogleLoading(false);
+    }
+  }
+
+  async function loadMatchRecords() {
+    setMatchesLoading(true);
+    setMatchesStatus('Loading Gmail and Drive match suggestions...');
+    try {
+      const [gmailRes, driveRes] = await Promise.all([
+        adminFetch('/.netlify/functions/admin-gmail-matches'),
+        adminFetch('/.netlify/functions/admin-drive-matches'),
+      ]);
+      if (redirectToLoginIfUnauthorized(gmailRes) || redirectToLoginIfUnauthorized(driveRes)) return;
+      const gmailData = await readAdminJson<{ threads?: GmailThreadRecord[]; error?: string }>(gmailRes, 'Could not load Gmail matches.');
+      const driveData = await readAdminJson<{ files?: DriveFileRecord[]; error?: string }>(driveRes, 'Could not load Drive matches.');
+      if (!gmailRes.ok) throw new Error(gmailData.error ?? 'Could not load Gmail matches.');
+      if (!driveRes.ok) throw new Error(driveData.error ?? 'Could not load Drive matches.');
+      setGmailThreads(Array.isArray(gmailData.threads) ? gmailData.threads : []);
+      setDriveFiles(Array.isArray(driveData.files) ? driveData.files : []);
+      setMatchesStatus('');
+    } catch (err) {
+      setMatchesStatus(err instanceof Error ? err.message : 'Could not load match suggestions.');
+    } finally {
+      setMatchesLoading(false);
+    }
+  }
+
+  async function updateExternalMatch(kind: 'gmail' | 'drive', id: string, suggestion: CopilotMatchSuggestion, decision: 'approved' | 'rejected' | 'pinned') {
+    setMatchesLoading(true);
+    setMatchesStatus(`${decision === 'rejected' ? 'Rejecting' : 'Saving'} ${kind} match...`);
+    try {
+      const res = await adminFetch(`/.netlify/functions/admin-${kind}-matches`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, decision, targetType: suggestion.targetType, targetId: suggestion.targetId }),
+      });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await readAdminJson<{ error?: string }>(res, 'Could not update match.');
+      if (!res.ok) throw new Error(data.error ?? 'Could not update match.');
+      setMatchesStatus(`${kind === 'gmail' ? 'Gmail' : 'Drive'} match ${decision}.`);
+      await loadMatchRecords();
+    } catch (err) {
+      setMatchesStatus(err instanceof Error ? err.message : 'Could not update match.');
+    } finally {
+      setMatchesLoading(false);
+    }
+  }
+
+  async function loadWeeklyReports() {
+    setReportsLoading(true);
+    setReportsStatus('Loading weekly reports...');
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-weekly-report');
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await readAdminJson<{ reports?: WeeklyReportRecord[]; error?: string }>(res, 'Could not load weekly reports.');
+      if (!res.ok) throw new Error(data.error ?? 'Could not load weekly reports.');
+      setWeeklyReports(Array.isArray(data.reports) ? data.reports : []);
+      setReportsStatus('');
+    } catch (err) {
+      setReportsStatus(err instanceof Error ? err.message : 'Could not load weekly reports.');
+    } finally {
+      setReportsLoading(false);
+    }
+  }
+
+  async function generateWeeklyReport() {
+    setReportsLoading(true);
+    setReportsStatus('Generating weekly report...');
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-weekly-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ days: 7 }),
+      });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await readAdminJson<{ report?: WeeklyReportRecord; error?: string }>(res, 'Could not generate weekly report.');
+      if (!res.ok || !data.report) throw new Error(data.error ?? 'Could not generate weekly report.');
+      setWeeklyReports(prev => [data.report!, ...prev.filter(report => report.id !== data.report!.id)]);
+      setReportsStatus('Weekly report generated.');
+    } catch (err) {
+      setReportsStatus(err instanceof Error ? err.message : 'Could not generate weekly report.');
+    } finally {
+      setReportsLoading(false);
     }
   }
 
@@ -2803,6 +2952,17 @@ export default function AdminPanel() {
     counts[order.productSlug] = (counts[order.productSlug] ?? 0) + 1;
     return counts;
   }, {});
+  const matchTargetLabel = (suggestion: CopilotMatchSuggestion) => {
+    if (suggestion.targetType === 'customer') {
+      const customer = copilotCustomers.find(item => item.id === suggestion.targetId);
+      return customer?.name || customer?.email || customer?.phone || suggestion.targetId;
+    }
+    const lead = copilotLeads.find(item => item.id === suggestion.targetId);
+    const customer = copilotCustomers.find(item => item.id === lead?.customerId);
+    return `${customer?.name || customer?.email || 'Lead'}${lead?.productInterest ? ` · ${lead.productInterest}` : ''}`;
+  };
+  const pendingGmailSuggestions = gmailThreads.reduce((count, thread) => count + (!thread.matchDecision ? (thread.suggestions?.length || 0) : 0), 0);
+  const pendingDriveSuggestions = driveFiles.reduce((count, file) => count + (!file.matchDecision ? (file.suggestions?.length || 0) : 0), 0);
 
   return (
     <>
@@ -2825,8 +2985,8 @@ export default function AdminPanel() {
             </button>
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(13, minmax(0, 1fr))', borderBottom: '1px solid #333' }}>
-          {(['dashboard', 'products', 'orders', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'pending'] as PanelTab[]).map(tab => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(15, minmax(0, 1fr))', borderBottom: '1px solid #333' }}>
+          {(['dashboard', 'products', 'orders', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'matches', 'reports', 'pending'] as PanelTab[]).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -4242,6 +4402,131 @@ export default function AdminPanel() {
                 ]).map(item => <li key={item}>{item}</li>)}
               </ul>
             </div>
+          </div>
+        )}
+
+        {activeTab === 'matches' && (
+          <div style={{ padding: '1rem', overflowY: 'auto', display: 'grid', gap: '1rem' }}>
+            <div style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.85rem', display: 'grid', gap: '0.6rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
+                <div>
+                  <div style={{ color: '#fff', fontWeight: 800 }}>Gmail and Drive Match Review</div>
+                  <div style={{ color: '#888', fontSize: '0.76rem', marginTop: '0.2rem' }}>{pendingGmailSuggestions} Gmail suggestions · {pendingDriveSuggestions} Drive suggestions</div>
+                </div>
+                <button type="button" onClick={loadMatchRecords} disabled={matchesLoading} style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: matchesLoading ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.76rem' }}>Refresh</button>
+              </div>
+              {matchesStatus && <div style={{ color: isAdminWarningStatus(matchesStatus) ? '#fb923c' : '#aaa', fontSize: '0.76rem' }}>{matchesStatus}</div>}
+              <div style={{ color: '#888', fontSize: '0.74rem', lineHeight: 1.45 }}>Live Google sync is still gated by owner consent. These panels are ready for synced records and can also review manually inserted/mock records.</div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '1rem' }}>
+              <div style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.85rem', display: 'grid', gap: '0.65rem' }}>
+                <div style={{ color: '#fff', fontWeight: 800 }}>Gmail Threads</div>
+                {gmailThreads.length === 0 ? (
+                  <div style={{ color: '#777', fontSize: '0.78rem' }}>No Gmail thread records yet.</div>
+                ) : (
+                  gmailThreads.map(thread => (
+                    <div key={thread.id} style={{ background: '#161616', border: '1px solid #303030', borderRadius: '6px', padding: '0.65rem', display: 'grid', gap: '0.45rem' }}>
+                      <div style={{ color: '#fff', fontWeight: 800 }}>{thread.subject || thread.id}</div>
+                      <div style={{ color: '#aaa', fontSize: '0.74rem', lineHeight: 1.45 }}>{thread.fromEmail || 'Unknown sender'} · {thread.productInterest || 'No product'} · {thread.receivedAt ? new Date(thread.receivedAt).toLocaleString() : 'No date'}</div>
+                      {thread.snippet && <div style={{ color: '#888', fontSize: '0.74rem', lineHeight: 1.45 }}>{thread.snippet}</div>}
+                      {thread.matchDecision ? (
+                        <div style={{ color: '#86efac', fontSize: '0.74rem' }}>Decision: {thread.matchDecision} {thread.linkedTargetId ? `· ${thread.linkedTargetType}:${thread.linkedTargetId}` : ''}</div>
+                      ) : (thread.suggestions?.length || 0) === 0 ? (
+                        <div style={{ color: '#777', fontSize: '0.74rem' }}>No safe match suggestion.</div>
+                      ) : (
+                        thread.suggestions?.map(suggestion => (
+                          <div key={`${suggestion.targetType}-${suggestion.targetId}`} style={{ borderTop: '1px solid #303030', paddingTop: '0.45rem', display: 'grid', gap: '0.35rem' }}>
+                            <div style={{ color: '#fff', fontSize: '0.74rem', fontWeight: 800 }}>{matchTargetLabel(suggestion)} · {suggestion.confidence}% · {suggestion.decision.replace(/_/g, ' ')}</div>
+                            <div style={{ color: '#888', fontSize: '0.7rem', lineHeight: 1.4 }}>{suggestion.reasons.join(' ')}</div>
+                            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                              <button type="button" onClick={() => updateExternalMatch('gmail', thread.id, suggestion, 'approved')} disabled={matchesLoading || suggestion.decision === 'possible_only'} style={{ background: suggestion.decision === 'possible_only' ? '#333' : '#166534', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.32rem 0.48rem', cursor: suggestion.decision === 'possible_only' ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: '0.68rem' }}>Approve</button>
+                              <button type="button" onClick={() => updateExternalMatch('gmail', thread.id, suggestion, 'pinned')} disabled={matchesLoading} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '6px', padding: '0.32rem 0.48rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.68rem' }}>Pin</button>
+                              <button type="button" onClick={() => updateExternalMatch('gmail', thread.id, suggestion, 'rejected')} disabled={matchesLoading} style={{ background: '#7f1d1d', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.32rem 0.48rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.68rem' }}>Reject</button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.85rem', display: 'grid', gap: '0.65rem' }}>
+                <div style={{ color: '#fff', fontWeight: 800 }}>Drive Files</div>
+                {driveFiles.length === 0 ? (
+                  <div style={{ color: '#777', fontSize: '0.78rem' }}>No Drive file records yet.</div>
+                ) : (
+                  driveFiles.map(file => (
+                    <div key={file.id} style={{ background: '#161616', border: '1px solid #303030', borderRadius: '6px', padding: '0.65rem', display: 'grid', gap: '0.45rem' }}>
+                      <div style={{ color: '#fff', fontWeight: 800 }}>{file.webViewLink ? <a href={file.webViewLink} target="_blank" rel="noreferrer" style={{ color: '#93c5fd' }}>{file.name || file.id}</a> : file.name || file.id}</div>
+                      <div style={{ color: '#aaa', fontSize: '0.74rem', lineHeight: 1.45 }}>{file.folderName || 'No folder'} · {file.productInterest || 'No product'} · {file.modifiedAt ? new Date(file.modifiedAt).toLocaleString() : 'No date'}</div>
+                      {file.description && <div style={{ color: '#888', fontSize: '0.74rem', lineHeight: 1.45 }}>{file.description}</div>}
+                      {file.matchDecision ? (
+                        <div style={{ color: '#86efac', fontSize: '0.74rem' }}>Decision: {file.matchDecision} {file.linkedTargetId ? `· ${file.linkedTargetType}:${file.linkedTargetId}` : ''}</div>
+                      ) : (file.suggestions?.length || 0) === 0 ? (
+                        <div style={{ color: '#777', fontSize: '0.74rem' }}>No safe match suggestion.</div>
+                      ) : (
+                        file.suggestions?.map(suggestion => (
+                          <div key={`${suggestion.targetType}-${suggestion.targetId}`} style={{ borderTop: '1px solid #303030', paddingTop: '0.45rem', display: 'grid', gap: '0.35rem' }}>
+                            <div style={{ color: '#fff', fontSize: '0.74rem', fontWeight: 800 }}>{matchTargetLabel(suggestion)} · {suggestion.confidence}% · {suggestion.decision.replace(/_/g, ' ')}</div>
+                            <div style={{ color: '#888', fontSize: '0.7rem', lineHeight: 1.4 }}>{suggestion.reasons.join(' ')}</div>
+                            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                              <button type="button" onClick={() => updateExternalMatch('drive', file.id, suggestion, 'approved')} disabled={matchesLoading || suggestion.decision === 'possible_only'} style={{ background: suggestion.decision === 'possible_only' ? '#333' : '#166534', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.32rem 0.48rem', cursor: suggestion.decision === 'possible_only' ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: '0.68rem' }}>Approve</button>
+                              <button type="button" onClick={() => updateExternalMatch('drive', file.id, suggestion, 'pinned')} disabled={matchesLoading} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '6px', padding: '0.32rem 0.48rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.68rem' }}>Pin</button>
+                              <button type="button" onClick={() => updateExternalMatch('drive', file.id, suggestion, 'rejected')} disabled={matchesLoading} style={{ background: '#7f1d1d', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.32rem 0.48rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.68rem' }}>Reject</button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'reports' && (
+          <div style={{ padding: '1rem', overflowY: 'auto', display: 'grid', gap: '1rem' }}>
+            <div style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.85rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
+              <div>
+                <div style={{ color: '#fff', fontWeight: 800 }}>Weekly Owner Reports</div>
+                <div style={{ color: '#888', fontSize: '0.76rem', marginTop: '0.2rem' }}>{weeklyReports.length} saved reports</div>
+              </div>
+              <div style={{ display: 'flex', gap: '0.45rem' }}>
+                <button type="button" onClick={loadWeeklyReports} disabled={reportsLoading} style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: reportsLoading ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.76rem' }}>Refresh</button>
+                <button type="button" onClick={generateWeeklyReport} disabled={reportsLoading} style={{ background: '#E8540A', border: 'none', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: reportsLoading ? 'wait' : 'pointer', fontWeight: 800, fontSize: '0.76rem' }}>Generate</button>
+              </div>
+            </div>
+            {reportsStatus && <div style={{ color: isAdminWarningStatus(reportsStatus) ? '#fb923c' : '#aaa', fontSize: '0.76rem' }}>{reportsStatus}</div>}
+            {weeklyReports.length === 0 && !reportsLoading ? (
+              <div style={{ color: '#777', fontSize: '0.82rem' }}>No weekly reports generated yet.</div>
+            ) : (
+              weeklyReports.map(report => (
+                <div key={report.id} style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.85rem', display: 'grid', gap: '0.75rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem', alignItems: 'baseline' }}>
+                    <div style={{ color: '#fff', fontWeight: 900 }}>{report.periodStart} to {report.periodEnd}</div>
+                    <div style={{ color: '#777', fontSize: '0.7rem' }}>{report.generatedAt ? new Date(report.generatedAt).toLocaleString() : 'No date'}</div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '0.5rem' }}>
+                    {report.sections.map(section => (
+                      <div key={section.title} style={{ background: '#161616', border: '1px solid #303030', borderRadius: '6px', padding: '0.6rem' }}>
+                        <div style={{ color: '#888', fontSize: '0.66rem', textTransform: 'uppercase', fontWeight: 800 }}>{section.title}</div>
+                        <div style={{ color: '#fff', fontSize: '1.25rem', fontWeight: 900, marginTop: '0.1rem' }}>{section.value}</div>
+                        <div style={{ color: '#777', fontSize: '0.68rem', lineHeight: 1.35 }}>{section.detail}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div>
+                    <div style={{ color: '#fff', fontSize: '0.78rem', fontWeight: 800, marginBottom: '0.3rem' }}>Recommended actions</div>
+                    <ul style={{ margin: '0 0 0 1rem', padding: 0, color: '#aaa', fontSize: '0.76rem', lineHeight: 1.5 }}>
+                      {report.recommendations.map(item => <li key={item}>{item}</li>)}
+                    </ul>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         )}
 

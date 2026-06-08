@@ -44,6 +44,7 @@ const ownerCopilot = await importTs(new URL('../netlify/functions/owner-copilot-
 const recordSync = await importTsWithoutImports(new URL('../netlify/functions/owner-copilot-record-sync.ts', import.meta.url));
 const aiGuardrails = await importTs(new URL('../netlify/functions/ai-guardrails-core.ts', import.meta.url));
 const googleOAuth = await importTsWithoutLocalImports(new URL('../netlify/functions/google-oauth-core.ts', import.meta.url));
+const matching = await importTs(new URL('../netlify/functions/owner-copilot-matching-core.ts', import.meta.url));
 
 test('buildProductKnowledgeContext returns grounded product sources with guardrails', () => {
   const context = productKnowledge.buildProductKnowledgeContext({
@@ -184,4 +185,50 @@ test('publicGoogleConnectionState reports setup and connection lifecycle states'
   assert.equal(googleOAuth.publicGoogleConnectionState({ refreshFailedAt: '2026-06-01T00:00:00.000Z' }, []), 'refresh_failed');
   assert.equal(googleOAuth.publicGoogleConnectionState({ expiresAt: '2026-06-01T00:00:00.000Z' }, []), 'token_expired');
   assert.equal(googleOAuth.publicGoogleConnectionState({ expiresAt: '2999-06-01T00:00:00.000Z' }, []), 'connected');
+});
+
+test('Gmail matching auto-links only exact customer contact evidence', () => {
+  const matches = matching.scoreGmailThreadMatches(
+    { id: 'thread-1', fromEmail: ' buyer@example.com ', subject: 'Advent 2150 quote' },
+    [{ id: 'customer-1', email: 'buyer@example.com', name: 'Alex Buyer' }],
+    [{ id: 'lead-1', customerId: 'customer-1', productInterest: 'Advent 2150' }]
+  );
+
+  assert.equal(matches[0].targetType, 'lead');
+  assert.equal(matches[0].decision, 'auto_link');
+  assert.ok(matches[0].confidence >= 95);
+});
+
+test('Gmail matching does not suggest on product interest alone', () => {
+  const matches = matching.scoreGmailThreadMatches(
+    { id: 'thread-2', subject: 'Advent 2150 quote please', snippet: 'I am interested in the Advent 2150.' },
+    [{ id: 'customer-1', email: 'buyer@example.com', name: 'Alex Buyer' }],
+    [{ id: 'lead-1', customerId: 'customer-1', productInterest: 'Advent 2150' }]
+  );
+
+  assert.deepEqual(matches, []);
+});
+
+test('Drive matching requires owner confirmation for name plus product evidence', () => {
+  const matches = matching.scoreDriveFileMatches(
+    { id: 'file-1', name: 'Alex Buyer Advent 2150 tray measurements.pdf', productInterest: 'Advent 2150' },
+    [{ id: 'customer-1', name: 'Alex Buyer', email: 'buyer@example.com' }],
+    [{ id: 'lead-1', customerId: 'customer-1', productInterest: 'Advent 2150' }]
+  );
+
+  const leadMatch = matches.find(match => match.targetType === 'lead');
+  assert.equal(leadMatch.decision, 'needs_confirmation');
+  assert.ok(leadMatch.confidence < 95);
+});
+
+test('Drive matching auto-links exact email metadata', () => {
+  const matches = matching.scoreDriveFileMatches(
+    { id: 'file-2', name: 'payload.pdf', customerEmail: 'buyer@example.com' },
+    [{ id: 'customer-1', name: 'Alex Buyer', email: 'buyer@example.com' }],
+    []
+  );
+
+  assert.equal(matches[0].targetType, 'customer');
+  assert.equal(matches[0].decision, 'auto_link');
+  assert.ok(matches[0].reasons.some(reason => reason.includes('email')));
 });

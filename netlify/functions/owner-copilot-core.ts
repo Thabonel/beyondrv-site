@@ -4,6 +4,10 @@ export const OWNER_COPILOT_AI_ACTION_STORE = 'owner-copilot-ai-actions';
 export const OWNER_COPILOT_AUDIT_STORE = 'owner-copilot-audit-logs';
 export const OWNER_COPILOT_CUSTOMER_STORE = 'owner-copilot-customers';
 export const OWNER_COPILOT_LEAD_STORE = 'owner-copilot-leads';
+export const OWNER_COPILOT_GMAIL_THREAD_STORE = 'owner-copilot-gmail-threads';
+export const OWNER_COPILOT_DRIVE_FILE_STORE = 'owner-copilot-drive-files';
+export const OWNER_COPILOT_WEEKLY_REPORT_STORE = 'owner-copilot-weekly-reports';
+export const OWNER_COPILOT_MARKETING_IDEA_STORE = 'owner-copilot-marketing-ideas';
 
 export type OwnerLeadUrgency = 'hot' | 'warm' | 'cold' | 'waiting_on_customer' | 'waiting_on_byondrv' | 'dormant' | 'won' | 'lost';
 
@@ -244,6 +248,22 @@ export function aiActionKey(actionId: string) {
 
 export function auditLogKey(auditId: string) {
   return `audit/${encodeURIComponent(auditId)}.json`;
+}
+
+export function gmailThreadKey(threadId: string) {
+  return `gmail-threads/${encodeURIComponent(threadId)}.json`;
+}
+
+export function driveFileKey(fileId: string) {
+  return `drive-files/${encodeURIComponent(fileId)}.json`;
+}
+
+export function weeklyReportKey(reportId: string) {
+  return `weekly-reports/${encodeURIComponent(reportId)}.json`;
+}
+
+export function marketingIdeaKey(ideaId: string) {
+  return `marketing-ideas/${encodeURIComponent(ideaId)}.json`;
 }
 
 export function newOwnerCopilotId(prefix: string) {
