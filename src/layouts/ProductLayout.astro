@@ -58,6 +58,14 @@ const youtubeThumbnail = youtubeVideo?.thumbnail
 const activeSpecGroups = data.specGroups?.filter((g: SpecGroup) => g.items.length > 0) ?? [];
 
 const priceNum = data.price.replace(/[^0-9.]/g, '');
+function compactSku(slug: string) {
+  const cleaned = slug.toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  let hash = 0;
+  for (const char of slug) hash = ((hash << 5) - hash + char.charCodeAt(0)) >>> 0;
+  const suffix = hash.toString(36).toUpperCase().padStart(6, '0').slice(-6);
+  const prefix = cleaned.slice(0, 39).replace(/-+$/g, '');
+  return `BRV-${prefix}-${suffix}`;
+}
 const productSchema = {
   "@context": "https://schema.org",
   "@type": "Product",
@@ -65,7 +73,7 @@ const productSchema = {
   "name": data.title,
   "description": data.seoDesc ?? data.tagline,
   "url": productUrl,
-  "sku": `BRV-${product.slug.toUpperCase().replace(/[^A-Z0-9]+/g, '-')}`,
+  "sku": compactSku(product.slug),
   "brand": { "@type": "Brand", "name": "Beyond RV" },
   "manufacturer": { "@type": "Organization", "name": "Beyond RV", "url": "https://beyondrv.com.au/" },
   "image": productImages,
