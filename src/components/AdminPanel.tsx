@@ -420,6 +420,7 @@ interface GoogleIntegrationStatus {
   connectedAt?: string;
   expiresAt?: string;
   lastSyncAt?: string;
+  settings?: GoogleOwnerSettings;
   setupChecklist: string[];
 }
 
@@ -427,8 +428,20 @@ interface GoogleSyncCheck {
   ready?: boolean;
   state?: GoogleIntegrationStatus['state'];
   message?: string;
+  synced?: number;
+  skipped?: number;
   requiredOwnerInputs?: string[];
   error?: string;
+}
+
+interface GoogleOwnerSettings {
+  gmailQuery: string;
+  gmailMaxResults: number;
+  ignoredSenders: string[];
+  driveFolderIds: string[];
+  driveMaxResults: number;
+  summarizeDriveFiles: boolean;
+  updatedAt?: string;
 }
 
 interface CopilotMatchSuggestion {
@@ -1255,6 +1268,16 @@ export default function AdminPanel() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [googleMessage, setGoogleMessage] = useState('');
   const [googleSyncChecks, setGoogleSyncChecks] = useState<Record<'gmail' | 'drive', GoogleSyncCheck | null>>({ gmail: null, drive: null });
+  const [googleSettings, setGoogleSettings] = useState<GoogleOwnerSettings>({
+    gmailQuery: 'newer_than:30d',
+    gmailMaxResults: 10,
+    ignoredSenders: [],
+    driveFolderIds: [],
+    driveMaxResults: 10,
+    summarizeDriveFiles: false,
+  });
+  const [googleIgnoredSendersText, setGoogleIgnoredSendersText] = useState('');
+  const [googleDriveFoldersText, setGoogleDriveFoldersText] = useState('');
   const [gmailThreads, setGmailThreads] = useState<GmailThreadRecord[]>([]);
   const [driveFiles, setDriveFiles] = useState<DriveFileRecord[]>([]);
   const [matchesLoading, setMatchesLoading] = useState(false);
@@ -1583,6 +1606,11 @@ export default function AdminPanel() {
       const data = await readAdminJson<GoogleIntegrationStatus & { error?: string }>(res, 'Could not load Google status.');
       if (!res.ok) throw new Error(data.error ?? 'Could not load Google status.');
       setGoogleStatus(data);
+      if (data.settings) {
+        setGoogleSettings(data.settings);
+        setGoogleIgnoredSendersText(data.settings.ignoredSenders.join('\n'));
+        setGoogleDriveFoldersText(data.settings.driveFolderIds.join('\n'));
+      }
       setGoogleMessage(data.state === 'connected'
         ? 'Google is connected for read-only Owner Copilot access.'
         : data.state === 'not_configured'
@@ -1617,15 +1645,45 @@ export default function AdminPanel() {
     }
   }
 
+  async function saveGoogleSettings() {
+    setGoogleLoading(true);
+    setGoogleMessage('Saving Google sync settings...');
+    try {
+      const payload = {
+        ...googleSettings,
+        ignoredSenders: googleIgnoredSendersText,
+        driveFolderIds: googleDriveFoldersText,
+      };
+      const res = await adminFetch('/.netlify/functions/google-owner-settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await readAdminJson<{ settings?: GoogleOwnerSettings; error?: string }>(res, 'Could not save Google settings.');
+      if (!res.ok || !data.settings) throw new Error(data.error ?? 'Could not save Google settings.');
+      setGoogleSettings(data.settings);
+      setGoogleIgnoredSendersText(data.settings.ignoredSenders.join('\n'));
+      setGoogleDriveFoldersText(data.settings.driveFolderIds.join('\n'));
+      setGoogleMessage('Google sync settings saved.');
+      await loadGoogleStatus();
+    } catch (err) {
+      setGoogleMessage(err instanceof Error ? err.message : 'Could not save Google settings.');
+    } finally {
+      setGoogleLoading(false);
+    }
+  }
+
   async function checkGoogleSync(kind: 'gmail' | 'drive') {
     setGoogleLoading(true);
-    setGoogleMessage(`Checking ${kind === 'gmail' ? 'Gmail' : 'Drive'} readiness...`);
+    setGoogleMessage(`Syncing ${kind === 'gmail' ? 'Gmail' : 'Drive'} metadata...`);
     try {
       const res = await adminFetch(`/.netlify/functions/google-${kind}-sync`, { method: 'POST' });
       if (redirectToLoginIfUnauthorized(res)) return;
       const data = await readAdminJson<GoogleSyncCheck>(res, `Could not check ${kind} readiness.`);
       setGoogleSyncChecks(prev => ({ ...prev, [kind]: data }));
       setGoogleMessage(data.message || `${kind === 'gmail' ? 'Gmail' : 'Drive'} readiness checked.`);
+      if (res.ok) await loadMatchRecords();
     } catch (err) {
       const message = err instanceof Error ? err.message : `Could not check ${kind} readiness.`;
       setGoogleSyncChecks(prev => ({ ...prev, [kind]: { error: message } }));
@@ -4337,16 +4395,16 @@ export default function AdminPanel() {
             <div style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.85rem', display: 'grid', gap: '0.75rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
                 <div>
-                  <div style={{ color: '#fff', fontWeight: 800 }}>Google Owner Access</div>
-                  <div style={{ color: '#888', fontSize: '0.78rem', marginTop: '0.25rem' }}>Read-only Gmail and Drive foundation for Owner Copilot.</div>
+                  <div style={{ color: '#fff', fontWeight: 900, fontSize: '1rem' }}>Connect Gmail and Drive</div>
+                  <div style={{ color: '#888', fontSize: '0.78rem', marginTop: '0.25rem' }}>Owner Copilot only reads approved metadata and sends nothing.</div>
                 </div>
                 <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
                   <button type="button" onClick={loadGoogleStatus} disabled={googleLoading} style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem 0.65rem', cursor: googleLoading ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.76rem' }}>Refresh</button>
-                  <button type="button" onClick={connectGoogle} disabled={googleLoading || googleStatus?.configured === false} style={{ background: googleStatus?.configured === false ? '#333' : '#E8540A', border: 'none', color: '#fff', borderRadius: '6px', padding: '0.48rem 0.65rem', cursor: googleStatus?.configured === false ? 'not-allowed' : 'pointer', fontWeight: 800, fontSize: '0.76rem' }}>Connect Google</button>
+                  <button type="button" onClick={connectGoogle} disabled={googleLoading || googleStatus?.configured === false || googleStatus?.state === 'connected'} style={{ background: googleStatus?.state === 'connected' || googleStatus?.configured === false ? '#333' : '#E8540A', border: 'none', color: '#fff', borderRadius: '6px', padding: '0.58rem 0.8rem', cursor: googleStatus?.state === 'connected' || googleStatus?.configured === false ? 'not-allowed' : 'pointer', fontWeight: 900, fontSize: '0.8rem' }}>{googleStatus?.state === 'connected' ? 'Google Connected' : 'Connect Google'}</button>
                   <button type="button" onClick={disconnectGoogle} disabled={googleLoading || googleStatus?.state !== 'connected'} style={{ background: googleStatus?.state === 'connected' ? '#7f1d1d' : '#333', border: 'none', color: '#fff', borderRadius: '6px', padding: '0.48rem 0.65rem', cursor: googleStatus?.state === 'connected' ? 'pointer' : 'not-allowed', fontWeight: 800, fontSize: '0.76rem' }}>Disconnect</button>
                 </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.65rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '0.65rem' }}>
                 <div style={{ background: '#161616', border: '1px solid #303030', borderRadius: '6px', padding: '0.65rem' }}>
                   <div style={{ color: '#888', fontSize: '0.7rem', textTransform: 'uppercase', fontWeight: 800 }}>Status</div>
                   <div style={{ color: googleStatus?.state === 'connected' ? '#86efac' : '#fb923c', fontWeight: 900, marginTop: '0.2rem' }}>{(googleStatus?.state || 'unknown').replace(/_/g, ' ')}</div>
@@ -4358,6 +4416,10 @@ export default function AdminPanel() {
                 <div style={{ background: '#161616', border: '1px solid #303030', borderRadius: '6px', padding: '0.65rem' }}>
                   <div style={{ color: '#888', fontSize: '0.7rem', textTransform: 'uppercase', fontWeight: 800 }}>Token expiry</div>
                   <div style={{ color: '#fff', fontWeight: 800, marginTop: '0.2rem' }}>{googleStatus?.expiresAt ? new Date(googleStatus.expiresAt).toLocaleString() : 'No token'}</div>
+                </div>
+                <div style={{ background: '#161616', border: '1px solid #303030', borderRadius: '6px', padding: '0.65rem' }}>
+                  <div style={{ color: '#888', fontSize: '0.7rem', textTransform: 'uppercase', fontWeight: 800 }}>Review queue</div>
+                  <div style={{ color: '#fff', fontWeight: 800, marginTop: '0.2rem' }}>{pendingGmailSuggestions + pendingDriveSuggestions} suggestions</div>
                 </div>
               </div>
               {googleMessage && <div style={{ color: isAdminWarningStatus(googleMessage) ? '#fb923c' : '#aaa', fontSize: '0.78rem' }}>{googleMessage}</div>}
@@ -4371,22 +4433,73 @@ export default function AdminPanel() {
             </div>
 
             <div style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.85rem', display: 'grid', gap: '0.75rem' }}>
-              <div style={{ color: '#fff', fontWeight: 800 }}>Sync Readiness</div>
+              <div style={{ color: '#fff', fontWeight: 800 }}>What should Owner Copilot read?</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.75rem' }}>
+                <div style={{ display: 'grid', gap: '0.45rem' }}>
+                  <label style={{ color: '#aaa', fontSize: '0.74rem', fontWeight: 800 }}>Gmail search</label>
+                  <input
+                    value={googleSettings.gmailQuery}
+                    onChange={e => setGoogleSettings(prev => ({ ...prev, gmailQuery: e.target.value }))}
+                    placeholder="newer_than:30d"
+                    style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem', fontSize: '0.78rem' }}
+                  />
+                  <label style={{ color: '#aaa', fontSize: '0.74rem', fontWeight: 800 }}>Ignore senders</label>
+                  <textarea
+                    value={googleIgnoredSendersText}
+                    onChange={e => setGoogleIgnoredSendersText(e.target.value)}
+                    placeholder="one email per line"
+                    rows={4}
+                    style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem', fontSize: '0.78rem', lineHeight: 1.4 }}
+                  />
+                  <label style={{ color: '#aaa', fontSize: '0.74rem', fontWeight: 800 }}>Gmail result limit</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={50}
+                    value={googleSettings.gmailMaxResults}
+                    onChange={e => setGoogleSettings(prev => ({ ...prev, gmailMaxResults: Number(e.target.value) }))}
+                    style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem', fontSize: '0.78rem' }}
+                  />
+                </div>
+                <div style={{ display: 'grid', gap: '0.45rem' }}>
+                  <label style={{ color: '#aaa', fontSize: '0.74rem', fontWeight: 800 }}>Approved Drive folder IDs</label>
+                  <textarea
+                    value={googleDriveFoldersText}
+                    onChange={e => setGoogleDriveFoldersText(e.target.value)}
+                    placeholder="one folder ID per line"
+                    rows={6}
+                    style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem', fontSize: '0.78rem', lineHeight: 1.4 }}
+                  />
+                  <label style={{ color: '#aaa', fontSize: '0.74rem', fontWeight: 800 }}>Drive result limit per folder</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={50}
+                    value={googleSettings.driveMaxResults}
+                    onChange={e => setGoogleSettings(prev => ({ ...prev, driveMaxResults: Number(e.target.value) }))}
+                    style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem', fontSize: '0.78rem' }}
+                  />
+                  <label style={{ display: 'flex', gap: '0.45rem', alignItems: 'center', color: '#aaa', fontSize: '0.74rem' }}>
+                    <input type="checkbox" checked={googleSettings.summarizeDriveFiles} onChange={e => setGoogleSettings(prev => ({ ...prev, summarizeDriveFiles: e.target.checked }))} />
+                    Allow future Drive file summaries after owner approval
+                  </label>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <button type="button" onClick={saveGoogleSettings} disabled={googleLoading} style={{ background: '#2563eb', border: 'none', color: '#fff', borderRadius: '6px', padding: '0.55rem 0.75rem', cursor: googleLoading ? 'wait' : 'pointer', fontWeight: 800, fontSize: '0.78rem' }}>Save Settings</button>
+                <button type="button" onClick={() => checkGoogleSync('gmail')} disabled={googleLoading || googleStatus?.state !== 'connected'} style={{ background: googleStatus?.state === 'connected' ? '#E8540A' : '#333', border: 'none', color: '#fff', borderRadius: '6px', padding: '0.55rem 0.75rem', cursor: googleStatus?.state === 'connected' ? 'pointer' : 'not-allowed', fontWeight: 800, fontSize: '0.78rem' }}>Sync Gmail</button>
+                <button type="button" onClick={() => checkGoogleSync('drive')} disabled={googleLoading || googleStatus?.state !== 'connected'} style={{ background: googleStatus?.state === 'connected' ? '#E8540A' : '#333', border: 'none', color: '#fff', borderRadius: '6px', padding: '0.55rem 0.75rem', cursor: googleStatus?.state === 'connected' ? 'pointer' : 'not-allowed', fontWeight: 800, fontSize: '0.78rem' }}>Sync Drive</button>
+                <button type="button" onClick={() => setActiveTab('matches')} style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem 0.75rem', cursor: 'pointer', fontWeight: 800, fontSize: '0.78rem' }}>Review Matches</button>
+              </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.75rem' }}>
                 {(['gmail', 'drive'] as const).map(kind => {
                   const check = googleSyncChecks[kind];
                   return (
-                    <div key={kind} style={{ background: '#161616', border: '1px solid #303030', borderRadius: '6px', padding: '0.75rem', display: 'grid', gap: '0.5rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center' }}>
-                        <div style={{ color: '#fff', fontWeight: 800 }}>{kind === 'gmail' ? 'Gmail' : 'Drive'}</div>
-                        <button type="button" onClick={() => checkGoogleSync(kind)} disabled={googleLoading} style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.38rem 0.55rem', cursor: googleLoading ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.72rem' }}>Check</button>
-                      </div>
-                      <div style={{ color: check?.ready ? '#86efac' : '#aaa', fontSize: '0.76rem', lineHeight: 1.45 }}>{check?.message || 'Ready checks will show what the owner still needs to choose before ingestion runs.'}</div>
-                      {Boolean(check?.requiredOwnerInputs?.length) && (
-                        <ul style={{ margin: '0 0 0 1rem', padding: 0, color: '#888', fontSize: '0.72rem', lineHeight: 1.45 }}>
-                          {check?.requiredOwnerInputs?.map(item => <li key={item}>{item}</li>)}
-                        </ul>
-                      )}
+                    <div key={kind} style={{ background: '#161616', border: '1px solid #303030', borderRadius: '6px', padding: '0.75rem', display: 'grid', gap: '0.35rem' }}>
+                      <div style={{ color: '#fff', fontWeight: 800 }}>{kind === 'gmail' ? 'Gmail sync' : 'Drive sync'}</div>
+                      <div style={{ color: check?.ready ? '#86efac' : '#aaa', fontSize: '0.76rem', lineHeight: 1.45 }}>{check?.message || 'Not synced this session.'}</div>
+                      {typeof check?.synced === 'number' && <div style={{ color: '#888', fontSize: '0.72rem' }}>Saved {check.synced} record{check.synced === 1 ? '' : 's'}{typeof check.skipped === 'number' ? ` · skipped ${check.skipped}` : ''}</div>}
+                      {Boolean(check?.requiredOwnerInputs?.length) && <div style={{ color: '#fb923c', fontSize: '0.72rem', lineHeight: 1.4 }}>{check?.requiredOwnerInputs?.join(' ')}</div>}
                       {check?.error && <div style={{ color: '#fb923c', fontSize: '0.72rem' }}>{check.error}</div>}
                     </div>
                   );

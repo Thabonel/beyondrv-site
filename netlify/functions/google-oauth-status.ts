@@ -1,7 +1,7 @@
 import type { Handler } from '@netlify/functions';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, safeBlobStoreError } from './blob-store';
-import { getGoogleConnection, googleOAuthConfig, publicGoogleConnectionState } from './google-oauth-core';
+import { getGoogleConnection, getGoogleOwnerSettings, googleOAuthConfig, publicGoogleConnectionState } from './google-oauth-core';
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'GET') return { statusCode: 405, body: 'Method Not Allowed' };
@@ -11,6 +11,7 @@ export const handler: Handler = async (event) => {
   const config = googleOAuthConfig(event);
   try {
     const connection = await getGoogleConnection();
+    const settings = await getGoogleOwnerSettings();
     const state = publicGoogleConnectionState(connection, config.missing);
     return {
       statusCode: 200,
@@ -25,6 +26,7 @@ export const handler: Handler = async (event) => {
         connectedAt: typeof connection?.connectedAt === 'string' ? connection.connectedAt : '',
         expiresAt: typeof connection?.expiresAt === 'string' ? connection.expiresAt : '',
         lastSyncAt: typeof connection?.lastSyncAt === 'string' ? connection.lastSyncAt : '',
+        settings,
         setupChecklist: [
           'Create or choose the Google Cloud project owned by Beyond RV.',
           'Configure OAuth consent for the owner account.',
