@@ -36,6 +36,16 @@
   status = 301
 
 [[redirects]]
+  from   = "/8ft-hardtop-slide-on/"
+  to     = "/7ft-electric-poptop-slide-on/"
+  status = 301
+
+[[redirects]]
+  from   = "/4-6m-poptop-truck-camper-one-off/"
+  to     = "/3-5m-poptop-truck-camper/"
+  status = 301
+
+[[redirects]]
   from   = "/media/*"
   to     = "/.netlify/functions/media-serve?key=:splat"
   status = 200
