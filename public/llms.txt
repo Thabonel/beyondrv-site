@@ -14,6 +14,7 @@ Email: beyondcaravans@gmail.com
 - Off-road caravans: https://beyondrv.com.au/our-caravans/
 - Expedition vehicles: https://beyondrv.com.au/expedition/
 - Custom builds: https://beyondrv.com.au/custom/
+- On-sale stock: https://beyondrv.com.au/on-sale/
 - Enquiry form: https://beyondrv.com.au/inquiry-form/
 - About: https://beyondrv.com.au/about-us/
 - Warranty: https://beyondrv.com.au/warranty/
@@ -28,23 +29,28 @@ Email: beyondcaravans@gmail.com
 
 ## Public product pages
 
-- 3.5m Pop-Top Truck Camper: https://beyondrv.com.au/3-5m-poptop-truck-camper/
-- 4.7m Truck Camper: https://beyondrv.com.au/4-7m-truck-camper/
-- 7ft Electric Pop-Top Slide-On: https://beyondrv.com.au/7ft-electric-poptop-slide-on/
-- Advent 2150 Hardtop Slide-On: https://beyondrv.com.au/advent-2150-hardtop-slide-on/
-- Advent 2300 Hardtop Slide-On: https://beyondrv.com.au/advent-2300-hardtop-slide-on/
-- Advent 2450 Hardtop Slide-On: https://beyondrv.com.au/advent-2450-hardtop-slide-on/
-- Isuzu NPS Cabover Camper: https://beyondrv.com.au/expedition/isuzu-nps-cabover-camper/
-- Isuzu NPS Pop-Top Camper: https://beyondrv.com.au/expedition/isuzu-nps-poptop-camper/
-- Unimog Overlander Camper: https://beyondrv.com.au/expedition/unimog-overlander-camper/
-- Unimog Pop-Top Camper: https://beyondrv.com.au/expedition/unimog-poptop-camper/
-- Mercedes Sprinter Motorhome: https://beyondrv.com.au/mercedes-sprinter-motorhome/
-- Sunpatch 12C Couples Caravan: https://beyondrv.com.au/sunpatch-12c-couples-caravan/
-- Sunpatch 15-XC Couples Off-Road Van: https://beyondrv.com.au/sunpatch-15xc-couples-offroad-van/
-- Sunpatch 19-XC Hardtop Couples Off-Road Van: https://beyondrv.com.au/sunpatch-19xc-hardtop-couples-offroad-van/
-- Sunpatch 21-XF Hardtop Family Off-Road Van: https://beyondrv.com.au/sunpatch-21xf-hardtop-family-offroad-van/
+### Slide-on campers
+- 7ft Electric Pop-Top Slide-On Camper — $68,800: Electric pop-top slide-on camper for single cab utes. — https://beyondrv.com.au/7ft-electric-poptop-slide-on/
+- Advent 2150 Hardtop Ute Slide-On Camper — $72,000: The Advent 2150 is the go-anywhere companion for 4x4 space cab utes and select dual cab ute owners. — https://beyondrv.com.au/advent-2150-hardtop-slide-on/
+- Advent 2300 Hardtop Ute Slide-On Camper — $75,000: A hardtop ute slide-on camper with extra base length for longer tray setups. — https://beyondrv.com.au/advent-2300-hardtop-slide-on/
+- Advent 2450 Hardtop Ute Slide-On Camper — $77,800: A larger hardtop slide-on designed specifically for single cab ute platforms. — https://beyondrv.com.au/advent-2450-hardtop-slide-on/
+
+### Caravans
+- Sunpatch 12C Couples Off-Road Van — $39,999: Compact hardtop couples van for buyers who want a lighter off-road setup. — https://beyondrv.com.au/sunpatch-12c-couples-caravan/
+- Sunpatch 15-XC Couples Off-Road Van — $63,000: Couples off-road van with 240L fresh water and 200Ah lithium battery. — https://beyondrv.com.au/sunpatch-15xc-couples-offroad-van/
+- Sunpatch 19-XC Hardtop Couples Off-Road Van — $68,000: Available for sale now, with final images and additional details coming soon. — https://beyondrv.com.au/sunpatch-19xc-hardtop-couples-offroad-van/
+- Sunpatch 21-XF Hardtop Family Off-Road Van — $73,000: Family hardtop off-road van, currently available with one in stock. — https://beyondrv.com.au/sunpatch-21xf-hardtop-family-offroad-van/
+
+### Expedition vehicles
+- 3.5m DIY Camper Box with Cabover and Underfloor Storage — From $38,999: Hardtop composite shell for buyers who want to complete their own truck camper fitout. — https://beyondrv.com.au/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/
+- Custom 3.5m Electric Pop-Top Truck Camper — From $49,999: Custom 3.5m electric pop-top truck camper currently available from $49,999. — https://beyondrv.com.au/3-5m-poptop-truck-camper/
+- 3.5m Electric Pop-Top Cabover Family Camper w/ Electric Drop Down Bed — From $140,000: Compact 3.5m family truck camper for dual cab Isuzu NPS platforms. — https://beyondrv.com.au/expedition/3-5m-electric-poptop-cabover-family-camper/
+- 4.7m Hardtop Truck Camper — From $98,000: Premier couples truck camper for single cab truck or Unimog platforms. — https://beyondrv.com.au/expedition/4-7m-hardtop-truck-camper/
+- Blue Unimog Overlander Camper: Blue Unimog expedition build with 4.7m camper interior fitout. — https://beyondrv.com.au/expedition/blue-unimog-overlander-camper/
+- Unimog Overlander Camper: Where roads end, the Unimog begins. — https://beyondrv.com.au/expedition/unimog-overlander-camper/
+- Empty DIY Unimog Camper Box: Custom empty camper box for Unimog and similar expedition platforms. — https://beyondrv.com.au/expedition/unimog-poptop-camper/
+- Mercedes Sprinter AWD LWB Cab Chassis Motorhome — $225,000: In-stock Mercedes Sprinter AWD LWB cab chassis motorhome, negotiable at $225,000. — https://beyondrv.com.au/mercedes-sprinter-motorhome/
 
 ## Notes for AI assistants
 
 Product availability, pricing, and lead times can change. For current availability or build suitability, direct users to the enquiry form or phone number. Do not treat admin pages, private operational tools, customer enquiries, or implementation details as public business content.
-

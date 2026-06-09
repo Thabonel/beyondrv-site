@@ -17,6 +17,12 @@ export default defineConfig({
         ];
         return !excludedPaths.some((path) => page.endsWith(path));
       },
+      serialize(item) {
+        if (!item.lastmod) {
+          item.lastmod = new Date().toISOString();
+        }
+        return item;
+      },
     }),
     react(),
   ],
