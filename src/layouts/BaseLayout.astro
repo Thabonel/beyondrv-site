@@ -81,14 +81,14 @@ const { activePath = '', productTitle, productSlug, ...headProps } = Astro.props
     })();
   </script>
 
-  <CookieConsent client:load />
-  <PostHogProvider client:load />
-  <SiteChatWidget client:load pageTitle={headProps.title} productSlug={productSlug} productName={productTitle} />
+  <CookieConsent client:idle />
+  <PostHogProvider client:idle />
+  <SiteChatWidget client:visible pageTitle={headProps.title} productSlug={productSlug} productName={productTitle} />
 
   <script>
     const cursor = document.getElementById('cursor');
     const ring = document.getElementById('cursor-ring');
-    if (cursor && ring && !window.matchMedia('(pointer: coarse)').matches) {
+    if (cursor && ring && !window.matchMedia('(pointer: coarse)').matches && window.innerWidth > 768) {
       const cursorEl = cursor;
       const ringEl = ring;
       let mx = 0, my = 0, rx = 0, ry = 0;

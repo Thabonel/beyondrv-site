@@ -14,17 +14,14 @@ function publicAssetExists(src: string) {
 }
 
 function optimizedProductVariant(src: string, width: number) {
-  if (width <= 480) {
-    const variant = src.replace(/\.webp$/, '-480.webp');
-    return publicAssetExists(variant) ? variant : src;
-  }
-  if (width <= 800) {
-    const variant = src.replace(/\.webp$/, '-800.webp');
-    return publicAssetExists(variant) ? variant : src;
-  }
-  if (width <= 1200) {
-    const variant = src.replace(/\.webp$/, '-1200.webp');
-    return publicAssetExists(variant) ? variant : src;
+  const candidates = [];
+  if (width <= 400) candidates.push('-400.webp', '-480.webp');
+  else if (width <= 480) candidates.push('-480.webp', '-400.webp');
+  else if (width <= 800) candidates.push('-800.webp', '-480.webp', '-400.webp');
+  else if (width <= 1200) candidates.push('-1200.webp', '-800.webp');
+  for (const suffix of candidates) {
+    const variant = src.replace(/\.webp$/, suffix);
+    if (publicAssetExists(variant)) return variant;
   }
   return src;
 }
@@ -42,7 +39,7 @@ export function displayImageUrl(src: string, width = 1200, fit: 'contain' | 'cov
   return `/.netlify/images?${params.toString()}`;
 }
 
-export function imageSrcSet(src: string, widths = [480, 800, 1200, 1600]) {
+export function imageSrcSet(src: string, widths = [400, 480, 800, 1200]) {
   const candidates = widths
     .map((width) => ({ width, url: displayImageUrl(src, width) }))
     .filter((candidate, index, all) => all.findIndex(item => item.url === candidate.url) === index);
