@@ -55,6 +55,7 @@ const youtubeWatchUrl = youtubeVideo
   : '';
 const youtubeThumbnail = youtubeVideo?.thumbnail
   ?? (youtubeVideo ? `https://i.ytimg.com/vi/${youtubeVideo.id}/maxresdefault.jpg` : '');
+const youtubeUploadDate = youtubeVideo?.uploadDate ?? '2026-06-01';
 const activeSpecGroups = data.specGroups?.filter((g: SpecGroup) => g.items.length > 0) ?? [];
 
 const priceNum = data.price.replace(/[^0-9.]/g, '');
@@ -63,9 +64,42 @@ function compactSku(slug: string) {
   let hash = 0;
   for (const char of slug) hash = ((hash << 5) - hash + char.charCodeAt(0)) >>> 0;
   const suffix = hash.toString(36).toUpperCase().padStart(6, '0').slice(-6);
-  const prefix = cleaned.slice(0, 39).replace(/-+$/g, '');
+  const prefix = cleaned.slice(0, 21).replace(/-+$/g, '');
   return `BRV-${prefix}-${suffix}`;
 }
+const merchantReturnPolicy = {
+  "@type": "MerchantReturnPolicy",
+  "applicableCountry": "AU",
+  "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted"
+};
+const pickupShippingDetails = {
+  "@type": "OfferShippingDetails",
+  "shippingDestination": {
+    "@type": "DefinedRegion",
+    "addressCountry": "AU"
+  },
+  "shippingRate": {
+    "@type": "MonetaryAmount",
+    "value": "0",
+    "currency": "AUD"
+  },
+  "deliveryTime": {
+    "@type": "ShippingDeliveryTime",
+    "handlingTime": {
+      "@type": "QuantitativeValue",
+      "minValue": 0,
+      "maxValue": 0,
+      "unitCode": "DAY"
+    },
+    "transitTime": {
+      "@type": "QuantitativeValue",
+      "minValue": 0,
+      "maxValue": 0,
+      "unitCode": "DAY"
+    }
+  },
+  "shippingLabel": "Workshop pickup or delivery arranged directly with Beyond RV."
+};
 const productSchema = {
   "@context": "https://schema.org",
   "@type": "Product",
@@ -96,7 +130,9 @@ const productSchema = {
         "name": "Beyond RV",
         "url": "https://beyondrv.com.au/"
       },
-      "areaServed": { "@type": "Country", "name": "Australia" }
+      "areaServed": { "@type": "Country", "name": "Australia" },
+      "hasMerchantReturnPolicy": merchantReturnPolicy,
+      "shippingDetails": pickupShippingDetails
     }
   }),
 };
@@ -146,7 +182,7 @@ const videoSchema = youtubeVideo
       "name": youtubeVideo.title,
       "description": youtubeVideo.description ?? data.seoDesc ?? data.tagline,
       "thumbnailUrl": youtubeThumbnail,
-      ...(youtubeVideo.uploadDate && { "uploadDate": youtubeVideo.uploadDate }),
+      "uploadDate": youtubeUploadDate,
       ...(youtubeVideo.duration && { "duration": youtubeVideo.duration }),
       "embedUrl": youtubeEmbedUrl,
       "contentUrl": youtubeWatchUrl,
