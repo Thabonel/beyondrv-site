@@ -16,8 +16,54 @@
   status = 301
 
 [[redirects]]
+  from   = "/15-ft-pop-top/"
+  to     = "/our-caravans/"
+  status = 301
+
+[[redirects]]
+  from   = "/17-ft/"
+  to     = "/our-caravans/"
+  status = 301
+
+[[redirects]]
+  from   = "/"
+  to     = "/our-slide-on-campers/?q=:search"
+  status = 301
+  query  = {s = ":search"}
+
+[[redirects]]
+  from   = "/feed/"
+  to     = "/"
+  status = 301
+
+[[redirects]]
+  from   = "/advent-"
+  to     = "/our-slide-on-campers/"
+  status = 301
+
+[[redirects]]
+  from   = "/advent-2150"
+  to     = "/advent-2150-hardtop-slide-on/"
+  status = 301
+
+[[redirects]]
   from   = "/3-5m-truck-camper-cabover/"
   to     = "/expedition/3-5m-electric-poptop-cabover-family-camper/"
+  status = 301
+
+[[redirects]]
+  from   = "/3-5m-truck-camper"
+  to     = "/3-5m-poptop-truck-camper/"
+  status = 301
+
+[[redirects]]
+  from   = "/3-5m-truck-camper/"
+  to     = "/3-5m-poptop-truck-camper/"
+  status = 301
+
+[[redirects]]
+  from   = "/15ft-truck-camper-combined-shower-toilet/"
+  to     = "/3-5m-poptop-truck-camper/"
   status = 301
 
 [[redirects]]
