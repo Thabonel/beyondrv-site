@@ -46,6 +46,20 @@ interface ProductPerformanceRecord {
   flags: string[];
 }
 
+interface ProductRecommendationResult {
+  status: 'ready' | 'fallback';
+  message: string;
+  diagnosis: string;
+  ownerInputs: string[];
+  recommendations: {
+    title: string;
+    action: string;
+    evidence: string;
+    priority: 'high' | 'medium' | 'low';
+    category: 'quick-fix' | 'owner-action' | 'marketing' | 'technical';
+  }[];
+}
+
 interface DashboardData {
   generatedAt: string;
   range: string;
@@ -204,6 +218,9 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [recommendations, setRecommendations] = useState<Record<string, ProductRecommendationResult>>({});
+  const [recommendationLoading, setRecommendationLoading] = useState<string | null>(null);
+  const [recommendationErrors, setRecommendationErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const controller = new AbortController();
@@ -239,6 +256,47 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
   }
 
   const chat = data?.chat ?? { recent: [], topTopics: [] };
+  const attentionProducts = data ? Array.from(new Map(
+    [...data.productInterest.staleProducts, ...data.inventory.weakListings].map((item) => {
+      const performance = data.productPerformance.find(product => product.slug === item.slug);
+      const flags = [
+        ...(performance?.flags ?? []),
+        ...('issue' in item ? [item.issue] : []),
+      ].filter((flag, index, all) => flag && all.indexOf(flag) === index);
+      return [item.slug, {
+        slug: item.slug,
+        title: item.title,
+        flags,
+        pageViews: performance?.pageViews ?? 0,
+        enquiries30Days: performance?.enquiries30Days ?? 0,
+        totalEnquiries: performance?.totalEnquiries ?? 0,
+      }];
+    })
+  ).values()).slice(0, 8) : [];
+
+  async function analyseProduct(product: typeof attentionProducts[number]) {
+    setRecommendationLoading(product.slug);
+    setRecommendationErrors(prev => ({ ...prev, [product.slug]: '' }));
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-product-recommendations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(product),
+      });
+      if (res.status === 401) {
+        clearAdminToken();
+        window.location.href = '/.netlify/functions/admin-login';
+        return;
+      }
+      const body = await adminJson<ProductRecommendationResult>(res, 'Could not analyse product');
+      if (!res.ok) throw new Error(body.error ?? 'Could not analyse product');
+      setRecommendations(prev => ({ ...prev, [product.slug]: body }));
+    } catch (err) {
+      setRecommendationErrors(prev => ({ ...prev, [product.slug]: err instanceof Error ? err.message : 'Could not analyse product.' }));
+    } finally {
+      setRecommendationLoading(null);
+    }
+  }
 
   return (
     <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.85rem', display: 'grid', gap: '0.85rem', alignContent: 'start' }}>
@@ -398,16 +456,53 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
           </Panel>
 
           <Panel title="Products Needing Attention">
-            {data.productInterest.staleProducts.length === 0 && data.inventory.weakListings.length === 0 ? (
+            {attentionProducts.length === 0 ? (
               <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No obvious stock issues in this range.</p>
             ) : (
-              <div style={{ display: 'grid', gap: '0.45rem' }}>
-                {[...data.productInterest.staleProducts.slice(0, 5), ...data.inventory.weakListings.slice(0, 5)].slice(0, 8).map((product, index) => (
-                  <div key={`${product.slug}-${index}`} style={{ borderBottom: '1px solid #252525', paddingBottom: '0.4rem' }}>
-                    <div style={{ color: '#fff', fontSize: '0.78rem', fontWeight: 700 }}>{product.title}</div>
-                    <div style={{ color: '#fb923c', fontSize: '0.7rem', marginTop: '0.15rem' }}>
-                      {'flags' in product ? product.flags.join(', ') || 'No enquiries in 30 days' : product.issue}
+              <div style={{ display: 'grid', gap: '0.65rem' }}>
+                {attentionProducts.map((product) => (
+                  <div key={product.slug} data-testid={`attention-product-${product.slug}`} style={{ borderBottom: '1px solid #252525', paddingBottom: '0.65rem', display: 'grid', gap: '0.45rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', gap: '0.6rem', alignItems: 'start' }}>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ color: '#fff', fontSize: '0.78rem', fontWeight: 700 }}>{product.title}</div>
+                        <div style={{ color: '#fb923c', fontSize: '0.7rem', marginTop: '0.15rem', lineHeight: 1.4 }}>{product.flags.join(', ')}</div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => analyseProduct(product)}
+                        disabled={recommendationLoading === product.slug}
+                        style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.38rem 0.5rem', cursor: recommendationLoading === product.slug ? 'wait' : 'pointer', fontSize: '0.7rem', fontWeight: 700, whiteSpace: 'nowrap' }}
+                      >
+                        {recommendationLoading === product.slug ? 'Analysing...' : recommendations[product.slug] ? 'Analyse Again' : 'Analyse with AI'}
+                      </button>
                     </div>
+                    {recommendationErrors[product.slug] && <div style={{ color: '#f87171', fontSize: '0.7rem' }}>{recommendationErrors[product.slug]}</div>}
+                    {recommendations[product.slug] && (
+                      <div data-testid={`product-recommendations-${product.slug}`} style={{ background: '#161616', border: '1px solid #333', borderRadius: '6px', padding: '0.65rem', display: 'grid', gap: '0.55rem' }}>
+                        {recommendations[product.slug].message && <div style={{ color: '#888', fontSize: '0.68rem' }}>{recommendations[product.slug].message}</div>}
+                        <div style={{ color: '#ddd', fontSize: '0.74rem', lineHeight: 1.45 }}>{recommendations[product.slug].diagnosis}</div>
+                        <div style={{ display: 'grid', gap: '0.5rem' }}>
+                          {recommendations[product.slug].recommendations.map((item) => (
+                            <div key={`${item.category}-${item.title}`} style={{ borderTop: '1px solid #292929', paddingTop: '0.5rem', display: 'grid', gap: '0.2rem' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center' }}>
+                                <div style={{ color: '#fff', fontSize: '0.74rem', fontWeight: 800 }}>{item.title}</div>
+                                <StatusPill status={item.priority === 'high' ? 'blocker' : item.priority === 'medium' ? 'warning' : 'ready'} />
+                              </div>
+                              <div style={{ color: '#ddd', fontSize: '0.72rem', lineHeight: 1.4 }}>{item.action}</div>
+                              <div style={{ color: '#777', fontSize: '0.66rem', lineHeight: 1.35 }}>{labelise(item.category)} · {item.evidence}</div>
+                            </div>
+                          ))}
+                        </div>
+                        {recommendations[product.slug].ownerInputs.length > 0 && (
+                          <div style={{ borderTop: '1px solid #292929', paddingTop: '0.5rem' }}>
+                            <div style={{ color: '#fff', fontSize: '0.7rem', fontWeight: 800 }}>Owner confirmation needed</div>
+                            <ul style={{ color: '#aaa', fontSize: '0.68rem', lineHeight: 1.4, margin: '0.3rem 0 0 1rem', padding: 0 }}>
+                              {recommendations[product.slug].ownerInputs.map(item => <li key={item}>{item}</li>)}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
