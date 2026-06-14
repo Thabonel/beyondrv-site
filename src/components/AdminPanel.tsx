@@ -4967,6 +4967,8 @@ export default function AdminPanel() {
                 <li>Check Due Follow-Ups first. Overdue follow-ups need action before browsing product statistics.</li>
                 <li>Check Email Delivery and Launch Readiness. Red items are setup blockers, orange items are warnings, and green items are ready.</li>
                 <li>Use Products Needing Attention to find weak listings, stale stock, or products that need better photos or copy.</li>
+                <li>Click Analyse with AI on a product needing attention to get a grounded diagnosis, ranked actions, evidence, and owner-confirmation items.</li>
+                <li>AI product recommendations do not change the website automatically. Confirm facts first, then use Products, Media, Homepage, Admin Chat, or Pending to make approved changes.</li>
                 <li>Use Product Interest, Funnel, and Traffic Quality to understand which products and marketing sources are producing enquiries.</li>
               </ol>
             </section>
@@ -4978,6 +4980,8 @@ export default function AdminPanel() {
                 <li>Set the lead status to New, Contacted, Quoted, Won, Lost, or Spam.</li>
                 <li>Set the follow-up date for the next call or email. Due and overdue items appear on Dashboard.</li>
                 <li>Add short notes after each contact attempt, quote, or outcome. Do not store passwords, payment details, or unnecessary private information.</li>
+                <li>Use Archive for test, old, duplicate, or low-value enquiries that should leave active queues without being deleted.</li>
+                <li>Use the Archived filter to find archived enquiries. Click Restore if the enquiry needs to return to active follow-up.</li>
                 <li>Marking a lead Won does not automatically remove a product from the website. Use Products or Admin Chat to make stock changes deliberately.</li>
               </ol>
             </section>
