@@ -3,6 +3,7 @@ import BaseLayout from './BaseLayout.astro';
 import OptionalExtras from '../components/OptionalExtras';
 import type { CollectionEntry } from 'astro:content';
 import { displayImageUrl, imageSrcSet, thumbImageUrl } from '../lib/media';
+import { normalizeVideoUploadDate } from '../lib/structuredData.js';
 
 type ProductData = CollectionEntry<'products'>['data'];
 type ProductCategory = ProductData['category'];
@@ -55,7 +56,7 @@ const youtubeWatchUrl = youtubeVideo
   : '';
 const youtubeThumbnail = youtubeVideo?.thumbnail
   ?? (youtubeVideo ? `https://i.ytimg.com/vi/${youtubeVideo.id}/maxresdefault.jpg` : '');
-const youtubeUploadDate = youtubeVideo?.uploadDate ?? '2026-06-01';
+const youtubeUploadDate = normalizeVideoUploadDate(youtubeVideo?.uploadDate);
 const activeSpecGroups = data.specGroups?.filter((g: SpecGroup) => g.items.length > 0) ?? [];
 
 const priceNum = data.price.replace(/[^0-9.]/g, '');

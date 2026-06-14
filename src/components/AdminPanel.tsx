@@ -1123,7 +1123,7 @@ function ProductVideoEditor({
         <input
           value={uploadDate}
           onChange={e => onChange({ youtubeVideoUploadDate: e.target.value })}
-          placeholder="Upload date, e.g. 2026-05-28"
+          placeholder="Upload date, e.g. 2026-05-28T09:00:00+10:00"
           style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.78rem' }}
         />
       </div>
@@ -1313,6 +1313,7 @@ export default function AdminPanel() {
   const [manualEnquiryStatus, setManualEnquiryStatus] = useState('');
   const [browserRemindersEnabled, setBrowserRemindersEnabled] = useState(false);
   const [browserReminderStatus, setBrowserReminderStatus] = useState('');
+  const [showLeadReminders, setShowLeadReminders] = useState(false);
   const [enquiryQueueFilter, setEnquiryQueueFilter] = useState<EnquiryQueueFilter>('active');
   const [openLeadDetailId, setOpenLeadDetailId] = useState<string | null>(null);
   const [leadDetails, setLeadDetails] = useState<Record<string, OwnerCopilotLeadDetail>>({});
@@ -3556,8 +3557,8 @@ export default function AdminPanel() {
         )}
 
         {activeTab === 'enquiries' && (
-          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '1rem', borderBottom: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
+          <div data-testid="enquiries-scroll-container" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+            <div style={{ position: 'sticky', top: 0, zIndex: 5, padding: '1rem', borderBottom: '1px solid #333', background: '#111', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
               <div>
                 <div style={{ color: '#fff', fontWeight: 700 }}>Recent Enquiries</div>
                 <div style={{ color: '#888', fontSize: '0.76rem', marginTop: '0.2rem' }}>Stored contact form submissions</div>
@@ -3588,7 +3589,7 @@ export default function AdminPanel() {
                   : `Email notifications need setup. Missing: ${contactConfig.missing.join(', ')}.`}
               </div>
             )}
-            <div style={{ padding: '0.85rem 1rem', borderBottom: '1px solid #333', background: '#151515', display: 'grid', gap: '0.65rem' }}>
+            <div data-testid="enquiries-attention" style={{ padding: '0.85rem 1rem', borderBottom: '1px solid #333', background: '#151515', display: 'grid', gap: '0.65rem' }}>
               <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '0.55rem', alignItems: 'center' }}>
                 <div>
                   <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem' }}>Needs Attention</div>
@@ -3596,21 +3597,33 @@ export default function AdminPanel() {
                     {leadReminders.total ? `${leadReminders.total} reminder${leadReminders.total === 1 ? '' : 's'} across recent enquiries.` : 'No recent lead reminders.'}
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={enableBrowserLeadReminders}
-                  disabled={browserRemindersEnabled}
-                  style={{ background: browserRemindersEnabled ? '#102416' : '#222', border: browserRemindersEnabled ? '1px solid #1a3a1a' : '1px solid #444', color: browserRemindersEnabled ? '#8f8' : '#fff', borderRadius: '6px', padding: '0.42rem 0.55rem', cursor: browserRemindersEnabled ? 'default' : 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
-                >
-                  {browserRemindersEnabled ? 'Browser Alerts On' : 'Enable Browser Alerts'}
-                </button>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', justifyContent: 'flex-end' }}>
+                  {leadReminders.total > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowLeadReminders(prev => !prev)}
+                      aria-expanded={showLeadReminders}
+                      style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.42rem 0.55rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
+                    >
+                      {showLeadReminders ? 'Hide Reminders' : `Show Reminders (${leadReminders.total})`}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={enableBrowserLeadReminders}
+                    disabled={browserRemindersEnabled}
+                    style={{ background: browserRemindersEnabled ? '#102416' : '#222', border: browserRemindersEnabled ? '1px solid #1a3a1a' : '1px solid #444', color: browserRemindersEnabled ? '#8f8' : '#fff', borderRadius: '6px', padding: '0.42rem 0.55rem', cursor: browserRemindersEnabled ? 'default' : 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
+                  >
+                    {browserRemindersEnabled ? 'Browser Alerts On' : 'Enable Browser Alerts'}
+                  </button>
+                </div>
               </div>
               {browserReminderStatus && (
                 <div style={{ color: '#aaa', fontSize: '0.72rem', lineHeight: 1.45 }}>
                   {browserReminderStatus}{browserReminderCandidates.length ? ` High-value reminders ready: ${browserReminderCandidates.length}.` : ''}
                 </div>
               )}
-              {leadReminders.total > 0 && (
+              {showLeadReminders && leadReminders.total > 0 && (
                 <div style={{ display: 'grid', gap: '0.55rem' }}>
                   {leadReminderSections.filter(([, items]) => items.length > 0).map(([title, items]) => (
                     <div key={title} style={{ display: 'grid', gap: '0.35rem' }}>
@@ -3744,11 +3757,11 @@ export default function AdminPanel() {
                 </div>
               </div>
             )}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '0.75rem', display: 'grid', gap: '0.65rem', alignContent: 'start' }}>
+            <div data-testid="enquiries-records" style={{ padding: '0.75rem', display: 'grid', gap: '0.65rem', alignContent: 'start' }}>
               {enquiriesStatus && <p style={{ color: '#fb923c', fontSize: '0.85rem', lineHeight: 1.45 }}>{enquiriesStatus}</p>}
               {enquiriesLoading && <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>Loading enquiries...</p>}
               {!enquiriesLoading && enquiries.length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+                <div style={{ position: 'sticky', top: '73px', zIndex: 4, display: 'flex', flexWrap: 'wrap', gap: '0.35rem', padding: '0.35rem 0', background: '#111' }}>
                   {[
                     ['active', `Active ${queueCounts.active}`],
                     ['needs-response', `Needs response ${queueCounts.needsResponse}`],
