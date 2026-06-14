@@ -45,6 +45,7 @@ export const handler: Handler = async (event) => {
             outcomeReason: '',
             firstResponseAt: '',
             lastContactedAt: '',
+            archivedAt: '',
             updatedAt: data.submittedAt ?? '',
           },
         };

@@ -63,6 +63,7 @@ export const handler: Handler = async (event) => {
           outcomeReason: '',
           firstResponseAt: '',
           lastContactedAt: '',
+          archivedAt: '',
           updatedAt: '',
         },
       }),
@@ -88,6 +89,7 @@ export const handler: Handler = async (event) => {
   const outcomeReason = clean(body.outcomeReason, 80);
   const firstResponseAt = clean(body.firstResponseAt, 80);
   const lastContactedAt = clean(body.lastContactedAt, 80);
+  const archivedAt = clean(body.archivedAt, 80);
 
   if (!enquiryId) {
     return {
@@ -138,6 +140,7 @@ export const handler: Handler = async (event) => {
     outcomeReason,
     firstResponseAt: firstResponseAt || (typeof existing?.firstResponseAt === 'string' ? existing.firstResponseAt : ''),
     lastContactedAt: lastContactedAt || (typeof existing?.lastContactedAt === 'string' ? existing.lastContactedAt : ''),
+    archivedAt,
     updatedAt: new Date().toISOString(),
   };
 
@@ -152,6 +155,21 @@ export const handler: Handler = async (event) => {
         id: timelineId,
         eventType: 'status_changed',
         summary: `Lead status changed from ${previousStatus} to ${status}.`,
+        relatedLeadId: enquiryId,
+        source: 'admin-lead-status',
+        aiGenerated: false,
+        createdAt: leadStatus.updatedAt,
+      });
+    }
+    const wasArchived = Boolean(existing?.archivedAt);
+    const isArchived = Boolean(archivedAt);
+    if (wasArchived !== isArchived) {
+      const timelineStore = getBlobStore(OWNER_COPILOT_TIMELINE_STORE);
+      const timelineId = newOwnerCopilotId('timeline');
+      await timelineStore.setJSON(timelineKey(timelineId), {
+        id: timelineId,
+        eventType: isArchived ? 'lead_archived' : 'lead_restored',
+        summary: isArchived ? 'Enquiry archived.' : 'Enquiry restored from archive.',
         relatedLeadId: enquiryId,
         source: 'admin-lead-status',
         aiGenerated: false,

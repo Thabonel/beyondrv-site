@@ -47,7 +47,7 @@ type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 type SuitabilityDataStatus = 'draft' | 'target' | 'confirmed';
 type EnquirySourceType = 'website_form' | 'manual_email' | 'phone_call' | 'facebook' | 'instagram' | 'referral' | 'walk_in' | 'other';
-type EnquiryQueueFilter = 'active' | 'needs-response' | 'follow-up-due' | 'hot' | 'all';
+type EnquiryQueueFilter = 'active' | 'needs-response' | 'follow-up-due' | 'hot' | 'all' | 'archived';
 type OrderType = 'standard_model' | 'one_off_stock' | 'demo_unit' | 'used_stock' | 'custom_build';
 type OrderStatus =
   | 'enquiry'
@@ -216,6 +216,7 @@ interface EnquiryRecord {
     outcomeReason?: '' | 'too-expensive' | 'wrong-vehicle' | 'no-payload' | 'bought-elsewhere' | 'just-researching' | 'no-response' | 'timing-not-right' | 'other';
     firstResponseAt?: string;
     lastContactedAt?: string;
+    archivedAt?: string;
     updatedAt?: string;
     aiClassification?: {
       suggestedPriority?: 'hot' | 'warm' | 'info-only' | 'spam-low-quality';
@@ -785,6 +786,7 @@ function calculateAdminLeadReminders(enquiries: EnquiryRecord[]): LeadReminderSu
   };
 
   for (const enquiry of enquiries) {
+    if (enquiry.leadStatus?.archivedAt) continue;
     const status = reminderStatus(enquiry);
     const priority = reminderPriority(enquiry);
     const firstResponseAt = enquiry.leadStatus?.firstResponseAt ?? '';
@@ -830,6 +832,10 @@ function isClosedEnquiry(enquiry: EnquiryRecord) {
   return isClosedLeadStatus(reminderStatus(enquiry));
 }
 
+function isArchivedEnquiry(enquiry: EnquiryRecord) {
+  return Boolean(enquiry.leadStatus?.archivedAt);
+}
+
 function hasCustomerResponse(enquiry: EnquiryRecord) {
   return Boolean(enquiry.leadStatus?.firstResponseAt || enquiry.leadStatus?.lastContactedAt || isRepliedOrBeyond(reminderStatus(enquiry)));
 }
@@ -859,6 +865,8 @@ function queueRank(enquiry: EnquiryRecord) {
 }
 
 function matchesQueueFilter(enquiry: EnquiryRecord, filter: EnquiryQueueFilter) {
+  if (filter === 'archived') return isArchivedEnquiry(enquiry);
+  if (isArchivedEnquiry(enquiry)) return false;
   if (filter === 'all') return true;
   if (filter === 'active') return !isClosedEnquiry(enquiry);
   if (filter === 'needs-response') return !isClosedEnquiry(enquiry) && !hasCustomerResponse(enquiry);
@@ -2112,6 +2120,7 @@ export default function AdminPanel() {
       outcomeReason: '',
       firstResponseAt: '',
       lastContactedAt: '',
+      archivedAt: '',
       updatedAt: enquiry.submittedAt,
     };
     const next = { ...current, ...patch, enquiryId: enquiry.id };
@@ -2130,6 +2139,7 @@ export default function AdminPanel() {
           outcomeReason: next.outcomeReason ?? '',
           firstResponseAt: next.firstResponseAt ?? '',
           lastContactedAt: next.lastContactedAt ?? '',
+          archivedAt: next.archivedAt ?? '',
         }),
       });
       if (redirectToLoginIfUnauthorized(res)) return;
@@ -2993,11 +3003,12 @@ export default function AdminPanel() {
     ['Manual leads missing follow-up date', leadReminders.manualMissingFollowUp],
   ] as const;
   const queueCounts = {
-    active: enquiries.filter(enquiry => !isClosedEnquiry(enquiry)).length,
-    needsResponse: enquiries.filter(enquiry => !isClosedEnquiry(enquiry) && !hasCustomerResponse(enquiry)).length,
-    followUpDue: enquiries.filter(isFollowUpDue).length,
-    hot: enquiries.filter(enquiry => enquiry.leadStatus?.priority === 'hot' && !isClosedEnquiry(enquiry)).length,
-    all: enquiries.length,
+    active: enquiries.filter(enquiry => !isArchivedEnquiry(enquiry) && !isClosedEnquiry(enquiry)).length,
+    needsResponse: enquiries.filter(enquiry => !isArchivedEnquiry(enquiry) && !isClosedEnquiry(enquiry) && !hasCustomerResponse(enquiry)).length,
+    followUpDue: enquiries.filter(enquiry => !isArchivedEnquiry(enquiry) && isFollowUpDue(enquiry)).length,
+    hot: enquiries.filter(enquiry => !isArchivedEnquiry(enquiry) && enquiry.leadStatus?.priority === 'hot' && !isClosedEnquiry(enquiry)).length,
+    all: enquiries.filter(enquiry => !isArchivedEnquiry(enquiry)).length,
+    archived: enquiries.filter(isArchivedEnquiry).length,
   };
   const queuedEnquiries = enquiries
     .filter(enquiry => matchesQueueFilter(enquiry, enquiryQueueFilter))
@@ -3768,6 +3779,7 @@ export default function AdminPanel() {
                     ['follow-up-due', `Follow-up due ${queueCounts.followUpDue}`],
                     ['hot', `Hot ${queueCounts.hot}`],
                     ['all', `All ${queueCounts.all}`],
+                    ['archived', `Archived ${queueCounts.archived}`],
                   ].map(([value, label]) => (
                     <button
                       key={value}
@@ -3793,6 +3805,7 @@ export default function AdminPanel() {
               {!enquiriesLoading && queuedEnquiries.map(enquiry => (
                 <div
                   key={enquiry.id}
+                  data-testid={`enquiry-card-${enquiry.id}`}
                   ref={node => {
                     enquiryRefs.current[enquiry.id] = node;
                   }}
@@ -3807,6 +3820,9 @@ export default function AdminPanel() {
                       <div style={{ color: enquiry.manual_entry ? '#fb923c' : '#aaa', border: enquiry.manual_entry ? '1px solid #63301f' : '1px solid #444', borderRadius: '999px', padding: '0.18rem 0.45rem', fontSize: '0.68rem', whiteSpace: 'nowrap' }}>
                         {SOURCE_LABELS[enquiry.source_type ?? 'website_form']}
                       </div>
+                      {isArchivedEnquiry(enquiry) && (
+                        <div style={{ color: '#bbb', border: '1px solid #555', borderRadius: '999px', padding: '0.18rem 0.45rem', fontSize: '0.68rem', whiteSpace: 'nowrap' }}>Archived</div>
+                      )}
                     </div>
                   </div>
                   <div style={{ color: '#aaa', fontSize: '0.76rem' }}>
@@ -4023,6 +4039,15 @@ export default function AdminPanel() {
                         style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: recordSyncSaving === enquiry.id ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.76rem' }}
                       >
                         {recordSyncSaving === enquiry.id ? 'Saving...' : 'Save Copilot Records'}
+                      </button>
+                      <button
+                        type="button"
+                        data-testid={`archive-enquiry-${enquiry.id}`}
+                        onClick={() => saveLeadStatus(enquiry, { archivedAt: isArchivedEnquiry(enquiry) ? '' : new Date().toISOString() })}
+                        disabled={leadSaving === enquiry.id}
+                        style={{ background: isArchivedEnquiry(enquiry) ? '#12331f' : '#222', border: isArchivedEnquiry(enquiry) ? '1px solid #256d3d' : '1px solid #555', color: isArchivedEnquiry(enquiry) ? '#bbf7d0' : '#ddd', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: leadSaving === enquiry.id ? 'wait' : 'pointer', fontWeight: 700, fontSize: '0.76rem' }}
+                      >
+                        {isArchivedEnquiry(enquiry) ? 'Restore' : 'Archive'}
                       </button>
                     </div>
                     {responseDrafts[enquiry.id] && (

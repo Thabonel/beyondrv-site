@@ -19,10 +19,11 @@ function enquiry(index: number) {
 }
 
 test('enquiries and reminders share one scroll container', async ({ page }) => {
+  const enquiries = Array.from({ length: 12 }, (_, index) => enquiry(index + 1));
   await page.route('**/.netlify/functions/admin-enquiries', route => route.fulfill({
     status: 200,
     contentType: 'application/json',
-    body: JSON.stringify({ enquiries: Array.from({ length: 12 }, (_, index) => enquiry(index + 1)) }),
+    body: JSON.stringify({ enquiries }),
   }));
   await page.route('**/.netlify/functions/admin-contact-config', route => route.fulfill({
     status: 200,
@@ -59,4 +60,44 @@ test('enquiries and reminders share one scroll container', async ({ page }) => {
   await scrollContainer.evaluate(element => element.scrollTo(0, element.scrollHeight));
   await expect(page.getByText('Test Customer 12')).toBeVisible();
   await expect(records).toBeVisible();
+});
+
+test('an enquiry can be archived and restored without deletion', async ({ page }) => {
+  const enquiries = [enquiry(1), enquiry(2)];
+  await page.route('**/.netlify/functions/admin-enquiries', route => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({ enquiries }),
+  }));
+  await page.route('**/.netlify/functions/admin-contact-config', route => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({ ready: true, toEmail: 'test@example.com', missing: [] }),
+  }));
+  await page.route('**/.netlify/functions/admin-lead-status', async route => {
+    const payload = route.request().postDataJSON();
+    const target = enquiries.find(item => item.id === payload.enquiryId);
+    if (target) target.leadStatus = { ...target.leadStatus, ...payload };
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ ok: true, leadStatus: target?.leadStatus }),
+    });
+  });
+
+  await page.goto('/admin/');
+  await page.getByRole('button', { name: 'enquiries' }).click();
+
+  await page.getByTestId('archive-enquiry-enquiry-1').click();
+  await expect(page.getByTestId('enquiry-card-enquiry-1')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Archived 1' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Archived 1' }).click();
+  await expect(page.getByTestId('enquiry-card-enquiry-1')).toBeVisible();
+  await expect(page.getByTestId('enquiry-card-enquiry-1').getByText('Archived')).toBeVisible();
+
+  await page.getByTestId('archive-enquiry-enquiry-1').click();
+  await expect(page.getByTestId('enquiry-card-enquiry-1')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Archived 0' })).toBeVisible();
+  expect(enquiries).toHaveLength(2);
 });
