@@ -76,16 +76,31 @@ const websiteSchema = {
     "query-input": "required name=search_term_string"
   }
 };
+const heroImage = '/images/site/unimog-hero-960.webp';
+const heroSrcSet = [480, 720, 960, 1200, 1458]
+  .map(width => `/images/site/unimog-hero-${width}.webp ${width}w`)
+  .join(', ');
+const heroSizes = '100vw';
 ---
 <BaseLayout
   title="Beyond RV — Queensland Slide-On Campers, Caravans & Expedition Vehicles"
   description="Beyond RV builds slide-on campers, hardtop caravans, and expedition vehicles in Mutdapilly, Queensland. For HiLux, Ranger, Unimog, and serious trucks. ADR compliant."
   structuredData={[orgSchema, websiteSchema]}
-  preloadImage={{ src: '/images/site/unimog-hero.jpg' }}
+  preloadImage={{ src: heroImage, srcset: heroSrcSet, sizes: heroSizes }}
 >
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-bg" style="background-image: url('/images/site/unimog-hero.jpg')"></div>
+    <div class="hero-bg">
+      <img
+        src={heroImage}
+        srcset={heroSrcSet}
+        sizes={heroSizes}
+        alt=""
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
+      />
+    </div>
     <div class="hero-overlay"></div>
     <div class="hero-overlay-bottom"></div>
 
