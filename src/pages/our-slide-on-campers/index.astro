@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import { displayImageUrl } from '../../lib/media';
+import { buildProductOffer } from '../../lib/structuredData.js';
 
 const productOrder = [
   'advent-2150-hardtop-slide-on',
@@ -22,11 +23,15 @@ const schema = {
   "@type": "CollectionPage",
   "name": "Beyond RV Slide-On Campers",
   "url": "https://beyondrv.com.au/our-slide-on-campers/",
-  "hasPart": products.map(p => ({
-    "@type": "Product",
-    "name": p.data.title,
-    "url": `https://beyondrv.com.au/${p.slug}/`
-  }))
+  "hasPart": products.map(p => {
+    const productUrl = `https://beyondrv.com.au/${p.slug}/`;
+    return {
+      "@type": "Product",
+      "name": p.data.title,
+      "url": productUrl,
+      "offers": buildProductOffer({ price: p.data.price, status: p.data.status, url: productUrl })
+    };
+  })
 };
 const faqSchema = {
   "@context": "https://schema.org",

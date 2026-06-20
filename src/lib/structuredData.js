@@ -26,3 +26,38 @@ export function normalizeVideoUploadDate(value) {
 
   return DEFAULT_VIDEO_UPLOAD_DATE;
 }
+
+export function parsePriceNumeric(price) {
+  if (!price) return undefined;
+  const numeric = String(price).replace(/[^0-9.]/g, '');
+  return numeric || undefined;
+}
+
+/**
+ * Build a schema.org Offer object for a product.
+ * @param {Object} options
+ * @param {any} options.price
+ * @param {any} options.status
+ * @param {any} options.url
+ * @param {any} [options.availability]
+ * @returns {Object|undefined}
+ */
+export function buildProductOffer({ price, status, url, availability }) {
+  const priceNum = parsePriceNumeric(price);
+  if (!priceNum) return undefined;
+  const isComingSoon = status === 'coming-soon';
+  return {
+    "@type": "Offer",
+    "url": url,
+    "priceCurrency": "AUD",
+    "price": priceNum,
+    "priceValidUntil": "2026-12-31",
+    "itemCondition": "https://schema.org/NewCondition",
+    "availability": availability ?? (isComingSoon ? "https://schema.org/PreOrder" : "https://schema.org/InStock"),
+    "seller": {
+      "@type": "Organization",
+      "name": "Beyond RV",
+      "url": "https://beyondrv.com.au/"
+    }
+  };
+}
