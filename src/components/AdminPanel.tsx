@@ -45,10 +45,13 @@ type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
 type PanelTab = 'dashboard' | 'products' | 'orders' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'drafts' | 'audit' | 'knowledge' | 'google' | 'matches' | 'reports' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
+type CommerceAvailability = 'available_in_australia' | 'coming_next_container' | 'made_to_order' | 'ask_availability' | 'unavailable';
+type SourceType = 'china_container' | 'local_supplier' | 'workshop_stock' | 'custom_made_to_order' | 'other';
 type SuitabilityDataStatus = 'draft' | 'target' | 'confirmed';
 type EnquirySourceType = 'website_form' | 'manual_email' | 'phone_call' | 'facebook' | 'instagram' | 'referral' | 'walk_in' | 'other';
 type EnquiryQueueFilter = 'active' | 'needs-response' | 'follow-up-due' | 'hot' | 'all' | 'archived';
 type OrderType = 'standard_model' | 'one_off_stock' | 'demo_unit' | 'used_stock' | 'custom_build';
+type ShippingMethod = 'australia_post' | 'brisbane_local_delivery' | 'pickup';
 type OrderStatus =
   | 'enquiry'
   | 'deposit_received'
@@ -90,18 +93,40 @@ interface YoutubeVideoMeta {
 }
 
 interface ProductRecord {
+  store?: boolean;
   slug: string;
   title: string;
-  price: string;
+  name?: string;
+  description?: string;
+  price: string | number;
+  compareAtPrice?: string | number;
+  saleLabel?: string;
   status: 'available' | 'on-sale' | 'coming-soon' | string;
   category: ProductCategory | string;
   tagline: string;
+  availability?: CommerceAvailability;
+  purchasableOnline?: boolean;
+  depositEnabled?: boolean;
+  fullPaymentEnabled?: boolean;
+  sourceType?: SourceType;
+  leadTimeText?: string;
+  containerEtaText?: string;
+  containerEtaDate?: string;
   featured?: boolean;
   onSale?: boolean;
   heroImage?: string;
   gallery?: string[];
   galleryCount?: number;
   relatedSlugs?: string[];
+  internalStockEstimate?: string;
+  targetAustraliaStock?: string;
+  containerReorderQuantity?: string;
+  minimumComfortStock?: string;
+  lastStockCheckedAt?: string;
+  lastStockCheckedBy?: string;
+  containerEligible?: boolean;
+  usualContainerLeadTimeDays?: string;
+  supplierNotes?: string;
   youtubeVideo?: YoutubeVideoMeta;
   suitabilityData?: SuitabilityData;
 }
@@ -141,7 +166,17 @@ interface EditProductForm {
   slug: string;
   title: string;
   price: string;
+  compareAtPrice: string;
+  saleLabel: string;
   status: ProductStatus;
+  availability: CommerceAvailability;
+  purchasableOnline: boolean;
+  depositEnabled: boolean;
+  fullPaymentEnabled: boolean;
+  sourceType: SourceType;
+  leadTimeText: string;
+  containerEtaText: string;
+  containerEtaDate: string;
   tagline: string;
   featured: boolean;
   onSale: boolean;
@@ -165,6 +200,15 @@ interface EditProductForm {
   suitabilityGtmKg: string;
   suitabilityTowBallWeightKg: string;
   suitabilityNotes: string;
+  internalStockEstimate: string;
+  targetAustraliaStock: string;
+  containerReorderQuantity: string;
+  minimumComfortStock: string;
+  lastStockCheckedAt: string;
+  lastStockCheckedBy: string;
+  containerEligible: boolean;
+  usualContainerLeadTimeDays: string;
+  supplierNotes: string;
   notes: string;
 }
 
@@ -203,6 +247,17 @@ interface EnquiryRecord {
   source_note?: string;
   product_interest?: string;
   enquiry_intent?: string;
+  fitment_context?: string;
+  fit_check_summary?: string;
+  vehicle_make_model_year?: string;
+  tray_type?: string;
+  tray_length?: string;
+  gvm_upgrade_status?: string;
+  travellers?: string;
+  travel_style?: string;
+  towing_requirement?: string;
+  budget_range?: string;
+  timeframe?: string;
   callback_date?: string;
   callback_time?: string;
   referral_source_self_reported?: string;
@@ -251,6 +306,34 @@ interface OrderRecord {
   createdAt: string;
   updatedAt: string;
   createdBy: string;
+  paymentType?: 'deposit' | 'full';
+  purchaseKind?: 'product' | 'cart';
+  stripeSessionId?: string;
+  stripePaymentIntentId?: string;
+  stripeEventId?: string;
+  paymentStatus?: string;
+  amountPaidCents?: number;
+  currency?: string;
+  orderSource?: string;
+  shippingName?: string;
+  shippingAddressLine1?: string;
+  shippingAddressLine2?: string;
+  shippingCity?: string;
+  shippingState?: string;
+  shippingPostcode?: string;
+  shippingCountry?: string;
+  shippingMethod?: ShippingMethod;
+  shippingChargeCents?: number;
+  shippingStatus?: string;
+  shippingCarrier?: string;
+  shippingService?: string;
+  trackingNumber?: string;
+  shippingLabelId?: string;
+  shippingLabelCreatedAt?: string;
+  shippingLabelPrintedAt?: string;
+  shippingLabelUrl?: string;
+  shippingBlockReason?: string;
+  shippingNotes?: string;
 }
 
 type OrderForm = Omit<OrderRecord, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'> & { id?: string };
@@ -629,6 +712,20 @@ const ORDER_TYPE_LABELS: Record<OrderType, string> = {
   custom_build: 'Custom build',
 };
 
+const SHIPPING_METHOD_LABELS: Record<ShippingMethod, string> = {
+  australia_post: 'Australia Post',
+  brisbane_local_delivery: 'Brisbane ute delivery',
+  pickup: 'Pickup only',
+};
+
+function moneyFromCents(value: number, currency = 'AUD') {
+  return new Intl.NumberFormat('en-AU', {
+    style: 'currency',
+    currency: currency.toUpperCase() === 'AUD' ? 'AUD' : 'AUD',
+    maximumFractionDigits: 2,
+  }).format(value / 100);
+}
+
 const ORDER_STATUS_GROUPS: OrderStatus[] = [
   'deposit_received',
   'ordered_from_factory',
@@ -660,6 +757,25 @@ function emptyOrderForm(): OrderForm {
     expectedHandoverDate: '',
     nextActionDate: '',
     notes: '',
+    shippingName: '',
+    shippingAddressLine1: '',
+    shippingAddressLine2: '',
+    shippingCity: '',
+    shippingState: '',
+    shippingPostcode: '',
+    shippingCountry: 'Australia',
+    shippingMethod: 'australia_post',
+    shippingChargeCents: 0,
+    shippingStatus: 'pending',
+    shippingCarrier: '',
+    shippingService: '',
+    trackingNumber: '',
+    shippingLabelId: '',
+    shippingLabelCreatedAt: '',
+    shippingLabelPrintedAt: '',
+    shippingLabelUrl: '',
+    shippingBlockReason: '',
+    shippingNotes: '',
   };
 }
 
@@ -693,6 +809,11 @@ function orderFormFromEnquiry(enquiry: EnquiryRecord, products: ProductRecord[])
     depositPaid: enquiry.leadStatus?.status === 'won',
     nextActionDate: enquiry.leadStatus?.nextFollowUpDate ?? '',
     notes: enquiry.leadStatus?.notes ?? '',
+    shippingCountry: 'Australia',
+    shippingMethod: 'australia_post',
+    shippingChargeCents: 0,
+    shippingStatus: 'pending',
+    shippingName: enquiry.name ?? '',
   };
 }
 
@@ -714,6 +835,25 @@ function orderFormFromRecord(order: OrderRecord): OrderForm {
     expectedHandoverDate: order.expectedHandoverDate ?? '',
     nextActionDate: order.nextActionDate ?? '',
     notes: order.notes ?? '',
+    shippingName: order.shippingName ?? '',
+    shippingAddressLine1: order.shippingAddressLine1 ?? '',
+    shippingAddressLine2: order.shippingAddressLine2 ?? '',
+    shippingCity: order.shippingCity ?? '',
+    shippingState: order.shippingState ?? '',
+    shippingPostcode: order.shippingPostcode ?? '',
+    shippingCountry: order.shippingCountry ?? 'Australia',
+    shippingMethod: order.shippingMethod ?? 'australia_post',
+    shippingChargeCents: order.shippingChargeCents ?? 0,
+    shippingStatus: order.shippingStatus ?? 'pending',
+    shippingCarrier: order.shippingCarrier ?? '',
+    shippingService: order.shippingService ?? '',
+    trackingNumber: order.trackingNumber ?? '',
+    shippingLabelId: order.shippingLabelId ?? '',
+    shippingLabelCreatedAt: order.shippingLabelCreatedAt ?? '',
+    shippingLabelPrintedAt: order.shippingLabelPrintedAt ?? '',
+    shippingLabelUrl: order.shippingLabelUrl ?? '',
+    shippingBlockReason: order.shippingBlockReason ?? '',
+    shippingNotes: order.shippingNotes ?? '',
   };
 }
 
@@ -1263,6 +1403,7 @@ export default function AdminPanel() {
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersStatus, setOrdersStatus] = useState('');
   const [orderSaving, setOrderSaving] = useState(false);
+  const [shippingLabelSavingId, setShippingLabelSavingId] = useState<string | null>(null);
   const [orderForm, setOrderForm] = useState<OrderForm | null>(null);
   const [copilotCustomers, setCopilotCustomers] = useState<CopilotCustomerRecord[]>([]);
   const [copilotLeads, setCopilotLeads] = useState<CopilotLeadRecord[]>([]);
@@ -1833,6 +1974,38 @@ export default function AdminPanel() {
       setOrdersStatus(err instanceof Error ? err.message : 'Could not save order.');
     } finally {
       setOrderSaving(false);
+    }
+  }
+
+  async function createShippingLabel(order: OrderRecord) {
+    setShippingLabelSavingId(order.id);
+    setOrdersStatus('Creating shipping label...');
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-shipping-label', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: order.id,
+          deliveryMethod: order.shippingMethod ?? 'australia_post',
+          carrier: order.shippingCarrier ?? '',
+          service: order.shippingService ?? '',
+          trackingNumber: order.trackingNumber ?? '',
+          shippingChargeCents: order.shippingChargeCents ?? 0,
+        }),
+      });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await readAdminJson<{ order?: OrderRecord; label?: { printUrl?: string }; printUrl?: string; error?: string }>(res, 'Shipping labels are unavailable in this environment.');
+      if (!res.ok || !data.order) throw new Error(data.error ?? 'Could not create shipping label');
+      setOrders(prev => prev.map(item => item.id === data.order!.id ? data.order! : item));
+      const printUrl = data.printUrl ?? data.label?.printUrl ?? data.order.shippingLabelUrl;
+      if (printUrl) {
+        window.open(printUrl, '_blank', 'noopener,noreferrer');
+      }
+      setOrdersStatus(`Shipping label created for ${data.order.customerName}.`);
+    } catch (err) {
+      setOrdersStatus(err instanceof Error ? err.message : 'Could not create shipping label.');
+    } finally {
+      setShippingLabelSavingId(null);
     }
   }
 
@@ -2483,11 +2656,22 @@ export default function AdminPanel() {
   }
 
   function editFormFromProduct(product: ProductRecord): EditProductForm {
+    const availability = product.availability ?? (product.status === 'coming-soon' ? 'coming_next_container' : 'available_in_australia');
     return {
       slug: product.slug,
       title: product.title,
-      price: product.price,
+      price: String(product.price),
+      compareAtPrice: product.compareAtPrice !== undefined ? String(product.compareAtPrice) : '',
+      saleLabel: product.saleLabel ?? '',
       status: (['available', 'on-sale', 'coming-soon'].includes(product.status) ? product.status : 'available') as ProductStatus,
+      availability,
+      purchasableOnline: product.purchasableOnline ?? (availability === 'available_in_australia'),
+      depositEnabled: product.depositEnabled ?? (availability === 'available_in_australia'),
+      fullPaymentEnabled: product.fullPaymentEnabled ?? (availability === 'available_in_australia'),
+      sourceType: product.sourceType ?? 'other',
+      leadTimeText: product.leadTimeText ?? '',
+      containerEtaText: product.containerEtaText ?? '',
+      containerEtaDate: product.containerEtaDate ?? '',
       tagline: product.tagline,
       featured: Boolean(product.featured),
       onSale: Boolean(product.onSale),
@@ -2511,6 +2695,15 @@ export default function AdminPanel() {
       suitabilityGtmKg: product.suitabilityData?.gtmKg ?? '',
       suitabilityTowBallWeightKg: product.suitabilityData?.towBallWeightKg ?? '',
       suitabilityNotes: product.suitabilityData?.notes ?? '',
+      internalStockEstimate: product.internalStockEstimate ?? '',
+      targetAustraliaStock: product.targetAustraliaStock ?? '',
+      containerReorderQuantity: product.containerReorderQuantity ?? '',
+      minimumComfortStock: product.minimumComfortStock ?? '',
+      lastStockCheckedAt: product.lastStockCheckedAt ?? '',
+      lastStockCheckedBy: product.lastStockCheckedBy ?? '',
+      containerEligible: Boolean(product.containerEligible),
+      usualContainerLeadTimeDays: product.usualContainerLeadTimeDays ?? '',
+      supplierNotes: product.supplierNotes ?? '',
       notes: '',
     };
   }
@@ -2639,19 +2832,38 @@ export default function AdminPanel() {
     adminFetch('/.netlify/functions/admin-product-edit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        slug: editProduct.slug,
-        title: editProduct.title.trim(),
-        price: editProduct.price.trim(),
-        status: editProduct.status,
-        onSale: editProduct.onSale,
-        featured: editProduct.featured,
-        tagline: editProduct.tagline.trim(),
-        heroImage: editProduct.heroImage.trim(),
-        gallery,
-        relatedSlugs: editProduct.relatedSlugs,
-        youtubeVideo: videoId
-          ? {
+        body: JSON.stringify({
+          slug: editProduct.slug,
+          title: editProduct.title.trim(),
+          price: editProduct.price.trim(),
+          compareAtPrice: editProduct.compareAtPrice.trim(),
+          saleLabel: editProduct.saleLabel.trim(),
+          status: editProduct.status,
+          availability: editProduct.availability,
+          purchasableOnline: editProduct.purchasableOnline,
+          depositEnabled: editProduct.depositEnabled,
+          fullPaymentEnabled: editProduct.fullPaymentEnabled,
+          sourceType: editProduct.sourceType,
+          leadTimeText: editProduct.leadTimeText.trim(),
+          containerEtaText: editProduct.containerEtaText.trim(),
+          containerEtaDate: editProduct.containerEtaDate.trim(),
+          onSale: editProduct.onSale,
+          featured: editProduct.featured,
+          tagline: editProduct.tagline.trim(),
+          heroImage: editProduct.heroImage.trim(),
+          gallery,
+          relatedSlugs: editProduct.relatedSlugs,
+          internalStockEstimate: editProduct.internalStockEstimate.trim(),
+          targetAustraliaStock: editProduct.targetAustraliaStock.trim(),
+          containerReorderQuantity: editProduct.containerReorderQuantity.trim(),
+          minimumComfortStock: editProduct.minimumComfortStock.trim(),
+          lastStockCheckedAt: editProduct.lastStockCheckedAt.trim(),
+          lastStockCheckedBy: editProduct.lastStockCheckedBy.trim(),
+          containerEligible: editProduct.containerEligible,
+          usualContainerLeadTimeDays: editProduct.usualContainerLeadTimeDays.trim(),
+          supplierNotes: editProduct.supplierNotes.trim(),
+          youtubeVideo: videoId
+            ? {
               url: editProduct.youtubeVideoUrl.trim(),
               title: editProduct.youtubeVideoTitle.trim(),
               description: editProduct.youtubeVideoDescription.trim(),
@@ -2762,8 +2974,17 @@ export default function AdminPanel() {
       `Create a new ${newProduct.category} product page using the existing product markdown format.\n\n` +
       `Title: ${newProduct.title.trim()}\n` +
       `Price: ${newProduct.price.trim()}\n` +
+      `Compare-at price: none\n` +
+      `Sale label: none\n` +
       `Tagline: ${newProduct.tagline.trim()}\n` +
       `Status: available\n` +
+      `Availability: available_in_australia\n` +
+      `Online purchase: yes\n` +
+      `Deposit enabled: yes\n` +
+      `Full payment enabled: yes\n` +
+      `Source type: other\n` +
+      `Public lead time: none\n` +
+      `Public container ETA: none\n` +
       `Category: ${newProduct.category}\n` +
       `Hero image: ${newProduct.heroImage.trim()}\n` +
       `Gallery order, one image per line:\n${gallery.join('\n')}\n\n` +
@@ -2983,7 +3204,7 @@ export default function AdminPanel() {
   const filteredProducts = products.filter((product) => {
     const q = productFilter.trim().toLowerCase();
     if (!q) return true;
-    return [product.title, product.slug, product.category, product.status]
+    return [product.title, product.name, product.slug, product.category, product.status, product.availability, product.sourceType, product.saleLabel]
       .join(' ')
       .toLowerCase()
       .includes(q);
@@ -3125,7 +3346,12 @@ export default function AdminPanel() {
                     <div style={{ padding: '0.65rem 0.7rem', minWidth: 0, display: 'grid', gap: '0.35rem', alignContent: 'center' }}>
                       <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem', lineHeight: 1.25 }}>{product.title}</div>
                       <div style={{ color: '#aaa', fontSize: '0.74rem' }}>
-                        {product.price} · {product.category} · {product.status} · {product.galleryCount ?? 0} photos
+                        {product.store ? 'Shop' : 'Vehicle'} · {product.price}
+                        {product.compareAtPrice ? ` · was ${product.compareAtPrice}` : ''}
+                        · {product.availability ?? product.status}
+                        {product.purchasableOnline ? ' · online' : ''}
+                        · {product.category}
+                        {product.galleryCount ?? 0 ? ` · ${product.galleryCount} photos` : ''}
                         {activeOrderCounts[product.slug] ? ` · ${activeOrderCounts[product.slug]} active order${activeOrderCounts[product.slug] === 1 ? '' : 's'}` : ''}
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: product.onSale || product.status === 'on-sale' ? '1fr 1fr 1fr' : '1fr 1fr', gap: '0.35rem' }}>
@@ -3161,8 +3387,9 @@ export default function AdminPanel() {
             {editProduct && (
               <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.85rem', display: 'grid', gap: '0.6rem', alignContent: 'start', background: '#141414' }}>
                 <input value={editProduct.title} onChange={e => setEditProduct(p => p && ({ ...p, title: e.target.value }))} placeholder="Title" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.4rem' }}>
                   <input value={editProduct.price} onChange={e => setEditProduct(p => p && ({ ...p, price: e.target.value }))} placeholder="$72,000" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                  <input value={editProduct.compareAtPrice} onChange={e => setEditProduct(p => p && ({ ...p, compareAtPrice: e.target.value }))} placeholder="Compare-at price" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                   <select value={editProduct.status} onChange={e => setEditProduct(p => p && ({ ...p, status: e.target.value as ProductStatus }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
                     <option value="available">Available</option>
                     <option value="on-sale">On sale</option>
@@ -3170,6 +3397,30 @@ export default function AdminPanel() {
                   </select>
                 </div>
                 <input value={editProduct.tagline} onChange={e => setEditProduct(p => p && ({ ...p, tagline: e.target.value }))} placeholder="Tagline" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '0.4rem' }}>
+                  <input value={editProduct.saleLabel} onChange={e => setEditProduct(p => p && ({ ...p, saleLabel: e.target.value }))} placeholder="Sale label" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                  <select value={editProduct.availability} onChange={e => setEditProduct(p => p && ({ ...p, availability: e.target.value as CommerceAvailability }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
+                    <option value="available_in_australia">Available in Australia</option>
+                    <option value="coming_next_container">Coming next container</option>
+                    <option value="made_to_order">Made to order</option>
+                    <option value="ask_availability">Ask about availability</option>
+                    <option value="unavailable">Unavailable</option>
+                  </select>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem' }}>
+                  <select value={editProduct.sourceType} onChange={e => setEditProduct(p => p && ({ ...p, sourceType: e.target.value as SourceType }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
+                    <option value="other">Source type</option>
+                    <option value="china_container">China container</option>
+                    <option value="local_supplier">Local supplier</option>
+                    <option value="workshop_stock">Workshop stock</option>
+                    <option value="custom_made_to_order">Custom made to order</option>
+                  </select>
+                  <input value={editProduct.leadTimeText} onChange={e => setEditProduct(p => p && ({ ...p, leadTimeText: e.target.value }))} placeholder="Public lead-time text" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem' }}>
+                  <input value={editProduct.containerEtaText} onChange={e => setEditProduct(p => p && ({ ...p, containerEtaText: e.target.value }))} placeholder="Public container ETA text" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                  <input type="date" value={editProduct.containerEtaDate} onChange={e => setEditProduct(p => p && ({ ...p, containerEtaDate: e.target.value }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '150px minmax(0, 1fr)', gap: '0.55rem', alignItems: 'center', border: '1px solid #333', borderRadius: '6px', padding: '0.45rem', background: '#101010' }}>
                   <ProductImagePreview src={editProduct.heroImage} title={`${editProduct.title} hero`} />
                   <div style={{ display: 'grid', gap: '0.35rem', minWidth: 0 }}>
@@ -3177,7 +3428,7 @@ export default function AdminPanel() {
                     <input value={editProduct.heroImage} onChange={e => setEditProduct(p => p && ({ ...p, heroImage: e.target.value }))} placeholder="Hero image URL or path" style={{ minWidth: 0, background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                   </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem', color: '#ddd', fontSize: '0.78rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.4rem', color: '#ddd', fontSize: '0.78rem' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     <input type="checkbox" checked={editProduct.onSale} onChange={e => setEditProduct(p => p && ({ ...p, onSale: e.target.checked }))} />
                     On sale
@@ -3186,7 +3437,33 @@ export default function AdminPanel() {
                     <input type="checkbox" checked={editProduct.featured} onChange={e => setEditProduct(p => p && ({ ...p, featured: e.target.checked }))} />
                     Featured
                   </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <input type="checkbox" checked={editProduct.purchasableOnline} onChange={e => setEditProduct(p => p && ({ ...p, purchasableOnline: e.target.checked }))} />
+                    Online purchase
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <input type="checkbox" checked={editProduct.depositEnabled} onChange={e => setEditProduct(p => p && ({ ...p, depositEnabled: e.target.checked }))} />
+                    Deposit enabled
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <input type="checkbox" checked={editProduct.fullPaymentEnabled} onChange={e => setEditProduct(p => p && ({ ...p, fullPaymentEnabled: e.target.checked }))} />
+                    Full payment enabled
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <input type="checkbox" checked={editProduct.containerEligible} onChange={e => setEditProduct(p => p && ({ ...p, containerEligible: e.target.checked }))} />
+                    Container eligible
+                  </label>
                 </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem', border: '1px solid #333', borderRadius: '6px', padding: '0.6rem', background: '#101010' }}>
+                  <input value={editProduct.internalStockEstimate} onChange={e => setEditProduct(p => p && ({ ...p, internalStockEstimate: e.target.value }))} placeholder="Internal stock estimate" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                  <input value={editProduct.targetAustraliaStock} onChange={e => setEditProduct(p => p && ({ ...p, targetAustraliaStock: e.target.value }))} placeholder="Target Australia stock" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                  <input value={editProduct.containerReorderQuantity} onChange={e => setEditProduct(p => p && ({ ...p, containerReorderQuantity: e.target.value }))} placeholder="Container reorder quantity" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                  <input value={editProduct.minimumComfortStock} onChange={e => setEditProduct(p => p && ({ ...p, minimumComfortStock: e.target.value }))} placeholder="Minimum comfort stock" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                  <input type="datetime-local" value={editProduct.lastStockCheckedAt} onChange={e => setEditProduct(p => p && ({ ...p, lastStockCheckedAt: e.target.value }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                  <input value={editProduct.lastStockCheckedBy} onChange={e => setEditProduct(p => p && ({ ...p, lastStockCheckedBy: e.target.value }))} placeholder="Last stock checked by" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                  <input value={editProduct.usualContainerLeadTimeDays} onChange={e => setEditProduct(p => p && ({ ...p, usualContainerLeadTimeDays: e.target.value }))} placeholder="Usual container lead time days" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                </div>
+                <textarea value={editProduct.supplierNotes} onChange={e => setEditProduct(p => p && ({ ...p, supplierNotes: e.target.value }))} placeholder="Private supplier or order notes" rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
                 <ProductGalleryEditor
                   heroImage={editProduct.heroImage}
                   galleryText={editProduct.galleryText}
@@ -3364,14 +3641,81 @@ export default function AdminPanel() {
                         </div>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', color: '#bbb', fontSize: '0.72rem' }}>
                           <span style={{ border: '1px solid #444', borderRadius: '999px', padding: '0.16rem 0.42rem' }}>{ORDER_TYPE_LABELS[order.orderType] ?? order.orderType}</span>
+                          {order.orderSource && (
+                            <span style={{ border: '1px solid #1d4ed8', color: '#93c5fd', borderRadius: '999px', padding: '0.16rem 0.42rem' }}>
+                              {order.orderSource === 'stripe_checkout' ? 'Stripe checkout' : order.orderSource}
+                            </span>
+                          )}
+                          {order.shippingMethod && (
+                            <span style={{ border: '1px solid #7c3aed', color: '#c4b5fd', borderRadius: '999px', padding: '0.16rem 0.42rem' }}>
+                              {SHIPPING_METHOD_LABELS[order.shippingMethod] ?? order.shippingMethod}
+                            </span>
+                          )}
+                          {order.paymentType && (
+                            <span style={{ border: '1px solid #256d3d', color: '#bbf7d0', borderRadius: '999px', padding: '0.16rem 0.42rem' }}>
+                              {order.paymentType === 'deposit' ? 'Deposit' : 'Full payment'}
+                            </span>
+                          )}
+                          {order.purchaseKind && (
+                            <span style={{ border: '1px solid #444', borderRadius: '999px', padding: '0.16rem 0.42rem' }}>{order.purchaseKind}</span>
+                          )}
                           {order.depositPaid && <span style={{ border: '1px solid #1a3a1a', color: '#8f8', borderRadius: '999px', padding: '0.16rem 0.42rem' }}>Deposit paid</span>}
+                          {typeof order.amountPaidCents === 'number' && (
+                            <span style={{ border: '1px solid #444', borderRadius: '999px', padding: '0.16rem 0.42rem' }}>
+                              Paid {moneyFromCents(order.amountPaidCents, order.currency ?? 'AUD')}
+                            </span>
+                          )}
+                          {order.paymentStatus && (
+                            <span style={{ border: '1px solid #444', borderRadius: '999px', padding: '0.16rem 0.42rem' }}>
+                              {order.paymentStatus}
+                            </span>
+                          )}
+                          {order.shippingStatus && (
+                            <span style={{ border: '1px solid #444', borderRadius: '999px', padding: '0.16rem 0.42rem' }}>
+                              {order.shippingStatus}
+                            </span>
+                          )}
                           {order.nextActionDate && <span style={{ border: '1px solid #63301f', color: '#fb923c', borderRadius: '999px', padding: '0.16rem 0.42rem' }}>Next: {order.nextActionDate}</span>}
                           {order.expectedArrivalDate && <span style={{ border: '1px solid #444', borderRadius: '999px', padding: '0.16rem 0.42rem' }}>ETA: {order.expectedArrivalDate}</span>}
                         </div>
                         <div style={{ color: '#777', fontSize: '0.72rem' }}>
                           {[order.customerPhone, order.customerEmail].filter(Boolean).join(' · ') || 'No contact details saved'}
                         </div>
+                        {(order.shippingName || order.shippingAddressLine1 || order.shippingCity || order.shippingPostcode) && (
+                          <div style={{ color: '#aaa', fontSize: '0.72rem', lineHeight: 1.45 }}>
+                            Delivery: {[order.shippingName, order.shippingAddressLine1, order.shippingAddressLine2, [order.shippingCity, order.shippingState, order.shippingPostcode].filter(Boolean).join(' '), order.shippingCountry].filter(Boolean).join(' · ')}
+                          </div>
+                        )}
+                        {order.trackingNumber && (
+                          <div style={{ color: '#93c5fd', fontSize: '0.72rem' }}>
+                            Tracking: {order.trackingNumber}
+                          </div>
+                        )}
+                        {order.shippingBlockReason && (
+                          <div style={{ color: '#fb923c', fontSize: '0.72rem' }}>
+                            Shipping blocked: {order.shippingBlockReason}
+                          </div>
+                        )}
                         {order.notes && <div style={{ color: '#ccc', fontSize: '0.76rem', lineHeight: 1.4, whiteSpace: 'pre-wrap' }}>{order.notes}</div>}
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+                          <button
+                            type="button"
+                            onClick={() => createShippingLabel(order)}
+                            disabled={shippingLabelSavingId === order.id}
+                            style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.38rem 0.55rem', cursor: shippingLabelSavingId === order.id ? 'wait' : 'pointer', fontSize: '0.72rem', fontWeight: 700 }}
+                          >
+                            {shippingLabelSavingId === order.id ? 'Creating...' : 'Create shipping label'}
+                          </button>
+                          {order.shippingLabelUrl && (
+                            <button
+                              type="button"
+                              onClick={() => window.open(order.shippingLabelUrl, '_blank', 'noopener,noreferrer')}
+                              style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.38rem 0.55rem', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700 }}
+                            >
+                              Print label
+                            </button>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </section>
@@ -3841,8 +4185,19 @@ export default function AdminPanel() {
                     </div>
                   )}
                   <div style={{ color: '#ddd', fontSize: '0.78rem', lineHeight: 1.45, whiteSpace: 'pre-wrap' }}>{enquiry.message}</div>
-                  {(enquiry.main_questions || enquiry.vehicle_details || enquiry.budget_notes || enquiry.timeline || enquiry.source_note) && (
+                  {(enquiry.fit_check_summary || enquiry.vehicle_make_model_year || enquiry.tray_type || enquiry.tray_length || enquiry.gvm_upgrade_status || enquiry.travellers || enquiry.travel_style || enquiry.towing_requirement || enquiry.budget_range || enquiry.timeframe || enquiry.main_questions || enquiry.vehicle_details || enquiry.budget_notes || enquiry.timeline || enquiry.source_note) && (
                     <div style={{ color: '#aaa', fontSize: '0.74rem', lineHeight: 1.45, display: 'grid', gap: '0.1rem' }}>
+                      {enquiry.fitment_context && <div>Fitment context: {enquiry.fitment_context}</div>}
+                      {enquiry.fit_check_summary && <div>Fit check: {enquiry.fit_check_summary}</div>}
+                      {enquiry.vehicle_make_model_year && <div>Vehicle: {enquiry.vehicle_make_model_year}</div>}
+                      {enquiry.tray_type && <div>Tray/tub type: {enquiry.tray_type}</div>}
+                      {enquiry.tray_length && <div>Tray length: {enquiry.tray_length}</div>}
+                      {enquiry.gvm_upgrade_status && <div>GVM upgrade: {enquiry.gvm_upgrade_status}</div>}
+                      {enquiry.travellers && <div>Travellers: {enquiry.travellers}</div>}
+                      {enquiry.travel_style && <div>Travel style: {enquiry.travel_style}</div>}
+                      {enquiry.towing_requirement && <div>Towing requirement: {enquiry.towing_requirement}</div>}
+                      {enquiry.budget_range && <div>Budget: {enquiry.budget_range}</div>}
+                      {enquiry.timeframe && <div>Timeframe: {enquiry.timeframe}</div>}
                       {enquiry.main_questions && <div>Main questions: {enquiry.main_questions}</div>}
                       {enquiry.vehicle_details && <div>Vehicle: {enquiry.vehicle_details}</div>}
                       {enquiry.budget_notes && <div>Budget: {enquiry.budget_notes}</div>}
@@ -4861,6 +5216,50 @@ export default function AdminPanel() {
               <input value={orderForm.customerPhone} onChange={e => setOrderForm(p => p && ({ ...p, customerPhone: e.target.value }))} placeholder="Phone" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.52rem', fontSize: '0.82rem' }} />
             </div>
             <input value={orderForm.customerEmail} onChange={e => setOrderForm(p => p && ({ ...p, customerEmail: e.target.value }))} placeholder="Email" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.52rem', fontSize: '0.82rem' }} />
+            <div style={{ border: '1px solid #333', borderRadius: '8px', padding: '0.75rem', background: '#101010', display: 'grid', gap: '0.5rem' }}>
+              <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.78rem' }}>Shipping / delivery</div>
+              <input value={orderForm.shippingName ?? ''} onChange={e => setOrderForm(p => p && ({ ...p, shippingName: e.target.value }))} placeholder="Delivery name" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }} />
+              <input value={orderForm.shippingAddressLine1 ?? ''} onChange={e => setOrderForm(p => p && ({ ...p, shippingAddressLine1: e.target.value }))} placeholder="Address line 1" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }} />
+              <input value={orderForm.shippingAddressLine2 ?? ''} onChange={e => setOrderForm(p => p && ({ ...p, shippingAddressLine2: e.target.value }))} placeholder="Address line 2" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.7fr 0.6fr 0.6fr', gap: '0.4rem' }}>
+                <input value={orderForm.shippingCity ?? ''} onChange={e => setOrderForm(p => p && ({ ...p, shippingCity: e.target.value }))} placeholder="City / suburb" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }} />
+                <input value={orderForm.shippingState ?? ''} onChange={e => setOrderForm(p => p && ({ ...p, shippingState: e.target.value }))} placeholder="State" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }} />
+                <input value={orderForm.shippingPostcode ?? ''} onChange={e => setOrderForm(p => p && ({ ...p, shippingPostcode: e.target.value }))} placeholder="Postcode" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }} />
+                <input value={orderForm.shippingCountry ?? ''} onChange={e => setOrderForm(p => p && ({ ...p, shippingCountry: e.target.value }))} placeholder="Country" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }} />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+                <select value={orderForm.shippingMethod ?? 'australia_post'} onChange={e => setOrderForm(p => p && ({ ...p, shippingMethod: e.target.value as ShippingMethod }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }}>
+                  <option value="australia_post">Australia Post</option>
+                  <option value="brisbane_local_delivery">Brisbane ute delivery</option>
+                  <option value="pickup">Pickup only</option>
+                </select>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={((orderForm.shippingChargeCents ?? 0) / 100).toFixed(2)}
+                  onChange={e => {
+                    const next = Number.parseFloat(e.target.value);
+                    setOrderForm(p => p && ({ ...p, shippingChargeCents: Number.isFinite(next) ? Math.round(next * 100) : 0 }));
+                  }}
+                  placeholder="Shipping / delivery charge"
+                  style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }}
+                />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+                <input value={orderForm.shippingCarrier ?? ''} onChange={e => setOrderForm(p => p && ({ ...p, shippingCarrier: e.target.value }))} placeholder="Carrier" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }} />
+                <input value={orderForm.shippingService ?? ''} onChange={e => setOrderForm(p => p && ({ ...p, shippingService: e.target.value }))} placeholder="Service" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }} />
+              </div>
+              <input value={orderForm.trackingNumber ?? ''} onChange={e => setOrderForm(p => p && ({ ...p, trackingNumber: e.target.value }))} placeholder="Tracking number or reference" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }} />
+              <select value={orderForm.shippingStatus ?? 'pending'} onChange={e => setOrderForm(p => p && ({ ...p, shippingStatus: e.target.value }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }}>
+                <option value="pending">Pending</option>
+                <option value="ready">Ready</option>
+                <option value="label_created">Label created</option>
+                <option value="in_transit">In transit</option>
+                <option value="delivered">Delivered</option>
+                <option value="blocked">Blocked</option>
+              </select>
+            </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
               <select
                 value={orderForm.productSlug}

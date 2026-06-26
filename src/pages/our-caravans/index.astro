@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProductCard from '../../components/ProductCard.astro';
+import ProductComparisonTable from '../../components/ProductComparisonTable.astro';
 import { displayImageUrl } from '../../lib/media';
 import { buildProductOffer } from '../../lib/structuredData.js';
 
@@ -29,7 +30,7 @@ const schema = {
       "@type": "Product",
       "name": p.data.title,
       "url": productUrl,
-      "offers": buildProductOffer({ price: p.data.price, status: p.data.status, url: productUrl })
+      "offers": buildProductOffer({ price: p.data.price, status: p.data.status, url: productUrl, availability: p.data.availability })
     };
   })
 };
@@ -85,19 +86,29 @@ const ctaImage = '/images/optimized/products/sunpatch-15xc-couples-offroad-van/0
   <section class="category-grid container">
     <div class="product-grid">
       {products.map(p => (
-        <ProductCard
-          title={p.data.title}
-          slug={p.slug}
-          category={p.data.category}
-          tagline={p.data.tagline}
-          price={p.data.price}
-          status={p.data.status}
-          heroImage={p.data.heroImage}
-          priceBadge={p.data.priceBadge}
-        />
-      ))}
-    </div>
+          <ProductCard
+            title={p.data.title}
+            slug={p.slug}
+            category={p.data.category}
+            tagline={p.data.tagline}
+            price={p.data.price}
+            status={p.data.status}
+            heroImage={p.data.heroImage}
+            priceBadge={p.data.priceBadge}
+            compareAtPrice={p.data.compareAtPrice}
+            saleLabel={p.data.saleLabel}
+            availability={p.data.availability}
+            sourceType={p.data.sourceType}
+          />
+        ))}
+      </div>
   </section>
+
+  <ProductComparisonTable
+    title="Off-Road Caravans"
+    intro="Compare the Sunpatch range by price, stock status, towing fit, sleeping layout, bathroom setup, electrical system, water capacity, and construction. Anything not confirmed in the product data stays marked as To be confirmed."
+    products={products}
+  />
 
   <section class="container" style="padding-bottom: 5rem">
     <div class="page-content">

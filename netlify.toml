@@ -96,6 +96,26 @@
   to     = "/.netlify/functions/media-serve?key=:splat"
   status = 200
 
+[[redirects]]
+  from   = "/api/checkout"
+  to     = "/.netlify/functions/checkout"
+  status = 200
+
+[[redirects]]
+  from   = "/api/session-status"
+  to     = "/.netlify/functions/session-status"
+  status = 200
+
+[[redirects]]
+  from   = "/api/stripe-webhook"
+  to     = "/.netlify/functions/stripe-webhook"
+  status = 200
+
+[[redirects]]
+  from   = "/api/shipping-quote"
+  to     = "/.netlify/functions/shipping-quote"
+  status = 200
+
 [[headers]]
   for    = "/*"
   [headers.values]

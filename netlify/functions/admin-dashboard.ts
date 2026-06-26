@@ -7,9 +7,11 @@ import {
   OWNER_COPILOT_TASK_STORE,
   type OwnerLeadIntelligence,
 } from './owner-copilot-core';
+import { buildUnifiedLifecycleRecords } from './unified-lifecycle';
 import catalogue from './product-catalogue.json';
 
 const ENQUIRY_STORE = 'customer-enquiries';
+const ORDER_STORE = 'customer-orders';
 const LEAD_STATUS_STORE = 'customer-lead-status';
 const POSTHOG_API_KEY = process.env.POSTHOG_API_KEY;
 const POSTHOG_PROJECT_ID = process.env.POSTHOG_PROJECT_ID;
@@ -34,6 +36,20 @@ interface ProductRecord {
   gallery?: string[];
   galleryCount?: number;
   relatedSlugs?: string[];
+  internalStockEstimate?: string;
+  targetAustraliaStock?: string;
+  containerReorderQuantity?: string;
+  minimumComfortStock?: string;
+  lastStockCheckedAt?: string;
+  lastStockCheckedBy?: string;
+  containerEligible?: boolean;
+  usualContainerLeadTimeDays?: string;
+  supplierNotes?: string;
+  availability?: string;
+  sourceType?: string;
+  leadTimeText?: string;
+  containerEtaText?: string;
+  containerEtaDate?: string;
 }
 
 interface EnquiryRecord {
@@ -64,9 +80,53 @@ interface LeadStatusRecord {
   updatedAt: string;
 }
 
+interface OrderRecord {
+  id: string;
+  customerName?: string;
+  customerEmail?: string;
+  customerPhone?: string;
+  productSlug?: string;
+  productTitle?: string;
+  productCategory?: string;
+  orderType?: string;
+  status?: string;
+  paymentStatus?: string;
+  shippingStatus?: string;
+  shippingMethod?: string;
+  sourceEnquiryId?: string;
+  amountPaidCents?: number;
+  currency?: string;
+  depositPaid?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 interface LeadRecord extends EnquiryRecord {
   leadStatus: LeadStatusRecord;
   intelligence: OwnerLeadIntelligence;
+}
+
+interface UnifiedLifecycleRecord {
+  id: string;
+  sourceRecordId: string;
+  sourceType: 'stripe_order' | 'enquiry' | 'availability_request' | 'quote_request';
+  sourceLabel: string;
+  recordType: 'paid_shop_order' | 'unpaid_enquiry' | 'availability_request' | 'quote_request' | 'container_follow_up' | 'customer_order' | 'archived';
+  recordLabel: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  productTitle: string;
+  productSlug: string;
+  paymentStatus: string;
+  enquiryStatus: string;
+  fulfilmentStatus: string;
+  fulfilmentLabel: string;
+  containerFollowUp: boolean;
+  internalNotes: string;
+  createdAt: string;
+  updatedAt: string;
+  sourceStore: 'customer-orders' | 'customer-enquiries';
 }
 
 interface MarketingInsight {
@@ -611,6 +671,9 @@ export const handler: Handler = async (event) => {
   const enquiries = (await getAllJson<EnquiryRecord>(ENQUIRY_STORE))
     .filter((enquiry) => enquiry?.id && enquiry?.submittedAt)
     .sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));
+  const orders = (await getAllJson<OrderRecord>(ORDER_STORE))
+    .filter((order) => Boolean(order?.id))
+    .sort((a, b) => (b.updatedAt ?? b.createdAt ?? '').localeCompare(a.updatedAt ?? a.createdAt ?? ''));
   const leadStatuses = await getLeadStatuses(enquiries);
   const [analytics, taskSummary] = await Promise.all([
     loadAnalytics(days, products),
@@ -714,6 +777,54 @@ export const handler: Handler = async (event) => {
       title: product.title,
       issue: !product.heroImage ? 'Missing hero image' : 'Fewer than three gallery images',
     }));
+  const planningProducts = products
+    .filter((product) => Boolean(
+      product.containerEligible ||
+      product.internalStockEstimate ||
+      product.targetAustraliaStock ||
+      product.containerReorderQuantity ||
+      product.minimumComfortStock ||
+      product.containerEtaText ||
+      product.leadTimeText ||
+      product.sourceType === 'china_container'
+    ))
+    .map((product) => ({
+      slug: product.slug,
+      title: product.title,
+      availability: product.availability,
+      sourceType: product.sourceType,
+      leadTimeText: product.leadTimeText,
+      containerEtaText: product.containerEtaText,
+      containerEtaDate: product.containerEtaDate,
+      internalStockEstimate: product.internalStockEstimate,
+      targetAustraliaStock: product.targetAustraliaStock,
+      containerReorderQuantity: product.containerReorderQuantity,
+      minimumComfortStock: product.minimumComfortStock,
+      lastStockCheckedAt: product.lastStockCheckedAt,
+      lastStockCheckedBy: product.lastStockCheckedBy,
+      containerEligible: product.containerEligible,
+      usualContainerLeadTimeDays: product.usualContainerLeadTimeDays,
+    }))
+    .slice(0, 12);
+
+  const orderStatuses = ['enquiry', 'deposit_received', 'ordered_from_factory', 'in_china_production', 'awaiting_shipping', 'in_transit', 'arrived_mutdapilly', 'local_fitout', 'ready_for_handover', 'delivered', 'cancelled']
+    .map((status) => ({
+      status,
+      count: orders.filter((order) => order.status === status).length,
+    }))
+    .filter((row) => row.count > 0);
+  const shippingStatuses = ['pending', 'ready', 'label_created', 'in_transit', 'delivered', 'blocked']
+    .map((status) => ({
+      status,
+      count: orders.filter((order) => order.shippingStatus === status).length,
+    }))
+    .filter((row) => row.count > 0);
+  const lifecycle = buildUnifiedLifecycleRecords({
+    orders,
+    enquiries: leadRecords,
+  }).slice(0, 20) as UnifiedLifecycleRecord[];
+  const recentOrders = orders.slice(0, 6);
+  const paidOrders = orders.filter((order) => Boolean(order.depositPaid || order.paymentStatus === 'paid' || order.paymentStatus === 'succeeded'));
 
   const contactReady = Boolean(process.env.RESEND_API_KEY && process.env.CONTACT_FROM_EMAIL);
   const readiness = [
@@ -737,6 +848,7 @@ export const handler: Handler = async (event) => {
       decisions: [
         'Lead status is admin-only for Phase 1 to avoid exposing private customer links in email.',
         'Won leads do not automatically mark products sold; the owner stays in control of stock changes.',
+        'Paid checkout records and manual order records share the same order store.',
         'Stale stock uses no enquiries in 30 days by default.',
         'Listed value uses the current public price only and excludes POA/contact pricing.',
         'Weekly summary emails are a later enhancement after real usage data exists.',
@@ -750,6 +862,7 @@ export const handler: Handler = async (event) => {
         estimatedListedValue,
         byCategory: [...byCategory.values()],
         byStatus: [...byStatus.values()],
+        planning: planningProducts,
         weakListings,
       },
       leads: {
@@ -763,6 +876,16 @@ export const handler: Handler = async (event) => {
         followUpQueue,
         recent: leadRecords.slice(0, 5),
       },
+      orders: {
+        total: orders.length,
+        paid: paidOrders.length,
+        enquiryLinked: orders.filter((order) => Boolean(order.sourceEnquiryId)).length,
+        shippingBlocked: orders.filter((order) => order.shippingStatus === 'blocked').length,
+        byStatus: orderStatuses,
+        byShippingStatus: shippingStatuses,
+        recent: recentOrders,
+      },
+      lifecycle,
       tasks: taskSummary,
       productPerformance,
       productInterest: {

@@ -1,0 +1,203 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { availabilityLabel, normalizeSaleLabel, sourceTypeLabel } from '../lib/shop';
+
+type ProductEntry = CollectionEntry<'products'>;
+type SpecRow = ProductEntry['data']['keySpecs'][number];
+type SpecGroup = NonNullable<ProductEntry['data']['specGroups']>[number];
+
+interface Props {
+  title: string;
+  intro: string;
+  products: ProductEntry[];
+}
+
+const { title, intro, products } = Astro.props as Props;
+
+function normalize(value = '') {
+  return value.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function findSpecValue(entry: ProductEntry, labels: string[], groups: string[] = []) {
+  const wantedLabels = labels.map(normalize);
+  const wantedGroups = groups.map(normalize);
+  const keySpec = entry.data.keySpecs.find((spec: SpecRow) => wantedLabels.includes(normalize(spec.label)));
+  if (keySpec?.value) return keySpec.value;
+
+  for (const group of (entry.data.specGroups ?? []) as SpecGroup[]) {
+    if (wantedGroups.length > 0 && !wantedGroups.includes(normalize(group.group))) continue;
+    const item = group.items.find((spec: SpecRow) => wantedLabels.includes(normalize(spec.label)));
+    if (item?.value) return item.value;
+  }
+
+  return '';
+}
+
+function collectSpecValues(entry: ProductEntry, labels: string[], groups: string[] = []) {
+  const values: string[] = [];
+  const wantedLabels = labels.map(normalize);
+  const wantedGroups = groups.map(normalize);
+
+  for (const spec of entry.data.keySpecs) {
+    if (wantedLabels.includes(normalize(spec.label)) && spec.value && !values.includes(spec.value)) {
+      values.push(spec.value);
+    }
+  }
+
+  for (const group of (entry.data.specGroups ?? []) as SpecGroup[]) {
+    if (wantedGroups.length > 0 && !wantedGroups.includes(normalize(group.group))) continue;
+    for (const spec of group.items) {
+      if (wantedLabels.includes(normalize(spec.label)) && spec.value && !values.includes(spec.value)) {
+        values.push(spec.value);
+      }
+    }
+  }
+
+  return values;
+}
+
+function textOrFallback(value: string, fallback = 'To be confirmed') {
+  const trimmed = value.trim();
+  return trimmed || fallback;
+}
+
+function getVehicleSummary(entry: ProductEntry) {
+  if (entry.data.category === 'slide-on') {
+    return findSpecValue(entry, ['Platform', 'Vehicle']) || 'Suitable ute tray setup';
+  }
+
+  if (entry.data.category === 'caravan') {
+    return 'Tow vehicle with suitable GVM, GCM and towing capacity';
+  }
+
+  if (entry.data.category === 'expedition') {
+    return findSpecValue(entry, ['Platform']) || 'Single cab truck or Unimog';
+  }
+
+  return 'Ask us';
+}
+
+function getPowerSummary(entry: ProductEntry) {
+  const values = collectSpecValues(entry, ['Battery', 'Solar', 'Inverter', 'Charging', 'Battery management'], ['Electrical']);
+  return values.length > 0 ? values.slice(0, 3).join(' · ') : '';
+}
+
+function getWaterSummary(entry: ProductEntry) {
+  const fresh = findSpecValue(entry, ['Fresh water', 'Fresh water tank', 'Water capacity'], ['Plumbing', 'Dimensions and Weight']);
+  const grey = findSpecValue(entry, ['Grey water', 'Grey water tank'], ['Plumbing', 'Dimensions and Weight']);
+  if (fresh && grey) return `${fresh} fresh / ${grey} grey`;
+  return fresh || grey || '';
+}
+
+function getConstructionSummary(entry: ProductEntry) {
+  const values = collectSpecValues(entry, ['Body', 'Shell', 'Floor', 'Roof', 'Construction', 'Chassis'], ['Build and Construction']);
+  return values.length > 0 ? values.slice(0, 2).join(' · ') : '';
+}
+
+function getBestFor(entry: ProductEntry) {
+  const feature = entry.data.features?.[0] ?? '';
+  if (feature) return feature;
+  return entry.data.tagline;
+}
+
+function getStockSummary(entry: ProductEntry) {
+  return normalizeSaleLabel(entry.data.priceBadge) || availabilityLabel(entry.data.availability ?? 'available_in_australia');
+}
+
+function getPriceSummary(entry: ProductEntry) {
+  return entry.data.price;
+}
+
+const rows = [
+  {
+    label: 'Price',
+    value: (entry: ProductEntry) => getPriceSummary(entry),
+  },
+  {
+    label: 'Stock status',
+    value: (entry: ProductEntry) => getStockSummary(entry),
+  },
+  {
+    label: 'Source / location',
+    value: (entry: ProductEntry) => sourceTypeLabel(entry.data.sourceType),
+  },
+  {
+    label: 'Base length',
+    value: (entry: ProductEntry) => textOrFallback(findSpecValue(entry, ['Base', 'Floor plan', 'Overall dimensions'])),
+  },
+  {
+    label: 'Recommended vehicle',
+    value: (entry: ProductEntry) => textOrFallback(getVehicleSummary(entry), 'Ask us'),
+  },
+  {
+    label: 'Sleeps',
+    value: (entry: ProductEntry) => textOrFallback(findSpecValue(entry, ['Sleeps', 'Sleeping'])),
+  },
+  {
+    label: 'Bathroom / ensuite',
+    value: (entry: ProductEntry) => textOrFallback(findSpecValue(entry, ['Bathroom', 'Ensuite', 'Build type'], ['Internal Features', 'Dimensions'])),
+  },
+  {
+    label: 'Power system',
+    value: (entry: ProductEntry) => textOrFallback(getPowerSummary(entry)),
+  },
+  {
+    label: 'Water capacity',
+    value: (entry: ProductEntry) => textOrFallback(getWaterSummary(entry)),
+  },
+  {
+    label: 'Construction',
+    value: (entry: ProductEntry) => textOrFallback(getConstructionSummary(entry)),
+  },
+  {
+    label: 'Best for',
+    value: (entry: ProductEntry) => textOrFallback(getBestFor(entry)),
+  },
+];
+---
+<section class="comparison-section container">
+  <div class="comparison-section-head">
+    <div>
+      <div class="section-eyebrow reveal">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Compare the Range</span>
+      </div>
+      <h2 class="section-title reveal reveal-delay-1">{title}</h2>
+    </div>
+    <p class="comparison-section-intro reveal reveal-delay-2">{intro}</p>
+  </div>
+
+  <div class="comparison-table-wrap reveal reveal-delay-1" role="region" aria-label={title} tabindex="0">
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th scope="col" class="comparison-field-col">Field</th>
+          {products.map((entry) => (
+            <th scope="col" class="comparison-product-col">
+              <a class="comparison-product-name" href={`/${entry.slug}/`}>{entry.data.title}</a>
+              <span class="comparison-product-price">{entry.data.price}</span>
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr>
+            <th scope="row" class="comparison-field-col">{row.label}</th>
+            {products.map((entry) => (
+              <td>{row.value(entry)}</td>
+            ))}
+          </tr>
+        ))}
+        <tr>
+          <th scope="row" class="comparison-field-col">CTA</th>
+          {products.map((entry) => (
+            <td>
+              <a class="comparison-table-link" href={`/${entry.slug}/`}>View details →</a>
+            </td>
+          ))}
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

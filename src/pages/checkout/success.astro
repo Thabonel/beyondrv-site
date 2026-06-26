@@ -1,0 +1,78 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="Payment Received | Beyond RV Shop"
+  description="Your Beyond RV order has been received."
+  activePath="/shop/"
+  noIndex={true}
+>
+  <section class="checkout-result container">
+    <div class="section-eyebrow">
+      <div class="section-eyebrow-line"></div>
+      <span class="section-eyebrow-text">Beyond RV Shop</span>
+    </div>
+    <h1 data-checkout-title>Payment received</h1>
+    <p data-checkout-summary>Thank you for your order. A receipt has been sent to your email address, and our team will be in touch to confirm the details and arrange delivery or fitment.</p>
+    <p data-checkout-details hidden></p>
+    <p>If you need anything in the meantime, call us on <a href="tel:+61430863819">0430 863 819</a>.</p>
+    <div class="checkout-result-actions">
+      <a class="btn-primary" href="/shop/">Back to the shop</a>
+      <a class="btn-ghost" href="/">Return home</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { writeCart, notifyCartChange } from '../../lib/cart';
+
+  const titleEl = document.querySelector<HTMLElement>('[data-checkout-title]');
+  const summaryEl = document.querySelector<HTMLElement>('[data-checkout-summary]');
+  const detailsEl = document.querySelector<HTMLElement>('[data-checkout-details]');
+
+  function formatAmount(amount: number, currency = 'AUD') {
+    return new Intl.NumberFormat('en-AU', {
+      style: 'currency',
+      currency: currency.toUpperCase() === 'AUD' ? 'AUD' : 'AUD',
+    }).format(amount / 100);
+  }
+
+  async function verifySession() {
+    const url = new URL(window.location.href);
+    const sessionId = url.searchParams.get('session_id') ?? url.searchParams.get('id');
+    if (!sessionId) return;
+
+    try {
+      const response = await fetch(`/api/session-status?session_id=${encodeURIComponent(sessionId)}`);
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data || data.ok !== true || data.paid !== true) return;
+
+      writeCart([]);
+      notifyCartChange();
+
+      if (titleEl) titleEl.textContent = 'Payment confirmed';
+
+      const purchaseKind = typeof data.metadata?.purchase_kind === 'string' ? data.metadata.purchase_kind : 'cart';
+      const productName = typeof data.metadata?.product_name === 'string' ? data.metadata.product_name : '';
+      const paymentType = typeof data.metadata?.payment_type === 'string' ? data.metadata.payment_type : 'full';
+      const amount = typeof data.amount_total === 'number' ? formatAmount(data.amount_total, data.currency ?? 'AUD') : '';
+
+      if (summaryEl) {
+        if (purchaseKind === 'product' && productName) {
+          summaryEl.textContent = `Thank you! Your ${paymentType === 'deposit' ? 'deposit' : 'full payment'} for ${productName} has been received. A receipt has been sent to your email address, and our team will be in touch to confirm the next steps.`;
+        } else {
+          summaryEl.textContent = 'Thank you for your order. A receipt has been sent to your email address, and our team will be in touch to confirm the details and arrange delivery or fitment.';
+        }
+      }
+
+      if (detailsEl && amount) {
+        detailsEl.textContent = `Amount received: ${amount}`;
+        detailsEl.hidden = false;
+      }
+    } catch {
+      return;
+    }
+  }
+
+  verifySession();
+</script>

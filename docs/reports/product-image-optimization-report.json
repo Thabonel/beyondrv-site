@@ -1,0 +1,96 @@
+{
+  "generatedAt": "2026-06-23T01:56:56.098Z",
+  "write": true,
+  "converted": 11,
+  "missing": 0,
+  "report": [
+    {
+      "slug": "accessories/twin-air-compressor-shield",
+      "status": "converted",
+      "src": "/images/products/twin-air-compressor-shield/01-twin-air-compressor-shield-hero.jpg",
+      "displayPath": "/images/optimized/products/accessories/twin-air-compressor-shield/01-01-twin-air-compressor-shield-hero.webp",
+      "originalBytes": 41541,
+      "optimizedBytes": 25182
+    },
+    {
+      "slug": "accessories/twin-air-compressor-shield",
+      "status": "converted",
+      "src": "/images/products/twin-air-compressor-shield/02-twin-air-compressor-shield.jpg",
+      "displayPath": "/images/optimized/products/accessories/twin-air-compressor-shield/02-02-twin-air-compressor-shield.webp",
+      "originalBytes": 453767,
+      "optimizedBytes": 322290
+    },
+    {
+      "slug": "accessories/twin-air-compressor-shield",
+      "status": "converted",
+      "src": "/images/products/twin-air-compressor-shield/03-twin-air-compressor-shield.jpg",
+      "displayPath": "/images/optimized/products/accessories/twin-air-compressor-shield/03-03-twin-air-compressor-shield.webp",
+      "originalBytes": 51643,
+      "optimizedBytes": 32338
+    },
+    {
+      "slug": "accessories/twin-air-compressor-shield",
+      "status": "converted",
+      "src": "/images/products/twin-air-compressor-shield/04-twin-air-compressor-shield.jpg",
+      "displayPath": "/images/optimized/products/accessories/twin-air-compressor-shield/04-04-twin-air-compressor-shield.webp",
+      "originalBytes": 485277,
+      "optimizedBytes": 337732
+    },
+    {
+      "slug": "accessories/twin-air-compressor-shield",
+      "status": "converted",
+      "src": "/images/products/twin-air-compressor-shield/05-twin-air-compressor-shield.jpg",
+      "displayPath": "/images/optimized/products/accessories/twin-air-compressor-shield/05-05-twin-air-compressor-shield.webp",
+      "originalBytes": 434373,
+      "optimizedBytes": 306430
+    },
+    {
+      "slug": "accessories/twin-air-compressor-shield",
+      "status": "converted",
+      "src": "/images/products/twin-air-compressor-shield/06-twin-air-compressor-shield.jpg",
+      "displayPath": "/images/optimized/products/accessories/twin-air-compressor-shield/06-06-twin-air-compressor-shield.webp",
+      "originalBytes": 338022,
+      "optimizedBytes": 208444
+    },
+    {
+      "slug": "accessories/twin-air-compressor-shield",
+      "status": "converted",
+      "src": "/images/products/twin-air-compressor-shield/07-twin-air-compressor-shield.jpg",
+      "displayPath": "/images/optimized/products/accessories/twin-air-compressor-shield/07-07-twin-air-compressor-shield.webp",
+      "originalBytes": 479716,
+      "optimizedBytes": 341278
+    },
+    {
+      "slug": "accessories/twin-air-compressor-shield",
+      "status": "converted",
+      "src": "/images/products/twin-air-compressor-shield/08-twin-air-compressor-shield.jpg",
+      "displayPath": "/images/optimized/products/accessories/twin-air-compressor-shield/08-08-twin-air-compressor-shield.webp",
+      "originalBytes": 397512,
+      "optimizedBytes": 384542
+    },
+    {
+      "slug": "accessories/twin-air-compressor-shield",
+      "status": "converted",
+      "src": "/images/products/twin-air-compressor-shield/09-twin-air-compressor-shield.jpg",
+      "displayPath": "/images/optimized/products/accessories/twin-air-compressor-shield/09-09-twin-air-compressor-shield.webp",
+      "originalBytes": 118310,
+      "optimizedBytes": 94426
+    },
+    {
+      "slug": "accessories/twin-air-compressor-shield",
+      "status": "converted",
+      "src": "/images/products/twin-air-compressor-shield/10-twin-air-compressor-shield.jpg",
+      "displayPath": "/images/optimized/products/accessories/twin-air-compressor-shield/10-10-twin-air-compressor-shield.webp",
+      "originalBytes": 441565,
+      "optimizedBytes": 443882
+    },
+    {
+      "slug": "accessories/twin-air-compressor-shield",
+      "status": "converted",
+      "src": "/images/products/twin-air-compressor-shield/11-twin-air-compressor-shield.jpg",
+      "displayPath": "/images/optimized/products/accessories/twin-air-compressor-shield/11-11-twin-air-compressor-shield.webp",
+      "originalBytes": 51218,
+      "optimizedBytes": 34430
+    }
+  ]
+}

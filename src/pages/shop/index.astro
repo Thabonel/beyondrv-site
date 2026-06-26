@@ -1,0 +1,152 @@
+---
+import { getCollection } from 'astro:content';
+import ShopProductCard from '../../components/ShopProductCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { categorySlug, shopProductPrice } from '../../lib/shop';
+
+const allProducts = await getCollection('products');
+type ProductEntry = typeof allProducts[number];
+type ShopProductData = Extract<ProductEntry['data'], { store: true }>;
+const products = allProducts
+  .filter((product) => product.data.store === true)
+  .map((product) => ({ ...product, data: product.data as ShopProductData }))
+  .sort((a, b) => a.data.name.localeCompare(b.data.name));
+const featuredProducts = products.filter((product) => product.data.featured);
+const categories = [...new Set(products.map((product) => product.data.category))]
+  .sort((a, b) => a.localeCompare(b));
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Beyond RV Parts & Accessories',
+  url: 'https://beyondrv.com.au/shop/',
+  description: 'Browse parts, accessories, and installed upgrades for Beyond RV campers and expedition vehicles.',
+  mainEntity: {
+    '@type': 'ItemList',
+    itemListElement: products.map((product, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: `https://beyondrv.com.au/shop/${product.data.slug}/`,
+      name: product.data.name,
+    })),
+  },
+};
+---
+<BaseLayout
+  title="RV Parts & Accessories | Beyond RV Shop"
+  description="Browse Beyond RV parts, accessories, power upgrades, and connectivity products for campers and expedition vehicles."
+  activePath="/shop/"
+  structuredData={schema}
+>
+  <section class="shop-hero">
+    <div class="container shop-hero-inner">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Beyond RV Shop</span>
+      </div>
+      <h1>Parts &amp; Accessories</h1>
+      <p>Practical upgrades and equipment for Beyond RV campers and expedition vehicles.</p>
+    </div>
+  </section>
+
+  {featuredProducts.length > 0 && (
+    <section class="shop-featured container" aria-labelledby="featured-products-heading">
+      <div class="shop-section-heading">
+        <div>
+          <span class="shop-kicker">Selected products</span>
+          <h2 id="featured-products-heading">Featured</h2>
+        </div>
+      </div>
+      <div class="shop-product-grid shop-product-grid--featured">
+        {featuredProducts.map(({ data }) => (
+          <ShopProductCard
+            name={data.name}
+            slug={data.slug}
+            description={data.description}
+            price={shopProductPrice(data.price)}
+            compareAtPrice={data.compareAtPrice}
+            saleLabel={data.saleLabel}
+            image={data.images[0]}
+            category={data.category}
+            productType={data.productType}
+            availability={data.productType === 'stock' ? data.availability : undefined}
+            sourceType={data.sourceType}
+            featured
+          />
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="shop-catalogue container" aria-labelledby="all-products-heading">
+    <div class="shop-section-heading">
+      <div>
+        <span class="shop-kicker">Full catalogue</span>
+        <h2 id="all-products-heading">All Products</h2>
+      </div>
+      <p id="shopResultCount" aria-live="polite">{products.length} {products.length === 1 ? 'product' : 'products'}</p>
+    </div>
+
+    <div class="shop-controls" role="search">
+      <div class="shop-control">
+        <label for="shopSearch">Search products</label>
+        <input id="shopSearch" type="search" placeholder="Search by name or description" autocomplete="off" />
+      </div>
+      <div class="shop-control">
+        <label for="shopCategory">Category</label>
+        <select id="shopCategory">
+          <option value="all">All categories</option>
+          {categories.map((category) => <option value={categorySlug(category)}>{category}</option>)}
+        </select>
+      </div>
+    </div>
+
+    <div class="shop-product-grid" data-catalogue-grid>
+      {products.map(({ data }) => (
+        <ShopProductCard
+          name={data.name}
+          slug={data.slug}
+          description={data.description}
+          price={shopProductPrice(data.price)}
+          compareAtPrice={data.compareAtPrice}
+          saleLabel={data.saleLabel}
+          image={data.images[0]}
+          category={data.category}
+          productType={data.productType}
+          availability={data.productType === 'stock' ? data.availability : undefined}
+          sourceType={data.sourceType}
+          featured={data.featured}
+        />
+      ))}
+    </div>
+    <p class="shop-empty" id="shopEmpty" hidden>No products match your search and category.</p>
+  </section>
+</BaseLayout>
+
+<script>
+  const searchInput = document.querySelector<HTMLInputElement>('#shopSearch');
+  const categorySelect = document.querySelector<HTMLSelectElement>('#shopCategory');
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-catalogue-grid] [data-shop-product]'));
+  const resultCount = document.querySelector<HTMLElement>('#shopResultCount');
+  const emptyState = document.querySelector<HTMLElement>('#shopEmpty');
+
+  function filterProducts() {
+    const query = searchInput?.value.trim().toLowerCase() ?? '';
+    const category = categorySelect?.value ?? 'all';
+    let visible = 0;
+
+    cards.forEach((card) => {
+      const matchesSearch = card.dataset.name?.includes(query) ?? false;
+      const matchesCategory = category === 'all' || card.dataset.category === category;
+      const matches = matchesSearch && matchesCategory;
+      card.hidden = !matches;
+      if (matches) visible += 1;
+    });
+
+    if (resultCount) resultCount.textContent = `${visible} ${visible === 1 ? 'product' : 'products'}`;
+    if (emptyState) emptyState.hidden = visible !== 0;
+  }
+
+  searchInput?.addEventListener('input', filterProducts);
+  categorySelect?.addEventListener('change', filterProducts);
+</script>

@@ -7,7 +7,7 @@ priceBadge: "IMAGES COMING SOON"
 status: "on-sale"
 onSale: true
 featured: false
-heroImage: "/images/site/sunpatch-19xc-coming-soon.webp"
+heroImage: "/images/optimized/products/sunpatch-19xc-hardtop-couples-offroad-van/01-sunpatch-19xc-coming-soon.webp"
 gallery: []
 keySpecs:
   - label: "Layout"

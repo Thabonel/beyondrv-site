@@ -1,0 +1,252 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { displayImageUrl } from '../lib/media';
+import { fulfilmentInfo } from '../lib/shop';
+import type { CatalogueEntry } from '../lib/cart';
+
+const allProducts = await getCollection('products');
+
+const catalogueEntries = allProducts.flatMap((product): [string, CatalogueEntry][] => {
+  if (product.data.store !== true || product.data.productType !== 'stock') return [];
+  const data = product.data;
+  const fulfilment = fulfilmentInfo(data.fulfilmentType);
+  return [[
+    data.slug,
+    {
+      slug: data.slug,
+      name: data.name,
+      price: Number(data.price),
+      image: displayImageUrl(data.images[0], 240),
+      href: `/shop/${data.slug}/`,
+      fulfilmentMessage: fulfilment.message,
+      checkoutEligible: fulfilment.checkoutEligible,
+      shippable: data.fulfilmentType === 'ship',
+    },
+  ]];
+});
+
+const catalogue: Record<string, CatalogueEntry> = Object.fromEntries(catalogueEntries);
+---
+<BaseLayout
+  title="Your Cart | Beyond RV Shop"
+  description="Review the parts and accessories in your Beyond RV shopping cart."
+  activePath="/cart/"
+>
+  <section class="cart container">
+    <div class="section-eyebrow">
+      <div class="section-eyebrow-line"></div>
+      <span class="section-eyebrow-text">Beyond RV Shop</span>
+    </div>
+    <h1>Your Cart</h1>
+
+    <div id="cartRoot" data-cart-root>
+      <p class="cart-loading">Loading your cart&hellip;</p>
+    </div>
+  </section>
+
+  <script type="application/json" id="cart-catalogue" is:inline set:html={JSON.stringify(catalogue)}></script>
+</BaseLayout>
+
+<script>
+  import {
+    readCart,
+    writeCart,
+    setQuantity,
+    removeItem,
+    subtotal,
+    notifyCartChange,
+    ORDER_MAX,
+    type CartItem,
+    type Catalogue,
+  } from '../lib/cart';
+  import { formatShopPrice } from '../lib/shop';
+
+  const root = document.querySelector<HTMLElement>('[data-cart-root]');
+  const catalogueEl = document.getElementById('cart-catalogue');
+  const catalogue: Catalogue = catalogueEl ? JSON.parse(catalogueEl.textContent || '{}') : {};
+
+  function esc(value: string): string {
+    return value.replace(/[&<>"]/g, (char) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[char] ?? char,
+    );
+  }
+
+  function currentItems(): CartItem[] {
+    return readCart().filter((item) => catalogue[item.slug]);
+  }
+
+  function render(): void {
+    if (!root) return;
+    const items = currentItems();
+
+    if (items.length === 0) {
+      root.innerHTML =
+        '<div class="cart-empty"><p>Your cart is empty.</p>' +
+        '<a class="btn-primary" href="/shop/">Browse the shop</a></div>';
+      return;
+    }
+
+    const rows = items
+      .map((item) => {
+        const product = catalogue[item.slug];
+        const max = ORDER_MAX;
+        const lineTotal = product.price * item.quantity;
+        return `
+          <div class="cart-row" data-cart-line>
+            <a class="cart-row-media" href="${product.href}"><img src="${product.image}" alt="" loading="lazy" decoding="async" /></a>
+            <div class="cart-row-info">
+              <a class="cart-row-name" href="${product.href}">${esc(product.name)}</a>
+              <span class="cart-row-unit">${formatShopPrice(product.price)} each</span>
+              <span class="cart-row-fulfilment${product.checkoutEligible ? '' : ' cart-row-fulfilment--notice'}">${esc(product.fulfilmentMessage)}</span>
+            </div>
+            <div class="cart-qty" role="group" aria-label="Quantity for ${esc(product.name)}">
+              <button type="button" class="cart-qty-btn" data-cart-dec data-slug="${item.slug}" aria-label="Decrease quantity"${item.quantity <= 1 ? ' disabled' : ''}>&minus;</button>
+              <span class="cart-qty-value" data-cart-qty>${item.quantity}</span>
+              <button type="button" class="cart-qty-btn" data-cart-inc data-slug="${item.slug}" aria-label="Increase quantity"${item.quantity >= max ? ' disabled' : ''}>+</button>
+            </div>
+            <span class="cart-row-total">${formatShopPrice(lineTotal)}</span>
+            <button type="button" class="cart-row-remove" data-cart-remove data-slug="${item.slug}" aria-label="Remove ${esc(product.name)}">Remove</button>
+          </div>`;
+      })
+      .join('');
+
+    const ineligible = items.filter((item) => !catalogue[item.slug].checkoutEligible);
+    const blocked = ineligible.length > 0;
+    const checkoutAction = blocked
+      ? `<p class="cart-blocked" data-cart-blocked role="alert">Some items in your cart can't be paid for online yet. Please remove them or enquire about ${ineligible
+          .map((item) => esc(catalogue[item.slug].name))
+          .join(', ')}.</p>
+        <a class="btn-primary cart-enquire" href="/inquiry-form/">Enquire about these items</a>`
+      : `<button type="button" class="btn-primary cart-checkout" data-cart-checkout>Proceed to checkout</button>`;
+
+    const allShippable = items.every((item) => catalogue[item.slug].shippable);
+    const shippingStep = !blocked && allShippable
+      ? `<form class="cart-shipping" data-shipping-form>
+          <label class="cart-shipping-label" for="cart-postcode">Estimate shipping</label>
+          <div class="cart-shipping-row">
+            <input id="cart-postcode" name="postcode" inputmode="numeric" autocomplete="postal-code" maxlength="4" placeholder="Postcode" data-shipping-postcode />
+            <button type="submit" class="btn-ghost" data-shipping-estimate>Get estimate</button>
+          </div>
+          <p class="cart-shipping-result" data-shipping-result role="status" aria-live="polite" hidden></p>
+        </form>`
+      : '';
+
+    root.innerHTML = `
+      <div class="cart-list">${rows}</div>
+      <div class="cart-summary">
+        <span class="cart-summary-label">Subtotal</span>
+        <span class="cart-summary-value" data-cart-subtotal>${formatShopPrice(subtotal(items, catalogue))}</span>
+      </div>
+      ${shippingStep}
+      <p class="cart-error" data-cart-error role="alert" hidden></p>
+      <div class="cart-actions">
+        <a class="cart-continue" href="/shop/">Continue shopping</a>
+        ${checkoutAction}
+      </div>
+      <p class="cart-secure-note">Secure checkout via Stripe.</p>`;
+  }
+
+  root?.addEventListener('click', (event) => {
+    const trigger = (event.target as HTMLElement).closest<HTMLElement>('[data-slug]');
+    if (!trigger) return;
+    const slug = trigger.dataset.slug;
+    if (!slug) return;
+    const product = catalogue[slug];
+    if (!product) return;
+
+    let items = readCart();
+    const current = items.find((item) => item.slug === slug)?.quantity ?? 0;
+
+    if (trigger.hasAttribute('data-cart-inc')) {
+      items = setQuantity(items, slug, current + 1, ORDER_MAX);
+    } else if (trigger.hasAttribute('data-cart-dec')) {
+      items = setQuantity(items, slug, current - 1, ORDER_MAX);
+    } else if (trigger.hasAttribute('data-cart-remove')) {
+      items = removeItem(items, slug);
+    } else {
+      return;
+    }
+
+    writeCart(items);
+    notifyCartChange();
+    render();
+  });
+
+  root?.addEventListener('click', async (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-cart-checkout]');
+    if (!button) return;
+
+    const items = currentItems();
+    if (items.length === 0) return;
+
+    const errorEl = document.querySelector<HTMLElement>('[data-cart-error]');
+    if (errorEl) errorEl.hidden = true;
+    button.disabled = true;
+    button.textContent = 'Starting secure checkout\u2026';
+
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: items.map((item) => ({ slug: item.slug, quantity: item.quantity })) }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (response.ok && data && typeof data.url === 'string') {
+        window.location.href = data.url;
+        return;
+      }
+      if (errorEl) {
+        errorEl.textContent = (data && data.message) || 'Checkout is unavailable right now. Please try again.';
+        errorEl.hidden = false;
+      }
+    } catch {
+      if (errorEl) {
+        errorEl.textContent = 'Could not reach checkout. Please try again or call 0430 863 819.';
+        errorEl.hidden = false;
+      }
+    }
+
+    button.disabled = false;
+    button.textContent = 'Proceed to checkout';
+  });
+
+  root?.addEventListener('submit', async (event) => {
+    const form = (event.target as HTMLElement).closest<HTMLFormElement>('[data-shipping-form]');
+    if (!form) return;
+    event.preventDefault();
+
+    const input = form.querySelector<HTMLInputElement>('[data-shipping-postcode]');
+    const resultEl = form.querySelector<HTMLElement>('[data-shipping-result]');
+    const submit = form.querySelector<HTMLButtonElement>('[data-shipping-estimate]');
+    const postcode = (input?.value ?? '').trim();
+
+    const items = currentItems();
+    if (items.length === 0 || !resultEl) return;
+
+    if (submit) submit.disabled = true;
+    try {
+      const response = await fetch('/api/shipping-quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: items.map((item) => ({ slug: item.slug, quantity: item.quantity })), postcode }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (response.ok && data && data.ok) {
+        const amount = formatShopPrice(data.amount);
+        resultEl.textContent = data.estimated
+          ? `Estimated shipping to ${postcode}: ${amount}. Development preview only \u2014 not charged. Final freight is confirmed before dispatch.`
+          : `Estimated shipping to ${postcode}: ${amount}.`;
+      } else {
+        resultEl.textContent = (data && data.message) || 'We could not estimate shipping right now.';
+      }
+    } catch {
+      resultEl.textContent = 'Could not reach the shipping estimator. Please try again or call 0430 863 819.';
+    }
+    resultEl.hidden = false;
+    if (submit) submit.disabled = false;
+  });
+
+  render();
+  window.addEventListener('storage', render);
+</script>

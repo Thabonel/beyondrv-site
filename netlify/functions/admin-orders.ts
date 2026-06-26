@@ -6,6 +6,9 @@ import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreErro
 const STORE_NAME = 'customer-orders';
 
 const VALID_ORDER_TYPES = new Set(['standard_model', 'one_off_stock', 'demo_unit', 'used_stock', 'custom_build']);
+const VALID_PAYMENT_TYPES = new Set(['deposit', 'full']);
+const VALID_PURCHASE_KINDS = new Set(['product', 'cart']);
+const VALID_SHIPPING_STATUSES = new Set(['pending', 'ready', 'label_created', 'in_transit', 'delivered', 'blocked']);
 const VALID_ORDER_STATUSES = new Set([
   'enquiry',
   'deposit_received',
@@ -32,6 +35,11 @@ function cleanBooleanWithFallback(body: Record<string, unknown>, existing: Recor
   return key in body ? body[key] === true : existing?.[key] === true;
 }
 
+function cleanNumberWithFallback(body: Record<string, unknown>, existing: Record<string, unknown> | null, key: string) {
+  const candidate = key in body ? body[key] : existing?.[key];
+  return typeof candidate === 'number' && Number.isFinite(candidate) ? candidate : undefined;
+}
+
 function isDateFieldValid(value: string) {
   return !value || /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
@@ -51,9 +59,18 @@ function normalizeOrder(body: Record<string, unknown>, existing: Record<string, 
   const expectedArrivalDate = cleanWithFallback(body, existing, 'expectedArrivalDate', 40);
   const expectedHandoverDate = cleanWithFallback(body, existing, 'expectedHandoverDate', 40);
   const nextActionDate = cleanWithFallback(body, existing, 'nextActionDate', 40);
+  const paymentType = cleanWithFallback(body, existing, 'paymentType', 20);
+  const purchaseKind = cleanWithFallback(body, existing, 'purchaseKind', 20);
+  const paymentStatus = cleanWithFallback(body, existing, 'paymentStatus', 40);
+  const currency = cleanWithFallback(body, existing, 'currency', 10).toUpperCase();
+  const orderSource = cleanWithFallback(body, existing, 'orderSource', 40);
+  const shippingStatus = cleanWithFallback(body, existing, 'shippingStatus', 40);
 
   if (!VALID_ORDER_TYPES.has(orderType)) throw new Error('Invalid order type');
   if (!VALID_ORDER_STATUSES.has(status)) throw new Error('Invalid order status');
+  if (paymentType && !VALID_PAYMENT_TYPES.has(paymentType)) throw new Error('Invalid payment type');
+  if (purchaseKind && !VALID_PURCHASE_KINDS.has(purchaseKind)) throw new Error('Invalid purchase kind');
+  if (shippingStatus && !VALID_SHIPPING_STATUSES.has(shippingStatus)) throw new Error('Invalid shipping status');
   if (!customerName) throw new Error('Missing customer name');
   if (!productTitle) throw new Error('Missing product');
   if (![factoryOrderDate, expectedArrivalDate, expectedHandoverDate, nextActionDate].every(isDateFieldValid)) {
@@ -73,6 +90,32 @@ function normalizeOrder(body: Record<string, unknown>, existing: Record<string, 
     orderType,
     status,
     depositPaid: cleanBooleanWithFallback(body, existing, 'depositPaid'),
+    paymentType: paymentType || undefined,
+    purchaseKind: purchaseKind || undefined,
+    stripeSessionId: cleanWithFallback(body, existing, 'stripeSessionId', 160),
+    stripePaymentIntentId: cleanWithFallback(body, existing, 'stripePaymentIntentId', 160),
+    stripeEventId: cleanWithFallback(body, existing, 'stripeEventId', 160),
+    paymentStatus: paymentStatus || undefined,
+    amountPaidCents: cleanNumberWithFallback(body, existing, 'amountPaidCents'),
+    currency: currency || undefined,
+    orderSource: orderSource || undefined,
+    shippingName: cleanWithFallback(body, existing, 'shippingName', 180),
+    shippingAddressLine1: cleanWithFallback(body, existing, 'shippingAddressLine1', 240),
+    shippingAddressLine2: cleanWithFallback(body, existing, 'shippingAddressLine2', 240),
+    shippingCity: cleanWithFallback(body, existing, 'shippingCity', 120),
+    shippingState: cleanWithFallback(body, existing, 'shippingState', 80),
+    shippingPostcode: cleanWithFallback(body, existing, 'shippingPostcode', 10),
+    shippingCountry: cleanWithFallback(body, existing, 'shippingCountry', 80),
+    shippingStatus: shippingStatus || undefined,
+    shippingCarrier: cleanWithFallback(body, existing, 'shippingCarrier', 120),
+    shippingService: cleanWithFallback(body, existing, 'shippingService', 120),
+    trackingNumber: cleanWithFallback(body, existing, 'trackingNumber', 160),
+    shippingLabelId: cleanWithFallback(body, existing, 'shippingLabelId', 160),
+    shippingLabelCreatedAt: cleanWithFallback(body, existing, 'shippingLabelCreatedAt', 80),
+    shippingLabelPrintedAt: cleanWithFallback(body, existing, 'shippingLabelPrintedAt', 80),
+    shippingLabelUrl: cleanWithFallback(body, existing, 'shippingLabelUrl', 300),
+    shippingBlockReason: cleanWithFallback(body, existing, 'shippingBlockReason', 240),
+    shippingNotes: cleanWithFallback(body, existing, 'shippingNotes', 4000),
     factoryOrderDate,
     expectedArrivalDate,
     expectedHandoverDate,

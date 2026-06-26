@@ -1,0 +1,66 @@
+---
+import { displayImageUrl, imageSrcSet } from '../lib/media';
+import { categorySlug, formatShopPrice, availabilityLabel, normalizeSaleLabel, shopProductPrice, sourceTypeLabel, type ShopAvailability } from '../lib/shop';
+
+interface Props {
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  compareAtPrice?: number | string;
+  saleLabel?: string;
+  image: string;
+  category: string;
+  productType: 'stock' | 'service';
+  availability?: ShopAvailability;
+  sourceType?: string;
+  featured?: boolean;
+}
+
+const { name, slug, description, price, compareAtPrice, saleLabel, image, category, productType, availability, sourceType, featured = false } = Astro.props;
+const cardImage = displayImageUrl(image, 800);
+const cardSrcSet = imageSrcSet(image, [480, 800]);
+const availabilityText = availability ? availabilityLabel(availability) : '';
+const sourceText = sourceTypeLabel(sourceType);
+const badgeText = normalizeSaleLabel(saleLabel);
+---
+<article
+  class="shop-product-card reveal"
+  data-shop-product
+  data-name={`${name} ${description}`.toLowerCase()}
+  data-category={categorySlug(category)}
+>
+  <a href={`/shop/${slug}/`} class="shop-product-card-link">
+    <div class="shop-product-card-image">
+      <img
+        src={cardImage}
+        srcset={cardSrcSet}
+        sizes="(max-width: 760px) 100vw, (max-width: 1100px) 50vw, 380px"
+        alt={name}
+        loading="lazy"
+        decoding="async"
+      />
+      {badgeText && <span class="shop-product-badge">{badgeText}</span>}
+      {!saleLabel && featured && <span class="shop-product-badge">Featured</span>}
+    </div>
+    <div class="shop-product-card-body">
+      <span class="shop-product-category">{category}</span>
+      <h3>{name}</h3>
+      <p>{description}</p>
+      <p class="shop-product-meta">{sourceText}</p>
+      <div class="shop-product-card-footer">
+        <div class="shop-product-price-stack">
+          {compareAtPrice !== undefined && shopProductPrice(compareAtPrice) !== price && (
+            <span class="shop-product-compare-at">{formatShopPrice(shopProductPrice(compareAtPrice))}</span>
+          )}
+          <span class="shop-product-price">{formatShopPrice(price)}</span>
+        </div>
+        {productType === 'stock' && availability && (
+          <span class:list={['shop-stock', { 'shop-stock--available': availability === 'available_in_australia' }]}>
+            {availabilityText}
+          </span>
+        )}
+      </div>
+    </div>
+  </a>
+</article>

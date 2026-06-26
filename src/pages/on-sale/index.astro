@@ -17,7 +17,7 @@ const allProducts = await getCollection('products');
 type ProductEntry = typeof allProducts[number];
 const isProduct = (product: ProductEntry | undefined): product is ProductEntry => Boolean(product);
 const products = productOrder
-  .map(slug => allProducts.find(p => p.slug === slug && p.data.onSale))
+  .map(slug => allProducts.find(p => p.slug === slug && p.data.store !== true && p.data.onSale))
   .filter(isProduct);
 ---
 <BaseLayout
@@ -56,6 +56,10 @@ const products = productOrder
             status={p.data.status}
             heroImage={p.data.heroImage}
             priceBadge={p.data.priceBadge}
+            compareAtPrice={p.data.compareAtPrice}
+            saleLabel={p.data.saleLabel}
+            availability={p.data.availability}
+            sourceType={p.data.sourceType}
           />
         ))}
       </div>

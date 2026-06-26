@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProductCard from '../../components/ProductCard.astro';
+import ProductComparisonTable from '../../components/ProductComparisonTable.astro';
 import { displayImageUrl, imageSrcSet } from '../../lib/media';
 import { buildProductOffer } from '../../lib/structuredData.js';
 
@@ -33,7 +34,7 @@ const schema = {
       "@type": "Product",
       "name": p.data.title,
       "url": productUrl,
-      "offers": buildProductOffer({ price: p.data.price, status: p.data.status, url: productUrl })
+      "offers": buildProductOffer({ price: p.data.price, status: p.data.status, url: productUrl, availability: p.data.availability })
     };
   })
 };
@@ -127,6 +128,10 @@ const calloutImage = '/images/optimized/products/expedition/4-7m-hardtop-truck-c
             status={p.data.status}
             heroImage={p.data.heroImage}
             priceBadge={p.data.priceBadge}
+            compareAtPrice={p.data.compareAtPrice}
+            saleLabel={p.data.saleLabel}
+            availability={p.data.availability}
+            sourceType={p.data.sourceType}
           />
         ))}
       </div>
@@ -149,11 +154,21 @@ const calloutImage = '/images/optimized/products/expedition/4-7m-hardtop-truck-c
             status={p.data.status}
             heroImage={p.data.heroImage}
             priceBadge={p.data.priceBadge}
+            compareAtPrice={p.data.compareAtPrice}
+            saleLabel={p.data.saleLabel}
+            availability={p.data.availability}
+            sourceType={p.data.sourceType}
           />
         ))}
       </div>
     </section>
   )}
+
+  <ProductComparisonTable
+    title="Expedition Vehicles"
+    intro="Compare the expedition range by price, platform, base size, sleeping layout, bathroom setup, power system, water capacity, and construction. When the build is platform-specific, the table calls that out plainly."
+    products={products}
+  />
 
   <section class="container" style="padding-bottom: 5rem">
     <div class="page-content">

@@ -1,0 +1,199 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { displayImageUrl, imageSrcSet } from '../../lib/media';
+import { formatShopPrice, shopProductPrice, availabilityLabel, availabilitySchema, canPurchaseOnline, isOnlinePayableFulfilment, fulfilmentInfo, sourceTypeLabel } from '../../lib/shop';
+import { ORDER_MAX } from '../../lib/cart';
+
+export async function getStaticPaths() {
+  const allProducts = await getCollection('products');
+  return allProducts
+    .filter((product) => product.data.store === true)
+    .map((product) => ({
+      params: { slug: product.data.store === true ? product.data.slug : '' },
+      props: { product },
+    }));
+}
+
+interface Props {
+  product: Awaited<ReturnType<typeof getCollection<'products'>>>[number];
+}
+
+const { product } = Astro.props;
+if (product.data.store !== true) throw new Error('Shop route received a non-shop product');
+const { data } = product;
+const stockData = data.productType === 'stock' ? data : null;
+const isAddable = stockData ? canPurchaseOnline(stockData) && isOnlinePayableFulfilment(stockData.fulfilmentType) : false;
+const stockLabel = stockData ? availabilityLabel(stockData.availability) : null;
+const fulfilment = stockData ? fulfilmentInfo(stockData.fulfilmentType) : null;
+const sourceType = stockData?.sourceType ?? 'other';
+const sourceTypeText = stockData ? sourceTypeLabel(sourceType) : '';
+const { Content } = await product.render();
+const unitPrice = shopProductPrice(data.price);
+const productUrl = `https://beyondrv.com.au/shop/${data.slug}/`;
+const structuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: data.name,
+    description: data.description,
+    image: data.images.map((image: string) => new URL(image, 'https://beyondrv.com.au').toString()),
+    category: data.category,
+    url: productUrl,
+    offers: {
+      '@type': 'Offer',
+      price: unitPrice,
+      priceCurrency: 'AUD',
+      url: productUrl,
+      ...(stockData
+        ? { availability: availabilitySchema(stockData.availability) }
+        : {}),
+    },
+    ...(stockData
+      ? {
+          additionalProperty: [
+            { '@type': 'PropertyValue', name: 'Weight', value: `${stockData.weight} kg` },
+            {
+              '@type': 'PropertyValue',
+              name: 'Dimensions',
+              value: `${stockData.dimensions.length} × ${stockData.dimensions.width} × ${stockData.dimensions.height} cm`,
+            },
+          ],
+        }
+      : {}),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://beyondrv.com.au/' },
+      { '@type': 'ListItem', position: 2, name: 'Shop', item: 'https://beyondrv.com.au/shop/' },
+      { '@type': 'ListItem', position: 3, name: data.name, item: productUrl },
+    ],
+  },
+];
+const mainImage = displayImageUrl(data.images[0], 1200);
+const mainImageSrcSet = imageSrcSet(data.images[0], [480, 800, 1200]);
+---
+<BaseLayout
+  title={data.seoTitle ?? `${data.name} | Beyond RV Shop`}
+  description={data.seoDesc ?? data.description}
+  image={data.images[0]}
+  type="product"
+  activePath="/shop/"
+  canonicalUrl={`/shop/${data.slug}/`}
+  structuredData={structuredData}
+  preloadImage={{ src: mainImage, srcset: mainImageSrcSet, sizes: '(max-width: 900px) 100vw, 58vw' }}
+>
+  <section class="shop-detail container">
+    <div class="shop-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+      <a href="/">Home</a><span aria-hidden="true">/</span>
+      <a href="/shop/">Shop</a><span aria-hidden="true">/</span>
+      <span aria-current="page">{data.name}</span>
+    </div>
+
+    <div class="shop-detail-grid">
+      <div class="shop-detail-media">
+        <img
+          class="shop-detail-main-image"
+          src={mainImage}
+          srcset={mainImageSrcSet}
+          sizes="(max-width: 900px) 100vw, 58vw"
+          alt={data.name}
+          decoding="async"
+        />
+        {data.images.length > 1 && (
+          <div class="shop-detail-gallery">
+            {data.images.slice(1).map((image: string, index: number) => (
+              <img src={displayImageUrl(image, 480)} alt={`${data.name} installation view ${index + 2}`} loading="lazy" decoding="async" />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div class="shop-detail-info">
+        <span class="shop-product-category">{data.category}</span>
+        <h1>{data.name}</h1>
+        <p class="shop-detail-description">{data.description}</p>
+        <div class="shop-detail-price-stack">
+          {stockData?.compareAtPrice !== undefined && shopProductPrice(stockData.compareAtPrice) !== unitPrice && (
+            <span class="shop-detail-compare-at">{formatShopPrice(shopProductPrice(stockData.compareAtPrice))}</span>
+          )}
+          {stockData?.saleLabel && <span class="shop-detail-sale-label">{stockData.saleLabel}</span>}
+          <p class="shop-detail-price">{formatShopPrice(unitPrice)}</p>
+        </div>
+        {stockData && (
+          <p class:list={['shop-stock shop-detail-stock', { 'shop-stock--available': stockData.availability === 'available_in_australia' }]}>
+            {stockLabel}
+          </p>
+        )}
+
+        {fulfilment && (
+          <p class="shop-fulfilment-note">{fulfilment.message}</p>
+        )}
+
+        {stockData?.leadTimeText && <p class="shop-detail-meta">{stockData.leadTimeText}</p>}
+        {stockData?.containerEtaText && <p class="shop-detail-meta">{stockData.containerEtaText}</p>}
+        {stockData?.containerEtaDate && <p class="shop-detail-meta">ETA date: {stockData.containerEtaDate}</p>}
+        {stockData?.sourceType && <p class="shop-detail-meta">{sourceTypeText}</p>}
+
+        {stockData && (
+          <dl class="shop-product-specs">
+            <div><dt>Weight</dt><dd>{stockData.weight} kg</dd></div>
+            <div><dt>Dimensions</dt><dd>{stockData.dimensions.length} &times; {stockData.dimensions.width} &times; {stockData.dimensions.height} cm</dd></div>
+          </dl>
+        )}
+
+        {isAddable && (
+          <div class="shop-cart-actions">
+            <button
+              class="btn-primary shop-add-to-cart"
+              type="button"
+              data-add-to-cart
+              data-slug={data.slug}
+              data-max={ORDER_MAX}
+            >
+              Add to Cart
+            </button>
+            <span class="shop-add-feedback" data-add-feedback role="status" aria-live="polite" hidden>Added to cart</span>
+          </div>
+        )}
+
+        <a
+          class:list={[isAddable ? 'btn-ghost' : 'btn-primary', 'shop-enquiry-link']}
+          href={`/inquiry-form/?product=${encodeURIComponent(data.slug)}&name=${encodeURIComponent(data.name)}`}
+        >
+          Ask about availability
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="shop-detail-content container">
+    <div class="prose">
+      <Content />
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { readCart, writeCart, addItem, notifyCartChange } from '../../lib/cart';
+
+  const button = document.querySelector<HTMLButtonElement>('[data-add-to-cart]');
+  const feedback = document.querySelector<HTMLElement>('[data-add-feedback]');
+
+  button?.addEventListener('click', () => {
+    const slug = button.dataset.slug;
+    const max = Number(button.dataset.max ?? '0');
+    if (!slug || max < 1) return;
+
+    writeCart(addItem(readCart(), slug, max));
+    notifyCartChange();
+
+    if (feedback) feedback.hidden = false;
+    button.textContent = 'Added \u2713';
+    window.setTimeout(() => {
+      button.textContent = 'Add to Cart';
+    }, 1500);
+  });
+</script>

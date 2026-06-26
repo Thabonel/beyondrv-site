@@ -13,6 +13,8 @@ export default defineConfig({
           '/admin/',
           '/admin/analytics/',
           '/inquiry-form/success/',
+          '/cart/',
+          '/checkout/success/',
           '/404.html',
         ];
         return !excludedPaths.some((path) => page.endsWith(path));

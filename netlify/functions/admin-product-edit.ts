@@ -10,18 +10,39 @@ const API = 'https://api.github.com';
 
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 type SuitabilityDataStatus = 'draft' | 'target' | 'confirmed';
+type CommerceAvailability = 'available_in_australia' | 'coming_next_container' | 'made_to_order' | 'ask_availability' | 'unavailable';
+type SourceType = 'china_container' | 'local_supplier' | 'workshop_stock' | 'custom_made_to_order' | 'other';
 
 interface ProductEditPayload {
   slug?: string;
   title?: string;
   price?: string;
+  compareAtPrice?: string;
+  saleLabel?: string;
   status?: ProductStatus;
+  availability?: CommerceAvailability;
+  purchasableOnline?: boolean;
+  depositEnabled?: boolean;
+  fullPaymentEnabled?: boolean;
+  sourceType?: SourceType;
+  leadTimeText?: string;
+  containerEtaText?: string;
+  containerEtaDate?: string;
   onSale?: boolean;
   featured?: boolean;
   tagline?: string;
   heroImage?: string;
   gallery?: string[];
   relatedSlugs?: string[];
+  internalStockEstimate?: string;
+  targetAustraliaStock?: string;
+  containerReorderQuantity?: string;
+  minimumComfortStock?: string;
+  lastStockCheckedAt?: string;
+  lastStockCheckedBy?: string;
+  containerEligible?: boolean;
+  usualContainerLeadTimeDays?: string;
+  supplierNotes?: string;
   youtubeVideo?: {
     url?: string;
     title?: string;
@@ -115,6 +136,13 @@ function cleanString(value = '') {
   return trimmed && trimmed.toLowerCase() !== 'none' ? trimmed : undefined;
 }
 
+function parseMoneyInput(value = '') {
+  const cleaned = value.trim().replace(/[^0-9.]/g, '');
+  if (!cleaned) return undefined;
+  const parsed = Number(cleaned);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
 function cleanSuitabilityData(value: ProductEditPayload['suitabilityData']) {
   const status = ['draft', 'target', 'confirmed'].includes(value?.status ?? '') ? value!.status : 'draft';
   const data = {
@@ -170,17 +198,103 @@ export const handler: Handler = async (event) => {
   }
 
   const data = parsed.data;
+  const isStoreProduct = data.store === true;
   data.title = payload.title!.trim();
-  data.price = payload.price!.trim();
+  if (isStoreProduct) {
+    data.name = payload.title!.trim();
+    const parsedPrice = parseMoneyInput(payload.price!);
+    if (parsedPrice === undefined) {
+      return { statusCode: 400, body: JSON.stringify({ error: 'Price must be numeric for shop products' }) };
+    }
+    data.price = parsedPrice;
+  } else {
+    data.price = payload.price!.trim();
+  }
   data.status = payload.status;
   data.onSale = Boolean(payload.onSale);
   data.featured = Boolean(payload.featured);
   data.tagline = payload.tagline!.trim();
   data.heroImage = payload.heroImage!.trim();
-  data.gallery = payload.gallery.map(item => item.trim()).filter(Boolean);
+  const gallery = payload.gallery.map(item => item.trim()).filter(Boolean);
+  data.gallery = gallery;
   data.relatedSlugs = Array.isArray(payload.relatedSlugs)
     ? payload.relatedSlugs.map(item => item.trim()).filter(Boolean)
     : [];
+  if (payload.compareAtPrice !== undefined) {
+    const parsedCompare = isStoreProduct ? parseMoneyInput(payload.compareAtPrice) : cleanString(payload.compareAtPrice);
+    if (parsedCompare === undefined) delete data.compareAtPrice;
+    else data.compareAtPrice = parsedCompare;
+  }
+  if (payload.saleLabel !== undefined) {
+    const saleLabel = cleanString(payload.saleLabel);
+    if (saleLabel) data.saleLabel = saleLabel;
+    else delete data.saleLabel;
+  }
+  if (payload.availability) data.availability = payload.availability;
+  if (payload.purchasableOnline !== undefined) data.purchasableOnline = Boolean(payload.purchasableOnline);
+  if (payload.depositEnabled !== undefined) data.depositEnabled = Boolean(payload.depositEnabled);
+  if (payload.fullPaymentEnabled !== undefined) data.fullPaymentEnabled = Boolean(payload.fullPaymentEnabled);
+  if (payload.sourceType) data.sourceType = payload.sourceType;
+  if (payload.leadTimeText !== undefined) {
+    const value = cleanString(payload.leadTimeText);
+    if (value) data.leadTimeText = value;
+    else delete data.leadTimeText;
+  }
+  if (payload.containerEtaText !== undefined) {
+    const value = cleanString(payload.containerEtaText);
+    if (value) data.containerEtaText = value;
+    else delete data.containerEtaText;
+  }
+  if (payload.containerEtaDate !== undefined) {
+    const value = cleanString(payload.containerEtaDate);
+    if (value) data.containerEtaDate = value;
+    else delete data.containerEtaDate;
+  }
+  if (payload.internalStockEstimate !== undefined) {
+    const value = cleanString(payload.internalStockEstimate);
+    if (value) data.internalStockEstimate = value;
+    else delete data.internalStockEstimate;
+  }
+  if (payload.targetAustraliaStock !== undefined) {
+    const value = cleanString(payload.targetAustraliaStock);
+    if (value) data.targetAustraliaStock = value;
+    else delete data.targetAustraliaStock;
+  }
+  if (payload.containerReorderQuantity !== undefined) {
+    const value = cleanString(payload.containerReorderQuantity);
+    if (value) data.containerReorderQuantity = value;
+    else delete data.containerReorderQuantity;
+  }
+  if (payload.minimumComfortStock !== undefined) {
+    const value = cleanString(payload.minimumComfortStock);
+    if (value) data.minimumComfortStock = value;
+    else delete data.minimumComfortStock;
+  }
+  if (payload.lastStockCheckedAt !== undefined) {
+    const value = cleanString(payload.lastStockCheckedAt);
+    if (value) data.lastStockCheckedAt = value;
+    else delete data.lastStockCheckedAt;
+  }
+  if (payload.lastStockCheckedBy !== undefined) {
+    const value = cleanString(payload.lastStockCheckedBy);
+    if (value) data.lastStockCheckedBy = value;
+    else delete data.lastStockCheckedBy;
+  }
+  if (payload.containerEligible !== undefined) data.containerEligible = Boolean(payload.containerEligible);
+  if (payload.usualContainerLeadTimeDays !== undefined) {
+    const value = cleanString(payload.usualContainerLeadTimeDays);
+    if (value) data.usualContainerLeadTimeDays = value;
+    else delete data.usualContainerLeadTimeDays;
+  }
+  if (payload.supplierNotes !== undefined) {
+    const value = cleanString(payload.supplierNotes);
+    if (value) data.supplierNotes = value;
+    else delete data.supplierNotes;
+  }
+  if (isStoreProduct) {
+    data.description = payload.tagline!.trim();
+    data.images = [payload.heroImage!.trim(), ...gallery];
+  }
 
   const videoId = extractYouTubeVideoId(payload.youtubeVideo?.url);
   if (videoId) {

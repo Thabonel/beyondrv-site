@@ -64,6 +64,47 @@ interface DashboardData {
   generatedAt: string;
   range: string;
   decisions: string[];
+  lifecycle: {
+    id: string;
+    sourceRecordId: string;
+    sourceType: 'stripe_order' | 'enquiry' | 'availability_request' | 'quote_request';
+    sourceLabel: string;
+    recordType: 'paid_shop_order' | 'unpaid_enquiry' | 'availability_request' | 'quote_request' | 'container_follow_up' | 'customer_order' | 'archived';
+    recordLabel: string;
+    customerName: string;
+    customerEmail: string;
+    customerPhone: string;
+    productTitle: string;
+    productSlug: string;
+    paymentStatus: string;
+    enquiryStatus: string;
+    fulfilmentStatus: string;
+    fulfilmentLabel: string;
+    containerFollowUp: boolean;
+    internalNotes: string;
+    createdAt: string;
+    updatedAt: string;
+    sourceStore: 'customer-orders' | 'customer-enquiries';
+  }[];
+  orders: {
+    total: number;
+    paid: number;
+    enquiryLinked: number;
+    shippingBlocked: number;
+    byStatus: { status: string; count: number }[];
+    byShippingStatus: { status: string; count: number }[];
+    recent: {
+      id: string;
+      customerName?: string;
+      productTitle?: string;
+      status?: string;
+      paymentStatus?: string;
+      shippingStatus?: string;
+      shippingMethod?: string;
+      sourceEnquiryId?: string;
+      updatedAt?: string;
+    }[];
+  };
   inventory: {
     totalProducts: number;
     available: number;
@@ -73,6 +114,23 @@ interface DashboardData {
     estimatedListedValue: number;
     byCategory: { category: string; count: number; value: number }[];
     byStatus: { status: string; count: number }[];
+    planning: {
+      slug: string;
+      title: string;
+      availability?: string;
+      sourceType?: string;
+      leadTimeText?: string;
+      containerEtaText?: string;
+      containerEtaDate?: string;
+      internalStockEstimate?: string;
+      targetAustraliaStock?: string;
+      containerReorderQuantity?: string;
+      minimumComfortStock?: string;
+      lastStockCheckedAt?: string;
+      lastStockCheckedBy?: string;
+      containerEligible?: boolean;
+      usualContainerLeadTimeDays?: string;
+    }[];
     weakListings: { slug: string; title: string; issue: string }[];
   };
   leads: {
@@ -164,6 +222,28 @@ const STATUS_COLOUR: Record<string, string> = {
   high: '#f87171',
   medium: '#fb923c',
   low: '#4ade80',
+  succeeded: '#4ade80',
+  stripe_order: '#4ade80',
+  enquiry: '#60a5fa',
+  availability_request: '#fb923c',
+  quote_request: '#60a5fa',
+  paid_shop_order: '#4ade80',
+  unpaid_enquiry: '#60a5fa',
+  container_follow_up: '#fb923c',
+  customer_order: '#4ade80',
+  archived: '#777',
+  paid: '#4ade80',
+  unpaid: '#fb923c',
+  refunded: '#777',
+  deposit_paid: '#4ade80',
+  deposit_received: '#4ade80',
+  awaiting_shipping: '#fb923c',
+  in_transit: '#60a5fa',
+  delivered: '#4ade80',
+  blocked: '#f87171',
+  ready_for_handover: '#4ade80',
+  completed: '#4ade80',
+  cancelled: '#777',
 };
 
 function money(value: number) {
@@ -175,7 +255,7 @@ function money(value: number) {
 }
 
 function labelise(value: string) {
-  return value.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+  return value.replace(/[_-]+/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
 }
 
 function StatCard({ label, value, sub, tone = 'ready' }: { label: string; value: string | number; sub?: string; tone?: string }) {
@@ -206,9 +286,8 @@ function StatusPill({ status }: { status: string }) {
       padding: '0.12rem 0.45rem',
       fontSize: '0.66rem',
       fontWeight: 800,
-      textTransform: 'uppercase',
     }}>
-      {status}
+      {labelise(status)}
     </span>
   );
 }
@@ -256,6 +335,14 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
   }
 
   const chat = data?.chat ?? { recent: [], topTopics: [] };
+  const lifecycleSummary = data ? {
+    total: data.lifecycle.length,
+    stripeOrders: data.lifecycle.filter((item) => item.sourceType === 'stripe_order').length,
+    enquiries: data.lifecycle.filter((item) => item.sourceType === 'enquiry').length,
+    availabilityRequests: data.lifecycle.filter((item) => item.sourceType === 'availability_request').length,
+    quoteRequests: data.lifecycle.filter((item) => item.sourceType === 'quote_request').length,
+    containerFollowUps: data.lifecycle.filter((item) => item.containerFollowUp).length,
+  } : null;
   const attentionProducts = data ? Array.from(new Map(
     [...data.productInterest.staleProducts, ...data.inventory.weakListings].map((item) => {
       const performance = data.productPerformance.find(product => product.slug === item.slug);
@@ -346,6 +433,62 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             <StatCard label="Email Delivery" value={data.contact.ready ? 'Ready' : 'Check'} sub={data.contact.ready ? data.contact.toEmail : 'Missing Resend/from email'} tone={data.contact.ready ? 'ready' : 'blocker'} />
             <StatCard label="Open Tasks" value={data.tasks.open} sub={`${data.tasks.overdue} overdue · ${pendingCount} pending changes`} tone={data.tasks.overdue ? 'blocker' : data.tasks.dueToday ? 'warning' : pendingCount ? 'warning' : 'ready'} />
           </div>
+
+          <Panel title="Unified Lifecycle">
+            {lifecycleSummary && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.45rem' }}>
+                <StatCard label="Total" value={lifecycleSummary.total} />
+                <StatCard label="Paid Orders" value={lifecycleSummary.stripeOrders} tone="ready" />
+                <StatCard label="Requests" value={lifecycleSummary.enquiries + lifecycleSummary.availabilityRequests + lifecycleSummary.quoteRequests} tone="warning" />
+                <StatCard label="Container Follow-Ups" value={lifecycleSummary.containerFollowUps} tone={lifecycleSummary.containerFollowUps ? 'warning' : 'ready'} />
+              </div>
+            )}
+            {data.lifecycle.length === 0 ? (
+              <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No lifecycle records yet.</p>
+            ) : (
+              <div style={{ display: 'grid', gap: '0.55rem' }}>
+                {data.lifecycle.map((item) => {
+                  const createdLabel = item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-AU') : '';
+                  const updatedLabel = item.updatedAt ? new Date(item.updatedAt).toLocaleDateString('en-AU') : '';
+                  const contactLine = [item.customerEmail, item.customerPhone].filter(Boolean).join(' · ');
+                  return (
+                    <div key={item.id} style={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '6px', padding: '0.7rem', display: 'grid', gap: '0.35rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.55rem', alignItems: 'start' }}>
+                        <div style={{ minWidth: 0 }}>
+                          <strong style={{ color: '#fff', fontSize: '0.8rem' }}>{item.customerName || 'Unnamed record'}</strong>
+                          <div style={{ color: '#aaa', fontSize: '0.71rem', marginTop: '0.12rem', lineHeight: 1.35 }}>
+                            {item.productTitle || item.productSlug || item.sourceRecordId || item.id}
+                          </div>
+                        </div>
+                        <div style={{ textAlign: 'right', color: '#888', fontSize: '0.66rem', lineHeight: 1.35 }}>
+                          <div>{updatedLabel || createdLabel || item.sourceRecordId}</div>
+                          {createdLabel && updatedLabel && updatedLabel !== createdLabel && <div>Created {createdLabel}</div>}
+                        </div>
+                      </div>
+                      {contactLine && <div style={{ color: '#888', fontSize: '0.68rem' }}>{contactLine}</div>}
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+                        <StatusPill status={item.sourceType} />
+                        <StatusPill status={item.recordType} />
+                        {item.paymentStatus && <StatusPill status={item.paymentStatus} />}
+                        {item.enquiryStatus && <StatusPill status={item.enquiryStatus} />}
+                        {item.fulfilmentStatus && <StatusPill status={item.fulfilmentStatus} />}
+                        {item.containerFollowUp && <StatusPill status="container_follow_up" />}
+                      </div>
+                      <div style={{ color: '#777', fontSize: '0.67rem', lineHeight: 1.35 }}>
+                        {item.sourceLabel} · {item.recordLabel} · {labelise(item.sourceStore)}{item.internalNotes ? ' · notes attached' : ''}
+                      </div>
+                      {item.internalNotes && (
+                        <div style={{ color: '#bbb', fontSize: '0.72rem', lineHeight: 1.45, whiteSpace: 'pre-wrap' }}>
+                          {item.internalNotes.slice(0, 220)}
+                          {item.internalNotes.length > 220 ? '…' : ''}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </Panel>
 
           <Panel title="Today's Owner Priorities">
             {data.leads.priorityQueue.length === 0 ? (
@@ -453,6 +596,45 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
                 </div>
               ))}
             </div>
+          </Panel>
+
+          <Panel title="Container Planning">
+            {data.inventory.planning.length === 0 ? (
+              <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No products currently have planning fields set.</p>
+            ) : (
+              <div style={{ display: 'grid', gap: '0.55rem' }}>
+                {data.inventory.planning.map((product) => (
+                  <div key={product.slug} style={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '6px', padding: '0.65rem', display: 'grid', gap: '0.35rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center' }}>
+                      <strong style={{ color: '#fff', fontSize: '0.78rem' }}>{product.title}</strong>
+                      {product.containerEligible ? (
+                        <StatusPill status="ready" />
+                      ) : (
+                        <StatusPill status={product.availability === 'coming_next_container' ? 'warning' : 'unavailable'} />
+                      )}
+                    </div>
+                    <div style={{ color: '#aaa', fontSize: '0.72rem', lineHeight: 1.35 }}>
+                      {[product.sourceType ? labelise(product.sourceType) : '', product.leadTimeText, product.containerEtaText].filter(Boolean).join(' · ')}
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+                      {product.internalStockEstimate && <span style={{ border: '1px solid #333', borderRadius: '999px', color: '#ccc', fontSize: '0.66rem', padding: '0.12rem 0.45rem' }}>Stock: {product.internalStockEstimate}</span>}
+                      {product.targetAustraliaStock && <span style={{ border: '1px solid #333', borderRadius: '999px', color: '#ccc', fontSize: '0.66rem', padding: '0.12rem 0.45rem' }}>Target: {product.targetAustraliaStock}</span>}
+                      {product.containerReorderQuantity && <span style={{ border: '1px solid #333', borderRadius: '999px', color: '#ccc', fontSize: '0.66rem', padding: '0.12rem 0.45rem' }}>Reorder: {product.containerReorderQuantity}</span>}
+                      {product.minimumComfortStock && <span style={{ border: '1px solid #333', borderRadius: '999px', color: '#ccc', fontSize: '0.66rem', padding: '0.12rem 0.45rem' }}>Comfort: {product.minimumComfortStock}</span>}
+                      {product.usualContainerLeadTimeDays && <span style={{ border: '1px solid #333', borderRadius: '999px', color: '#ccc', fontSize: '0.66rem', padding: '0.12rem 0.45rem' }}>Lead: {product.usualContainerLeadTimeDays}d</span>}
+                      {product.containerEtaDate && <span style={{ border: '1px solid #333', borderRadius: '999px', color: '#ccc', fontSize: '0.66rem', padding: '0.12rem 0.45rem' }}>ETA: {product.containerEtaDate}</span>}
+                    </div>
+                    {(product.lastStockCheckedBy || product.lastStockCheckedAt) && (
+                      <div style={{ color: '#777', fontSize: '0.68rem' }}>
+                        {product.lastStockCheckedBy && `Checked by ${product.lastStockCheckedBy}`}
+                        {product.lastStockCheckedBy && product.lastStockCheckedAt ? ' · ' : ''}
+                        {product.lastStockCheckedAt && new Date(product.lastStockCheckedAt).toLocaleString('en-AU')}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </Panel>
 
           <Panel title="Products Needing Attention">

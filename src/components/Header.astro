@@ -10,6 +10,7 @@ const navLinks = [
   { href: '/expedition/', label: 'Expedition' },
   { href: '/vehicle-suitability-checker/', label: 'Suitability' },
   { href: '/on-sale/', label: 'On Sale' },
+  { href: '/shop/', label: 'Shop' },
   { href: '/custom/', label: 'Custom' },
   { href: '/about-us/', label: 'About' },
 ];
@@ -39,10 +40,17 @@ const navLinks = [
     ))}
   </ul>
 
+  <a href="/cart/" class="nav-cart" aria-label="View cart">
+    Cart
+    <span class="nav-cart-count" data-cart-count hidden>0</span>
+  </a>
+
   <a href="/inquiry-form/" class="nav-cta">Enquire Now</a>
 </nav>
 
 <script>
+  import { readCart, totalCount, CART_EVENT } from '../lib/cart';
+
   const navbar = document.getElementById('navbar');
   const hamburger = document.getElementById('navHamburger');
   const navLinks = document.getElementById('navLinks');
@@ -65,4 +73,15 @@ const navLinks = [
       hamburger?.setAttribute('aria-label', 'Open navigation menu');
     }
   });
+
+  const cartCount = document.querySelector<HTMLElement>('[data-cart-count]');
+  function refreshCartCount() {
+    if (!cartCount) return;
+    const count = totalCount(readCart());
+    cartCount.textContent = String(count);
+    cartCount.hidden = count === 0;
+  }
+  refreshCartCount();
+  window.addEventListener(CART_EVENT, refreshCartCount);
+  window.addEventListener('storage', refreshCartCount);
 </script>

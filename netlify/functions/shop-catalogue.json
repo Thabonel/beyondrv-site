@@ -1,0 +1,42 @@
+[
+  {
+    "slug": "additional-200w-solar-panel",
+    "name": "Additional 200W Solar Panel",
+    "price": 500,
+    "image": "/images/optimized/products/advent-2300-hardtop-slide-on/01-advent-2300-hardtop-slide-on-hero.webp",
+    "productType": "stock",
+    "availability": "made_to_order",
+    "purchasableOnline": false,
+    "fulfilmentType": "install"
+  },
+  {
+    "slug": "extra-200ah-battery",
+    "name": "Extra 200Ah Battery",
+    "price": 1500,
+    "image": "/images/optimized/products/advent-2150-hardtop-slide-on/01-advent-2150-hardtop-slide-on-hero.webp",
+    "productType": "service"
+  },
+  {
+    "slug": "starlink-mini-supply-and-install",
+    "name": "Starlink Mini Supply and Installation",
+    "price": 1500,
+    "image": "/images/optimized/products/expedition/unimog-overlander-camper/01-unimog-hero.webp",
+    "productType": "service"
+  },
+  {
+    "slug": "twin-air-compressor-shield",
+    "name": "Twin Air Compressor Shield",
+    "price": 188,
+    "image": "/images/optimized/products/accessories/twin-air-compressor-shield/01-01-twin-air-compressor-shield-hero.webp",
+    "productType": "stock",
+    "availability": "available_in_australia",
+    "purchasableOnline": true,
+    "fulfilmentType": "ship",
+    "shippingSize": "medium",
+    "packedWeightKg": 3.6,
+    "packedLengthCm": 51,
+    "packedWidthCm": 32,
+    "packedHeightCm": 22,
+    "shippingDataStatus": "estimated"
+  }
+]

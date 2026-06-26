@@ -1,5 +1,6 @@
 ---
 import { displayImageUrl, imageSrcSet } from '../lib/media';
+import { availabilityLabel, normalizeSaleLabel, sourceTypeLabel } from '../lib/shop';
 
 interface Props {
   title: string;
@@ -10,10 +11,17 @@ interface Props {
   status: string;
   heroImage: string;
   priceBadge?: string;
+  compareAtPrice?: string;
+  saleLabel?: string;
+  availability?: 'available_in_australia' | 'coming_next_container' | 'made_to_order' | 'ask_availability' | 'unavailable';
+  sourceType?: string;
 }
-const { title, slug, category, tagline, price, status, heroImage, priceBadge } = Astro.props;
+const { title, slug, category, tagline, price, status, heroImage, priceBadge, compareAtPrice, saleLabel, availability, sourceType } = Astro.props;
 const href = `/${slug}/`;
-const isComingSoon = status === 'coming-soon';
+const availabilityBadge = availability && availability !== 'available_in_australia' ? availabilityLabel(availability) : '';
+const badgeText = normalizeSaleLabel(saleLabel ?? priceBadge ?? '');
+const statusBadge = availabilityBadge || (status === 'coming-soon' ? 'Coming Soon' : '');
+const sourceLabel = sourceTypeLabel(sourceType);
 const categoryLabel = category === 'slide-on' ? 'Slide-On' : category === 'caravan' ? 'Caravan' : 'Expedition';
 const cardImage = displayImageUrl(heroImage, 800);
 const cardSrcSet = imageSrcSet(heroImage, [480, 800]);
@@ -30,17 +38,21 @@ const cardSrcSet = imageSrcSet(heroImage, [480, 800]);
         decoding="async"
       />
       <div class="product-card-overlay"></div>
-      {priceBadge && !isComingSoon && <span class="badge">{priceBadge}</span>}
-      {isComingSoon && <span class="coming-soon-badge">Coming Soon</span>}
+      {badgeText && <span class="badge">{badgeText}</span>}
+      {!badgeText && statusBadge && <span class="coming-soon-badge">{statusBadge}</span>}
     </div>
     <div class="product-card-body">
       <span class="product-card-category">{categoryLabel}</span>
       <h3 class="product-card-title">{title}</h3>
       <p class="product-card-tagline">{tagline}</p>
+      <p class="product-card-meta">{sourceLabel}</p>
       <div class="product-card-footer">
-        <span class="product-card-price">{price}</span>
+        <div class="product-card-price-stack">
+          {compareAtPrice && compareAtPrice !== price && <span class="product-card-compare-at">{compareAtPrice}</span>}
+          <span class="product-card-price">{price}</span>
+        </div>
         <span class="product-card-cta">
-          {isComingSoon ? 'Register Interest →' : 'View Details →'}
+          {status === 'coming-soon' || (availability && availability !== 'available_in_australia' && availability !== 'made_to_order') ? 'Register Interest →' : 'View Details →'}
         </span>
       </div>
     </div>

@@ -3,6 +3,8 @@ import BaseLayout from './BaseLayout.astro';
 import OptionalExtras from '../components/OptionalExtras';
 import type { CollectionEntry } from 'astro:content';
 import { displayImageUrl, imageSrcSet, thumbImageUrl } from '../lib/media';
+import { calculateDepositAmount, parseMoneyValue } from '../lib/payment';
+import { availabilityLabel, availabilitySchema, canPurchaseVehicleOnline, formatShopPrice, normalizeSaleLabel, sourceTypeLabel } from '../lib/shop';
 import { normalizeVideoUploadDate } from '../lib/structuredData.js';
 
 type ProductData = CollectionEntry<'products'>['data'];
@@ -12,13 +14,13 @@ type SpecGroup = NonNullable<ProductData['specGroups']>[number];
 type Feature = NonNullable<ProductData['features']>[number];
 type FaqItem = NonNullable<ProductData['faq']>[number];
 type YoutubeVideo = NonNullable<ProductData['youtubeVideo']>;
+type SuitabilityData = NonNullable<ProductData['suitabilityData']>;
 
 interface Props {
   product: CollectionEntry<'products'>;
 }
 const { product } = Astro.props as Props;
 const { data } = product;
-const isComingSoon = data.status === 'coming-soon';
 const encodedSlug = encodeURIComponent(product.slug);
 const encodedName = encodeURIComponent(data.title);
 const enquiryUrl = `/inquiry-form/?product=${encodedSlug}&name=${encodedName}`;
@@ -58,8 +60,62 @@ const youtubeThumbnail = youtubeVideo?.thumbnail
   ?? (youtubeVideo ? `https://i.ytimg.com/vi/${youtubeVideo.id}/maxresdefault.jpg` : '');
 const youtubeUploadDate = normalizeVideoUploadDate(youtubeVideo?.uploadDate);
 const activeSpecGroups = data.specGroups?.filter((g: SpecGroup) => g.items.length > 0) ?? [];
+const suitability = data.suitabilityData;
+
+function suitabilityValue(value?: string) {
+  const trimmed = value?.trim();
+  return trimmed || 'Confirm with Beyond RV';
+}
+
+function suitabilityStatusLabel(status?: SuitabilityData['status']) {
+  if (!status) return 'Confirm with Beyond RV';
+  return status.replace(/-/g, ' ').replace(/\b\w/g, (char: string) => char.toUpperCase());
+}
+
+const suitabilityFieldRows = data.category === 'caravan'
+  ? [
+      { label: 'Dry / tare weight', value: suitabilityValue(suitability?.dryWeightKg) },
+      { label: 'Estimated loaded weight', value: suitabilityValue(suitability?.estimatedLoadedWeightKg) },
+      { label: 'ATM', value: suitabilityValue(suitability?.atmKg) },
+      { label: 'GTM', value: suitabilityValue(suitability?.gtmKg) },
+      { label: 'Tow ball weight', value: suitabilityValue(suitability?.towBallWeightKg) },
+    ]
+  : [
+      { label: 'Dry weight', value: suitabilityValue(suitability?.dryWeightKg) },
+      { label: 'Estimated loaded weight', value: suitabilityValue(suitability?.estimatedLoadedWeightKg) },
+      { label: 'Required tray length', value: suitabilityValue(suitability?.requiredTrayLengthMm) },
+      { label: 'Required tray width', value: suitabilityValue(suitability?.requiredTrayWidthMm) },
+      { label: 'Centre of gravity', value: suitabilityValue(suitability?.centreOfGravityMm) },
+    ];
 
 const priceNum = data.price.replace(/[^0-9.]/g, '');
+const parsedPrice = parseMoneyValue(data.price);
+const hasValidPrice = Number.isFinite(parsedPrice) && parsedPrice > 0;
+const availability = data.availability ?? (data.status === 'coming-soon' ? 'coming_next_container' : 'available_in_australia');
+const isComingSoon = availability !== 'available_in_australia' && availability !== 'made_to_order';
+const canDeposit = canPurchaseVehicleOnline({
+  availability,
+  purchasableOnline: data.purchasableOnline,
+  depositEnabled: data.depositEnabled,
+  fullPaymentEnabled: data.fullPaymentEnabled,
+}, 'deposit') && hasValidPrice;
+const canFullPayment = canPurchaseVehicleOnline({
+  availability,
+  purchasableOnline: data.purchasableOnline,
+  depositEnabled: data.depositEnabled,
+  fullPaymentEnabled: data.fullPaymentEnabled,
+}, 'full') && hasValidPrice;
+const depositAmount = canDeposit ? calculateDepositAmount(parsedPrice) : 0;
+const saleBadge = normalizeSaleLabel(data.saleLabel ?? data.priceBadge ?? '');
+const availabilityCopy = availability !== 'available_in_australia' ? availabilityLabel(availability) : '';
+const sourceCopy = sourceTypeLabel(data.sourceType);
+const paymentNote = canDeposit && canFullPayment
+  ? 'Secure checkout via Stripe. Deposit and full payment options available.'
+  : canDeposit
+    ? 'Secure checkout via Stripe. Deposit payment available.'
+    : canFullPayment
+      ? 'Secure checkout via Stripe. Full payment available.'
+      : '';
 function compactSku(slug: string) {
   const cleaned = slug.toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-+|-+$/g, '');
   let hash = 0;
@@ -115,17 +171,15 @@ const productSchema = {
   "category": categoryMeta.name,
   "itemCondition": "https://schema.org/NewCondition",
   "areaServed": { "@type": "Country", "name": "Australia" },
-  ...(priceNum && {
-    "offers": {
+  ...(hasValidPrice && {
+  "offers": {
       "@type": "Offer",
       "url": productUrl,
       "priceCurrency": "AUD",
       "price": priceNum,
       "priceValidUntil": "2026-12-31",
       "itemCondition": "https://schema.org/NewCondition",
-      "availability": isComingSoon
-        ? "https://schema.org/PreOrder"
-        : "https://schema.org/InStock",
+      "availability": availabilitySchema(availability),
       "seller": {
         "@type": "Organization",
         "name": "Beyond RV",
@@ -264,10 +318,19 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
       <p class="product-tagline">{data.tagline}</p>
 
       <div class="product-price-block">
-        {data.priceBadge && !isComingSoon && <span class="badge">{data.priceBadge}</span>}
-        {isComingSoon && <span class="coming-soon-badge">Coming Soon</span>}
-        <span class="product-price">{data.price}</span>
+        {saleBadge && <span class="badge">{saleBadge}</span>}
+        {!saleBadge && availabilityCopy && <span class="coming-soon-badge">{availabilityCopy}</span>}
+        <div class="product-price-stack">
+          {data.compareAtPrice && data.compareAtPrice !== data.price && <span class="product-compare-at">{data.compareAtPrice}</span>}
+          <span class="product-price">{data.price}</span>
+        </div>
       </div>
+
+      {availabilityCopy && <p class="product-availability-note">{availabilityCopy}</p>}
+      {data.leadTimeText && <p class="product-availability-note">{data.leadTimeText}</p>}
+      {data.containerEtaText && <p class="product-availability-note">{data.containerEtaText}</p>}
+      {data.containerEtaDate && <p class="product-availability-note">ETA date: {data.containerEtaDate}</p>}
+      <p class="product-availability-note">{sourceCopy}</p>
 
       {data.keySpecs.length > 0 && (
         <div class="key-specs">
@@ -280,16 +343,34 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
         </div>
       )}
 
-      <div class="product-ctas">
-        {isComingSoon ? (
-          <a href={enquiryUrl + '&intent=register'} class="btn-primary">Register Interest</a>
+      <div class="product-ctas" data-stripe-product data-product-slug={product.slug}>
+        {canDeposit || canFullPayment ? (
+          <>
+            {canDeposit && (
+              <button type="button" class="btn-primary" data-stripe-checkout data-purchase-type="deposit">
+                Pay {formatShopPrice(depositAmount)} Deposit
+              </button>
+            )}
+            {canFullPayment && (
+              <button type="button" class="btn-ghost" data-stripe-checkout data-purchase-type="full">
+                Buy Now - Full Price {data.price}
+              </button>
+            )}
+            <a href={enquiryUrl} class="btn-ghost">Ask a question</a>
+          </>
         ) : (
           <>
-            <a href={enquiryUrl} class="btn-primary">Enquire Now</a>
-            <a href={enquiryUrl + '&intent=buy'} class="btn-ghost">Buy Now</a>
+            <a href={enquiryUrl + '&intent=register'} class="btn-primary">{availability === 'available_in_australia' ? 'Enquire Now' : 'Register Interest'}</a>
+            {availability === 'available_in_australia' && <a href={enquiryUrl + '&intent=buy'} class="btn-ghost">Buy Now</a>}
           </>
         )}
       </div>
+      {(canDeposit || canFullPayment) && paymentNote && (
+        <p class="product-payment-note" data-payment-note>
+          {paymentNote}
+        </p>
+      )}
+      <p class="product-payment-error" data-payment-error role="alert" hidden></p>
     </div>
   </section>
 
@@ -302,6 +383,43 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
         If you are comparing sizes, tow weights, tray fitment, or custom options, start with the
         <a href={categoryMeta.url}>{categoryMeta.name.toLowerCase()}</a> range or send the team an
         <a href={enquiryUrl}>enquiry for this product</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="product-suitability-section container">
+    <div class="product-suitability-card">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Fitment Guidance</span>
+      </div>
+      <h2 class="section-title">Weights, Payload &amp; Vehicle Suitability</h2>
+      <p class="product-suitability-intro">
+        These figures are a buying guide, not a legal guarantee. Confirm your exact vehicle, tray or tow setup,
+        accessories, passengers, and loading plan with Beyond RV before purchase.
+      </p>
+
+      <div class="product-suitability-status">
+        <span class="product-suitability-status-label">Data status</span>
+        <strong>{suitabilityStatusLabel(suitability?.status)}</strong>
+      </div>
+
+      <div class="product-suitability-grid" aria-label={`${data.title} fitment guidance`}>
+        {suitabilityFieldRows.map((row) => (
+          <div class="product-suitability-item">
+            <span class="product-suitability-label">{row.label}</span>
+            <strong class="product-suitability-value">{row.value}</strong>
+          </div>
+        ))}
+      </div>
+
+      {(suitability?.notes ?? data.tagline) && (
+        <p class="product-suitability-notes">
+          {suitability?.notes ?? data.tagline}
+        </p>
+      )}
+      <p class="product-suitability-disclaimer">
+        No invented weights or fitment claims. If a value is missing, it stays as Confirm with Beyond RV.
       </p>
     </div>
   </section>
@@ -475,6 +593,8 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
   const heroImg = document.getElementById('productHeroImg') as HTMLImageElement | null;
   const thumbButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.thumb-btn'));
   const galleryCurrent = document.querySelector<HTMLElement>('[data-gallery-current]');
+  const checkoutRoot = document.querySelector<HTMLElement>('[data-stripe-product]');
+  const checkoutError = document.querySelector<HTMLElement>('[data-payment-error]');
   let activeGalleryIndex = Math.max(0, thumbButtons.findIndex(btn => btn.classList.contains('active')));
 
   function showGalleryImage(index: number) {
@@ -535,5 +655,46 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
     specPanels.forEach(panel => {
       panel.open = false;
     });
+  });
+
+  checkoutRoot?.addEventListener('click', async (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-stripe-checkout]');
+    if (!button) return;
+
+    const slug = checkoutRoot.dataset.productSlug;
+    const purchaseType = button.dataset.purchaseType;
+    if (!slug || (purchaseType !== 'deposit' && purchaseType !== 'full')) return;
+
+    const originalLabel = button.textContent ?? 'Checkout';
+    button.disabled = true;
+    button.textContent = 'Starting secure checkout...';
+    if (checkoutError) checkoutError.hidden = true;
+
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, type: purchaseType }),
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (response.ok && data && typeof data.url === 'string') {
+        window.location.href = data.url;
+        return;
+      }
+
+      if (checkoutError) {
+        checkoutError.textContent = (data && data.message) || 'Something went wrong creating your checkout. Please try again or call 0430 863 819.';
+        checkoutError.hidden = false;
+      }
+    } catch {
+      if (checkoutError) {
+        checkoutError.textContent = 'Something went wrong creating your checkout. Please try again or call 0430 863 819.';
+        checkoutError.hidden = false;
+      }
+    }
+
+    button.disabled = false;
+    button.textContent = originalLabel;
   });
 </script>

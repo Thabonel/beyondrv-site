@@ -1,0 +1,512 @@
+<style>
+  /* Product Page Styles */
+  .stock-product-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    font-family: Arial, sans-serif;
+  }
+
+  .product-hero {
+    text-align: center;
+    margin-bottom: 50px;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    border-radius: 10px;
+  }
+
+  .product-hero h1 {
+    color: #ffffff;
+    font-size: 42px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .product-price {
+    font-size: 36px;
+    color: #FF6B35;
+    font-weight: bold;
+    margin: 20px 0;
+  }
+
+  .product-status {
+    display: inline-block;
+    background: #FF6B35;
+    color: #000;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+
+  .photo-gallery-container {
+    margin: 50px 0;
+  }
+
+  .main-image-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto 20px auto;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  }
+
+  .main-image-wrapper img {
+    width: 100%;
+    height: 600px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .zoom-hint {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.8);
+    color: #FF6B35;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    pointer-events: none;
+  }
+
+  .thumbnail-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 15px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .thumbnail {
+    position: relative;
+    cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 3px solid transparent;
+    transition: all 0.3s ease;
+  }
+
+  .thumbnail:hover {
+    border-color: #FF6B35;
+    transform: scale(1.05);
+  }
+
+  .thumbnail.active {
+    border-color: #FF6B35;
+    box-shadow: 0 4px 10px rgba(255, 107, 53, 0.5);
+  }
+
+  .thumbnail img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .specs-section {
+    margin: 50px 0;
+    background: #f5f5f5;
+    padding: 40px;
+    border-radius: 10px;
+  }
+
+  .specs-section h2 {
+    color: #1a1a1a;
+    font-size: 32px;
+    margin-bottom: 30px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .spec-category {
+    background: #1a1a1a;
+    color: #fff;
+    padding: 15px 20px;
+    margin: 20px 0 10px 0;
+    border-radius: 5px;
+    border-left: 5px solid #FF6B35;
+  }
+
+  .spec-category h3 {
+    margin: 0;
+    color: #FF6B35;
+    font-size: 20px;
+    text-transform: uppercase;
+  }
+
+  .spec-list {
+    background: #fff;
+    padding: 20px 30px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
+
+  .spec-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .spec-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e0e0;
+    color: #333;
+    line-height: 1.6;
+  }
+
+  .spec-list li:last-child {
+    border-bottom: none;
+  }
+
+  .spec-list li::before {
+    content: "✓ ";
+    color: #FF6B35;
+    font-weight: bold;
+    margin-right: 10px;
+  }
+
+  .contact-section {
+    text-align: center;
+    margin: 60px 0;
+    padding: 50px 20px;
+    background: #1a1a1a;
+    border-radius: 10px;
+  }
+
+  .contact-section h2 {
+    color: #fff;
+    font-size: 32px;
+    margin-bottom: 20px;
+  }
+
+  .contact-section p {
+    color: #ccc;
+    font-size: 18px;
+    margin-bottom: 30px;
+  }
+
+  .contact-button {
+    display: inline-block;
+    padding: 18px 50px;
+    background: #000;
+    color: #FF6B35;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: bold;
+    border: 3px solid #FF6B35;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .contact-button:hover {
+    background: #FF6B35;
+    color: #000;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+  }
+
+  .phone-link {
+    display: block;
+    margin-top: 20px;
+    color: #FF6B35;
+    font-size: 24px;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  .phone-link:hover {
+    color: #fff;
+  }
+
+  /* Lightbox */
+  .lightbox {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.95);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lightbox.active {
+    display: flex;
+  }
+
+  .lightbox img {
+    max-width: 90%;
+    max-height: 90vh;
+    object-fit: contain;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    color: #FF6B35;
+    font-size: 40px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .lightbox-close:hover {
+    color: #fff;
+  }
+
+  @media (max-width: 768px) {
+    .product-hero h1 {
+      font-size: 28px;
+    }
+
+    .product-price {
+      font-size: 28px;
+    }
+
+    .main-image-wrapper img {
+      height: 400px;
+    }
+
+    .thumbnail-gallery {
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: 10px;
+    }
+
+    .thumbnail img {
+      height: 80px;
+    }
+
+    .specs-section {
+      padding: 20px;
+    }
+  }
+  </style>
+
+  <div class="stock-product-page">
+
+    <!-- Hero Section -->
+    <div class="product-hero">
+      <h1>3.5m Truck Camper with Cabover</h1>
+      <div class="product-price">SPECIAL $60,000</div>
+      <div class="product-status">IN STOCK - READY FOR DELIVERY</div>
+    </div>
+
+    <!-- Photo Gallery -->
+    <div class="photo-gallery-container">
+      <div class="main-image-wrapper" onclick="openLightbox(document.getElementById('mainImage').src)">
+        <img id="mainImage" src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-19-scaled.jpg" alt="3.5m Cabover Main">
+        <div class="zoom-hint">Click to enlarge</div>
+      </div>
+
+      <div class="thumbnail-gallery">
+        <div class="thumbnail active" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-19-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-19-scaled.jpg" alt="View 1">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-01-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-01-scaled.jpg" alt="View 2">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-02-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-02-scaled.jpg" alt="View 2">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-03-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-03-scaled.jpg" alt="View 3">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-04-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-04-scaled.jpg" alt="View 4">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-05-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-05-scaled.jpg" alt="View 5">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-06-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-06-scaled.jpg" alt="View 6">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-07-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-07-scaled.jpg" alt="View 7">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-08-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-08-scaled.jpg" alt="View 8">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-09-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-09-scaled.jpg" alt="View 9">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-10-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-10-scaled.jpg" alt="View 10">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-11-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-11-scaled.jpg" alt="View 11">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-12-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-12-scaled.jpg" alt="View 12">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-13-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-13-scaled.jpg" alt="View 13">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-14-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-14-scaled.jpg" alt="View 14">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-15-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-15-scaled.jpg" alt="View 15">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-16-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-16-scaled.jpg" alt="View 16">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-17-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-17-scaled.jpg" alt="View 17">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-18-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-18-scaled.jpg" alt="View 18">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-20-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-20-scaled.jpg" alt="View 20">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-21-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-21-scaled.jpg" alt="View 21">
+        </div>
+        <div class="thumbnail" onclick="changeMainImage(this, 'https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-22-scaled.jpg')">
+          <img src="https://beyondrv.com.au/wp-content/uploads/2025/11/3.5m-Truck-Camper-w-Cabover-22-scaled.jpg" alt="View 22">
+        </div>
+      </div>
+    </div>
+
+    <!-- Specifications -->
+    <div class="specs-section">
+      <h2>Full Specifications</h2>
+
+      <div class="spec-category">
+        <h3>Dimensions & Construction</h3>
+      </div>
+      <div class="spec-list">
+        <ul>
+          <li>Base dimensions: 3500 x 2100mm</li>
+          <li>Cabover section: 2100mm extension (1400mm high)</li>
+          <li>Full composite construction</li>
+          <li>4x 12V electric jack legs</li>
+          <li>Quality RV flush mounted entry door with security door and flyscreen</li>
+          <li>Double glazed windows with privacy and flyscreen</li>
+          <li>LED lightbars throughout doorside, offside and rear</li>
+        </ul>
+      </div>
+
+      <div class="spec-category">
+        <h3>Interior Layout</h3>
+      </div>
+      <div class="spec-list">
+        <ul>
+          <li>North/South queen size bed over cabover section</li>
+          <li>High quality queen size innerspring mattress</li>
+          <li>U-shaped club lounge (converts to second bed)</li>
+          <li>Combined shower and toilet</li>
+          <li>Quality cabinetry throughout with marine style locks</li>
+          <li>Overhead cabinet with gas struts</li>
+          <li>Internal kitchenette with Laminex benchtop</li>
+          <li>Twin burner gas cooktop</li>
+          <li>Stainless steel sink with glass lid</li>
+          <li>Rangehood with LED</li>
+          <li>Quality vinyl flooring with underlay</li>
+          <li>High quality synthetic leather upholstery</li>
+        </ul>
+      </div>
+
+      <div class="spec-category">
+        <h3>Electrical System</h3>
+      </div>
+      <div class="spec-list">
+        <ul>
+          <li>300ah Lithium-ion battery with Bluetooth smart connectivity</li>
+          <li>Solar controller with solar panels</li>
+          <li>DC/DC Charger via Anderson plug</li>
+          <li>3000W inverter</li>
+          <li>12V air conditioning unit</li>
+          <li>59L Engel compressor fridge</li>
+          <li>Bluetooth radio entertainment system with 4x speakers</li>
+          <li>Double-pole powerpoints throughout</li>
+          <li>12v marine fans</li>
+        </ul>
+      </div>
+
+      <div class="spec-category">
+        <h3>Plumbing System</h3>
+      </div>
+      <div class="spec-list">
+        <ul>
+          <li>12V water pump</li>
+          <li>External hot and cold shower</li>
+          <li>Truma Ultrarapid gas/electric hot water system</li>
+          <li>Combined shower toilet with stainless steel shower base</li>
+          <li>Australian Gas Certification</li>
+        </ul>
+      </div>
+
+      <div class="spec-category">
+        <h3>External Features</h3>
+      </div>
+      <div class="spec-list">
+        <ul>
+          <li>External pullout BBQ with stainless steel sink and gas bayonet</li>
+          <li>Entry steps and grab handle</li>
+          <li>Quality access hatch doors with triple rubber seal</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="contact-section">
+      <h2>Interested in this 3.5m Cabover?</h2>
+      <p>This vehicle is in stock and ready for immediate delivery. Spacious cabover design with extra sleeping capacity. Contact us today for more information or to arrange a viewing.</p>
+      <a href="/inquiry-form/" class="contact-button">Send Inquiry</a>
+      <a href="tel:0430863819" class="phone-link">Call Us: 0430 863 819</a>
+    </div>
+
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <span class="lightbox-close">&times;</span>
+    <img id="lightbox-img" src="" alt="Full size image">
+  </div>
+
+  <script>
+  function changeMainImage(thumbnail, src) {
+    // Update main image
+    document.getElementById('mainImage').src = src;
+
+    // Remove active class from all thumbnails
+    var thumbnails = document.querySelectorAll('.thumbnail');
+    thumbnails.forEach(function(thumb) {
+      thumb.classList.remove('active');
+    });
+
+    // Add active class to clicked thumbnail
+    thumbnail.classList.add('active');
+  }
+
+  function openLightbox(src) {
+    document.getElementById('lightbox').classList.add('active');
+    document.getElementById('lightbox-img').src = src;
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('active');
+    document.body.style.overflow = 'auto';
+  }
+
+  // Close on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeLightbox();
+    }
+  });
+  </script>

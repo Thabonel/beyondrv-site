@@ -43,6 +43,8 @@ const schema = {
       <input type="hidden" name="form-name" value="beyondrv-enquiry" />
       <input type="hidden" name="product_interest" id="productInterestField" value="" />
       <input type="hidden" name="enquiry_intent" id="intentField" value="" />
+      <input type="hidden" name="fitment_context" id="fitmentContextField" value="general" />
+      <input type="hidden" name="fit_check_summary" id="fitCheckSummaryField" value="" />
       <input type="hidden" name="referral_partner" id="referralPartner" value="" />
       <input type="hidden" name="referral_entry_page" id="referralEntryPage" value="" />
       <input type="hidden" name="referral_first_touch" id="referralFirstTouch" value="" />
@@ -135,6 +137,129 @@ const schema = {
         </div>
       </div>
 
+      <details class="enquiry-fitment-details" id="fitmentDetails">
+        <summary class="enquiry-fitment-summary">Add vehicle and fitment details for slide-on or truck-camper advice</summary>
+        <div class="enquiry-fitment-body">
+          <p class="form-help">
+            If you are asking about a slide-on camper, truck camper, expedition body, or a vehicle suitability check,
+            these details help us give you a real answer faster. If this is a general enquiry, you can leave them blank.
+          </p>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="vehicleMakeModelYear">Vehicle make, model and year</label>
+              <input
+                class="form-input"
+                type="text"
+                id="vehicleMakeModelYear"
+                name="vehicle_make_model_year"
+                autocomplete="off"
+                placeholder="Example: 2022 Ford Ranger Wildtrak"
+              />
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="trayType">Tray or tub type</label>
+              <select class="form-input" id="trayType" name="tray_type" style="cursor: pointer">
+                <option value="">— Select —</option>
+                <option value="Steel tray">Steel tray</option>
+                <option value="Alloy tray">Alloy tray</option>
+                <option value="Tub">Tub</option>
+                <option value="Tray with canopy">Tray with canopy</option>
+                <option value="Unsure">Unsure</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="trayLength">Tray length (mm)</label>
+              <input
+                class="form-input"
+                type="number"
+                id="trayLength"
+                name="tray_length"
+                min="0"
+                inputmode="numeric"
+                placeholder="2150"
+              />
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="gvmUpgradeStatus">GVM upgrade status</label>
+              <select class="form-input" id="gvmUpgradeStatus" name="gvm_upgrade_status" style="cursor: pointer">
+                <option value="">— Select —</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+                <option value="Unsure">Unsure</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="travellers">Number of travellers</label>
+              <input
+                class="form-input"
+                type="number"
+                id="travellers"
+                name="travellers"
+                min="0"
+                inputmode="numeric"
+                placeholder="2"
+              />
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="travelStyle">Planned travel style</label>
+              <select class="form-input" id="travelStyle" name="travel_style" style="cursor: pointer">
+                <option value="">— Select —</option>
+                <option value="Touring">Touring</option>
+                <option value="Beach">Beach</option>
+                <option value="Remote travel">Remote travel</option>
+                <option value="Full-time travel">Full-time travel</option>
+                <option value="Work use">Work use</option>
+                <option value="Towing a boat or trailer">Towing a boat or trailer</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="towingRequirement">Towing requirement</label>
+              <select class="form-input" id="towingRequirement" name="towing_requirement" style="cursor: pointer">
+                <option value="">— Select —</option>
+                <option value="None">None</option>
+                <option value="Boat">Boat</option>
+                <option value="Trailer">Trailer</option>
+                <option value="Boat and trailer">Boat and trailer</option>
+                <option value="Unsure">Unsure</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="budgetRange">Budget range</label>
+              <input
+                class="form-input"
+                type="text"
+                id="budgetRange"
+                name="budget_range"
+                autocomplete="off"
+                placeholder="Optional"
+              />
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label" for="timeframe">Timeframe</label>
+            <select class="form-input" id="timeframe" name="timeframe" style="cursor: pointer">
+              <option value="">— Select —</option>
+              <option value="Ready now">Ready now</option>
+              <option value="1-3 months">1-3 months</option>
+              <option value="3-6 months">3-6 months</option>
+              <option value="Researching">Researching</option>
+            </select>
+          </div>
+        </div>
+      </details>
+
       <div class="form-field">
         <label class="form-label" for="referralSourceSelfReported">
           How did you hear about us? <span aria-hidden="true" style="color:var(--orange)">*</span>
@@ -198,10 +323,26 @@ const schema = {
   const productName = params.get('name');
   const intent = params.get('intent');
   const message = params.get('message');
+  const fitCheckSummary = params.get('fit_check_summary') ?? params.get('fitCheckSummary');
 
   const msgField = document.getElementById('message') as HTMLTextAreaElement | null;
   const hiddenField = document.getElementById('productInterestField') as HTMLInputElement | null;
   const intentField = document.getElementById('intentField') as HTMLInputElement | null;
+  const fitmentContextField = document.getElementById('fitmentContextField') as HTMLInputElement | null;
+  const fitCheckSummaryField = document.getElementById('fitCheckSummaryField') as HTMLInputElement | null;
+  const fitmentDetails = document.getElementById('fitmentDetails') as HTMLDetailsElement | null;
+  const vehicleMakeModelYear = document.getElementById('vehicleMakeModelYear') as HTMLInputElement | null;
+  const trayType = document.getElementById('trayType') as HTMLSelectElement | null;
+  const trayLength = document.getElementById('trayLength') as HTMLInputElement | null;
+  const gvmUpgradeStatus = document.getElementById('gvmUpgradeStatus') as HTMLSelectElement | null;
+  const travellers = document.getElementById('travellers') as HTMLInputElement | null;
+  const travelStyle = document.getElementById('travelStyle') as HTMLSelectElement | null;
+  const towingRequirement = document.getElementById('towingRequirement') as HTMLSelectElement | null;
+  const budgetRange = document.getElementById('budgetRange') as HTMLInputElement | null;
+  const timeframe = document.getElementById('timeframe') as HTMLSelectElement | null;
+
+  const lowerSlug = productSlug?.toLowerCase() ?? '';
+  const fitmentRequired = intent === 'vehicle-suitability' || ['slide-on', 'truck', 'expedition', 'custom-build', 'unimog', 'nps'].some(hint => lowerSlug.includes(hint));
 
   const displayName = productName
     ? decodeURIComponent(productName)
@@ -213,8 +354,14 @@ const schema = {
     msgField.value = message;
     msgField.focus();
     msgField.setSelectionRange(message.length, message.length);
+  } else if (fitCheckSummary && msgField) {
+    msgField.value = fitCheckSummary;
+    msgField.focus();
+    msgField.setSelectionRange(fitCheckSummary.length, fitCheckSummary.length);
   } else if (displayName && msgField) {
-    const prefix = intent === 'buy'
+    const prefix = intent === 'vehicle-suitability'
+      ? `I need help checking whether the ${displayName} suits my vehicle. `
+      : intent === 'buy'
       ? `I'd like to purchase the ${displayName}. `
       : intent === 'register'
         ? `I'd like to register my interest in the ${displayName}. `
@@ -223,8 +370,40 @@ const schema = {
     msgField.focus();
     msgField.setSelectionRange(prefix.length, prefix.length);
   }
-  if (productSlug && hiddenField) hiddenField.value = decodeURIComponent(productSlug);
+  if (displayName && hiddenField) hiddenField.value = displayName;
+  else if (productSlug && hiddenField) hiddenField.value = decodeURIComponent(productSlug);
+  else if (intent === 'vehicle-suitability' && hiddenField) hiddenField.value = 'Vehicle suitability check';
   if (intent && intentField) intentField.value = intent;
+  if (fitmentContextField) fitmentContextField.value = fitmentRequired ? 'vehicle-fitment' : 'general';
+  if (fitCheckSummaryField && fitCheckSummary) fitCheckSummaryField.value = fitCheckSummary;
+  if (fitmentDetails) fitmentDetails.open = fitmentRequired;
+
+  const setInputValue = (el: HTMLInputElement | HTMLSelectElement | null, value: string | null) => {
+    if (el && value) el.value = value;
+  };
+  setInputValue(vehicleMakeModelYear, params.get('vehicle_make_model_year'));
+  setInputValue(trayType, params.get('tray_type'));
+  setInputValue(trayLength, params.get('tray_length'));
+  setInputValue(gvmUpgradeStatus, params.get('gvm_upgrade_status'));
+  setInputValue(travellers, params.get('travellers'));
+  setInputValue(travelStyle, params.get('travel_style'));
+  setInputValue(towingRequirement, params.get('towing_requirement'));
+  setInputValue(budgetRange, params.get('budget_range'));
+  setInputValue(timeframe, params.get('timeframe'));
+
+  const fitmentFieldSetRequired = fitmentRequired;
+  [vehicleMakeModelYear, trayType, trayLength, gvmUpgradeStatus, travellers, travelStyle, timeframe].forEach((field) => {
+    if (!field) return;
+    field.required = fitmentFieldSetRequired;
+  });
+
+  if (fitmentRequired && !message && !fitCheckSummary && msgField) {
+    const fitmentPrefix = displayName
+      ? `Please help me check fitment for the ${displayName}. `
+      : 'Please help me check fitment for my vehicle and camper setup. ';
+    msgField.value = fitmentPrefix;
+    msgField.setSelectionRange(fitmentPrefix.length, fitmentPrefix.length);
+  }
 
   const referralSource = document.getElementById('referralSourceSelfReported') as HTMLSelectElement | null;
   const referralOtherField = document.getElementById('referralOtherField') as HTMLDivElement | null;

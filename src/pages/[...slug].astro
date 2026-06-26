@@ -5,6 +5,7 @@ import ProductLayout from '../layouts/ProductLayout.astro';
 export async function getStaticPaths() {
   const products = await getCollection('products');
   return products
+    .filter(p => p.data.store !== true)
     .filter(p => !p.slug.startsWith('expedition/'))
     .map(p => ({
       params: { slug: p.slug },

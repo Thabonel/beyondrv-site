@@ -21,6 +21,29 @@ const LLMS_FULL_OUTPUT_FILE = join(ROOT, 'public/llms-full.txt');
 
 const SITE_URL = 'https://beyondrv.com.au';
 
+function imageListFromData(data) {
+  if (Array.isArray(data.gallery) && data.gallery.length) return data.gallery;
+  if (Array.isArray(data.images) && data.images.length > 1) return data.images.slice(1);
+  return [];
+}
+
+function heroImageFromData(data) {
+  if (typeof data.heroImage === 'string' && data.heroImage.trim()) return data.heroImage.trim();
+  if (Array.isArray(data.images) && typeof data.images[0] === 'string') return data.images[0];
+  return '';
+}
+
+function numberOrUndefined(value) {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string') {
+    const cleaned = value.replace(/[^0-9.]/g, '');
+    if (!cleaned) return undefined;
+    const parsed = Number(cleaned);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+  return undefined;
+}
+
 /** Recursively collect all .md file paths under a directory */
 function collectMdFiles(dir) {
   const entries = readdirSync(dir, { withFileTypes: true });
@@ -51,11 +74,12 @@ if (!existsSync(PRODUCTS_DIR)) {
 
 const mdFiles = collectMdFiles(PRODUCTS_DIR);
 
-const catalogue = mdFiles.map((filePath) => {
+const catalogue = mdFiles.flatMap((filePath) => {
   const fileContent = readFileSync(filePath, 'utf-8');
   const { data, content } = matter(fileContent);
 
   const slug = slugFromPath(filePath);
+  const gallery = imageListFromData(data);
 
   // Truncate markdown body to 300 chars, backing up to a word boundary
   const truncated = content.trim().slice(0, 300);
@@ -64,24 +88,47 @@ const catalogue = mdFiles.map((filePath) => {
   // Keep only the first 4 keySpecs to save tokens
   const keySpecs = Array.isArray(data.keySpecs) ? data.keySpecs.slice(0, 4) : [];
 
-  return {
+  return [{
+    store:        data.store === true,
     slug,
-    title:       data.title       ?? '',
-    price:       data.price       ?? '',
-    status:      data.status      ?? '',
-    category:    data.category    ?? '',
-    tagline:     data.tagline     ?? '',
-    featured:    data.featured    ?? false,
-    onSale:      data.onSale      ?? false,
-    heroImage:   data.heroImage   ?? '',
-    gallery:     Array.isArray(data.gallery) ? data.gallery : [],
-    galleryCount: Array.isArray(data.gallery) ? data.gallery.length : 0,
+    title:        data.title ?? data.name ?? '',
+    name:         data.name ?? data.title ?? '',
+    price:        data.price ?? '',
+    compareAtPrice: numberOrUndefined(data.compareAtPrice),
+    saleLabel:    data.saleLabel,
+    status:       data.status ?? '',
+    category:     data.category ?? '',
+    tagline:      data.tagline ?? '',
+    description:  data.description ?? description,
+    featured:     data.featured ?? false,
+    onSale:       data.onSale ?? false,
+    heroImage:    heroImageFromData(data),
+    gallery,
+    galleryCount: gallery.length,
     relatedSlugs: Array.isArray(data.relatedSlugs) ? data.relatedSlugs : [],
+    productType:  data.productType,
+    availability: data.availability,
+    purchasableOnline: data.purchasableOnline,
+    depositEnabled: data.depositEnabled,
+    fullPaymentEnabled: data.fullPaymentEnabled,
+    sourceType:   data.sourceType,
+    leadTimeText: data.leadTimeText,
+    containerEtaText: data.containerEtaText,
+    containerEtaDate: data.containerEtaDate,
+    internalStockEstimate: data.internalStockEstimate,
+    targetAustraliaStock: data.targetAustraliaStock,
+    containerReorderQuantity: data.containerReorderQuantity,
+    minimumComfortStock: data.minimumComfortStock,
+    lastStockCheckedAt: data.lastStockCheckedAt,
+    lastStockCheckedBy: data.lastStockCheckedBy,
+    containerEligible: data.containerEligible,
+    usualContainerLeadTimeDays: data.usualContainerLeadTimeDays,
+    supplierNotes: data.supplierNotes,
     youtubeVideo: data.youtubeVideo && typeof data.youtubeVideo === 'object' ? data.youtubeVideo : undefined,
     suitabilityData: data.suitabilityData && typeof data.suitabilityData === 'object' ? data.suitabilityData : undefined,
     keySpecs,
     description,
-  };
+  }];
 });
 
 // Sort for deterministic output (slug alphabetical)
@@ -89,6 +136,56 @@ catalogue.sort((a, b) => a.slug.localeCompare(b.slug));
 
 mkdirSync(dirname(OUTPUT_FILE), { recursive: true });
 writeFileSync(OUTPUT_FILE, JSON.stringify(catalogue, null, 2) + '\n', 'utf-8');
+
+// ─── Shop product manifest (trusted checkout source, store: true only) ──────────
+// Emits ONLY an explicit public allow-list of fields (never private/internal data),
+// and skips drafts/hidden/unpublished or malformed products.
+const SHOP_OUTPUT_FILE = join(ROOT, 'netlify/functions/shop-catalogue.json');
+
+const shopCatalogue = mdFiles.flatMap((filePath) => {
+  const { data } = matter(readFileSync(filePath, 'utf-8'));
+  if (data.store !== true) return [];
+  if (data.draft === true || data.published === false || data.hidden === true) return [];
+  if (!data.slug || !data.name) return [];
+  const gallery = imageListFromData(data);
+  const entry = {
+    slug: data.slug,
+    name: data.name,
+    title: data.title ?? data.name,
+    description: data.description ?? '',
+    price: typeof data.price === 'number' ? data.price : Number(data.price),
+    compareAtPrice: numberOrUndefined(data.compareAtPrice),
+    saleLabel: data.saleLabel,
+    image: heroImageFromData(data),
+    gallery,
+    productType: data.productType,
+    availability: data.availability,
+    purchasableOnline: data.purchasableOnline === true,
+    sourceType: data.sourceType,
+    leadTimeText: data.leadTimeText,
+    containerEtaText: data.containerEtaText,
+    containerEtaDate: data.containerEtaDate,
+  };
+  if (data.productType === 'stock') {
+    entry.availability = data.availability;
+    entry.purchasableOnline = data.purchasableOnline === true;
+    entry.fulfilmentType = data.fulfilmentType ?? 'quote_required';
+    if (entry.fulfilmentType === 'ship') {
+      entry.shippingSize = data.shippingSize ?? 'medium';
+      entry.packedWeightKg = data.packedWeightKg;
+      entry.packedLengthCm = data.packedLengthCm;
+      entry.packedWidthCm = data.packedWidthCm;
+      entry.packedHeightCm = data.packedHeightCm;
+      entry.shippingDataStatus = data.shippingDataStatus ?? 'estimated';
+    }
+  }
+  return [entry];
+});
+
+shopCatalogue.sort((a, b) => a.slug.localeCompare(b.slug));
+writeFileSync(SHOP_OUTPUT_FILE, JSON.stringify(shopCatalogue, null, 2) + '\n', 'utf-8');
+console.log(`✓ Shop catalogue written: ${SHOP_OUTPUT_FILE} (${shopCatalogue.length} products)`);
+
 
 const chatbotKnowledge = existsSync(KNOWLEDGE_FILE)
   ? readFileSync(KNOWLEDGE_FILE, 'utf-8').trim()

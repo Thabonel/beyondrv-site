@@ -5,6 +5,8 @@ const mobilePages = [
   '/our-slide-on-campers/',
   '/our-caravans/',
   '/on-sale/',
+  '/shop/',
+  '/shop/additional-200w-solar-panel/',
   '/advent-2300-hardtop-slide-on/',
   '/sunpatch-15xc-couples-offroad-van/',
   '/expedition/4-7m-hardtop-truck-camper/',
