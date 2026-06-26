@@ -270,7 +270,13 @@ const schema = [
 
   function setNotes(notes: string[]) {
     const warningNotes = byId('warningNotes');
-    if (warningNotes) warningNotes.innerHTML = notes.map((note: string) => `<li>${note}</li>`).join('');
+    if (!warningNotes) return;
+    warningNotes.replaceChildren();
+    notes.forEach((note: string) => {
+      const item = document.createElement('li');
+      item.textContent = note;
+      warningNotes.appendChild(item);
+    });
   }
 
   function calculateSlideOn() {

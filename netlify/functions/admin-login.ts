@@ -15,30 +15,27 @@ function textResponse(statusCode: number, body: string): HandlerResponse {
   return { statusCode, body };
 }
 
-function successResponse(location: string, token: string, cookie: string): HandlerResponse {
+function loginPageResponse(error = ''): HandlerResponse {
   return {
     statusCode: 200,
     headers: {
       'Content-Type': 'text/html',
       'Cache-Control': 'no-store',
+      'Set-Cookie': `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`,
+    },
+    body: loginPage(error),
+  };
+}
+
+function successResponse(location: string, cookie: string): HandlerResponse {
+  return {
+    statusCode: 303,
+    headers: {
+      'Cache-Control': 'no-store',
+      'Location': location,
       'Set-Cookie': cookie,
     },
-    body: `<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="robots" content="noindex, nofollow" />
-    <title>Signing in...</title>
-  </head>
-  <body style="background:#0a0a0a;color:#fff;font-family:system-ui,sans-serif">
-    <p>Signing in...</p>
-    <script>
-      localStorage.setItem('brv_admin_token', ${JSON.stringify(token)});
-      window.location.replace(${JSON.stringify(location)});
-    </script>
-    <p><a href="${location}" style="color:#E8540A">Continue to admin</a></p>
-  </body>
-</html>`,
+    body: '',
   };
 }
 
@@ -95,7 +92,7 @@ export const handler: Handler = async (event) => {
   }
 
   if (event.httpMethod === 'GET') {
-    return htmlResponse(200, loginPage());
+    return loginPageResponse();
   }
 
   if (event.httpMethod !== 'POST') {
@@ -106,13 +103,12 @@ export const handler: Handler = async (event) => {
   const password = params.get('password') ?? '';
 
   if (password !== expected) {
-    return htmlResponse(401, loginPage('Incorrect password.'));
+    return loginPageResponse('Incorrect password.');
   }
 
   const token = createAdminToken();
   return successResponse(
     '/admin/',
-    token,
     `${COOKIE_NAME}=${encodeURIComponent(token)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=28800`
   );
 };

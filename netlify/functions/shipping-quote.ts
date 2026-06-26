@@ -2,6 +2,7 @@ import type { Handler } from '@netlify/functions';
 import manifest from './shop-catalogue.json';
 import { buildCatalogue, type ShopManifestEntry } from '../../src/lib/checkout';
 import { resolveShippableItems, calculateShippingQuote } from '../../src/lib/shipping';
+import { isRateLimited, rateLimitResponse } from './security-utils';
 
 /**
  * Phase 4A — development-safe Australia Post shipping estimate.
@@ -24,6 +25,7 @@ function json(statusCode: number, body: unknown) {
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
+  if (await isRateLimited(event, 'shipping-quote', 60, 10 * 60)) return rateLimitResponse();
 
   let payload: { items?: unknown; postcode?: unknown };
   try {

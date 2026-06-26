@@ -2,6 +2,7 @@ import type { Handler } from '@netlify/functions';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 
 const STORE_NAME = 'product-media';
+const SAFE_MEDIA_KEY = /^(?:products|pages)\/[a-z0-9._/-]{1,480}$/;
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'GET' && event.httpMethod !== 'HEAD') {
@@ -10,7 +11,7 @@ export const handler: Handler = async (event) => {
   const blobConnection = connectBlobStore(event);
 
   const key = event.queryStringParameters?.key ?? '';
-  if (!key.startsWith('products/') && !key.startsWith('pages/')) {
+  if (!SAFE_MEDIA_KEY.test(key) || key.includes('..') || key.includes('//')) {
     return { statusCode: 400, body: 'Invalid media key' };
   }
 

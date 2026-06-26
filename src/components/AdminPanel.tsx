@@ -1,4 +1,4 @@
-import { Component, type ReactNode, useState, useRef, useEffect } from 'react';
+import React, { Component, type ReactNode, useState, useRef, useEffect } from 'react';
 import AdminDashboard from './AdminDashboard';
 import initialRecentBuilds from '../data/homepage/recent-builds.json';
 import initialTestimonials from '../data/homepage/testimonials.json';

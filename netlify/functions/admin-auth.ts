@@ -43,7 +43,7 @@ export function isAdminAuthorized(event: HandlerEvent) {
     event.headers['x-admin-password'] ??
     event.headers['X-Admin-Password'];
 
-  if (headerPassword === expected) return true;
+  if (typeof headerPassword === 'string' && constantTimeEqual(headerPassword, expected)) return true;
   const headerToken =
     event.headers['x-admin-token'] ??
     event.headers['X-Admin-Token'];
@@ -51,12 +51,13 @@ export function isAdminAuthorized(event: HandlerEvent) {
   if (typeof headerToken === 'string' && isValidAdminToken(headerToken)) return true;
 
   const cookies = parseCookies(event.headers.cookie);
+  if (!isTrustedCookieAuthRequest(event)) return false;
   return isValidAdminToken(cookies[COOKIE_NAME]);
 }
 
 export function createAdminToken() {
   const issuedAt = Date.now().toString();
-  const secret = getExpectedPassword();
+  const secret = getCookieSecrets()[0] ?? getExpectedPassword();
   return `${TOKEN_VERSION}.${issuedAt}.${sign(`${TOKEN_VERSION}.${issuedAt}`, secret)}`;
 }
 
@@ -76,4 +77,25 @@ export function unauthorizedResponse() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ error: 'Unauthorized' }),
   };
+}
+
+function isUnsafeMethod(method = 'GET') {
+  return !['GET', 'HEAD', 'OPTIONS'].includes(method.toUpperCase());
+}
+
+function sameOrigin(candidate: string | undefined, host: string | undefined) {
+  if (!candidate || !host) return true;
+  try {
+    return new URL(candidate).host === host;
+  } catch {
+    return false;
+  }
+}
+
+function isTrustedCookieAuthRequest(event: HandlerEvent) {
+  if (!isUnsafeMethod(event.httpMethod)) return true;
+  const host = event.headers.host ?? event.headers.Host;
+  const origin = event.headers.origin ?? event.headers.Origin;
+  const referer = event.headers.referer ?? event.headers.Referer;
+  return sameOrigin(origin, host) && sameOrigin(referer, host);
 }

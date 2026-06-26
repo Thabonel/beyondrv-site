@@ -1,8 +1,5 @@
 export function adminFetch(input: RequestInfo | URL, init: RequestInit = {}) {
-  const token = typeof localStorage !== 'undefined' ? localStorage.getItem('brv_admin_token') : '';
   const headers = new Headers(init.headers);
-
-  if (token) headers.set('x-admin-token', token);
 
   return fetch(input, {
     ...init,
@@ -27,5 +24,5 @@ export async function adminJson<T>(res: Response, fallbackError: string): Promis
 }
 
 export function clearAdminToken() {
-  localStorage.removeItem('brv_admin_token');
+  if (typeof localStorage !== 'undefined') localStorage.removeItem('brv_admin_token');
 }

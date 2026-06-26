@@ -4,6 +4,7 @@ import productManifest from './product-catalogue.json';
 import { buildCatalogue, validateCheckout, canPurchaseVehicleOnline, type ShopManifestEntry } from '../../src/lib/checkout';
 import { calculateDepositAmount, parseMoneyValue } from '../../src/lib/payment';
 import { json, siteUrl } from './stripe-shared';
+import { isRateLimited, rateLimitResponse } from './security-utils';
 
 /**
  * Required environment variables (set in the Netlify dashboard, functions scope):
@@ -162,6 +163,7 @@ function resolveCheckoutPayload(payload: CheckoutPayload) {
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
+  if (await isRateLimited(event, 'checkout', 20, 10 * 60)) return rateLimitResponse();
 
   let payload: CheckoutPayload;
   try {

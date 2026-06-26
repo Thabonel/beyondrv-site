@@ -3,6 +3,7 @@ import type { Handler } from '@netlify/functions';
 import { createHash } from 'crypto';
 import catalogue from './product-catalogue.json';
 import chatbotKnowledge from './chatbot-knowledge.json';
+import { isRateLimited } from './security-utils';
 
 const openAiKey = process.env.OPENAI_API_KEY;
 const client = openAiKey ? new OpenAI({ apiKey: openAiKey }) : null;
@@ -187,6 +188,14 @@ export const handler: Handler = async (event) => {
 
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
+  }
+
+  if (await isRateLimited(event, 'site-chat', 30, 10 * 60)) {
+    return {
+      statusCode: 429,
+      headers: { ...sseHeaders, 'Retry-After': '600' },
+      body: 'data: Too many chat requests just now. Please wait a few minutes or call 0430 863 819.\\n\\ndata: [DONE]\\n\\n',
+    };
   }
 
   if (!client) {

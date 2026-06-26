@@ -14,8 +14,8 @@
     "images:optimize": "node SCRIPTS/optimize-product-images.mjs --write"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.8",
-    "@astrojs/react": "^5.0.4",
+    "@astrojs/check": "^0.9.9",
+    "@astrojs/react": "^5.0.7",
     "@astrojs/sitemap": "^2.0.2",
     "@netlify/blobs": "^10.7.8",
     "astro": "^4.16.19",
@@ -33,5 +33,12 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "sharp": "^0.34.5"
+  },
+  "overrides": {
+    "@opentelemetry/core": "^2.8.0",
+    "@opentelemetry/resources": "^2.8.0",
+    "@opentelemetry/sdk-trace-base": "^2.8.0",
+    "@opentelemetry/sdk-trace-node": "^2.8.0",
+    "yaml-language-server": "^1.23.0"
   }
 }

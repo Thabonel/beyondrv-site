@@ -2,6 +2,7 @@ import type { Handler } from '@netlify/functions';
 import { randomUUID } from 'crypto';
 import { connectBlobStore, getBlobStore, safeBlobStoreError, type BlobStoreConnection } from './blob-store';
 import { syncEnquiryToOwnerCopilotRecords } from './owner-copilot-record-sync';
+import { isRateLimited, rateLimitResponse } from './security-utils';
 
 const STORE_NAME = 'customer-enquiries';
 const RESEND_API = 'https://api.resend.com/emails';
@@ -186,6 +187,7 @@ async function backupEnquiry(id: string, record: Record<string, unknown>, blobRu
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
+  if (await isRateLimited(event, 'contact-submit', 5, 15 * 60)) return rateLimitResponse();
   const blobRuntimeSource = connectBlobStore(event);
 
   let body: EnquiryPayload;
