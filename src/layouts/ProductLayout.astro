@@ -6,6 +6,7 @@ import { displayImageUrl, imageSrcSet, thumbImageUrl } from '../lib/media';
 import { calculateDepositAmount, parseMoneyValue } from '../lib/payment';
 import { availabilityLabel, availabilitySchema, canPurchaseVehicleOnline, formatShopPrice, normalizeSaleLabel, sourceTypeLabel } from '../lib/shop';
 import { normalizeVideoUploadDate } from '../lib/structuredData.js';
+import paymentSettings from '../data/payment-settings.json';
 
 type ProductData = CollectionEntry<'products'>['data'];
 type ProductCategory = ProductData['category'];
@@ -91,6 +92,9 @@ const suitabilityFieldRows = data.category === 'caravan'
 const priceNum = data.price.replace(/[^0-9.]/g, '');
 const parsedPrice = parseMoneyValue(data.price);
 const hasValidPrice = Number.isFinite(parsedPrice) && parsedPrice > 0;
+const configuredDepositPercent = Number.isFinite(paymentSettings.vehicleDepositPercent) && paymentSettings.vehicleDepositPercent > 0 && paymentSettings.vehicleDepositPercent <= 1
+  ? paymentSettings.vehicleDepositPercent
+  : 1 / 3;
 const availability = data.availability ?? (data.status === 'coming-soon' ? 'coming_next_container' : 'available_in_australia');
 const isComingSoon = availability !== 'available_in_australia' && availability !== 'made_to_order';
 const canDeposit = canPurchaseVehicleOnline({
@@ -105,7 +109,11 @@ const canFullPayment = canPurchaseVehicleOnline({
   depositEnabled: data.depositEnabled,
   fullPaymentEnabled: data.fullPaymentEnabled,
 }, 'full') && hasValidPrice;
-const depositAmount = canDeposit ? calculateDepositAmount(parsedPrice) : 0;
+const depositAmount = canDeposit ? calculateDepositAmount(parsedPrice, configuredDepositPercent) : 0;
+const depositNoticeTitle = paymentSettings.depositLegalNoticeTitle || 'Before you pay a deposit';
+const depositNoticeBody = Array.isArray(paymentSettings.depositLegalNoticeBody)
+  ? paymentSettings.depositLegalNoticeBody.filter((line: string) => line.trim())
+  : [];
 const saleBadge = normalizeSaleLabel(data.saleLabel ?? data.priceBadge ?? '');
 const availabilityCopy = availability !== 'available_in_australia' ? availabilityLabel(availability) : '';
 const sourceCopy = sourceTypeLabel(data.sourceType);
@@ -343,12 +351,12 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
         </div>
       )}
 
-      <div class="product-ctas" data-stripe-product data-product-slug={product.slug}>
+      <div class="product-ctas" data-stripe-product data-product-slug={product.slug} data-product-title={data.title}>
         {canDeposit || canFullPayment ? (
           <>
             {canDeposit && (
               <button type="button" class="btn-primary" data-stripe-checkout data-purchase-type="deposit">
-                Pay {formatShopPrice(depositAmount)} Deposit
+                Buy Now - Deposit {formatShopPrice(depositAmount)}
               </button>
             )}
             {canFullPayment && (
@@ -373,6 +381,30 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
       <p class="product-payment-error" data-payment-error role="alert" hidden></p>
     </div>
   </section>
+
+  {(canDeposit || canFullPayment) && (
+    <div class="checkout-notice-modal" data-checkout-notice hidden>
+      <div class="checkout-notice-backdrop" data-checkout-notice-cancel></div>
+      <div class="checkout-notice-card" role="dialog" aria-modal="true" aria-labelledby="checkoutNoticeTitle">
+        <div class="section-eyebrow">
+          <div class="section-eyebrow-line"></div>
+          <span class="section-eyebrow-text">Deposit request</span>
+        </div>
+        <h2 id="checkoutNoticeTitle">{depositNoticeTitle}</h2>
+        <p class="checkout-notice-summary" data-checkout-notice-summary>
+          You are about to pay a {formatShopPrice(depositAmount)} deposit for {data.title}.
+        </p>
+        <ul>
+          {depositNoticeBody.map((line: string) => <li>{line}</li>)}
+        </ul>
+        <div class="checkout-notice-actions">
+          <button type="button" class="btn-primary" data-checkout-notice-continue>Continue to secure payment</button>
+          <a class="btn-ghost" href={enquiryUrl + '&intent=deposit-question'}>Enquire before paying</a>
+          <button type="button" class="checkout-notice-cancel" data-checkout-notice-cancel>Cancel</button>
+        </div>
+      </div>
+    </div>
+  )}
 
   <section class="product-description container">
     <div class="product-description-body prose">
@@ -595,6 +627,47 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
   const galleryCurrent = document.querySelector<HTMLElement>('[data-gallery-current]');
   const checkoutRoot = document.querySelector<HTMLElement>('[data-stripe-product]');
   const checkoutError = document.querySelector<HTMLElement>('[data-payment-error]');
+  const noticeModal = document.querySelector<HTMLElement>('[data-checkout-notice]');
+  const noticeSummary = document.querySelector<HTMLElement>('[data-checkout-notice-summary]');
+  const noticeContinue = document.querySelector<HTMLButtonElement>('[data-checkout-notice-continue]');
+  const noticeCancelButtons = document.querySelectorAll<HTMLElement>('[data-checkout-notice-cancel]');
+  let pendingCheckoutButton: HTMLButtonElement | null = null;
+
+  function openCheckoutNotice(button: HTMLButtonElement) {
+    if (!noticeModal) return false;
+    pendingCheckoutButton = button;
+    const purchaseType = button.dataset.purchaseType;
+    if (noticeSummary) {
+      const productTitle = checkoutRoot?.dataset.productTitle || 'this product';
+      noticeSummary.textContent = purchaseType === 'deposit'
+        ? `You are about to pay a ${button.textContent?.replace(/^Buy Now -\s*/i, '').trim() || 'deposit'} for ${productTitle}.`
+        : `You are about to continue to secure checkout for ${productTitle}.`;
+    }
+    noticeModal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    noticeContinue?.focus();
+    return true;
+  }
+
+  function closeCheckoutNotice() {
+    if (!noticeModal) return;
+    noticeModal.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  noticeCancelButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      pendingCheckoutButton = null;
+      closeCheckoutNotice();
+    });
+  });
+
+  noticeContinue?.addEventListener('click', () => {
+    const button = pendingCheckoutButton;
+    pendingCheckoutButton = null;
+    closeCheckoutNotice();
+    if (button) void startStripeCheckout(button);
+  });
   let activeGalleryIndex = Math.max(0, thumbButtons.findIndex(btn => btn.classList.contains('active')));
 
   function showGalleryImage(index: number) {
@@ -657,10 +730,8 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
     });
   });
 
-  checkoutRoot?.addEventListener('click', async (event) => {
-    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-stripe-checkout]');
-    if (!button) return;
-
+  async function startStripeCheckout(button: HTMLButtonElement) {
+    if (!checkoutRoot) return;
     const slug = checkoutRoot.dataset.productSlug;
     const purchaseType = button.dataset.purchaseType;
     if (!slug || (purchaseType !== 'deposit' && purchaseType !== 'full')) return;
@@ -696,5 +767,16 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
 
     button.disabled = false;
     button.textContent = originalLabel;
+  }
+
+  checkoutRoot?.addEventListener('click', (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-stripe-checkout]');
+    if (!button) return;
+
+    const slug = checkoutRoot.dataset.productSlug;
+    const purchaseType = button.dataset.purchaseType;
+    if (!slug || (purchaseType !== 'deposit' && purchaseType !== 'full')) return;
+
+    if (!openCheckoutNotice(button)) void startStripeCheckout(button);
   });
 </script>

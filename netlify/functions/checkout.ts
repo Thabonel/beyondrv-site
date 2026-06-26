@@ -1,6 +1,7 @@
 import type { Handler } from '@netlify/functions';
 import manifest from './shop-catalogue.json';
 import productManifest from './product-catalogue.json';
+import paymentSettings from '../../src/data/payment-settings.json';
 import { buildCatalogue, validateCheckout, canPurchaseVehicleOnline, type ShopManifestEntry } from '../../src/lib/checkout';
 import { calculateDepositAmount, parseMoneyValue } from '../../src/lib/payment';
 import { json, siteUrl } from './stripe-shared';
@@ -36,7 +37,11 @@ const productCatalogue = productManifest as ProductCatalogueEntry[];
 const productBySlug = Object.fromEntries(productCatalogue.map((product) => [product.slug, product]));
 const SITE_URL = siteUrl();
 const STRIPE_SESSIONS_API = 'https://api.stripe.com/v1/checkout/sessions';
-const DEPOSIT_PERCENT = Number(process.env.STRIPE_DEPOSIT_PERCENT ?? '0.3');
+
+function configuredDepositPercent() {
+  const value = Number((paymentSettings as { vehicleDepositPercent?: unknown }).vehicleDepositPercent);
+  return Number.isFinite(value) && value > 0 && value <= 1 ? value : 1 / 3;
+}
 
 function isCheckoutType(value: unknown): value is 'deposit' | 'full' {
   return value === 'deposit' || value === 'full';
@@ -82,7 +87,7 @@ function resolveProductPurchase(slug: string, requestedType: unknown) {
     };
   }
 
-  const amount = type === 'deposit' ? calculateDepositAmount(price, Number.isFinite(DEPOSIT_PERCENT) ? DEPOSIT_PERCENT : 0.3) : Math.round(price);
+  const amount = type === 'deposit' ? calculateDepositAmount(price, configuredDepositPercent()) : Math.round(price);
   if (amount <= 0) {
     return {
       ok: false as const,

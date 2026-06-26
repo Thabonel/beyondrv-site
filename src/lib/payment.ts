@@ -1,4 +1,4 @@
-export const STRIPE_DEPOSIT_PERCENT = 0.3;
+export const STRIPE_DEPOSIT_PERCENT = 1 / 3;
 
 export function parseMoneyValue(value: string | number): number {
   if (typeof value === 'number') return value;

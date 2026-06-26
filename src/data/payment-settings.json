@@ -1,0 +1,9 @@
+{
+  "vehicleDepositPercent": 0.3333333333,
+  "depositLegalNoticeTitle": "Before you pay a deposit",
+  "depositLegalNoticeBody": [
+    "This payment is a deposit request for the selected Beyond RV product. It does not replace the final sales contract.",
+    "After payment, Beyond RV will contact you to confirm availability, build specification, delivery or fitment details, final pricing, and the contract paperwork.",
+    "Your order is subject to Beyond RV accepting and confirming the final contract details. Your rights under the Australian Consumer Law are not excluded."
+  ]
+}

@@ -9,8 +9,7 @@ test('parseMoneyValue strips formatting and currency labels', () => {
 });
 
 test('calculateDepositAmount rounds to the nearest dollar', () => {
-  assert.equal(STRIPE_DEPOSIT_PERCENT, 0.3);
-  assert.equal(calculateDepositAmount(78999), 23700);
-  assert.equal(calculateDepositAmount(49999), 15000);
+  assert.equal(STRIPE_DEPOSIT_PERCENT, 1 / 3);
+  assert.equal(calculateDepositAmount(78999), 26333);
+  assert.equal(calculateDepositAmount(49999), 16666);
 });
-

@@ -2,6 +2,7 @@ import React, { Component, type ReactNode, useState, useRef, useEffect } from 'r
 import AdminDashboard from './AdminDashboard';
 import initialRecentBuilds from '../data/homepage/recent-builds.json';
 import initialTestimonials from '../data/homepage/testimonials.json';
+import initialPaymentSettings from '../data/payment-settings.json';
 import { adminFetch, clearAdminToken } from '../lib/adminApi';
 
 interface Message {
@@ -42,7 +43,7 @@ interface PendingChange {
 }
 
 type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
-type PanelTab = 'dashboard' | 'products' | 'shop' | 'orders' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'drafts' | 'audit' | 'knowledge' | 'google' | 'matches' | 'reports' | 'pending';
+type PanelTab = 'dashboard' | 'products' | 'shop' | 'orders' | 'settings' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'drafts' | 'audit' | 'knowledge' | 'google' | 'matches' | 'reports' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 type CommerceAvailability = 'available_in_australia' | 'coming_next_container' | 'made_to_order' | 'ask_availability' | 'unavailable';
@@ -94,6 +95,12 @@ interface YoutubeVideoMeta {
   duration?: string;
   startSeconds?: number;
   transcriptSummary?: string;
+}
+
+interface PaymentSettings {
+  vehicleDepositPercent: number;
+  depositLegalNoticeTitle: string;
+  depositLegalNoticeBody: string[];
 }
 
 interface ProductRecord {
@@ -1460,6 +1467,11 @@ function makePendingChange(path: string, content: string, description: string): 
   };
 }
 
+function formatDepositPercentInput(value: number) {
+  const percent = Number.isFinite(value) ? value * 100 : 33.33333333;
+  return percent.toFixed(3).replace(/\.?0+$/, '');
+}
+
 function orderedItems<T extends { sortOrder: number }>(items: T[]) {
   return [...items].sort((a, b) => a.sortOrder - b.sortOrder);
 }
@@ -1583,6 +1595,11 @@ export default function AdminPanel() {
   const [recentBuilds, setRecentBuilds] = useState<RecentBuild[]>(limitRecentBuilds(initialRecentBuilds as RecentBuild[]));
   const [testimonials, setTestimonials] = useState<Testimonial[]>(renumber(orderedItems(initialTestimonials as Testimonial[])));
   const [homepageStatus, setHomepageStatus] = useState('');
+  const [paymentSettings, setPaymentSettings] = useState<PaymentSettings>(initialPaymentSettings as PaymentSettings);
+  const [paymentDepositPercent, setPaymentDepositPercent] = useState(formatDepositPercentInput((initialPaymentSettings as PaymentSettings).vehicleDepositPercent));
+  const [paymentNoticeTitle, setPaymentNoticeTitle] = useState((initialPaymentSettings as PaymentSettings).depositLegalNoticeTitle);
+  const [paymentNoticeBody, setPaymentNoticeBody] = useState((initialPaymentSettings as PaymentSettings).depositLegalNoticeBody.join('\n'));
+  const [paymentSettingsStatus, setPaymentSettingsStatus] = useState('');
   const [loading, setLoading] = useState(false);
   const [pending, setPending] = useState<PendingChange[]>([]);
   const [deployStatus, setDeployStatus] = useState<DeployStatus>('idle');
@@ -3370,6 +3387,46 @@ export default function AdminPanel() {
     setActiveTab('pending');
   }
 
+  function queuePaymentSettingsUpdate() {
+    const percent = Number(paymentDepositPercent.trim());
+    if (!Number.isFinite(percent) || percent <= 0 || percent > 100) {
+      setPaymentSettingsStatus('Enter a deposit percentage between 0 and 100.');
+      return;
+    }
+
+    const title = paymentNoticeTitle.trim() || 'Before you pay a deposit';
+    const body = paymentNoticeBody
+      .split('\n')
+      .map(line => line.trim())
+      .filter(Boolean);
+
+    if (body.length === 0) {
+      setPaymentSettingsStatus('Add at least one legal notice line.');
+      return;
+    }
+
+    const nextSettings: PaymentSettings = {
+      vehicleDepositPercent: Number((percent / 100).toFixed(10)),
+      depositLegalNoticeTitle: title,
+      depositLegalNoticeBody: body,
+    };
+
+    setPaymentSettings(nextSettings);
+    setPaymentDepositPercent(formatDepositPercentInput(nextSettings.vehicleDepositPercent));
+    setPaymentNoticeTitle(nextSettings.depositLegalNoticeTitle);
+    setPaymentNoticeBody(nextSettings.depositLegalNoticeBody.join('\n'));
+    setPending(prev => [
+      ...prev.filter(change => change.path !== 'src/data/payment-settings.json'),
+      makePendingChange(
+        'src/data/payment-settings.json',
+        `${JSON.stringify(nextSettings, null, 2)}\n`,
+        `Update vehicle deposit to ${formatDepositPercentInput(nextSettings.vehicleDepositPercent)}%`
+      ),
+    ]);
+    setPaymentSettingsStatus('Payment settings queued. Open Pending to preview and deploy.');
+    setActiveTab('pending');
+  }
+
   async function deploy() {
     if (!pending.length || deployStatus === 'deploying') return;
 
@@ -3599,8 +3656,8 @@ export default function AdminPanel() {
             </button>
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(16, minmax(0, 1fr))', borderBottom: '1px solid #333' }}>
-          {(['dashboard', 'products', 'shop', 'orders', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'matches', 'reports', 'pending'] as PanelTab[]).map(tab => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(17, minmax(0, 1fr))', borderBottom: '1px solid #333' }}>
+          {(['dashboard', 'products', 'shop', 'orders', 'settings', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'matches', 'reports', 'pending'] as PanelTab[]).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -4280,6 +4337,69 @@ export default function AdminPanel() {
                 );
               })}
             </div>
+          </div>
+        )}
+
+        {activeTab === 'settings' && (
+          <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '1rem', display: 'grid', gap: '1rem', alignContent: 'start' }}>
+            <section style={{ border: '1px solid #333', borderRadius: '8px', background: '#111', padding: '1rem', display: 'grid', gap: '0.8rem' }}>
+              <div>
+                <div style={{ color: '#fff', fontWeight: 800, fontSize: '1rem' }}>Payment Settings</div>
+                <div style={{ color: '#888', fontSize: '0.78rem', marginTop: '0.2rem', lineHeight: 1.45 }}>
+                  Controls camper and caravan deposit checkout. The product page display and Stripe checkout use this same setting.
+                </div>
+              </div>
+
+              {paymentSettingsStatus && (
+                <div style={{ color: paymentSettingsStatus.startsWith('Enter') || paymentSettingsStatus.startsWith('Add') ? '#fb923c' : '#8f8', fontSize: '0.78rem', lineHeight: 1.4 }}>
+                  {paymentSettingsStatus}
+                </div>
+              )}
+
+              <label style={{ display: 'grid', gap: '0.3rem', color: '#ddd', fontSize: '0.78rem', fontWeight: 700 }}>
+                Vehicle deposit percentage
+                <input
+                  value={paymentDepositPercent}
+                  onChange={e => setPaymentDepositPercent(e.target.value)}
+                  inputMode="decimal"
+                  placeholder="33.333"
+                  style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.58rem', fontSize: '0.86rem' }}
+                />
+                <span style={{ color: '#777', fontSize: '0.7rem', fontWeight: 400 }}>
+                  Current saved setting: {formatDepositPercentInput(paymentSettings.vehicleDepositPercent)}%. Enter 33.333 for one third of the product price.
+                </span>
+              </label>
+
+              <label style={{ display: 'grid', gap: '0.3rem', color: '#ddd', fontSize: '0.78rem', fontWeight: 700 }}>
+                Deposit popup heading
+                <input
+                  value={paymentNoticeTitle}
+                  onChange={e => setPaymentNoticeTitle(e.target.value)}
+                  style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.58rem', fontSize: '0.86rem' }}
+                />
+              </label>
+
+              <label style={{ display: 'grid', gap: '0.3rem', color: '#ddd', fontSize: '0.78rem', fontWeight: 700 }}>
+                Deposit popup legal notice
+                <textarea
+                  value={paymentNoticeBody}
+                  onChange={e => setPaymentNoticeBody(e.target.value)}
+                  rows={7}
+                  style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.58rem', fontSize: '0.82rem', lineHeight: 1.45 }}
+                />
+                <span style={{ color: '#777', fontSize: '0.7rem', fontWeight: 400 }}>
+                  One line becomes one bullet in the buyer confirmation popup. Keep this factual and avoid saying consumer rights are excluded.
+                </span>
+              </label>
+
+              <button
+                type="button"
+                onClick={queuePaymentSettingsUpdate}
+                style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.7rem', cursor: 'pointer', fontWeight: 800 }}
+              >
+                Queue Payment Settings Update
+              </button>
+            </section>
           </div>
         )}
 
