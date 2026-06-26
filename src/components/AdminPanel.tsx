@@ -1507,6 +1507,7 @@ export default function AdminPanel() {
   const [showNewProductForm, setShowNewProductForm] = useState(false);
   const [newProductMode, setNewProductMode] = useState<'business' | 'shop'>('business');
   const [editProduct, setEditProduct] = useState<EditProductForm | null>(null);
+  const [productEditStatus, setProductEditStatus] = useState('');
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersStatus, setOrdersStatus] = useState('');
@@ -2796,7 +2797,7 @@ export default function AdminPanel() {
       packedWidthCm: product.packedWidthCm !== undefined ? String(product.packedWidthCm) : '',
       packedHeightCm: product.packedHeightCm !== undefined ? String(product.packedHeightCm) : '',
       shippingDataStatus: product.shippingDataStatus ?? 'estimated',
-      tagline: product.tagline,
+      tagline: product.tagline || product.description || '',
       featured: Boolean(product.featured),
       onSale: Boolean(product.onSale),
       heroImage: product.heroImage ?? '',
@@ -2896,6 +2897,7 @@ export default function AdminPanel() {
 
   function startStructuredEdit(product: ProductRecord) {
     setEditProduct(editFormFromProduct(product));
+    setProductEditStatus('');
     setActiveTab(product.store ? 'shop' : 'products');
   }
 
@@ -2909,7 +2911,9 @@ export default function AdminPanel() {
     ].filter(Boolean);
 
     if (missing.length) {
-      setMessages(prev => [...prev, { role: 'assistant', content: `The product edit form needs: ${missing.join(', ')}.` }]);
+      const message = `The product edit form needs: ${missing.join(', ')}.`;
+      setProductEditStatus(message);
+      setMessages(prev => [...prev, { role: 'assistant', content: message }]);
       return;
     }
 
@@ -2925,7 +2929,9 @@ export default function AdminPanel() {
         editProduct.fulfilmentType === 'ship' && !editProduct.packedHeightCm.trim() && 'packed height',
       ].filter(Boolean);
       if (stockMissing.length) {
-        setMessages(prev => [...prev, { role: 'assistant', content: `Shop stock items need: ${stockMissing.join(', ')}.` }]);
+        const message = `Shop stock items need: ${stockMissing.join(', ')}.`;
+        setProductEditStatus(message);
+        setMessages(prev => [...prev, { role: 'assistant', content: message }]);
         return;
       }
     }
@@ -2945,32 +2951,42 @@ export default function AdminPanel() {
     );
 
     if (gallery.length === 0) {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'The gallery must contain at least one image URL or path.' }]);
+      const message = 'The gallery must contain at least one image URL or path.';
+      setProductEditStatus(message);
+      setMessages(prev => [...prev, { role: 'assistant', content: message }]);
       return;
     }
 
     if (invalidRelated.length) {
-      setMessages(prev => [...prev, { role: 'assistant', content: `These related product slugs are not valid: ${invalidRelated.join(', ')}.` }]);
+      const message = `These related product slugs are not valid: ${invalidRelated.join(', ')}.`;
+      setProductEditStatus(message);
+      setMessages(prev => [...prev, { role: 'assistant', content: message }]);
       return;
     }
 
     if (hasVideoFields && !editProduct.youtubeVideoUrl.trim()) {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Add a YouTube URL for the product video, or clear all video fields.' }]);
+      const message = 'Add a YouTube URL for the product video, or clear all video fields.';
+      setProductEditStatus(message);
+      setMessages(prev => [...prev, { role: 'assistant', content: message }]);
       return;
     }
 
     if (editProduct.youtubeVideoUrl.trim() && !isValidYouTubeVideoId(videoId)) {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'The YouTube video URL does not look valid. Paste a normal YouTube, youtu.be, Shorts, embed URL, or a clean video ID.' }]);
+      const message = 'The YouTube video URL does not look valid. Paste a normal YouTube, youtu.be, Shorts, embed URL, or a clean video ID.';
+      setProductEditStatus(message);
+      setMessages(prev => [...prev, { role: 'assistant', content: message }]);
       return;
     }
 
     if (videoId && !editProduct.youtubeVideoTitle.trim()) {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Add a short video title before queueing the product edit.' }]);
+      const message = 'Add a short video title before queueing the product edit.';
+      setProductEditStatus(message);
+      setMessages(prev => [...prev, { role: 'assistant', content: message }]);
       return;
     }
 
-    setActiveTab('pending');
     setLoading(true);
+    setProductEditStatus('Queueing product edit...');
     adminFetch('/.netlify/functions/admin-product-edit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -3057,11 +3073,16 @@ export default function AdminPanel() {
           }
           return [...prev, data.pendingChange!];
         });
-        setMessages(prev => [...prev, { role: 'assistant', content: `${editProduct.title.trim()} edit queued. Open Pending to review and deploy it.` }]);
+        const message = `${editProduct.title.trim()} edit queued. Open Pending to review and deploy it.`;
+        setProductEditStatus(message);
+        setMessages(prev => [...prev, { role: 'assistant', content: message }]);
         setEditProduct(null);
+        setActiveTab('pending');
       })
       .catch(err => {
-        setMessages(prev => [...prev, { role: 'assistant', content: err instanceof Error ? err.message : 'Could not queue product edit.' }]);
+        const message = err instanceof Error ? err.message : 'Could not queue product edit.';
+        setProductEditStatus(message);
+        setMessages(prev => [...prev, { role: 'assistant', content: message }]);
       })
       .finally(() => setLoading(false));
   }
@@ -3723,7 +3744,10 @@ export default function AdminPanel() {
                     <option value="coming-soon">Coming soon</option>
                   </select>
                 </div>
-                <input value={editProduct.tagline} onChange={e => setEditProduct(p => p && ({ ...p, tagline: e.target.value }))} placeholder="Tagline" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                <input value={editProduct.tagline} onChange={e => {
+                  setProductEditStatus('');
+                  setEditProduct(p => p && ({ ...p, tagline: e.target.value }));
+                }} placeholder={editProduct.store ? 'Short shop description' : 'Tagline'} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                 <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '0.4rem' }}>
                   <input value={editProduct.saleLabel} onChange={e => setEditProduct(p => p && ({ ...p, saleLabel: e.target.value }))} placeholder="Sale label" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                   <select value={editProduct.availability} onChange={e => setEditProduct(p => p && ({ ...p, availability: e.target.value as CommerceAvailability }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
@@ -3825,9 +3849,9 @@ export default function AdminPanel() {
                     <input type="checkbox" checked={editProduct.fullPaymentEnabled} onChange={e => setEditProduct(p => p && ({ ...p, fullPaymentEnabled: e.target.checked }))} />
                     Full payment enabled
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }} title="Internal planning flag. Turn this on when this product can be included in a future China container order.">
                     <input type="checkbox" checked={editProduct.containerEligible} onChange={e => setEditProduct(p => p && ({ ...p, containerEligible: e.target.checked }))} />
-                    Container eligible
+                    Can reorder in China container
                   </label>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem', border: '1px solid #333', borderRadius: '6px', padding: '0.6rem', background: '#101010' }}>
@@ -3904,8 +3928,24 @@ export default function AdminPanel() {
                   </>
                 )}
                 <textarea value={editProduct.notes} onChange={e => setEditProduct(p => p && ({ ...p, notes: e.target.value }))} placeholder="Optional notes for copy/spec changes" rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
+                {productEditStatus && (
+                  <div style={{
+                    border: productEditStatus.toLowerCase().includes('queued') ? '1px solid #14532d' : '1px solid #7c2d12',
+                    background: productEditStatus.toLowerCase().includes('queued') ? '#052e16' : '#2a1410',
+                    color: productEditStatus.toLowerCase().includes('queued') ? '#86efac' : '#fed7aa',
+                    borderRadius: '6px',
+                    padding: '0.55rem',
+                    fontSize: '0.76rem',
+                    lineHeight: 1.4,
+                  }}>
+                    {productEditStatus}
+                  </div>
+                )}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
-                  <button onClick={() => setEditProduct(null)} style={{ background: '#222', color: '#aaa', border: '1px solid #444', borderRadius: '6px', padding: '0.55rem', cursor: 'pointer', fontWeight: 700 }}>
+                  <button onClick={() => {
+                    setEditProduct(null);
+                    setProductEditStatus('');
+                  }} style={{ background: '#222', color: '#aaa', border: '1px solid #444', borderRadius: '6px', padding: '0.55rem', cursor: 'pointer', fontWeight: 700 }}>
                     Cancel
                   </button>
                   <button onClick={queueStructuredEdit} disabled={loading} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.55rem', cursor: 'pointer', fontWeight: 700 }}>

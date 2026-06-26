@@ -89,6 +89,12 @@ function isSafeProductSlug(slug: string) {
   return /^[a-z0-9][a-z0-9/-]*[a-z0-9]$/.test(slug) && !slug.includes('..') && !slug.includes('//');
 }
 
+function productPathCandidates(slug: string) {
+  const paths = [`src/content/products/${slug}.md`];
+  if (!slug.includes('/')) paths.push(`src/content/products/accessories/${slug}.md`);
+  return paths;
+}
+
 async function githubFetch(path: string): Promise<string | null> {
   if (!GITHUB_TOKEN || !GITHUB_REPO) return null;
   const res = await fetch(
@@ -210,10 +216,18 @@ export const handler: Handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: 'Gallery must include at least one image' }) };
   }
 
-  const path = `src/content/products/${slug}.md`;
-  const current = await githubFetch(path);
+  const candidates = productPathCandidates(slug);
+  let path = candidates[0];
+  let current: string | null = null;
+  for (const candidate of candidates) {
+    current = await githubFetch(candidate);
+    if (current) {
+      path = candidate;
+      break;
+    }
+  }
   if (!current) {
-    return { statusCode: 404, body: JSON.stringify({ error: `Could not read ${path}` }) };
+    return { statusCode: 404, body: JSON.stringify({ error: `Could not read product file for ${slug}` }) };
   }
 
   let parsed;
