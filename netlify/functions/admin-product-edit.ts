@@ -300,21 +300,25 @@ export const handler: Handler = async (event) => {
   if (isStoreProduct) {
     if (payload.weight !== undefined) {
       const parsedWeight = parseNumberInput(payload.weight);
-      if (parsedWeight === undefined || parsedWeight <= 0) return { statusCode: 400, body: JSON.stringify({ error: 'Shop weight must be numeric' }) };
-      data.weight = parsedWeight;
+      if (parsedWeight === undefined || parsedWeight <= 0) delete data.weight;
+      else data.weight = parsedWeight;
     }
     const parsedLength = payload.dimensionLength !== undefined ? parseNumberInput(payload.dimensionLength) : undefined;
     const parsedWidth = payload.dimensionWidth !== undefined ? parseNumberInput(payload.dimensionWidth) : undefined;
     const parsedHeight = payload.dimensionHeight !== undefined ? parseNumberInput(payload.dimensionHeight) : undefined;
     if (payload.dimensionLength !== undefined || payload.dimensionWidth !== undefined || payload.dimensionHeight !== undefined) {
-      if (parsedLength === undefined || parsedLength <= 0 || parsedWidth === undefined || parsedWidth <= 0 || parsedHeight === undefined || parsedHeight <= 0) {
-        return { statusCode: 400, body: JSON.stringify({ error: 'Shop dimensions must be numeric' }) };
+      const hasAnyDimension = Boolean(payload.dimensionLength?.trim() || payload.dimensionWidth?.trim() || payload.dimensionHeight?.trim());
+      if (!hasAnyDimension) {
+        delete data.dimensions;
+      } else if (parsedLength === undefined || parsedLength <= 0 || parsedWidth === undefined || parsedWidth <= 0 || parsedHeight === undefined || parsedHeight <= 0) {
+        return { statusCode: 400, body: JSON.stringify({ error: 'Complete all item dimensions, or leave all item dimension fields blank' }) };
+      } else {
+        data.dimensions = {
+          length: parsedLength,
+          width: parsedWidth,
+          height: parsedHeight,
+        };
       }
-      data.dimensions = {
-        length: parsedLength,
-        width: parsedWidth,
-        height: parsedHeight,
-      };
     }
     if (payload.pickupLocation !== undefined) {
       const value = cleanString(payload.pickupLocation);

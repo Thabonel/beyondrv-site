@@ -28,9 +28,20 @@ const stockLabel = stockData ? availabilityLabel(stockData.availability) : null;
 const fulfilment = stockData ? fulfilmentInfo(stockData.fulfilmentType) : null;
 const sourceType = stockData?.sourceType ?? 'other';
 const sourceTypeText = stockData ? sourceTypeLabel(sourceType) : '';
+const hasItemSpecs = Boolean(stockData?.weight && stockData?.dimensions);
 const { Content } = await product.render();
 const unitPrice = shopProductPrice(data.price);
 const productUrl = `https://beyondrv.com.au/shop/${data.slug}/`;
+const itemAdditionalProperty = stockData && hasItemSpecs && stockData.weight && stockData.dimensions
+  ? [
+      { '@type': 'PropertyValue', name: 'Item weight', value: `${stockData.weight} kg` },
+      {
+        '@type': 'PropertyValue',
+        name: 'Item dimensions',
+        value: `${stockData.dimensions.length} × ${stockData.dimensions.width} × ${stockData.dimensions.height} cm`,
+      },
+    ]
+  : undefined;
 const structuredData = [
   {
     '@context': 'https://schema.org',
@@ -49,18 +60,7 @@ const structuredData = [
         ? { availability: availabilitySchema(stockData.availability) }
         : {}),
     },
-    ...(stockData
-      ? {
-          additionalProperty: [
-            { '@type': 'PropertyValue', name: 'Weight', value: `${stockData.weight} kg` },
-            {
-              '@type': 'PropertyValue',
-              name: 'Dimensions',
-              value: `${stockData.dimensions.length} × ${stockData.dimensions.width} × ${stockData.dimensions.height} cm`,
-            },
-          ],
-        }
-      : {}),
+    ...(itemAdditionalProperty ? { additionalProperty: itemAdditionalProperty } : {}),
   },
   {
     '@context': 'https://schema.org',
@@ -137,7 +137,7 @@ const mainImageSrcSet = imageSrcSet(data.images[0], [480, 800, 1200]);
         {stockData?.containerEtaDate && <p class="shop-detail-meta">ETA date: {stockData.containerEtaDate}</p>}
         {stockData?.sourceType && <p class="shop-detail-meta">{sourceTypeText}</p>}
 
-        {stockData && (
+        {stockData && hasItemSpecs && stockData.weight && stockData.dimensions && (
           <dl class="shop-product-specs">
             <div><dt>Item weight</dt><dd>{stockData.weight} kg</dd></div>
             <div><dt>Item dimensions</dt><dd>{stockData.dimensions.length} &times; {stockData.dimensions.width} &times; {stockData.dimensions.height} cm</dd></div>

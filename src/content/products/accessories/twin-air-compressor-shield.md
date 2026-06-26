@@ -17,11 +17,6 @@ images:
   - "/images/optimized/products/accessories/twin-air-compressor-shield/10-10-twin-air-compressor-shield.webp"
   - "/images/optimized/products/accessories/twin-air-compressor-shield/11-11-twin-air-compressor-shield.webp"
 productType: stock
-weight: 1
-dimensions:
-  length: 32
-  width: 51
-  height: 22
 # Packed weight is estimated at 3.6 kg (no scale available). Confirm before treating live Australia Post rates as final.
 packedLengthCm: 51
 packedWidthCm: 32

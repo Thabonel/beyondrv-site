@@ -100,12 +100,12 @@ const shopBase = {
 const stockProduct = z.object({
   ...shopBase,
   productType:   z.literal('stock'),
-  weight:        z.number().positive(),
+  weight:        z.number().positive().optional(),
   dimensions:    z.object({
     length: z.number().positive(),
     width:  z.number().positive(),
     height: z.number().positive(),
-  }),
+  }).optional(),
   availability:  z.enum(['available_in_australia', 'coming_next_container', 'made_to_order', 'ask_availability', 'unavailable']),
   purchasableOnline: z.boolean().default(false),
   fulfilmentType: z.enum(['ship', 'pickup', 'install', 'quote_required']).default('quote_required'),

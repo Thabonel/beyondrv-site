@@ -2919,10 +2919,6 @@ export default function AdminPanel() {
 
     if (editProduct.store && editProduct.productType === 'stock') {
       const stockMissing = [
-        !editProduct.weight.trim() && 'weight',
-        !editProduct.dimensionLength.trim() && 'length',
-        !editProduct.dimensionWidth.trim() && 'width',
-        !editProduct.dimensionHeight.trim() && 'height',
         editProduct.fulfilmentType === 'ship' && !editProduct.packedWeightKg.trim() && 'packed weight',
         editProduct.fulfilmentType === 'ship' && !editProduct.packedLengthCm.trim() && 'packed length',
         editProduct.fulfilmentType === 'ship' && !editProduct.packedWidthCm.trim() && 'packed width',
@@ -3098,10 +3094,6 @@ export default function AdminPanel() {
       !newProduct.heroImage.trim() && 'hero photo',
       gallery.length === 0 && 'gallery photos',
       newProduct.mode === 'business' && !newProduct.keySpecs.trim() && 'key specs',
-      newProduct.mode === 'shop' && newProduct.productType === 'stock' && !newProduct.weight.trim() && 'weight',
-      newProduct.mode === 'shop' && newProduct.productType === 'stock' && !newProduct.dimensionLength.trim() && 'length',
-      newProduct.mode === 'shop' && newProduct.productType === 'stock' && !newProduct.dimensionWidth.trim() && 'width',
-      newProduct.mode === 'shop' && newProduct.productType === 'stock' && !newProduct.dimensionHeight.trim() && 'height',
       newProduct.mode === 'shop' && newProduct.productType === 'stock' && newProduct.fulfilmentType === 'ship' && !newProduct.packedWeightKg.trim() && 'packed weight',
       newProduct.mode === 'shop' && newProduct.productType === 'stock' && newProduct.fulfilmentType === 'ship' && !newProduct.packedLengthCm.trim() && 'packed length',
       newProduct.mode === 'shop' && newProduct.productType === 'stock' && newProduct.fulfilmentType === 'ship' && !newProduct.packedWidthCm.trim() && 'packed width',
@@ -3187,13 +3179,14 @@ export default function AdminPanel() {
         ? `\nProduct type: stock\n` +
           `Fulfilment type: ${newProduct.fulfilmentType}\n` +
           `Shipping size: ${newProduct.shippingSize}\n` +
-          `Weight: ${newProduct.weight.trim()}\n` +
-          `Dimensions (L x W x H cm): ${newProduct.dimensionLength.trim()} x ${newProduct.dimensionWidth.trim()} x ${newProduct.dimensionHeight.trim()}\n` +
+          `Actual item weight kg, before packaging: ${newProduct.weight.trim() || 'not provided'}\n` +
+          `Actual item dimensions cm, before packaging: ${newProduct.dimensionLength.trim() && newProduct.dimensionWidth.trim() && newProduct.dimensionHeight.trim() ? `${newProduct.dimensionLength.trim()} x ${newProduct.dimensionWidth.trim()} x ${newProduct.dimensionHeight.trim()}` : 'not provided'}\n` +
           `Pickup location: ${newProduct.pickupLocation.trim() || 'none'}\n` +
           `Requires installation: ${newProduct.requiresInstallation ? 'yes' : 'no'}\n` +
           `Packed weight kg: ${newProduct.fulfilmentType === 'ship' ? newProduct.packedWeightKg.trim() : 'none'}\n` +
           `Packed dimensions cm: ${newProduct.fulfilmentType === 'ship' ? `${newProduct.packedLengthCm.trim()} x ${newProduct.packedWidthCm.trim()} x ${newProduct.packedHeightCm.trim()}` : 'none'}\n` +
-          `Shipping data status: ${newProduct.fulfilmentType === 'ship' ? newProduct.shippingDataStatus : 'none'}`
+          `Shipping data status: ${newProduct.fulfilmentType === 'ship' ? newProduct.shippingDataStatus : 'none'}\n` +
+          `Do not copy packed box specs into item specs. If actual item specs are not provided, omit weight and dimensions from frontmatter.`
         : `\nProduct type: service\nFulfilment type: ${newProduct.fulfilmentType}\nShipping size: none\n`;
 
       sendMessage(
