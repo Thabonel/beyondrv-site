@@ -237,6 +237,7 @@
       "advent-2450-hardtop-slide-on",
       "7ft-electric-poptop-slide-on"
     ],
+    "onlinePurchaseEnabled": true,
     "keySpecs": [
       {
         "label": "Base",
@@ -293,6 +294,7 @@
       "advent-2450-hardtop-slide-on",
       "7ft-electric-poptop-slide-on"
     ],
+    "onlinePurchaseEnabled": true,
     "youtubeVideo": {
       "id": "J95sJbwJSQ8",
       "title": "Beyond RV Advent 2300 Walkthrough",
@@ -364,6 +366,7 @@
       "advent-2300-hardtop-slide-on",
       "7ft-electric-poptop-slide-on"
     ],
+    "onlinePurchaseEnabled": true,
     "youtubeVideo": {
       "id": "B8up0wM7f3w",
       "title": "Beyond RV Advent 2450 Walkthrough",
@@ -746,6 +749,7 @@
       "sunpatch-19xc-hardtop-couples-offroad-van",
       "sunpatch-21xf-hardtop-family-offroad-van"
     ],
+    "onlinePurchaseEnabled": true,
     "suitabilityData": {
       "status": "draft"
     },
@@ -802,6 +806,7 @@
       "sunpatch-19xc-hardtop-couples-offroad-van",
       "sunpatch-21xf-hardtop-family-offroad-van"
     ],
+    "onlinePurchaseEnabled": true,
     "youtubeVideo": {
       "id": "u8fwCR5yeJw",
       "title": "Beyond RV Sunpatch 15-XC Walkthrough",
@@ -850,6 +855,7 @@
       "sunpatch-15xc-couples-offroad-van",
       "sunpatch-21xf-hardtop-family-offroad-van"
     ],
+    "onlinePurchaseEnabled": true,
     "keySpecs": [
       {
         "label": "Layout",
@@ -904,6 +910,7 @@
       "sunpatch-15xc-couples-offroad-van",
       "sunpatch-19xc-hardtop-couples-offroad-van"
     ],
+    "onlinePurchaseEnabled": true,
     "youtubeVideo": {
       "id": "LhvLFQbvruc",
       "title": "SUNPATCH 21-XF FAMILY OFFROAD CARAVAN SHOWCASE",
