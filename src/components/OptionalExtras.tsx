@@ -1,52 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { OPTIONAL_EXTRA_CATEGORIES } from '../data/optional-extras';
 
 interface Props {
   basePrice: string;
   productSlug: string;
   productName: string;
 }
-
-const EXTRAS = [
-  {
-    category: 'Power & Electrical',
-    items: [
-      { id: 'battery',  label: 'Extra 200Ah battery',                        price: 1500 },
-      { id: 'inverter', label: 'Upgrade to 3000W Redarc inverter',           price: 3500 },
-      { id: 'solar',    label: 'Additional 200W solar panel',                price: 500  },
-    ],
-  },
-  {
-    category: 'Heating & Cooling',
-    items: [
-      { id: 'heater-aufocus', label: '2kW AuFocus diesel heater supply and install',                    price: 2000 },
-      { id: 'heater-truma',   label: 'Upgrade to Truma Combi D6 diesel air and water heater',          price: 3500 },
-    ],
-  },
-  {
-    category: 'Connectivity',
-    items: [
-      { id: 'starlink', label: 'Starlink Mini supply and install', price: 1500 },
-    ],
-  },
-  {
-    category: 'Water Systems',
-    items: [
-      { id: 'greywater', label: '40L greywater tank with 12V sump pump', price: 1000 },
-    ],
-  },
-  {
-    category: 'Exterior Finish',
-    items: [
-      { id: 'gelcoat-colour', label: 'Custom gel-coat colour matching', price: 3000 },
-    ],
-  },
-  {
-    category: 'Vehicle Connection',
-    items: [
-      { id: 'anderson', label: 'Anderson Plug supply and install to vehicle', price: 300 },
-    ],
-  },
-];
 
 function formatPrice(n: number) {
   return '$' + n.toLocaleString('en-AU');
@@ -56,9 +15,29 @@ export default function OptionalExtras({ basePrice, productSlug, productName }: 
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const basePriceNum = parseInt(basePrice.replace(/[^0-9]/g, ''), 10) || null;
-  const extrasTotal = EXTRAS.flatMap(c => c.items)
+  const selectedExtraIds = OPTIONAL_EXTRA_CATEGORIES.flatMap(c => c.items)
+    .filter(i => selected.has(i.id))
+    .map(i => i.id);
+  const extrasTotal = OPTIONAL_EXTRA_CATEGORIES.flatMap(c => c.items)
     .filter(i => selected.has(i.id))
     .reduce((sum, i) => sum + i.price, 0);
+  const configuredTotal = basePriceNum ? basePriceNum + extrasTotal : null;
+
+  useEffect(() => {
+    const detail = {
+      productSlug,
+      selectedExtraIds,
+      extrasTotal,
+      configuredTotal,
+    };
+    const checkoutRoot = document.querySelector<HTMLElement>('[data-stripe-product]');
+    if (checkoutRoot) {
+      checkoutRoot.dataset.selectedExtraIds = selectedExtraIds.join(',');
+      checkoutRoot.dataset.extrasTotal = String(extrasTotal);
+      checkoutRoot.dataset.configuredTotal = configuredTotal ? String(configuredTotal) : '';
+    }
+    window.dispatchEvent(new CustomEvent('byondrv:extras-change', { detail }));
+  }, [productSlug, selectedExtraIds.join(','), extrasTotal, configuredTotal]);
 
   function toggle(id: string) {
     setSelected(prev => {
@@ -69,7 +48,7 @@ export default function OptionalExtras({ basePrice, productSlug, productName }: 
   }
 
   function buildEnquiryUrl() {
-    const selectedItems = EXTRAS.flatMap(c =>
+    const selectedItems = OPTIONAL_EXTRA_CATEGORIES.flatMap(c =>
       c.items.filter(i => selected.has(i.id)).map(i => `${i.label} (${formatPrice(i.price)})`)
     );
     const extrasStr = selectedItems.length
@@ -84,7 +63,7 @@ export default function OptionalExtras({ basePrice, productSlug, productName }: 
       <p className="extras-subtitle">Select optional extras below — prices are added to your base configuration.</p>
 
       <div className="extras-grid">
-        {EXTRAS.map(cat => (
+        {OPTIONAL_EXTRA_CATEGORIES.map(cat => (
           <div key={cat.category} className="extras-category">
             <h3 className="extras-category-title">{cat.category}</h3>
             {cat.items.map(item => (
@@ -110,7 +89,7 @@ export default function OptionalExtras({ basePrice, productSlug, productName }: 
             <span className="extras-plus">+</span>
             <span>Extras: <strong>{formatPrice(extrasTotal)}</strong></span>
             <span className="extras-plus">=</span>
-            <span className="extras-grand-total">Total: <strong>{formatPrice(basePriceNum + extrasTotal)}</strong></span>
+            <span className="extras-grand-total">Configured total: <strong>{formatPrice(basePriceNum + extrasTotal)}</strong></span>
           </div>
         ) : (
           <div className="extras-total-breakdown">

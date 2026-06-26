@@ -348,7 +348,15 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
         </div>
       )}
 
-      <div class="product-ctas" data-stripe-product data-product-slug={product.slug} data-product-title={data.title}>
+      <div
+        class="product-ctas"
+        data-stripe-product
+        data-product-slug={product.slug}
+        data-product-title={data.title}
+        data-base-price={parsedPrice}
+        data-deposit-percent={configuredDepositPercent}
+        data-selected-extra-ids=""
+      >
         {canDeposit || canFullPayment ? (
           <>
             {canDeposit && (
@@ -622,13 +630,69 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
   const heroImg = document.getElementById('productHeroImg') as HTMLImageElement | null;
   const thumbButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.thumb-btn'));
   const galleryCurrent = document.querySelector<HTMLElement>('[data-gallery-current]');
-  const checkoutRoot = document.querySelector<HTMLElement>('[data-stripe-product]');
-  const checkoutError = document.querySelector<HTMLElement>('[data-payment-error]');
-  const noticeModal = document.querySelector<HTMLElement>('[data-checkout-notice]');
-  const noticeSummary = document.querySelector<HTMLElement>('[data-checkout-notice-summary]');
-  const noticeContinue = document.querySelector<HTMLButtonElement>('[data-checkout-notice-continue]');
-  const noticeCancelButtons = document.querySelectorAll<HTMLElement>('[data-checkout-notice-cancel]');
-  let pendingCheckoutButton: HTMLButtonElement | null = null;
+const checkoutRoot = document.querySelector<HTMLElement>('[data-stripe-product]');
+const checkoutError = document.querySelector<HTMLElement>('[data-payment-error]');
+const noticeModal = document.querySelector<HTMLElement>('[data-checkout-notice]');
+const noticeSummary = document.querySelector<HTMLElement>('[data-checkout-notice-summary]');
+const noticeContinue = document.querySelector<HTMLButtonElement>('[data-checkout-notice-continue]');
+const noticeCancelButtons = document.querySelectorAll<HTMLElement>('[data-checkout-notice-cancel]');
+const paymentNoteEl = document.querySelector<HTMLElement>('[data-payment-note]');
+const depositCheckoutButton = checkoutRoot?.querySelector<HTMLButtonElement>('[data-stripe-checkout][data-purchase-type="deposit"]');
+const fullCheckoutButton = checkoutRoot?.querySelector<HTMLButtonElement>('[data-stripe-checkout][data-purchase-type="full"]');
+const defaultPaymentNote = paymentNoteEl?.textContent?.trim() || 'Secure checkout via Stripe.';
+let pendingCheckoutButton: HTMLButtonElement | null = null;
+let selectedExtraIds: string[] = [];
+
+function formatCheckoutMoney(amount: number, includeCents = true) {
+  if (!Number.isFinite(amount)) return includeCents ? '$0.00' : '$0';
+  return amount.toLocaleString('en-AU', {
+    style: 'currency',
+    currency: 'AUD',
+    minimumFractionDigits: includeCents ? 2 : 0,
+    maximumFractionDigits: includeCents ? 2 : 0,
+  });
+}
+
+function configuredCheckoutTotal() {
+  const configured = Number(checkoutRoot?.dataset.configuredTotal);
+  const base = Number(checkoutRoot?.dataset.basePrice);
+  return Number.isFinite(configured) && configured > 0 ? configured : base;
+}
+
+function configuredDepositAmount() {
+  const total = configuredCheckoutTotal();
+  const percent = Number(checkoutRoot?.dataset.depositPercent);
+  const depositPercent = Number.isFinite(percent) && percent > 0 && percent <= 1 ? percent : 1 / 3;
+  return Math.max(1, Math.round(total * depositPercent));
+}
+
+function selectedExtraIdsFromRoot() {
+  return (checkoutRoot?.dataset.selectedExtraIds ?? '')
+    .split(',')
+    .map((id) => id.trim())
+    .filter(Boolean);
+}
+
+function updateConfiguredCheckoutText() {
+  selectedExtraIds = selectedExtraIdsFromRoot();
+  const total = configuredCheckoutTotal();
+  const hasExtras = selectedExtraIds.length > 0;
+  if (depositCheckoutButton) {
+    depositCheckoutButton.textContent = `Buy Now - Deposit ${formatCheckoutMoney(configuredDepositAmount())}`;
+  }
+  if (fullCheckoutButton) {
+    fullCheckoutButton.textContent = `Buy Now - Full Price ${formatCheckoutMoney(total, false)}`;
+  }
+  if (paymentNoteEl) {
+    paymentNoteEl.textContent = hasExtras
+      ? `Secure checkout via Stripe. Payment is based on your configured total of ${formatCheckoutMoney(total, false)}, including selected extras.`
+      : defaultPaymentNote;
+  }
+}
+
+window.addEventListener('byondrv:extras-change', () => {
+  updateConfiguredCheckoutText();
+});
 
   function openCheckoutNotice(button: HTMLButtonElement) {
     if (!noticeModal) return false;
@@ -637,8 +701,8 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
     if (noticeSummary) {
       const productTitle = checkoutRoot?.dataset.productTitle || 'this product';
       noticeSummary.textContent = purchaseType === 'deposit'
-        ? `You are about to pay a ${button.textContent?.replace(/^Buy Now -\s*/i, '').trim() || 'deposit'} for ${productTitle}.`
-        : `You are about to continue to secure checkout for ${productTitle}.`;
+        ? `You are about to pay a ${formatCheckoutMoney(configuredDepositAmount())} deposit for ${productTitle}, based on the configured total of ${formatCheckoutMoney(configuredCheckoutTotal(), false)}.`
+        : `You are about to pay the configured total of ${formatCheckoutMoney(configuredCheckoutTotal(), false)} for ${productTitle}.`;
     }
     noticeModal.hidden = false;
     document.body.style.overflow = 'hidden';
@@ -742,7 +806,7 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug, type: purchaseType }),
+        body: JSON.stringify({ slug, type: purchaseType, selectedExtraIds }),
       });
       const data = await response.json().catch(() => ({}));
 
@@ -776,4 +840,6 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
 
     if (!openCheckoutNotice(button)) void startStripeCheckout(button);
   });
+
+  updateConfiguredCheckoutText();
 </script>
