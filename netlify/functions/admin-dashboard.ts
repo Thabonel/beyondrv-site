@@ -27,7 +27,7 @@ type LeadStatusValue = 'new' | 'contacted' | 'replied' | 'called' | 'qualified' 
 interface ProductRecord {
   slug: string;
   title: string;
-  price: string;
+  price: string | number;
   status: string;
   category: string;
   featured?: boolean;
@@ -152,7 +152,8 @@ function daysAgo(days: number) {
   return date;
 }
 
-function parsePrice(price: string) {
+function parsePrice(price: string | number | null | undefined) {
+  if (typeof price === 'number') return Number.isFinite(price) ? Math.round(price) : 0;
   if (!price || /poa|contact|tba|coming/i.test(price)) return 0;
   const match = price.replace(/,/g, '').match(/\$?\s*(\d+(?:\.\d+)?)/);
   return match ? Math.round(Number(match[1])) : 0;
