@@ -3162,7 +3162,7 @@ export default function AdminPanel() {
         `Create a new ${newProduct.category} product page using the existing product markdown format.\n\n` +
         `Title: ${newProduct.title.trim()}\n` +
         `Price: ${newProduct.price.trim()}\n` +
-        `Compare-at price: none\n` +
+        `Original price / was price: none\n` +
         `Sale label: none\n` +
         `Tagline: ${newProduct.tagline.trim()}\n` +
         `Status: available\n` +
@@ -3737,7 +3737,7 @@ export default function AdminPanel() {
                 />
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.4rem' }}>
                   <input value={editProduct.price} onChange={e => setEditProduct(p => p && ({ ...p, price: e.target.value }))} placeholder="$72,000" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                  <input value={editProduct.compareAtPrice} onChange={e => setEditProduct(p => p && ({ ...p, compareAtPrice: e.target.value }))} placeholder="Compare-at price" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                  <input value={editProduct.compareAtPrice} onChange={e => setEditProduct(p => p && ({ ...p, compareAtPrice: e.target.value }))} placeholder="Original price / was price" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                   <select value={editProduct.status} onChange={e => setEditProduct(p => p && ({ ...p, status: e.target.value as ProductStatus }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
                     <option value="available">Available</option>
                     <option value="on-sale">On sale</option>
