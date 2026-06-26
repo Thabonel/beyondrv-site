@@ -3776,7 +3776,7 @@ export default function AdminPanel() {
                   <div style={{ display: 'grid', gap: '0.45rem', border: '1px solid #333', borderRadius: '6px', padding: '0.6rem', background: '#101010' }}>
                     <div>
                       <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.78rem' }}>Shop Details</div>
-                      <div style={{ color: '#777', fontSize: '0.68rem', marginTop: '0.15rem', lineHeight: 1.35 }}>Keep the fields simple. Stock items need weight and dimensions so the cart and shipping logic can work.</div>
+                      <div style={{ color: '#777', fontSize: '0.68rem', marginTop: '0.15rem', lineHeight: 1.35 }}>Item specs are shown on the product page. Postage specs are the packed box/carton details used for shipping estimates.</div>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.4rem' }}>
                       <select value={editProduct.productType} onChange={e => setEditProduct(p => p && ({ ...p, productType: e.target.value as ShopProductType }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
@@ -3796,29 +3796,67 @@ export default function AdminPanel() {
                         <option value="oversized">Oversized</option>
                       </select>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem' }}>
-                      <input value={editProduct.weight} onChange={e => setEditProduct(p => p && ({ ...p, weight: e.target.value }))} placeholder="Weight kg" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.35rem' }}>
-                        <input value={editProduct.dimensionLength} onChange={e => setEditProduct(p => p && ({ ...p, dimensionLength: e.target.value }))} placeholder="L cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                        <input value={editProduct.dimensionWidth} onChange={e => setEditProduct(p => p && ({ ...p, dimensionWidth: e.target.value }))} placeholder="W cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                        <input value={editProduct.dimensionHeight} onChange={e => setEditProduct(p => p && ({ ...p, dimensionHeight: e.target.value }))} placeholder="H cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                    <div style={{ display: 'grid', gap: '0.4rem', border: '1px solid #2a2a2a', borderRadius: '6px', padding: '0.55rem', background: '#151515' }}>
+                      <div>
+                        <div style={{ color: '#eee', fontWeight: 700, fontSize: '0.73rem', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Item specs shown on product page</div>
+                        <div style={{ color: '#777', fontSize: '0.66rem', marginTop: '0.12rem', lineHeight: 1.35 }}>Use the actual item size and item weight before packaging.</div>
                       </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem' }}>
+                        <label style={{ display: 'grid', gap: '0.2rem', color: '#aaa', fontSize: '0.66rem' }}>
+                          Item weight (kg)
+                          <input value={editProduct.weight} onChange={e => setEditProduct(p => p && ({ ...p, weight: e.target.value }))} placeholder="Actual item weight" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        </label>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.35rem' }}>
+                          <label style={{ display: 'grid', gap: '0.2rem', color: '#aaa', fontSize: '0.66rem' }}>
+                            Item L (cm)
+                            <input value={editProduct.dimensionLength} onChange={e => setEditProduct(p => p && ({ ...p, dimensionLength: e.target.value }))} placeholder="Length" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                          </label>
+                          <label style={{ display: 'grid', gap: '0.2rem', color: '#aaa', fontSize: '0.66rem' }}>
+                            Item W (cm)
+                            <input value={editProduct.dimensionWidth} onChange={e => setEditProduct(p => p && ({ ...p, dimensionWidth: e.target.value }))} placeholder="Width" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                          </label>
+                          <label style={{ display: 'grid', gap: '0.2rem', color: '#aaa', fontSize: '0.66rem' }}>
+                            Item H (cm)
+                            <input value={editProduct.dimensionHeight} onChange={e => setEditProduct(p => p && ({ ...p, dimensionHeight: e.target.value }))} placeholder="Height" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem' }}>
                       <input value={editProduct.pickupLocation} onChange={e => setEditProduct(p => p && ({ ...p, pickupLocation: e.target.value }))} placeholder="Pickup location" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                       <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#ddd', fontSize: '0.78rem' }}>
                         <input type="checkbox" checked={editProduct.requiresInstallation} onChange={e => setEditProduct(p => p && ({ ...p, requiresInstallation: e.target.checked }))} />
                         Requires installation
                       </label>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '0.4rem' }}>
-                      <input value={editProduct.packedWeightKg} onChange={e => setEditProduct(p => p && ({ ...p, packedWeightKg: e.target.value }))} placeholder="Packed weight kg" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                      <input value={editProduct.packedLengthCm} onChange={e => setEditProduct(p => p && ({ ...p, packedLengthCm: e.target.value }))} placeholder="Packed L cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                      <input value={editProduct.packedWidthCm} onChange={e => setEditProduct(p => p && ({ ...p, packedWidthCm: e.target.value }))} placeholder="Packed W cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                      <input value={editProduct.packedHeightCm} onChange={e => setEditProduct(p => p && ({ ...p, packedHeightCm: e.target.value }))} placeholder="Packed H cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                    <div style={{ display: 'grid', gap: '0.4rem', border: '1px solid #2a2a2a', borderRadius: '6px', padding: '0.55rem', background: '#151515' }}>
+                      <div>
+                        <div style={{ color: '#eee', fontWeight: 700, fontSize: '0.73rem', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Postage / packed box specs</div>
+                        <div style={{ color: '#777', fontSize: '0.66rem', marginTop: '0.12rem', lineHeight: 1.35 }}>Use the boxed/carton size and packed weight. These can be bigger and heavier than the item.</div>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '0.4rem' }}>
+                        <label style={{ display: 'grid', gap: '0.2rem', color: '#aaa', fontSize: '0.66rem' }}>
+                          Boxed weight (kg)
+                          <input value={editProduct.packedWeightKg} onChange={e => setEditProduct(p => p && ({ ...p, packedWeightKg: e.target.value }))} placeholder="Packed weight" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        </label>
+                        <label style={{ display: 'grid', gap: '0.2rem', color: '#aaa', fontSize: '0.66rem' }}>
+                          Boxed L (cm)
+                          <input value={editProduct.packedLengthCm} onChange={e => setEditProduct(p => p && ({ ...p, packedLengthCm: e.target.value }))} placeholder="Box length" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        </label>
+                        <label style={{ display: 'grid', gap: '0.2rem', color: '#aaa', fontSize: '0.66rem' }}>
+                          Boxed W (cm)
+                          <input value={editProduct.packedWidthCm} onChange={e => setEditProduct(p => p && ({ ...p, packedWidthCm: e.target.value }))} placeholder="Box width" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        </label>
+                        <label style={{ display: 'grid', gap: '0.2rem', color: '#aaa', fontSize: '0.66rem' }}>
+                          Boxed H (cm)
+                          <input value={editProduct.packedHeightCm} onChange={e => setEditProduct(p => p && ({ ...p, packedHeightCm: e.target.value }))} placeholder="Box height" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        </label>
+                      </div>
+                      <select value={editProduct.shippingDataStatus} onChange={e => setEditProduct(p => p && ({ ...p, shippingDataStatus: e.target.value as ShopShippingDataStatus }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
+                        <option value="estimated">Estimated shipping data</option>
+                        <option value="confirmed">Confirmed shipping data</option>
+                      </select>
                     </div>
-                    <select value={editProduct.shippingDataStatus} onChange={e => setEditProduct(p => p && ({ ...p, shippingDataStatus: e.target.value as ShopShippingDataStatus }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
-                      <option value="estimated">Estimated shipping data</option>
-                      <option value="confirmed">Confirmed shipping data</option>
-                    </select>
                   </div>
                 )}
                 <div style={{ display: 'grid', gridTemplateColumns: '150px minmax(0, 1fr)', gap: '0.55rem', alignItems: 'center', border: '1px solid #333', borderRadius: '6px', padding: '0.45rem', background: '#101010' }}>
