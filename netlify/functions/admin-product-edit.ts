@@ -12,22 +12,41 @@ type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 type SuitabilityDataStatus = 'draft' | 'target' | 'confirmed';
 type CommerceAvailability = 'available_in_australia' | 'coming_next_container' | 'made_to_order' | 'ask_availability' | 'unavailable';
 type SourceType = 'china_container' | 'local_supplier' | 'workshop_stock' | 'custom_made_to_order' | 'other';
+type ShopProductType = 'stock' | 'service';
+type ShopFulfilmentType = 'ship' | 'pickup' | 'install' | 'quote_required';
+type ShopShippingSize = 'small' | 'medium' | 'large' | 'oversized';
+type ShopShippingDataStatus = 'estimated' | 'confirmed';
 
 interface ProductEditPayload {
   slug?: string;
   title?: string;
+  category?: string;
   price?: string;
   compareAtPrice?: string;
   saleLabel?: string;
   status?: ProductStatus;
+  productType?: ShopProductType;
   availability?: CommerceAvailability;
   purchasableOnline?: boolean;
   depositEnabled?: boolean;
   fullPaymentEnabled?: boolean;
   sourceType?: SourceType;
+  fulfilmentType?: ShopFulfilmentType;
+  shippingSize?: ShopShippingSize;
   leadTimeText?: string;
   containerEtaText?: string;
   containerEtaDate?: string;
+  weight?: string;
+  dimensionLength?: string;
+  dimensionWidth?: string;
+  dimensionHeight?: string;
+  pickupLocation?: string;
+  requiresInstallation?: boolean;
+  packedWeightKg?: string;
+  packedLengthCm?: string;
+  packedWidthCm?: string;
+  packedHeightCm?: string;
+  shippingDataStatus?: ShopShippingDataStatus;
   onSale?: boolean;
   featured?: boolean;
   tagline?: string;
@@ -143,6 +162,13 @@ function parseMoneyInput(value = '') {
   return Number.isFinite(parsed) ? parsed : undefined;
 }
 
+function parseNumberInput(value = '') {
+  const cleaned = value.trim().replace(/[^0-9.]/g, '');
+  if (!cleaned) return undefined;
+  const parsed = Number(cleaned);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
 function cleanSuitabilityData(value: ProductEditPayload['suitabilityData']) {
   const status = ['draft', 'target', 'confirmed'].includes(value?.status ?? '') ? value!.status : 'draft';
   const data = {
@@ -176,7 +202,7 @@ export const handler: Handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: 'Invalid product slug' }) };
   }
 
-  const required = [payload.title, payload.price, payload.status, payload.tagline, payload.heroImage];
+  const required = [payload.title, payload.price, payload.status, payload.tagline, payload.heroImage, payload.category];
   if (required.some(value => typeof value !== 'string' || !value.trim())) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Missing required product fields' }) };
   }
@@ -200,6 +226,8 @@ export const handler: Handler = async (event) => {
   const data = parsed.data;
   const isStoreProduct = data.store === true;
   data.title = payload.title!.trim();
+  const category = payload.category!.trim();
+  data.category = category;
   if (isStoreProduct) {
     data.name = payload.title!.trim();
     const parsedPrice = parseMoneyInput(payload.price!);
@@ -207,10 +235,13 @@ export const handler: Handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'Price must be numeric for shop products' }) };
     }
     data.price = parsedPrice;
+    if (payload.productType) data.productType = payload.productType;
   } else {
     data.price = payload.price!.trim();
   }
-  data.status = payload.status;
+  if (!isStoreProduct) {
+    data.status = payload.status;
+  }
   data.onSale = Boolean(payload.onSale);
   data.featured = Boolean(payload.featured);
   data.tagline = payload.tagline!.trim();
@@ -232,9 +263,11 @@ export const handler: Handler = async (event) => {
   }
   if (payload.availability) data.availability = payload.availability;
   if (payload.purchasableOnline !== undefined) data.purchasableOnline = Boolean(payload.purchasableOnline);
-  if (payload.depositEnabled !== undefined) data.depositEnabled = Boolean(payload.depositEnabled);
-  if (payload.fullPaymentEnabled !== undefined) data.fullPaymentEnabled = Boolean(payload.fullPaymentEnabled);
+  if (!isStoreProduct && payload.depositEnabled !== undefined) data.depositEnabled = Boolean(payload.depositEnabled);
+  if (!isStoreProduct && payload.fullPaymentEnabled !== undefined) data.fullPaymentEnabled = Boolean(payload.fullPaymentEnabled);
   if (payload.sourceType) data.sourceType = payload.sourceType;
+  if (isStoreProduct && payload.fulfilmentType) data.fulfilmentType = payload.fulfilmentType;
+  if (isStoreProduct && payload.shippingSize) data.shippingSize = payload.shippingSize;
   if (payload.leadTimeText !== undefined) {
     const value = cleanString(payload.leadTimeText);
     if (value) data.leadTimeText = value;
@@ -249,6 +282,53 @@ export const handler: Handler = async (event) => {
     const value = cleanString(payload.containerEtaDate);
     if (value) data.containerEtaDate = value;
     else delete data.containerEtaDate;
+  }
+  if (isStoreProduct) {
+    if (payload.weight !== undefined) {
+      const parsedWeight = parseNumberInput(payload.weight);
+      if (parsedWeight === undefined || parsedWeight <= 0) return { statusCode: 400, body: JSON.stringify({ error: 'Shop weight must be numeric' }) };
+      data.weight = parsedWeight;
+    }
+    const parsedLength = payload.dimensionLength !== undefined ? parseNumberInput(payload.dimensionLength) : undefined;
+    const parsedWidth = payload.dimensionWidth !== undefined ? parseNumberInput(payload.dimensionWidth) : undefined;
+    const parsedHeight = payload.dimensionHeight !== undefined ? parseNumberInput(payload.dimensionHeight) : undefined;
+    if (payload.dimensionLength !== undefined || payload.dimensionWidth !== undefined || payload.dimensionHeight !== undefined) {
+      if (parsedLength === undefined || parsedLength <= 0 || parsedWidth === undefined || parsedWidth <= 0 || parsedHeight === undefined || parsedHeight <= 0) {
+        return { statusCode: 400, body: JSON.stringify({ error: 'Shop dimensions must be numeric' }) };
+      }
+      data.dimensions = {
+        length: parsedLength,
+        width: parsedWidth,
+        height: parsedHeight,
+      };
+    }
+    if (payload.pickupLocation !== undefined) {
+      const value = cleanString(payload.pickupLocation);
+      if (value) data.pickupLocation = value;
+      else delete data.pickupLocation;
+    }
+    if (payload.requiresInstallation !== undefined) data.requiresInstallation = Boolean(payload.requiresInstallation);
+    if (payload.packedWeightKg !== undefined) {
+      const parsedPackedWeight = parseNumberInput(payload.packedWeightKg);
+      if (parsedPackedWeight === undefined || parsedPackedWeight <= 0) delete data.packedWeightKg;
+      else data.packedWeightKg = parsedPackedWeight;
+    }
+    if (payload.packedLengthCm !== undefined) {
+      const parsedPackedLength = parseNumberInput(payload.packedLengthCm);
+      if (parsedPackedLength === undefined || parsedPackedLength <= 0) delete data.packedLengthCm;
+      else data.packedLengthCm = parsedPackedLength;
+    }
+    if (payload.packedWidthCm !== undefined) {
+      const parsedPackedWidth = parseNumberInput(payload.packedWidthCm);
+      if (parsedPackedWidth === undefined || parsedPackedWidth <= 0) delete data.packedWidthCm;
+      else data.packedWidthCm = parsedPackedWidth;
+    }
+    if (payload.packedHeightCm !== undefined) {
+      const parsedPackedHeight = parseNumberInput(payload.packedHeightCm);
+      if (parsedPackedHeight === undefined || parsedPackedHeight <= 0) delete data.packedHeightCm;
+      else data.packedHeightCm = parsedPackedHeight;
+    }
+    if (payload.shippingDataStatus) data.shippingDataStatus = payload.shippingDataStatus;
   }
   if (payload.internalStockEstimate !== undefined) {
     const value = cleanString(payload.internalStockEstimate);

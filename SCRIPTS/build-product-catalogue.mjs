@@ -16,6 +16,8 @@ const PRODUCTS_DIR = join(ROOT, 'src/content/products');
 const OUTPUT_FILE = join(ROOT, 'netlify/functions/product-catalogue.json');
 const KNOWLEDGE_FILE = join(ROOT, 'src/data/chatbot-knowledge.md');
 const KNOWLEDGE_OUTPUT_FILE = join(ROOT, 'netlify/functions/chatbot-knowledge.json');
+const ADMIN_KNOWLEDGE_FILE = join(ROOT, 'src/data/admin-chat-knowledge.md');
+const ADMIN_KNOWLEDGE_OUTPUT_FILE = join(ROOT, 'netlify/functions/admin-chat-knowledge.json');
 const LLMS_OUTPUT_FILE = join(ROOT, 'public/llms.txt');
 const LLMS_FULL_OUTPUT_FILE = join(ROOT, 'public/llms-full.txt');
 
@@ -196,6 +198,16 @@ writeFileSync(
   JSON.stringify({ content: chatbotKnowledge }, null, 2) + '\n',
   'utf-8'
 );
+
+const adminChatbotKnowledge = existsSync(ADMIN_KNOWLEDGE_FILE)
+  ? readFileSync(ADMIN_KNOWLEDGE_FILE, 'utf-8').trim()
+  : '';
+writeFileSync(
+  ADMIN_KNOWLEDGE_OUTPUT_FILE,
+  JSON.stringify({ content: adminChatbotKnowledge }, null, 2) + '\n',
+  'utf-8'
+);
+console.log(`✓ Admin chat knowledge written: ${ADMIN_KNOWLEDGE_OUTPUT_FILE}`);
 
 console.log(`✓ Product catalogue written: ${OUTPUT_FILE}`);
 console.log(`✓ Chatbot knowledge written: ${KNOWLEDGE_OUTPUT_FILE}`);

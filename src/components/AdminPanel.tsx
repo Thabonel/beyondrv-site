@@ -42,11 +42,15 @@ interface PendingChange {
 }
 
 type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
-type PanelTab = 'dashboard' | 'products' | 'orders' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'drafts' | 'audit' | 'knowledge' | 'google' | 'matches' | 'reports' | 'pending';
+type PanelTab = 'dashboard' | 'products' | 'shop' | 'orders' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'drafts' | 'audit' | 'knowledge' | 'google' | 'matches' | 'reports' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 type CommerceAvailability = 'available_in_australia' | 'coming_next_container' | 'made_to_order' | 'ask_availability' | 'unavailable';
 type SourceType = 'china_container' | 'local_supplier' | 'workshop_stock' | 'custom_made_to_order' | 'other';
+type ShopProductType = 'stock' | 'service';
+type ShopFulfilmentType = 'ship' | 'pickup' | 'install' | 'quote_required';
+type ShopShippingSize = 'small' | 'medium' | 'large' | 'oversized';
+type ShopShippingDataStatus = 'estimated' | 'confirmed';
 type SuitabilityDataStatus = 'draft' | 'target' | 'confirmed';
 type EnquirySourceType = 'website_form' | 'manual_email' | 'phone_call' | 'facebook' | 'instagram' | 'referral' | 'walk_in' | 'other';
 type EnquiryQueueFilter = 'active' | 'needs-response' | 'follow-up-due' | 'hot' | 'all' | 'archived';
@@ -94,6 +98,7 @@ interface YoutubeVideoMeta {
 
 interface ProductRecord {
   store?: boolean;
+  productType?: ShopProductType;
   slug: string;
   title: string;
   name?: string;
@@ -109,9 +114,24 @@ interface ProductRecord {
   depositEnabled?: boolean;
   fullPaymentEnabled?: boolean;
   sourceType?: SourceType;
+  fulfilmentType?: ShopFulfilmentType;
+  shippingSize?: ShopShippingSize;
   leadTimeText?: string;
   containerEtaText?: string;
   containerEtaDate?: string;
+  weight?: number;
+  dimensions?: {
+    length: number;
+    width: number;
+    height: number;
+  };
+  pickupLocation?: string;
+  requiresInstallation?: boolean;
+  packedWeightKg?: number;
+  packedLengthCm?: number;
+  packedWidthCm?: number;
+  packedHeightCm?: number;
+  shippingDataStatus?: ShopShippingDataStatus;
   featured?: boolean;
   onSale?: boolean;
   heroImage?: string;
@@ -145,8 +165,9 @@ interface SuitabilityData {
 }
 
 interface NewProductForm {
+  mode: 'business' | 'shop';
   title: string;
-  category: ProductCategory;
+  category: string;
   price: string;
   tagline: string;
   keySpecs: string;
@@ -160,15 +181,9 @@ interface NewProductForm {
   youtubeVideoUploadDate: string;
   youtubeVideoDuration: string;
   youtubeVideoTranscriptSummary: string;
-}
-
-interface EditProductForm {
-  slug: string;
-  title: string;
-  price: string;
-  compareAtPrice: string;
-  saleLabel: string;
-  status: ProductStatus;
+  productType: ShopProductType;
+  fulfilmentType: ShopFulfilmentType;
+  shippingSize: ShopShippingSize;
   availability: CommerceAvailability;
   purchasableOnline: boolean;
   depositEnabled: boolean;
@@ -177,6 +192,50 @@ interface EditProductForm {
   leadTimeText: string;
   containerEtaText: string;
   containerEtaDate: string;
+  weight: string;
+  dimensionLength: string;
+  dimensionWidth: string;
+  dimensionHeight: string;
+  pickupLocation: string;
+  requiresInstallation: boolean;
+  packedWeightKg: string;
+  packedLengthCm: string;
+  packedWidthCm: string;
+  packedHeightCm: string;
+  shippingDataStatus: ShopShippingDataStatus;
+}
+
+interface EditProductForm {
+  store: boolean;
+  slug: string;
+  title: string;
+  price: string;
+  compareAtPrice: string;
+  saleLabel: string;
+  category: string;
+  productType: ShopProductType;
+  status: ProductStatus;
+  availability: CommerceAvailability;
+  purchasableOnline: boolean;
+  depositEnabled: boolean;
+  fullPaymentEnabled: boolean;
+  sourceType: SourceType;
+  fulfilmentType: ShopFulfilmentType;
+  shippingSize: ShopShippingSize;
+  leadTimeText: string;
+  containerEtaText: string;
+  containerEtaDate: string;
+  weight: string;
+  dimensionLength: string;
+  dimensionWidth: string;
+  dimensionHeight: string;
+  pickupLocation: string;
+  requiresInstallation: boolean;
+  packedWeightKg: string;
+  packedLengthCm: string;
+  packedWidthCm: string;
+  packedHeightCm: string;
+  shippingDataStatus: ShopShippingDataStatus;
   tagline: string;
   featured: boolean;
   onSale: boolean;
@@ -612,6 +671,7 @@ const VERDICT_STYLE: Record<JudgeDecision, { label: string; color: string; borde
 };
 
 const EMPTY_PRODUCT_FORM: NewProductForm = {
+  mode: 'business',
   title: '',
   category: 'slide-on',
   price: '',
@@ -627,6 +687,28 @@ const EMPTY_PRODUCT_FORM: NewProductForm = {
   youtubeVideoUploadDate: '',
   youtubeVideoDuration: '',
   youtubeVideoTranscriptSummary: '',
+  productType: 'stock',
+  fulfilmentType: 'ship',
+  shippingSize: 'medium',
+  availability: 'available_in_australia',
+  purchasableOnline: true,
+  depositEnabled: true,
+  fullPaymentEnabled: true,
+  sourceType: 'other',
+  leadTimeText: '',
+  containerEtaText: '',
+  containerEtaDate: '',
+  weight: '',
+  dimensionLength: '',
+  dimensionWidth: '',
+  dimensionHeight: '',
+  pickupLocation: '',
+  requiresInstallation: false,
+  packedWeightKg: '',
+  packedLengthCm: '',
+  packedWidthCm: '',
+  packedHeightCm: '',
+  shippingDataStatus: 'estimated',
 };
 
 const EMPTY_RECENT_BUILD: RecentBuild = {
@@ -739,6 +821,30 @@ const ORDER_STATUS_GROUPS: OrderStatus[] = [
   'delivered',
   'cancelled',
 ];
+
+const SHOP_PRODUCT_TYPE_LABELS: Record<ShopProductType, string> = {
+  stock: 'Stock item',
+  service: 'Service item',
+};
+
+const SHOP_FULFILMENT_LABELS: Record<ShopFulfilmentType, string> = {
+  ship: 'Ship',
+  pickup: 'Pickup',
+  install: 'Install',
+  quote_required: 'Quote required',
+};
+
+const SHOP_SHIPPING_SIZE_LABELS: Record<ShopShippingSize, string> = {
+  small: 'Small',
+  medium: 'Medium',
+  large: 'Large',
+  oversized: 'Oversized',
+};
+
+const SHOP_SHIPPING_DATA_STATUS_LABELS: Record<ShopShippingDataStatus, string> = {
+  estimated: 'Estimated',
+  confirmed: 'Confirmed',
+};
 
 function emptyOrderForm(): OrderForm {
   return {
@@ -1395,9 +1501,11 @@ export default function AdminPanel() {
   const [showChatDrawer, setShowChatDrawer] = useState(false);
   const [products, setProducts] = useState<ProductRecord[]>([]);
   const [productFilter, setProductFilter] = useState('');
+  const [shopFilter, setShopFilter] = useState('');
   const [productsLoading, setProductsLoading] = useState(true);
   const [newProduct, setNewProduct] = useState<NewProductForm>(EMPTY_PRODUCT_FORM);
   const [showNewProductForm, setShowNewProductForm] = useState(false);
+  const [newProductMode, setNewProductMode] = useState<'business' | 'shop'>('business');
   const [editProduct, setEditProduct] = useState<EditProductForm | null>(null);
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
@@ -1530,7 +1638,7 @@ export default function AdminPanel() {
   }, [activeTab]);
 
   useEffect(() => {
-    if (activeTab === 'orders' || activeTab === 'products') {
+    if (activeTab === 'orders' || activeTab === 'products' || activeTab === 'shop') {
       void loadOrders();
     }
   }, [activeTab]);
@@ -2658,20 +2766,36 @@ export default function AdminPanel() {
   function editFormFromProduct(product: ProductRecord): EditProductForm {
     const availability = product.availability ?? (product.status === 'coming-soon' ? 'coming_next_container' : 'available_in_australia');
     return {
+      store: Boolean(product.store),
       slug: product.slug,
       title: product.title,
       price: String(product.price),
       compareAtPrice: product.compareAtPrice !== undefined ? String(product.compareAtPrice) : '',
       saleLabel: product.saleLabel ?? '',
+      category: String(product.category ?? ''),
+      productType: product.productType ?? 'stock',
       status: (['available', 'on-sale', 'coming-soon'].includes(product.status) ? product.status : 'available') as ProductStatus,
       availability,
       purchasableOnline: product.purchasableOnline ?? (availability === 'available_in_australia'),
       depositEnabled: product.depositEnabled ?? (availability === 'available_in_australia'),
       fullPaymentEnabled: product.fullPaymentEnabled ?? (availability === 'available_in_australia'),
       sourceType: product.sourceType ?? 'other',
+      fulfilmentType: product.fulfilmentType ?? 'quote_required',
+      shippingSize: product.shippingSize ?? 'medium',
       leadTimeText: product.leadTimeText ?? '',
       containerEtaText: product.containerEtaText ?? '',
       containerEtaDate: product.containerEtaDate ?? '',
+      weight: product.weight !== undefined ? String(product.weight) : '',
+      dimensionLength: product.dimensions?.length !== undefined ? String(product.dimensions.length) : '',
+      dimensionWidth: product.dimensions?.width !== undefined ? String(product.dimensions.width) : '',
+      dimensionHeight: product.dimensions?.height !== undefined ? String(product.dimensions.height) : '',
+      pickupLocation: product.pickupLocation ?? '',
+      requiresInstallation: Boolean(product.requiresInstallation),
+      packedWeightKg: product.packedWeightKg !== undefined ? String(product.packedWeightKg) : '',
+      packedLengthCm: product.packedLengthCm !== undefined ? String(product.packedLengthCm) : '',
+      packedWidthCm: product.packedWidthCm !== undefined ? String(product.packedWidthCm) : '',
+      packedHeightCm: product.packedHeightCm !== undefined ? String(product.packedHeightCm) : '',
+      shippingDataStatus: product.shippingDataStatus ?? 'estimated',
       tagline: product.tagline,
       featured: Boolean(product.featured),
       onSale: Boolean(product.onSale),
@@ -2728,7 +2852,7 @@ export default function AdminPanel() {
     }
 
     setEditProduct(form);
-    setActiveTab('products');
+    setActiveTab(product.store ? 'shop' : 'products');
   }
 
   function queueKnowledgeUpdate() {
@@ -2772,6 +2896,7 @@ export default function AdminPanel() {
 
   function startStructuredEdit(product: ProductRecord) {
     setEditProduct(editFormFromProduct(product));
+    setActiveTab(product.store ? 'shop' : 'products');
   }
 
   function queueStructuredEdit() {
@@ -2786,6 +2911,23 @@ export default function AdminPanel() {
     if (missing.length) {
       setMessages(prev => [...prev, { role: 'assistant', content: `The product edit form needs: ${missing.join(', ')}.` }]);
       return;
+    }
+
+    if (editProduct.store && editProduct.productType === 'stock') {
+      const stockMissing = [
+        !editProduct.weight.trim() && 'weight',
+        !editProduct.dimensionLength.trim() && 'length',
+        !editProduct.dimensionWidth.trim() && 'width',
+        !editProduct.dimensionHeight.trim() && 'height',
+        editProduct.fulfilmentType === 'ship' && !editProduct.packedWeightKg.trim() && 'packed weight',
+        editProduct.fulfilmentType === 'ship' && !editProduct.packedLengthCm.trim() && 'packed length',
+        editProduct.fulfilmentType === 'ship' && !editProduct.packedWidthCm.trim() && 'packed width',
+        editProduct.fulfilmentType === 'ship' && !editProduct.packedHeightCm.trim() && 'packed height',
+      ].filter(Boolean);
+      if (stockMissing.length) {
+        setMessages(prev => [...prev, { role: 'assistant', content: `Shop stock items need: ${stockMissing.join(', ')}.` }]);
+        return;
+      }
     }
 
     const gallery = parseGalleryText(editProduct.galleryText);
@@ -2832,21 +2974,36 @@ export default function AdminPanel() {
     adminFetch('/.netlify/functions/admin-product-edit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      body: JSON.stringify({
           slug: editProduct.slug,
           title: editProduct.title.trim(),
+          category: editProduct.category.trim(),
           price: editProduct.price.trim(),
           compareAtPrice: editProduct.compareAtPrice.trim(),
           saleLabel: editProduct.saleLabel.trim(),
           status: editProduct.status,
+          productType: editProduct.productType,
           availability: editProduct.availability,
           purchasableOnline: editProduct.purchasableOnline,
           depositEnabled: editProduct.depositEnabled,
           fullPaymentEnabled: editProduct.fullPaymentEnabled,
           sourceType: editProduct.sourceType,
+          fulfilmentType: editProduct.fulfilmentType,
+          shippingSize: editProduct.shippingSize,
           leadTimeText: editProduct.leadTimeText.trim(),
           containerEtaText: editProduct.containerEtaText.trim(),
           containerEtaDate: editProduct.containerEtaDate.trim(),
+          weight: editProduct.weight.trim(),
+          dimensionLength: editProduct.dimensionLength.trim(),
+          dimensionWidth: editProduct.dimensionWidth.trim(),
+          dimensionHeight: editProduct.dimensionHeight.trim(),
+          pickupLocation: editProduct.pickupLocation.trim(),
+          requiresInstallation: editProduct.requiresInstallation,
+          packedWeightKg: editProduct.packedWeightKg.trim(),
+          packedLengthCm: editProduct.packedLengthCm.trim(),
+          packedWidthCm: editProduct.packedWidthCm.trim(),
+          packedHeightCm: editProduct.packedHeightCm.trim(),
+          shippingDataStatus: editProduct.shippingDataStatus,
           onSale: editProduct.onSale,
           featured: editProduct.featured,
           tagline: editProduct.tagline.trim(),
@@ -2915,10 +3072,19 @@ export default function AdminPanel() {
       !newProduct.title.trim() && 'title',
       !newProduct.price.trim() && 'price',
       !newProduct.tagline.trim() && 'tagline',
-      !newProduct.keySpecs.trim() && 'key specs',
+      !newProduct.category.trim() && 'category',
       !newProduct.description.trim() && 'description',
       !newProduct.heroImage.trim() && 'hero photo',
       gallery.length === 0 && 'gallery photos',
+      newProduct.mode === 'business' && !newProduct.keySpecs.trim() && 'key specs',
+      newProduct.mode === 'shop' && newProduct.productType === 'stock' && !newProduct.weight.trim() && 'weight',
+      newProduct.mode === 'shop' && newProduct.productType === 'stock' && !newProduct.dimensionLength.trim() && 'length',
+      newProduct.mode === 'shop' && newProduct.productType === 'stock' && !newProduct.dimensionWidth.trim() && 'width',
+      newProduct.mode === 'shop' && newProduct.productType === 'stock' && !newProduct.dimensionHeight.trim() && 'height',
+      newProduct.mode === 'shop' && newProduct.productType === 'stock' && newProduct.fulfilmentType === 'ship' && !newProduct.packedWeightKg.trim() && 'packed weight',
+      newProduct.mode === 'shop' && newProduct.productType === 'stock' && newProduct.fulfilmentType === 'ship' && !newProduct.packedLengthCm.trim() && 'packed length',
+      newProduct.mode === 'shop' && newProduct.productType === 'stock' && newProduct.fulfilmentType === 'ship' && !newProduct.packedWidthCm.trim() && 'packed width',
+      newProduct.mode === 'shop' && newProduct.productType === 'stock' && newProduct.fulfilmentType === 'ship' && !newProduct.packedHeightCm.trim() && 'packed height',
     ].filter(Boolean);
 
     if (missing.length) {
@@ -2953,47 +3119,82 @@ export default function AdminPanel() {
       return;
     }
 
-    if (videoId && !newProduct.youtubeVideoTitle.trim()) {
+    if (newProduct.mode === 'business' && videoId && !newProduct.youtubeVideoTitle.trim()) {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Add a short video title before queueing the new product draft.' }]);
       return;
     }
 
-    const videoInstructions = videoId
-      ? `YouTube video frontmatter:\n` +
-        `id: ${videoId}\n` +
-        `title: ${newProduct.youtubeVideoTitle.trim()}\n` +
-        `description: ${newProduct.youtubeVideoDescription.trim() || 'None'}\n` +
-        `thumbnail: ${newProduct.youtubeVideoThumbnail.trim() || youtubeThumbnailUrl(videoId)}\n` +
-        `uploadDate: ${newProduct.youtubeVideoUploadDate.trim() || 'None'}\n` +
-        `duration: ${newProduct.youtubeVideoDuration.trim() || 'None'}\n` +
-        `transcriptSummary: ${newProduct.youtubeVideoTranscriptSummary.trim() || 'None'}`
-      : `YouTube video frontmatter: None. Do not add a youtubeVideo block.`;
-
     setActiveTab('pending');
-    sendMessage(
-      `Create a new ${newProduct.category} product page using the existing product markdown format.\n\n` +
-      `Title: ${newProduct.title.trim()}\n` +
-      `Price: ${newProduct.price.trim()}\n` +
-      `Compare-at price: none\n` +
-      `Sale label: none\n` +
-      `Tagline: ${newProduct.tagline.trim()}\n` +
-      `Status: available\n` +
-      `Availability: available_in_australia\n` +
-      `Online purchase: yes\n` +
-      `Deposit enabled: yes\n` +
-      `Full payment enabled: yes\n` +
-      `Source type: other\n` +
-      `Public lead time: none\n` +
-      `Public container ETA: none\n` +
-      `Category: ${newProduct.category}\n` +
-      `Hero image: ${newProduct.heroImage.trim()}\n` +
-      `Gallery order, one image per line:\n${gallery.join('\n')}\n\n` +
-      `Key specs, one per line:\n${newProduct.keySpecs.trim()}\n\n` +
-      `Description/body copy:\n${newProduct.description.trim()}\n\n` +
-      `${videoInstructions}\n\n` +
-      `Use a URL-safe slug based on the title. Before proposing the new file, list src/content/products and confirm the slug does not already exist. ` +
-      `Use exactly the supplied hero image and gallery order. Store only the clean YouTube video ID in youtubeVideo.id. Do not invent image URLs or video metadata.`
-    );
+    if (newProduct.mode === 'business') {
+      const videoInstructions = videoId
+        ? `YouTube video frontmatter:\n` +
+          `id: ${videoId}\n` +
+          `title: ${newProduct.youtubeVideoTitle.trim()}\n` +
+          `description: ${newProduct.youtubeVideoDescription.trim() || 'None'}\n` +
+          `thumbnail: ${newProduct.youtubeVideoThumbnail.trim() || youtubeThumbnailUrl(videoId)}\n` +
+          `uploadDate: ${newProduct.youtubeVideoUploadDate.trim() || 'None'}\n` +
+          `duration: ${newProduct.youtubeVideoDuration.trim() || 'None'}\n` +
+          `transcriptSummary: ${newProduct.youtubeVideoTranscriptSummary.trim() || 'None'}`
+        : `YouTube video frontmatter: None. Do not add a youtubeVideo block.`;
+
+      sendMessage(
+        `Create a new ${newProduct.category} product page using the existing product markdown format.\n\n` +
+        `Title: ${newProduct.title.trim()}\n` +
+        `Price: ${newProduct.price.trim()}\n` +
+        `Compare-at price: none\n` +
+        `Sale label: none\n` +
+        `Tagline: ${newProduct.tagline.trim()}\n` +
+        `Status: available\n` +
+        `Availability: available_in_australia\n` +
+        `Online purchase: yes\n` +
+        `Deposit enabled: yes\n` +
+        `Full payment enabled: yes\n` +
+        `Source type: other\n` +
+        `Public lead time: none\n` +
+        `Public container ETA: none\n` +
+        `Category: ${newProduct.category}\n` +
+        `Hero image: ${newProduct.heroImage.trim()}\n` +
+        `Gallery order, one image per line:\n${gallery.join('\n')}\n\n` +
+        `Key specs, one per line:\n${newProduct.keySpecs.trim()}\n\n` +
+        `Description/body copy:\n${newProduct.description.trim()}\n\n` +
+        `${videoInstructions}\n\n` +
+        `Use a URL-safe slug based on the title. Before proposing the new file, list src/content/products and confirm the slug does not already exist. ` +
+        `Use exactly the supplied hero image and gallery order. Store only the clean YouTube video ID in youtubeVideo.id. Do not invent image URLs or video metadata.`
+      );
+    } else {
+      const stockInstructions = newProduct.productType === 'stock'
+        ? `\nProduct type: stock\n` +
+          `Fulfilment type: ${newProduct.fulfilmentType}\n` +
+          `Shipping size: ${newProduct.shippingSize}\n` +
+          `Weight: ${newProduct.weight.trim()}\n` +
+          `Dimensions (L x W x H cm): ${newProduct.dimensionLength.trim()} x ${newProduct.dimensionWidth.trim()} x ${newProduct.dimensionHeight.trim()}\n` +
+          `Pickup location: ${newProduct.pickupLocation.trim() || 'none'}\n` +
+          `Requires installation: ${newProduct.requiresInstallation ? 'yes' : 'no'}\n` +
+          `Packed weight kg: ${newProduct.fulfilmentType === 'ship' ? newProduct.packedWeightKg.trim() : 'none'}\n` +
+          `Packed dimensions cm: ${newProduct.fulfilmentType === 'ship' ? `${newProduct.packedLengthCm.trim()} x ${newProduct.packedWidthCm.trim()} x ${newProduct.packedHeightCm.trim()}` : 'none'}\n` +
+          `Shipping data status: ${newProduct.fulfilmentType === 'ship' ? newProduct.shippingDataStatus : 'none'}`
+        : `\nProduct type: service\nFulfilment type: ${newProduct.fulfilmentType}\nShipping size: none\n`;
+
+      sendMessage(
+        `Create a new shop item markdown file under src/content/products/accessories/ using the shop schema.\n\n` +
+        `Title: ${newProduct.title.trim()}\n` +
+        `Slug: use a URL-safe slug based on the title.\n` +
+        `Category: ${newProduct.category.trim()}\n` +
+        `Price: ${newProduct.price.trim()}\n` +
+        `Tagline: ${newProduct.tagline.trim()}\n` +
+        `Description/body copy: ${newProduct.description.trim()}\n` +
+        `Hero image: ${newProduct.heroImage.trim()}\n` +
+        `Gallery order, one image per line:\n${gallery.join('\n')}\n` +
+        `Availability: ${newProduct.availability}\n` +
+        `Online purchase: ${newProduct.purchasableOnline ? 'yes' : 'no'}\n` +
+        `Source type: ${newProduct.sourceType}\n` +
+        `Public lead time: ${newProduct.leadTimeText.trim() || 'none'}\n` +
+        `Public container ETA: ${newProduct.containerEtaText.trim() || 'none'}\n` +
+        `Public container ETA date: ${newProduct.containerEtaDate.trim() || 'none'}${stockInstructions}\n\n` +
+        `Keep the file simple and owner-friendly. Use store: true and fill only the fields needed by the shop schema. ` +
+        `Do not add business-product-only fields such as keySpecs or YouTube metadata.`
+      );
+    }
     setNewProduct(EMPTY_PRODUCT_FORM);
     setShowNewProductForm(false);
   }
@@ -3201,7 +3402,9 @@ export default function AdminPanel() {
   }[deployStatus];
 
   const hasEscalated = pending.some(c => c.judgeDecision === 'escalate');
-  const filteredProducts = products.filter((product) => {
+  const businessProducts = products.filter(product => product.store !== true);
+  const shopCatalogueProducts = products.filter(product => product.store === true);
+  const filteredBusinessProducts = businessProducts.filter((product) => {
     const q = productFilter.trim().toLowerCase();
     if (!q) return true;
     return [product.title, product.name, product.slug, product.category, product.status, product.availability, product.sourceType, product.saleLabel]
@@ -3209,6 +3412,112 @@ export default function AdminPanel() {
       .toLowerCase()
       .includes(q);
   });
+  const filteredShopProducts = shopCatalogueProducts.filter((product) => {
+    const q = shopFilter.trim().toLowerCase();
+    if (!q) return true;
+    return [
+      product.title,
+      product.name,
+      product.slug,
+      product.category,
+      product.status,
+      product.productType,
+      product.fulfilmentType,
+      product.shippingSize,
+      product.availability,
+      product.sourceType,
+      product.saleLabel,
+    ]
+      .join(' ')
+      .toLowerCase()
+      .includes(q);
+  });
+  const businessSections = [
+    { key: 'caravan', label: 'Caravans', items: filteredBusinessProducts.filter(product => product.category === 'caravan') },
+    { key: 'slide-on', label: 'Slide-ons', items: filteredBusinessProducts.filter(product => product.category === 'slide-on') },
+    { key: 'expedition', label: 'Expedition', items: filteredBusinessProducts.filter(product => product.category === 'expedition') },
+  ];
+  const otherBusinessProducts = filteredBusinessProducts.filter(product => !['caravan', 'slide-on', 'expedition'].includes(String(product.category)));
+  const shopSections = [
+    { key: 'stock', label: 'Shop stock items', items: filteredShopProducts.filter(product => product.productType === 'stock') },
+    { key: 'service', label: 'Shop services', items: filteredShopProducts.filter(product => product.productType === 'service') },
+  ];
+  const renderProductCard = (product: ProductRecord, variant: 'business' | 'shop') => {
+    const isShop = variant === 'shop';
+    const metaParts = isShop
+      ? [
+          'Shop item',
+          SHOP_PRODUCT_TYPE_LABELS[product.productType ?? 'stock'],
+          product.category,
+          product.price,
+          product.compareAtPrice ? `was ${product.compareAtPrice}` : '',
+          SHOP_FULFILMENT_LABELS[product.fulfilmentType ?? 'quote_required'],
+          SHOP_SHIPPING_SIZE_LABELS[product.shippingSize ?? 'medium'],
+          product.availability ?? product.status,
+          product.purchasableOnline ? 'online' : '',
+          product.requiresInstallation ? 'install' : '',
+          product.shippingDataStatus ? SHOP_SHIPPING_DATA_STATUS_LABELS[product.shippingDataStatus] : '',
+          product.galleryCount ?? 0 ? `${product.galleryCount} photos` : '',
+        ]
+      : [
+          'Vehicle',
+          product.category,
+          product.price,
+          product.compareAtPrice ? `was ${product.compareAtPrice}` : '',
+          product.availability ?? product.status,
+          product.purchasableOnline ? 'online' : '',
+          product.galleryCount ?? 0 ? `${product.galleryCount} photos` : '',
+          activeOrderCounts[product.slug] ? `${activeOrderCounts[product.slug]} active order${activeOrderCounts[product.slug] === 1 ? '' : 's'}` : '',
+        ];
+    const actionColumns = isShop ? '1fr' : product.onSale || product.status === 'on-sale' ? '1fr 1fr 1fr' : '1fr 1fr';
+
+    return (
+      <div key={product.slug} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', overflow: 'hidden', flexShrink: 0, display: 'grid', gridTemplateColumns: '150px minmax(0, 1fr)' }}>
+        <AdminProductThumb src={product.heroImage} title={product.title} />
+        <div style={{ padding: '0.65rem 0.7rem', minWidth: 0, display: 'grid', gap: '0.35rem', alignContent: 'center' }}>
+          <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem', lineHeight: 1.25 }}>{product.title}</div>
+          <div style={{ color: '#aaa', fontSize: '0.74rem' }}>
+            {metaParts.filter(Boolean).join(' · ')}
+          </div>
+          {product.store && product.productType === 'stock' && (
+            <div style={{ color: '#888', fontSize: '0.7rem', lineHeight: 1.4 }}>
+              {product.fulfilmentType === 'ship'
+                ? 'Ship-ready stock item with packed shipping dimensions saved for checkout and Australia Post.'
+                : product.fulfilmentType === 'pickup'
+                  ? 'Pickup stock item with location details saved for staff.'
+                  : product.fulfilmentType === 'install'
+                    ? 'Installation item for the workshop team.'
+                    : 'Quote-required stock item.'}
+            </div>
+          )}
+          <div style={{ display: 'grid', gridTemplateColumns: actionColumns, gap: '0.35rem' }}>
+            <button
+              onClick={() => startStructuredEdit(product)}
+              style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
+            >
+              Edit
+            </button>
+            {!isShop && (
+              <button
+                onClick={() => startProductOrder(product, 'deposit_received')}
+                style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
+              >
+                Order
+              </button>
+            )}
+            {!isShop && (product.onSale || product.status === 'on-sale') && (
+              <button
+                onClick={() => requestProductUpdate(product, `This one-off sale product has sold. Remove it from active product listings and make sure the old URL redirects to ${product.category === 'caravan' ? '/our-caravans/' : product.category === 'expedition' ? '/expedition/' : '/our-slide-on-campers/'}. Do not remove standard product-line models unless they are one-off sale stock.`)}
+                style={{ background: '#2a1410', color: '#fb923c', border: '1px solid #63301f', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
+              >
+                Sold
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
   const leadReminders = calculateAdminLeadReminders(enquiries);
   const browserReminderCandidates = [
     ...leadReminders.hotLeads,
@@ -3276,8 +3585,8 @@ export default function AdminPanel() {
             </button>
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(15, minmax(0, 1fr))', borderBottom: '1px solid #333' }}>
-          {(['dashboard', 'products', 'orders', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'matches', 'reports', 'pending'] as PanelTab[]).map(tab => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(16, minmax(0, 1fr))', borderBottom: '1px solid #333' }}>
+          {(['dashboard', 'products', 'shop', 'orders', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'matches', 'reports', 'pending'] as PanelTab[]).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -3304,12 +3613,20 @@ export default function AdminPanel() {
           </AdminSectionBoundary>
         )}
 
-        {activeTab === 'products' && (
+        {(activeTab === 'products' || activeTab === 'shop') && (
           <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '1rem', borderBottom: '1px solid #333' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', marginBottom: editProduct || showNewProductForm ? 0 : '0.45rem' }}>
                 <div>
-                  <div style={{ color: '#fff', fontWeight: 700 }}>{editProduct ? 'Edit Product' : showNewProductForm ? 'Add Product Draft' : 'Product Manager'}</div>
+                  <div style={{ color: '#fff', fontWeight: 700 }}>
+                    {editProduct
+                      ? (editProduct.store ? 'Edit Shop Item' : 'Edit Product')
+                      : showNewProductForm
+                        ? (newProductMode === 'shop' ? 'Add Shop Item' : 'Add Product Draft')
+                        : activeTab === 'shop'
+                          ? 'Shop Manager'
+                          : 'Product Manager'}
+                  </div>
                   {editProduct && <div style={{ color: '#888', fontSize: '0.74rem', marginTop: '0.18rem' }}>{editProduct.slug}</div>}
                 </div>
                 {editProduct && (
@@ -3323,70 +3640,80 @@ export default function AdminPanel() {
                   </button>
                 )}
                 {!editProduct && !showNewProductForm && (
-                  <button onClick={() => setShowNewProductForm(true)} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.46rem 0.7rem', cursor: 'pointer', fontWeight: 700 }}>
-                    Add Product
+                  <button onClick={() => {
+                    const mode = activeTab === 'shop' ? 'shop' : 'business';
+                    setNewProductMode(mode);
+                    setNewProduct({ ...EMPTY_PRODUCT_FORM, mode });
+                    setShowNewProductForm(true);
+                  }} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.46rem 0.7rem', cursor: 'pointer', fontWeight: 700 }}>
+                    {activeTab === 'shop' ? 'Add Shop Item' : 'Add Product'}
                   </button>
                 )}
               </div>
               {!editProduct && !showNewProductForm && (
                 <input
-                  value={productFilter}
-                  onChange={e => setProductFilter(e.target.value)}
-                  placeholder="Search products..."
+                  value={activeTab === 'shop' ? shopFilter : productFilter}
+                  onChange={e => activeTab === 'shop' ? setShopFilter(e.target.value) : setProductFilter(e.target.value)}
+                  placeholder={activeTab === 'shop' ? 'Search shop items...' : 'Search products...'}
                   style={{ width: '100%', boxSizing: 'border-box', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem 0.65rem', fontSize: '0.82rem', outline: 'none' }}
                 />
               )}
             </div>
             {!editProduct && !showNewProductForm && (
-              <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.75rem', display: 'grid', gap: '0.85rem', alignContent: 'start' }}>
                 {productsLoading && <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>Loading products...</p>}
-                {!productsLoading && filteredProducts.map(product => (
-                  <div key={product.slug} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', overflow: 'hidden', flexShrink: 0, display: 'grid', gridTemplateColumns: '150px minmax(0, 1fr)' }}>
-                    <AdminProductThumb src={product.heroImage} title={product.title} />
-                    <div style={{ padding: '0.65rem 0.7rem', minWidth: 0, display: 'grid', gap: '0.35rem', alignContent: 'center' }}>
-                      <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem', lineHeight: 1.25 }}>{product.title}</div>
-                      <div style={{ color: '#aaa', fontSize: '0.74rem' }}>
-                        {product.store ? 'Shop' : 'Vehicle'} · {product.price}
-                        {product.compareAtPrice ? ` · was ${product.compareAtPrice}` : ''}
-                        · {product.availability ?? product.status}
-                        {product.purchasableOnline ? ' · online' : ''}
-                        · {product.category}
-                        {product.galleryCount ?? 0 ? ` · ${product.galleryCount} photos` : ''}
-                        {activeOrderCounts[product.slug] ? ` · ${activeOrderCounts[product.slug]} active order${activeOrderCounts[product.slug] === 1 ? '' : 's'}` : ''}
-                      </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: product.onSale || product.status === 'on-sale' ? '1fr 1fr 1fr' : '1fr 1fr', gap: '0.35rem' }}>
-                        <button
-                          onClick={() => startStructuredEdit(product)}
-                          style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => startProductOrder(product, 'deposit_received')}
-                          style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
-                        >
-                          Order
-                        </button>
-                        {(product.onSale || product.status === 'on-sale') && (
-                        <button
-                          onClick={() => requestProductUpdate(product, `This one-off sale product has sold. Remove it from active product listings and make sure the old URL redirects to ${product.category === 'caravan' ? '/our-caravans/' : product.category === 'expedition' ? '/expedition/' : '/our-slide-on-campers/'}. Do not remove standard product-line models unless they are one-off sale stock.`)}
-                          style={{ background: '#2a1410', color: '#fb923c', border: '1px solid #63301f', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
-                        >
-                          Sold
-                        </button>
+                {!productsLoading && (
+                  <>
+                    {activeTab === 'shop' ? (
+                      <>
+                        {shopSections.map(section => section.items.length > 0 && (
+                          <section key={section.key} style={{ display: 'grid', gap: '0.55rem' }}>
+                            <div style={{ color: '#aaa', fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{section.label} ({section.items.length})</div>
+                            <div style={{ display: 'grid', gap: '0.6rem' }}>
+                              {section.items.map(product => renderProductCard(product, 'shop'))}
+                            </div>
+                          </section>
+                        ))}
+                        {!shopSections.some(section => section.items.length > 0) && (
+                          <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>No matching shop items</p>
                         )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                {!productsLoading && filteredProducts.length === 0 && (
-                  <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>No matching products</p>
+                      </>
+                    ) : (
+                      <>
+                        {businessSections.map(section => section.items.length > 0 && (
+                          <section key={section.key} style={{ display: 'grid', gap: '0.55rem' }}>
+                            <div style={{ color: '#aaa', fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{section.label} ({section.items.length})</div>
+                            <div style={{ display: 'grid', gap: '0.6rem' }}>
+                              {section.items.map(product => renderProductCard(product, 'business'))}
+                            </div>
+                          </section>
+                        ))}
+                        {otherBusinessProducts.length > 0 && (
+                          <section style={{ display: 'grid', gap: '0.55rem' }}>
+                            <div style={{ color: '#aaa', fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Other ({otherBusinessProducts.length})</div>
+                            <div style={{ display: 'grid', gap: '0.6rem' }}>
+                              {otherBusinessProducts.map(product => renderProductCard(product, 'business'))}
+                            </div>
+                          </section>
+                        )}
+                        {!businessSections.some(section => section.items.length > 0) && otherBusinessProducts.length === 0 && (
+                          <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>No matching camper or caravan products</p>
+                        )}
+                      </>
+                    )}
+                  </>
                 )}
               </div>
             )}
             {editProduct && (
               <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.85rem', display: 'grid', gap: '0.6rem', alignContent: 'start', background: '#141414' }}>
                 <input value={editProduct.title} onChange={e => setEditProduct(p => p && ({ ...p, title: e.target.value }))} placeholder="Title" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                <input
+                  value={editProduct.category}
+                  onChange={e => setEditProduct(p => p && ({ ...p, category: e.target.value }))}
+                  placeholder={editProduct.store ? 'Shop category, e.g. Air Systems' : 'Category'}
+                  style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}
+                />
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.4rem' }}>
                   <input value={editProduct.price} onChange={e => setEditProduct(p => p && ({ ...p, price: e.target.value }))} placeholder="$72,000" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                   <input value={editProduct.compareAtPrice} onChange={e => setEditProduct(p => p && ({ ...p, compareAtPrice: e.target.value }))} placeholder="Compare-at price" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
@@ -3421,6 +3748,55 @@ export default function AdminPanel() {
                   <input value={editProduct.containerEtaText} onChange={e => setEditProduct(p => p && ({ ...p, containerEtaText: e.target.value }))} placeholder="Public container ETA text" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                   <input type="date" value={editProduct.containerEtaDate} onChange={e => setEditProduct(p => p && ({ ...p, containerEtaDate: e.target.value }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                 </div>
+                {editProduct.store && (
+                  <div style={{ display: 'grid', gap: '0.45rem', border: '1px solid #333', borderRadius: '6px', padding: '0.6rem', background: '#101010' }}>
+                    <div>
+                      <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.78rem' }}>Shop Details</div>
+                      <div style={{ color: '#777', fontSize: '0.68rem', marginTop: '0.15rem', lineHeight: 1.35 }}>Keep the fields simple. Stock items need weight and dimensions so the cart and shipping logic can work.</div>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.4rem' }}>
+                      <select value={editProduct.productType} onChange={e => setEditProduct(p => p && ({ ...p, productType: e.target.value as ShopProductType }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
+                        <option value="stock">Stock item</option>
+                        <option value="service">Service item</option>
+                      </select>
+                      <select value={editProduct.fulfilmentType} onChange={e => setEditProduct(p => p && ({ ...p, fulfilmentType: e.target.value as ShopFulfilmentType }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
+                        <option value="ship">Ship</option>
+                        <option value="pickup">Pickup</option>
+                        <option value="install">Install</option>
+                        <option value="quote_required">Quote required</option>
+                      </select>
+                      <select value={editProduct.shippingSize} onChange={e => setEditProduct(p => p && ({ ...p, shippingSize: e.target.value as ShopShippingSize }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
+                        <option value="small">Small</option>
+                        <option value="medium">Medium</option>
+                        <option value="large">Large</option>
+                        <option value="oversized">Oversized</option>
+                      </select>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem' }}>
+                      <input value={editProduct.weight} onChange={e => setEditProduct(p => p && ({ ...p, weight: e.target.value }))} placeholder="Weight kg" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.35rem' }}>
+                        <input value={editProduct.dimensionLength} onChange={e => setEditProduct(p => p && ({ ...p, dimensionLength: e.target.value }))} placeholder="L cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        <input value={editProduct.dimensionWidth} onChange={e => setEditProduct(p => p && ({ ...p, dimensionWidth: e.target.value }))} placeholder="W cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        <input value={editProduct.dimensionHeight} onChange={e => setEditProduct(p => p && ({ ...p, dimensionHeight: e.target.value }))} placeholder="H cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                      </div>
+                      <input value={editProduct.pickupLocation} onChange={e => setEditProduct(p => p && ({ ...p, pickupLocation: e.target.value }))} placeholder="Pickup location" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#ddd', fontSize: '0.78rem' }}>
+                        <input type="checkbox" checked={editProduct.requiresInstallation} onChange={e => setEditProduct(p => p && ({ ...p, requiresInstallation: e.target.checked }))} />
+                        Requires installation
+                      </label>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '0.4rem' }}>
+                      <input value={editProduct.packedWeightKg} onChange={e => setEditProduct(p => p && ({ ...p, packedWeightKg: e.target.value }))} placeholder="Packed weight kg" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                      <input value={editProduct.packedLengthCm} onChange={e => setEditProduct(p => p && ({ ...p, packedLengthCm: e.target.value }))} placeholder="Packed L cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                      <input value={editProduct.packedWidthCm} onChange={e => setEditProduct(p => p && ({ ...p, packedWidthCm: e.target.value }))} placeholder="Packed W cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                      <input value={editProduct.packedHeightCm} onChange={e => setEditProduct(p => p && ({ ...p, packedHeightCm: e.target.value }))} placeholder="Packed H cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                    </div>
+                    <select value={editProduct.shippingDataStatus} onChange={e => setEditProduct(p => p && ({ ...p, shippingDataStatus: e.target.value as ShopShippingDataStatus }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
+                      <option value="estimated">Estimated shipping data</option>
+                      <option value="confirmed">Confirmed shipping data</option>
+                    </select>
+                  </div>
+                )}
                 <div style={{ display: 'grid', gridTemplateColumns: '150px minmax(0, 1fr)', gap: '0.55rem', alignItems: 'center', border: '1px solid #333', borderRadius: '6px', padding: '0.45rem', background: '#101010' }}>
                   <ProductImagePreview src={editProduct.heroImage} title={`${editProduct.title} hero`} />
                   <div style={{ display: 'grid', gap: '0.35rem', minWidth: 0 }}>
@@ -3470,59 +3846,63 @@ export default function AdminPanel() {
                   onGalleryTextChange={galleryText => setEditProduct(p => p && ({ ...p, galleryText }))}
                   onHeroImageChange={heroImage => setEditProduct(p => p && ({ ...p, heroImage }))}
                 />
-                <ProductVideoEditor
-                  videoUrl={editProduct.youtubeVideoUrl}
-                  title={editProduct.youtubeVideoTitle}
-                  description={editProduct.youtubeVideoDescription}
-                  thumbnail={editProduct.youtubeVideoThumbnail}
-                  uploadDate={editProduct.youtubeVideoUploadDate}
-                  duration={editProduct.youtubeVideoDuration}
-                  transcriptSummary={editProduct.youtubeVideoTranscriptSummary}
-                  onChange={patch => setEditProduct(p => p && ({ ...p, ...patch }))}
-                />
-                <div style={{ display: 'grid', gap: '0.45rem', border: '1px solid #333', borderRadius: '6px', padding: '0.6rem', background: '#101010' }}>
-                  <div>
-                    <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.78rem' }}>Suitability Checker Data</div>
-                    <div style={{ color: '#777', fontSize: '0.68rem', marginTop: '0.15rem', lineHeight: 1.35 }}>Use draft or target while lighter slide-on weights are being developed. Only confirmed data should later be used for public model matching.</div>
-                  </div>
-                  <select value={editProduct.suitabilityStatus} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityStatus: e.target.value as SuitabilityDataStatus }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
-                    <option value="draft">Draft</option>
-                    <option value="target">Target</option>
-                    <option value="confirmed">Confirmed</option>
-                  </select>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
-                    <input value={editProduct.suitabilityDryWeightKg} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityDryWeightKg: e.target.value }))} placeholder="Slide-on dry weight kg" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                    <input value={editProduct.suitabilityEstimatedLoadedWeightKg} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityEstimatedLoadedWeightKg: e.target.value }))} placeholder="Estimated loaded weight kg" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                    <input value={editProduct.suitabilityRequiredTrayLengthMm} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityRequiredTrayLengthMm: e.target.value }))} placeholder="Required tray length mm" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                    <input value={editProduct.suitabilityRequiredTrayWidthMm} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityRequiredTrayWidthMm: e.target.value }))} placeholder="Required tray width mm" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                    <input value={editProduct.suitabilityCentreOfGravityMm} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityCentreOfGravityMm: e.target.value }))} placeholder="Centre of gravity mm" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                    <input value={editProduct.suitabilityAtmKg} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityAtmKg: e.target.value }))} placeholder="Caravan ATM kg" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                    <input value={editProduct.suitabilityGtmKg} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityGtmKg: e.target.value }))} placeholder="Caravan GTM kg" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                    <input value={editProduct.suitabilityTowBallWeightKg} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityTowBallWeightKg: e.target.value }))} placeholder="Loaded tow ball weight kg" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                  </div>
-                  <textarea value={editProduct.suitabilityNotes} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityNotes: e.target.value }))} placeholder="Suitability notes, assumptions, or why data is not confirmed yet" rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
-                </div>
-                <div style={{ display: 'grid', gap: '0.35rem' }}>
-                  <div style={{ color: '#aaa', fontSize: '0.74rem', fontWeight: 700 }}>Related Products</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.3rem', maxHeight: '96px', overflowY: 'auto', border: '1px solid #333', borderRadius: '6px', padding: '0.45rem', background: '#101010' }}>
-                    {products.filter(product => product.slug !== editProduct.slug).map(product => (
-                      <label key={product.slug} style={{ color: '#ddd', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '0.3rem', minWidth: 0 }}>
-                        <input
-                          type="checkbox"
-                          checked={editProduct.relatedSlugs.includes(product.slug)}
-                          onChange={e => setEditProduct(p => {
-                            if (!p) return p;
-                            const relatedSlugs = e.target.checked
-                              ? [...p.relatedSlugs, product.slug]
-                              : p.relatedSlugs.filter(slug => slug !== product.slug);
-                            return { ...p, relatedSlugs };
-                          })}
-                        />
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.title}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
+                {!editProduct.store && (
+                  <>
+                    <ProductVideoEditor
+                      videoUrl={editProduct.youtubeVideoUrl}
+                      title={editProduct.youtubeVideoTitle}
+                      description={editProduct.youtubeVideoDescription}
+                      thumbnail={editProduct.youtubeVideoThumbnail}
+                      uploadDate={editProduct.youtubeVideoUploadDate}
+                      duration={editProduct.youtubeVideoDuration}
+                      transcriptSummary={editProduct.youtubeVideoTranscriptSummary}
+                      onChange={patch => setEditProduct(p => p && ({ ...p, ...patch }))}
+                    />
+                    <div style={{ display: 'grid', gap: '0.45rem', border: '1px solid #333', borderRadius: '6px', padding: '0.6rem', background: '#101010' }}>
+                      <div>
+                        <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.78rem' }}>Suitability Checker Data</div>
+                        <div style={{ color: '#777', fontSize: '0.68rem', marginTop: '0.15rem', lineHeight: 1.35 }}>Use draft or target while lighter slide-on weights are being developed. Only confirmed data should later be used for public model matching.</div>
+                      </div>
+                      <select value={editProduct.suitabilityStatus} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityStatus: e.target.value as SuitabilityDataStatus }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
+                        <option value="draft">Draft</option>
+                        <option value="target">Target</option>
+                        <option value="confirmed">Confirmed</option>
+                      </select>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+                        <input value={editProduct.suitabilityDryWeightKg} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityDryWeightKg: e.target.value }))} placeholder="Slide-on dry weight kg" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        <input value={editProduct.suitabilityEstimatedLoadedWeightKg} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityEstimatedLoadedWeightKg: e.target.value }))} placeholder="Estimated loaded weight kg" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        <input value={editProduct.suitabilityRequiredTrayLengthMm} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityRequiredTrayLengthMm: e.target.value }))} placeholder="Required tray length mm" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        <input value={editProduct.suitabilityRequiredTrayWidthMm} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityRequiredTrayWidthMm: e.target.value }))} placeholder="Required tray width mm" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        <input value={editProduct.suitabilityCentreOfGravityMm} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityCentreOfGravityMm: e.target.value }))} placeholder="Centre of gravity mm" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        <input value={editProduct.suitabilityAtmKg} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityAtmKg: e.target.value }))} placeholder="Caravan ATM kg" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        <input value={editProduct.suitabilityGtmKg} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityGtmKg: e.target.value }))} placeholder="Caravan GTM kg" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        <input value={editProduct.suitabilityTowBallWeightKg} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityTowBallWeightKg: e.target.value }))} placeholder="Loaded tow ball weight kg" inputMode="numeric" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                      </div>
+                      <textarea value={editProduct.suitabilityNotes} onChange={e => setEditProduct(p => p && ({ ...p, suitabilityNotes: e.target.value }))} placeholder="Suitability notes, assumptions, or why data is not confirmed yet" rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
+                    </div>
+                    <div style={{ display: 'grid', gap: '0.35rem' }}>
+                      <div style={{ color: '#aaa', fontSize: '0.74rem', fontWeight: 700 }}>Related Products</div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.3rem', maxHeight: '96px', overflowY: 'auto', border: '1px solid #333', borderRadius: '6px', padding: '0.45rem', background: '#101010' }}>
+                        {products.filter(product => product.slug !== editProduct.slug).map(product => (
+                          <label key={product.slug} style={{ color: '#ddd', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '0.3rem', minWidth: 0 }}>
+                            <input
+                              type="checkbox"
+                              checked={editProduct.relatedSlugs.includes(product.slug)}
+                              onChange={e => setEditProduct(p => {
+                                if (!p) return p;
+                                const relatedSlugs = e.target.checked
+                                  ? [...p.relatedSlugs, product.slug]
+                                  : p.relatedSlugs.filter(slug => slug !== product.slug);
+                                return { ...p, relatedSlugs };
+                              })}
+                            />
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.title}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
                 <textarea value={editProduct.notes} onChange={e => setEditProduct(p => p && ({ ...p, notes: e.target.value }))} placeholder="Optional notes for copy/spec changes" rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
                   <button onClick={() => setEditProduct(null)} style={{ background: '#222', color: '#aaa', border: '1px solid #444', borderRadius: '6px', padding: '0.55rem', cursor: 'pointer', fontWeight: 700 }}>
@@ -3535,18 +3915,123 @@ export default function AdminPanel() {
               </div>
             )}
             {!editProduct && showNewProductForm && <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.85rem', display: 'grid', gap: '0.5rem', alignContent: 'start', background: '#141414' }}>
-              <input value={newProduct.title} onChange={e => setNewProduct(p => ({ ...p, title: e.target.value }))} placeholder="Product title" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
-                <select value={newProduct.category} onChange={e => setNewProduct(p => ({ ...p, category: e.target.value as ProductCategory }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
-                  <option value="slide-on">Slide-on</option>
-                  <option value="caravan">Caravan</option>
-                  <option value="expedition">Expedition</option>
-                </select>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewProductMode('business');
+                    setNewProduct(prev => ({ ...EMPTY_PRODUCT_FORM, ...prev, mode: 'business', category: ['slide-on', 'caravan', 'expedition'].includes(prev.category) ? prev.category : 'slide-on' }));
+                  }}
+                  style={{ background: newProduct.mode === 'business' ? '#E8540A' : '#222', color: '#fff', border: '1px solid #444', borderRadius: '6px', padding: '0.5rem', cursor: 'pointer', fontWeight: 700 }}
+                >
+                  Camper / Caravan
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewProductMode('shop');
+                    setNewProduct(prev => ({ ...EMPTY_PRODUCT_FORM, ...prev, mode: 'shop', productType: prev.productType ?? 'stock', fulfilmentType: prev.fulfilmentType ?? 'ship', shippingSize: prev.shippingSize ?? 'medium' }));
+                  }}
+                  style={{ background: newProduct.mode === 'shop' ? '#E8540A' : '#222', color: '#fff', border: '1px solid #444', borderRadius: '6px', padding: '0.5rem', cursor: 'pointer', fontWeight: 700 }}
+                >
+                  Shop Item
+                </button>
+              </div>
+              <input value={newProduct.title} onChange={e => setNewProduct(p => ({ ...p, title: e.target.value }))} placeholder={newProduct.mode === 'shop' ? 'Shop item title' : 'Product title'} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+                {newProduct.mode === 'business' ? (
+                  <select value={newProduct.category} onChange={e => setNewProduct(p => ({ ...p, category: e.target.value }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
+                    <option value="slide-on">Slide-on</option>
+                    <option value="caravan">Caravan</option>
+                    <option value="expedition">Expedition</option>
+                  </select>
+                ) : (
+                  <input value={newProduct.category} onChange={e => setNewProduct(p => ({ ...p, category: e.target.value }))} placeholder="Shop category, e.g. Air Systems" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                )}
                 <input value={newProduct.price} onChange={e => setNewProduct(p => ({ ...p, price: e.target.value }))} placeholder="$72,000" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
               </div>
-              <input value={newProduct.tagline} onChange={e => setNewProduct(p => ({ ...p, tagline: e.target.value }))} placeholder="Short tagline" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-              <textarea value={newProduct.keySpecs} onChange={e => setNewProduct(p => ({ ...p, keySpecs: e.target.value }))} placeholder="Key specs, one per line" rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
-              <textarea value={newProduct.description} onChange={e => setNewProduct(p => ({ ...p, description: e.target.value }))} placeholder="Product description" rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
+              <input value={newProduct.tagline} onChange={e => setNewProduct(p => ({ ...p, tagline: e.target.value }))} placeholder={newProduct.mode === 'shop' ? 'Short shop description' : 'Short tagline'} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+              {newProduct.mode === 'business' ? (
+                <textarea value={newProduct.keySpecs} onChange={e => setNewProduct(p => ({ ...p, keySpecs: e.target.value }))} placeholder="Key specs, one per line" rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
+              ) : (
+                <div style={{ display: 'grid', gap: '0.45rem', border: '1px solid #333', borderRadius: '6px', padding: '0.6rem', background: '#101010' }}>
+                  <div>
+                    <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.78rem' }}>Shop Details</div>
+                    <div style={{ color: '#777', fontSize: '0.68rem', marginTop: '0.15rem', lineHeight: 1.35 }}>Keep this simple. The owner only needs enough detail to create a clean shop entry.</div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.4rem' }}>
+                    <select value={newProduct.productType} onChange={e => setNewProduct(p => ({ ...p, productType: e.target.value as ShopProductType }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
+                      <option value="stock">Stock item</option>
+                      <option value="service">Service item</option>
+                    </select>
+                    <select value={newProduct.fulfilmentType} onChange={e => setNewProduct(p => ({ ...p, fulfilmentType: e.target.value as ShopFulfilmentType }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
+                      <option value="ship">Ship</option>
+                      <option value="pickup">Pickup</option>
+                      <option value="install">Install</option>
+                      <option value="quote_required">Quote required</option>
+                    </select>
+                    <select value={newProduct.shippingSize} onChange={e => setNewProduct(p => ({ ...p, shippingSize: e.target.value as ShopShippingSize }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
+                      <option value="small">Small</option>
+                      <option value="medium">Medium</option>
+                      <option value="large">Large</option>
+                      <option value="oversized">Oversized</option>
+                    </select>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem' }}>
+                    <select value={newProduct.availability} onChange={e => setNewProduct(p => ({ ...p, availability: e.target.value as CommerceAvailability }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
+                      <option value="available_in_australia">Available in Australia</option>
+                      <option value="coming_next_container">Coming next container</option>
+                      <option value="made_to_order">Made to order</option>
+                      <option value="ask_availability">Ask about availability</option>
+                      <option value="unavailable">Unavailable</option>
+                    </select>
+                    <select value={newProduct.sourceType} onChange={e => setNewProduct(p => ({ ...p, sourceType: e.target.value as SourceType }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
+                      <option value="other">Source type</option>
+                      <option value="china_container">China container</option>
+                      <option value="local_supplier">Local supplier</option>
+                      <option value="workshop_stock">Workshop stock</option>
+                      <option value="custom_made_to_order">Custom made to order</option>
+                    </select>
+                    <input value={newProduct.leadTimeText} onChange={e => setNewProduct(p => ({ ...p, leadTimeText: e.target.value }))} placeholder="Public lead-time text" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                    <input value={newProduct.containerEtaText} onChange={e => setNewProduct(p => ({ ...p, containerEtaText: e.target.value }))} placeholder="Public container ETA text" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                    <input type="date" value={newProduct.containerEtaDate} onChange={e => setNewProduct(p => ({ ...p, containerEtaDate: e.target.value }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#ddd', fontSize: '0.78rem' }}>
+                      <input type="checkbox" checked={newProduct.purchasableOnline} onChange={e => setNewProduct(p => ({ ...p, purchasableOnline: e.target.checked }))} />
+                      Online purchase
+                    </label>
+                  </div>
+                  {newProduct.productType === 'stock' && (
+                    <>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+                        <input value={newProduct.weight} onChange={e => setNewProduct(p => ({ ...p, weight: e.target.value }))} placeholder="Weight kg" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.35rem' }}>
+                          <input value={newProduct.dimensionLength} onChange={e => setNewProduct(p => ({ ...p, dimensionLength: e.target.value }))} placeholder="L cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                          <input value={newProduct.dimensionWidth} onChange={e => setNewProduct(p => ({ ...p, dimensionWidth: e.target.value }))} placeholder="W cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                          <input value={newProduct.dimensionHeight} onChange={e => setNewProduct(p => ({ ...p, dimensionHeight: e.target.value }))} placeholder="H cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        </div>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem' }}>
+                        <input value={newProduct.pickupLocation} onChange={e => setNewProduct(p => ({ ...p, pickupLocation: e.target.value }))} placeholder="Pickup location" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#ddd', fontSize: '0.78rem' }}>
+                          <input type="checkbox" checked={newProduct.requiresInstallation} onChange={e => setNewProduct(p => ({ ...p, requiresInstallation: e.target.checked }))} />
+                          Requires installation
+                        </label>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '0.4rem' }}>
+                        <input value={newProduct.packedWeightKg} onChange={e => setNewProduct(p => ({ ...p, packedWeightKg: e.target.value }))} placeholder="Packed weight kg" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        <input value={newProduct.packedLengthCm} onChange={e => setNewProduct(p => ({ ...p, packedLengthCm: e.target.value }))} placeholder="Packed L cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        <input value={newProduct.packedWidthCm} onChange={e => setNewProduct(p => ({ ...p, packedWidthCm: e.target.value }))} placeholder="Packed W cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        <input value={newProduct.packedHeightCm} onChange={e => setNewProduct(p => ({ ...p, packedHeightCm: e.target.value }))} placeholder="Packed H cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                      </div>
+                      <select value={newProduct.shippingDataStatus} onChange={e => setNewProduct(p => ({ ...p, shippingDataStatus: e.target.value as ShopShippingDataStatus }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
+                        <option value="estimated">Estimated shipping data</option>
+                        <option value="confirmed">Confirmed shipping data</option>
+                      </select>
+                    </>
+                  )}
+                </div>
+              )}
+              <textarea value={newProduct.description} onChange={e => setNewProduct(p => ({ ...p, description: e.target.value }))} placeholder={newProduct.mode === 'shop' ? 'Shop description' : 'Product description'} rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
               <div style={{ display: 'grid', gap: '0.45rem', border: '1px solid #333', borderRadius: '6px', padding: '0.55rem', background: '#101010' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.65rem' }}>
                   <div>
@@ -3574,23 +4059,25 @@ export default function AdminPanel() {
                   onGalleryTextChange={galleryText => setNewProduct(p => ({ ...p, galleryText }))}
                   onHeroImageChange={heroImage => setNewProduct(p => ({ ...p, heroImage }))}
                 />
-                <ProductVideoEditor
-                  videoUrl={newProduct.youtubeVideoUrl}
-                  title={newProduct.youtubeVideoTitle}
-                  description={newProduct.youtubeVideoDescription}
-                  thumbnail={newProduct.youtubeVideoThumbnail}
-                  uploadDate={newProduct.youtubeVideoUploadDate}
-                  duration={newProduct.youtubeVideoDuration}
-                  transcriptSummary={newProduct.youtubeVideoTranscriptSummary}
-                  onChange={patch => setNewProduct(p => ({ ...p, ...patch }))}
-                />
+                {newProduct.mode === 'business' && (
+                  <ProductVideoEditor
+                    videoUrl={newProduct.youtubeVideoUrl}
+                    title={newProduct.youtubeVideoTitle}
+                    description={newProduct.youtubeVideoDescription}
+                    thumbnail={newProduct.youtubeVideoThumbnail}
+                    uploadDate={newProduct.youtubeVideoUploadDate}
+                    duration={newProduct.youtubeVideoDuration}
+                    transcriptSummary={newProduct.youtubeVideoTranscriptSummary}
+                    onChange={patch => setNewProduct(p => ({ ...p, ...patch }))}
+                  />
+                )}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
                 <button onClick={() => setShowNewProductForm(false)} style={{ background: '#222', color: '#aaa', border: '1px solid #444', borderRadius: '6px', padding: '0.6rem', cursor: 'pointer', fontWeight: 700 }}>
                   Cancel
                 </button>
                 <button onClick={queueNewProduct} disabled={loading} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.6rem', cursor: 'pointer', fontWeight: 700 }}>
-                  Queue Product Draft
+                  {newProduct.mode === 'shop' ? 'Queue Shop Item' : 'Queue Product Draft'}
                 </button>
               </div>
             </div>}
@@ -3743,8 +4230,13 @@ export default function AdminPanel() {
                     <option key={page.slug} value={mediaTargetValue('pages', page.slug)}>{page.label}</option>
                   ))}
                 </optgroup>
-                <optgroup label="Products">
-                  {products.map(product => (
+                <optgroup label="Camper and caravan products">
+                  {businessProducts.map(product => (
+                    <option key={product.slug} value={mediaTargetValue('products', product.slug)}>{product.title}</option>
+                  ))}
+                </optgroup>
+                <optgroup label="Shop items">
+                  {shopCatalogueProducts.map(product => (
                     <option key={product.slug} value={mediaTargetValue('products', product.slug)}>{product.title}</option>
                   ))}
                 </optgroup>

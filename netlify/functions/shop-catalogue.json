@@ -1,33 +1,23 @@
 [
   {
-    "slug": "additional-200w-solar-panel",
-    "name": "Additional 200W Solar Panel",
-    "price": 500,
-    "image": "/images/optimized/products/advent-2300-hardtop-slide-on/01-advent-2300-hardtop-slide-on-hero.webp",
-    "productType": "stock",
-    "availability": "made_to_order",
-    "purchasableOnline": false,
-    "fulfilmentType": "install"
-  },
-  {
-    "slug": "extra-200ah-battery",
-    "name": "Extra 200Ah Battery",
-    "price": 1500,
-    "image": "/images/optimized/products/advent-2150-hardtop-slide-on/01-advent-2150-hardtop-slide-on-hero.webp",
-    "productType": "service"
-  },
-  {
-    "slug": "starlink-mini-supply-and-install",
-    "name": "Starlink Mini Supply and Installation",
-    "price": 1500,
-    "image": "/images/optimized/products/expedition/unimog-overlander-camper/01-unimog-hero.webp",
-    "productType": "service"
-  },
-  {
     "slug": "twin-air-compressor-shield",
     "name": "Twin Air Compressor Shield",
+    "title": "Twin Air Compressor Shield",
+    "description": "Boxed twin air compressor shield in 3mm marine-grade aluminium, ready for immediate delivery Australia-wide.",
     "price": 188,
     "image": "/images/optimized/products/accessories/twin-air-compressor-shield/01-01-twin-air-compressor-shield-hero.webp",
+    "gallery": [
+      "/images/optimized/products/accessories/twin-air-compressor-shield/02-02-twin-air-compressor-shield.webp",
+      "/images/optimized/products/accessories/twin-air-compressor-shield/03-03-twin-air-compressor-shield.webp",
+      "/images/optimized/products/accessories/twin-air-compressor-shield/04-04-twin-air-compressor-shield.webp",
+      "/images/optimized/products/accessories/twin-air-compressor-shield/05-05-twin-air-compressor-shield.webp",
+      "/images/optimized/products/accessories/twin-air-compressor-shield/06-06-twin-air-compressor-shield.webp",
+      "/images/optimized/products/accessories/twin-air-compressor-shield/07-07-twin-air-compressor-shield.webp",
+      "/images/optimized/products/accessories/twin-air-compressor-shield/08-08-twin-air-compressor-shield.webp",
+      "/images/optimized/products/accessories/twin-air-compressor-shield/09-09-twin-air-compressor-shield.webp",
+      "/images/optimized/products/accessories/twin-air-compressor-shield/10-10-twin-air-compressor-shield.webp",
+      "/images/optimized/products/accessories/twin-air-compressor-shield/11-11-twin-air-compressor-shield.webp"
+    ],
     "productType": "stock",
     "availability": "available_in_australia",
     "purchasableOnline": true,

@@ -1,11 +1,14 @@
 [
   {
+    "store": false,
     "slug": "3-5m-diy-camper-box-with-cabover-and-underfloor-storage",
     "title": "3.5m DIY Camper Box with Cabover and Underfloor Storage",
+    "name": "3.5m DIY Camper Box with Cabover and Underfloor Storage",
     "price": "From $38,999",
     "status": "on-sale",
     "category": "expedition",
     "tagline": "Hardtop composite shell for buyers who want to complete their own truck camper fitout.",
+    "description": "The **3.5m DIY Camper Box with Cabover and Underfloor Storage** is a waterproofed composite shell for buyers who want to complete their own truck camper fitout. It is sold as-is: what you see is what you get.",
     "featured": false,
     "onSale": true,
     "heroImage": "/images/optimized/products/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/01-3-5m-diy-camper-box-with-cabover-and-underfloor-storage-hero.webp",
@@ -48,16 +51,18 @@
         "label": "Condition",
         "value": "Sold as-is"
       }
-    ],
-    "description": "The **3.5m DIY Camper Box with Cabover and Underfloor Storage** is a waterproofed composite shell for buyers who want to complete their own truck camper fitout. It is sold as-is: what you see is what you get."
+    ]
   },
   {
+    "store": false,
     "slug": "3-5m-poptop-truck-camper",
     "title": "Custom 3.5m Electric Pop-Top Truck Camper",
+    "name": "Custom 3.5m Electric Pop-Top Truck Camper",
     "price": "From $49,999",
     "status": "on-sale",
     "category": "expedition",
     "tagline": "Custom 3.5m electric pop-top truck camper currently available from $49,999.",
+    "description": "The **Custom 3.5m Electric Pop-Top Truck Camper** is an expedition/truck camper product, so it has been moved out of the Slide-Ons category and into Expedition and On Sale.",
     "featured": false,
     "onSale": true,
     "heroImage": "/images/optimized/products/3-5m-poptop-truck-camper/01-3-5m-poptop-truck-camper-hero.webp",
@@ -102,16 +107,18 @@
         "label": "Price",
         "value": "From $49,999"
       }
-    ],
-    "description": "The **Custom 3.5m Electric Pop-Top Truck Camper** is an expedition/truck camper product, so it has been moved out of the Slide-Ons category and into Expedition and On Sale."
+    ]
   },
   {
+    "store": false,
     "slug": "7ft-electric-poptop-slide-on",
     "title": "7ft Electric Pop-Top Slide-On Camper",
+    "name": "7ft Electric Pop-Top Slide-On Camper",
     "price": "$68,800",
     "status": "available",
     "category": "slide-on",
     "tagline": "Electric pop-top slide-on camper for single cab utes.",
+    "description": "The **7ft Electric Pop-Top Slide-On** is built for single cab ute owners who want a lower travel profile with standing room once camped.",
     "featured": false,
     "onSale": false,
     "heroImage": "/images/optimized/products/7ft-electric-poptop-slide-on/01-7ft-electric-poptop-slide-on-hero.webp",
@@ -157,16 +164,50 @@
         "label": "Roof",
         "value": "Electric pop-top"
       }
-    ],
-    "description": "The **7ft Electric Pop-Top Slide-On** is built for single cab ute owners who want a lower travel profile with standing room once camped."
+    ]
   },
   {
+    "store": true,
+    "slug": "accessories/twin-air-compressor-shield",
+    "title": "Twin Air Compressor Shield",
+    "name": "Twin Air Compressor Shield",
+    "price": 188,
+    "status": "",
+    "category": "Air Systems",
+    "tagline": "",
+    "description": "Our updated twin air compressor shields are back in stock and ready for immediate delivery Australia-wide.\n\nThe latest design now suits the new style of air tank. Each shield is boxed and ready to ship.\n\nThe switch, air tank, and hose connector can be mounted on either side, making the setup…",
+    "featured": true,
+    "onSale": false,
+    "heroImage": "/images/optimized/products/accessories/twin-air-compressor-shield/01-01-twin-air-compressor-shield-hero.webp",
+    "gallery": [
+      "/images/optimized/products/accessories/twin-air-compressor-shield/02-02-twin-air-compressor-shield.webp",
+      "/images/optimized/products/accessories/twin-air-compressor-shield/03-03-twin-air-compressor-shield.webp",
+      "/images/optimized/products/accessories/twin-air-compressor-shield/04-04-twin-air-compressor-shield.webp",
+      "/images/optimized/products/accessories/twin-air-compressor-shield/05-05-twin-air-compressor-shield.webp",
+      "/images/optimized/products/accessories/twin-air-compressor-shield/06-06-twin-air-compressor-shield.webp",
+      "/images/optimized/products/accessories/twin-air-compressor-shield/07-07-twin-air-compressor-shield.webp",
+      "/images/optimized/products/accessories/twin-air-compressor-shield/08-08-twin-air-compressor-shield.webp",
+      "/images/optimized/products/accessories/twin-air-compressor-shield/09-09-twin-air-compressor-shield.webp",
+      "/images/optimized/products/accessories/twin-air-compressor-shield/10-10-twin-air-compressor-shield.webp",
+      "/images/optimized/products/accessories/twin-air-compressor-shield/11-11-twin-air-compressor-shield.webp"
+    ],
+    "galleryCount": 10,
+    "relatedSlugs": [],
+    "productType": "stock",
+    "availability": "available_in_australia",
+    "purchasableOnline": true,
+    "keySpecs": []
+  },
+  {
+    "store": false,
     "slug": "advent-2150-hardtop-slide-on",
     "title": "Advent 2150 Hardtop Ute Slide-On Camper",
+    "name": "Advent 2150 Hardtop Ute Slide-On Camper",
     "price": "$72,000",
     "status": "on-sale",
     "category": "slide-on",
     "tagline": "The Advent 2150 is the go-anywhere companion for 4x4 space cab utes and select dual cab ute owners.",
+    "description": "The **Advent 2150** is built for owners who want a compact hardtop slide-on camper matched to a serious 4x4 ute. It keeps the slide-on range focused on ute platforms while giving buyers a ready-to-roll Beyond RV camper at the confirmed owner price.",
     "featured": true,
     "onSale": true,
     "heroImage": "/images/optimized/products/advent-2150-hardtop-slide-on/01-advent-2150-hardtop-slide-on-hero.webp",
@@ -209,16 +250,18 @@
         "label": "Roof",
         "value": "Hardtop"
       }
-    ],
-    "description": "The **Advent 2150** is built for owners who want a compact hardtop slide-on camper matched to a serious 4x4 ute. It keeps the slide-on range focused on ute platforms while giving buyers a ready-to-roll Beyond RV camper at the confirmed owner price."
+    ]
   },
   {
+    "store": false,
     "slug": "advent-2300-hardtop-slide-on",
     "title": "Advent 2300 Hardtop Ute Slide-On Camper",
+    "name": "Advent 2300 Hardtop Ute Slide-On Camper",
     "price": "$75,000",
     "status": "available",
     "category": "slide-on",
     "tagline": "A hardtop ute slide-on camper with extra base length for longer tray setups.",
+    "description": "The **Advent 2300** sits in the middle of the Advent hardtop ute slide-on range, giving buyers a longer base while staying within the ute slide-on category.",
     "featured": false,
     "onSale": false,
     "heroImage": "/images/optimized/products/advent-2300-hardtop-slide-on/01-advent-2300-hardtop-slide-on-hero.webp",
@@ -269,16 +312,18 @@
         "label": "Category",
         "value": "Ute slide-on"
       }
-    ],
-    "description": "The **Advent 2300** sits in the middle of the Advent hardtop ute slide-on range, giving buyers a longer base while staying within the ute slide-on category."
+    ]
   },
   {
+    "store": false,
     "slug": "advent-2450-hardtop-slide-on",
     "title": "Advent 2450 Hardtop Ute Slide-On Camper",
+    "name": "Advent 2450 Hardtop Ute Slide-On Camper",
     "price": "$77,800",
     "status": "available",
     "category": "slide-on",
     "tagline": "A larger hardtop slide-on designed specifically for single cab ute platforms.",
+    "description": "The **Advent 2450** remains part of the ute slide-on range as a build-to-order model. It is designed for single cab utes and is no longer presented as in-stock or on sale.",
     "featured": false,
     "onSale": false,
     "heroImage": "/images/optimized/products/advent-2450-hardtop-slide-on/01-advent-2450-hardtop-slide-on-hero.webp",
@@ -338,16 +383,18 @@
         "label": "Status",
         "value": "Build to order"
       }
-    ],
-    "description": "The **Advent 2450** remains part of the ute slide-on range as a build-to-order model. It is designed for single cab utes and is no longer presented as in-stock or on sale."
+    ]
   },
   {
+    "store": false,
     "slug": "expedition/3-5m-electric-poptop-cabover-family-camper",
     "title": "3.5m Electric Pop-Top Cabover Family Camper w/ Electric Drop Down Bed",
+    "name": "3.5m Electric Pop-Top Cabover Family Camper w/ Electric Drop Down Bed",
     "price": "From $140,000",
     "status": "available",
     "category": "expedition",
     "tagline": "Compact 3.5m family truck camper for dual cab Isuzu NPS platforms.",
+    "description": "The **3.5m Electric Pop-Top Cabover Family Camper** is built for families who want a compact expedition camper body on a dual cab Isuzu NPS. It can be configured as a slide-on or a permanently mounted camper.",
     "featured": false,
     "onSale": false,
     "heroImage": "/images/optimized/products/expedition/3-5m-electric-poptop-cabover-family-camper/01-expedition-3-5m-electric-poptop-cabover-family-camper-hero.webp",
@@ -396,16 +443,18 @@
         "label": "Mounting",
         "value": "Slide-on or permanent"
       }
-    ],
-    "description": "The **3.5m Electric Pop-Top Cabover Family Camper** is built for families who want a compact expedition camper body on a dual cab Isuzu NPS. It can be configured as a slide-on or a permanently mounted camper."
+    ]
   },
   {
+    "store": false,
     "slug": "expedition/4-7m-hardtop-truck-camper",
     "title": "4.7m Hardtop Truck Camper",
+    "name": "4.7m Hardtop Truck Camper",
     "price": "From $98,000",
     "status": "available",
     "category": "expedition",
     "tagline": "Premier couples truck camper for single cab truck or Unimog platforms.",
+    "description": "The **4.7m Hardtop Truck Camper** is the premier Beyond RV truck camper option for couples. It can be built for single cab truck platforms or adapted to suit a Unimog, with 2.2m and 2.4m wide configurations available.",
     "featured": false,
     "onSale": false,
     "heroImage": "/images/optimized/products/expedition/4-7m-hardtop-truck-camper/01-expedition-4-7m-hardtop-truck-camper-hero.webp",
@@ -456,16 +505,18 @@
         "label": "Platform",
         "value": "Single cab truck or Unimog"
       }
-    ],
-    "description": "The **4.7m Hardtop Truck Camper** is the premier Beyond RV truck camper option for couples. It can be built for single cab truck platforms or adapted to suit a Unimog, with 2.2m and 2.4m wide configurations available."
+    ]
   },
   {
+    "store": false,
     "slug": "expedition/blue-unimog-overlander-camper",
     "title": "Blue Unimog Overlander Camper",
+    "name": "Blue Unimog Overlander Camper",
     "price": "POA",
     "status": "available",
     "category": "expedition",
     "tagline": "Blue Unimog expedition build with 4.7m camper interior fitout.",
+    "description": "The **Blue Unimog Overlander Camper** shows a custom Unimog expedition build paired with the 4.7m camper interior fitout. It is a build-to-order expedition platform for buyers who want a serious off-road truck camper with a full living body.",
     "featured": false,
     "onSale": false,
     "heroImage": "/images/optimized/products/expedition/unimog-overlander-camper/04-blue-unimog-2.webp",
@@ -506,16 +557,18 @@
         "label": "Interior",
         "value": "4.7m truck camper fitout"
       }
-    ],
-    "description": "The **Blue Unimog Overlander Camper** shows a custom Unimog expedition build paired with the 4.7m camper interior fitout. It is a build-to-order expedition platform for buyers who want a serious off-road truck camper with a full living body."
+    ]
   },
   {
+    "store": false,
     "slug": "expedition/unimog-overlander-camper",
     "title": "Unimog Overlander Camper",
+    "name": "Unimog Overlander Camper",
     "price": "POA",
     "status": "available",
     "category": "expedition",
     "tagline": "Where roads end, the Unimog begins.",
+    "description": "The **Unimog Overlander** is Beyond RV's most extreme build. Mounted on the legendary Mercedes-Benz Unimog with portal axles, this is the expedition vehicle for people who genuinely leave all roads behind.\n\nFull composite body, complete live-aboard spec, custom-built to order. Contact us to discuss…",
     "featured": true,
     "onSale": false,
     "heroImage": "/images/optimized/products/expedition/unimog-overlander-camper/01-unimog-hero.webp",
@@ -547,16 +600,18 @@
         "label": "Price",
         "value": "POA"
       }
-    ],
-    "description": "The **Unimog Overlander** is Beyond RV's most extreme build. Mounted on the legendary Mercedes-Benz Unimog with portal axles, this is the expedition vehicle for people who genuinely leave all roads behind.\n\nFull composite body, complete live-aboard spec, custom-built to order. Contact us to discuss…"
+    ]
   },
   {
+    "store": false,
     "slug": "expedition/unimog-poptop-camper",
     "title": "Empty DIY Unimog Camper Box",
+    "name": "Empty DIY Unimog Camper Box",
     "price": "POA",
     "status": "available",
     "category": "expedition",
     "tagline": "Custom empty camper box for Unimog and similar expedition platforms.",
+    "description": "The **Empty DIY Unimog Camper Box** is for buyers who want Beyond RV composite construction as the base for their own expedition fitout. It can be supplied as a hardtop or electric pop-top, either as a flatpack kit or fully assembled box with wiring roughed in.",
     "featured": false,
     "onSale": false,
     "heroImage": "/images/optimized/products/expedition/unimog-poptop-camper/01-unimog-poptop-15.webp",
@@ -598,16 +653,18 @@
         "label": "Supply",
         "value": "Flatpack or assembled"
       }
-    ],
-    "description": "The **Empty DIY Unimog Camper Box** is for buyers who want Beyond RV composite construction as the base for their own expedition fitout. It can be supplied as a hardtop or electric pop-top, either as a flatpack kit or fully assembled box with wiring roughed in."
+    ]
   },
   {
+    "store": false,
     "slug": "mercedes-sprinter-motorhome",
     "title": "Mercedes Sprinter AWD LWB Cab Chassis Motorhome",
+    "name": "Mercedes Sprinter AWD LWB Cab Chassis Motorhome",
     "price": "$225,000",
     "status": "on-sale",
     "category": "expedition",
     "tagline": "In-stock Mercedes Sprinter AWD LWB cab chassis motorhome, negotiable at $225,000.",
+    "description": "The **Mercedes Sprinter AWD LWB Cab Chassis Motorhome** remains in stock and available for immediate delivery at $225,000 negotiable.",
     "featured": true,
     "onSale": true,
     "heroImage": "/images/optimized/products/mercedes-sprinter-motorhome/01-4-7m-truck-camper-17-scaled.webp",
@@ -652,16 +709,18 @@
         "label": "Price",
         "value": "$225,000 negotiable"
       }
-    ],
-    "description": "The **Mercedes Sprinter AWD LWB Cab Chassis Motorhome** remains in stock and available for immediate delivery at $225,000 negotiable."
+    ]
   },
   {
+    "store": false,
     "slug": "sunpatch-12c-couples-caravan",
     "title": "Sunpatch 12C Couples Off-Road Van",
+    "name": "Sunpatch 12C Couples Off-Road Van",
     "price": "$39,999",
     "status": "on-sale",
     "category": "caravan",
     "tagline": "Compact hardtop couples van for buyers who want a lighter off-road setup.",
+    "description": "The **Sunpatch 12C** is the compact couples option in the Beyond RV caravan range, priced at the owner-confirmed $39,999.",
     "featured": true,
     "onSale": true,
     "heroImage": "/images/optimized/products/sunpatch-12c-couples-caravan/01-sunpatch-12c-couples-caravan-hero.webp",
@@ -703,16 +762,18 @@
         "label": "Price",
         "value": "$39,999"
       }
-    ],
-    "description": "The **Sunpatch 12C** is the compact couples option in the Beyond RV caravan range, priced at the owner-confirmed $39,999."
+    ]
   },
   {
+    "store": false,
     "slug": "sunpatch-15xc-couples-offroad-van",
     "title": "Sunpatch 15-XC Couples Off-Road Van",
+    "name": "Sunpatch 15-XC Couples Off-Road Van",
     "price": "$63,000",
     "status": "on-sale",
     "category": "caravan",
     "tagline": "Couples off-road van with 240L fresh water and 200Ah lithium battery.",
+    "description": "The **Sunpatch 15-XC** is a couples off-road van with the owner-confirmed $63,000 price, 1900kg tare, 2500kg ATM, 240L fresh water and a 200Ah lithium battery.",
     "featured": true,
     "onSale": true,
     "heroImage": "/images/optimized/products/sunpatch-15xc-couples-offroad-van/01-sunpatch-15xc-couples-offroad-van-hero.webp",
@@ -767,16 +828,18 @@
         "label": "Battery",
         "value": "200Ah"
       }
-    ],
-    "description": "The **Sunpatch 15-XC** is a couples off-road van with the owner-confirmed $63,000 price, 1900kg tare, 2500kg ATM, 240L fresh water and a 200Ah lithium battery."
+    ]
   },
   {
+    "store": false,
     "slug": "sunpatch-19xc-hardtop-couples-offroad-van",
     "title": "Sunpatch 19-XC Hardtop Couples Off-Road Van",
+    "name": "Sunpatch 19-XC Hardtop Couples Off-Road Van",
     "price": "$68,000",
     "status": "on-sale",
     "category": "caravan",
     "tagline": "Available for sale now, with final images and additional details coming soon.",
+    "description": "The **Sunpatch 19-XC** is available for sale now at $68,000. Final owner-supplied images and additional details are coming soon, so this page is deliberately marked for easy update once those assets arrive.",
     "featured": false,
     "onSale": true,
     "heroImage": "/images/optimized/products/sunpatch-19xc-hardtop-couples-offroad-van/01-sunpatch-19xc-coming-soon.webp",
@@ -800,16 +863,18 @@
         "label": "Images",
         "value": "Coming soon"
       }
-    ],
-    "description": "The **Sunpatch 19-XC** is available for sale now at $68,000. Final owner-supplied images and additional details are coming soon, so this page is deliberately marked for easy update once those assets arrive."
+    ]
   },
   {
+    "store": false,
     "slug": "sunpatch-21xf-hardtop-family-offroad-van",
     "title": "Sunpatch 21-XF Hardtop Family Off-Road Van",
+    "name": "Sunpatch 21-XF Hardtop Family Off-Road Van",
     "price": "$73,000",
     "status": "on-sale",
     "category": "caravan",
     "tagline": "Family hardtop off-road van, currently available with one in stock.",
+    "description": "The **Sunpatch 21-XF** is the family off-road van in the Sunpatch range. Owner clarification sets this product at $73,000, with one in stock and sleeping for five people.",
     "featured": false,
     "onSale": true,
     "heroImage": "/images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/01-sunpatch-21xf-hardtop-family-offroad-van-hero.webp",
@@ -862,7 +927,6 @@
         "label": "Price",
         "value": "$73,000"
       }
-    ],
-    "description": "The **Sunpatch 21-XF** is the family off-road van in the Sunpatch range. Owner clarification sets this product at $73,000, with one in stock and sleeping for five people."
+    ]
   }
 ]

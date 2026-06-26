@@ -7,7 +7,7 @@ const pages = [
   { path: '/advent-2450-hardtop-slide-on/', title: /Advent 2450/ },
   { path: '/7ft-electric-poptop-slide-on/', title: /7ft Electric/ },
   { path: '/shop/', title: /Parts & Accessories/ },
-  { path: '/shop/additional-200w-solar-panel/', title: /Additional 200W Solar Panel/ },
+  { path: '/shop/twin-air-compressor-shield/', title: /Twin Air Compressor Shield/ },
   { path: '/inquiry-form/', title: /Enquire/ },
 ];
 

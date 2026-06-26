@@ -4,6 +4,7 @@ import { randomUUID } from 'crypto';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore } from './blob-store';
 import catalogue from './product-catalogue.json';
+import adminKnowledge from './admin-chat-knowledge.json';
 
 const openAiKey = process.env.OPENAI_API_KEY;
 const client = openAiKey ? new OpenAI({ apiKey: openAiKey }) : null;
@@ -185,7 +186,11 @@ RULES:
 - For images, the current UI can describe intended image changes but cannot upload full image files into the repository
 - Be concise and friendly
 - After proposing a change, tell the owner to review it in the Pending Changes panel and click Deploy when ready
-- If the judge blocks your proposal, explain why to the owner and ask for clarification`;
+- If the judge blocks your proposal, explain why to the owner and ask for clarification
+- Use the admin knowledge below to answer operational questions without exploring the codebase every time
+
+ADMIN KNOWLEDGE (private, never shared with customers):
+${adminKnowledge.content}`;
 
 async function githubFetch(path: string): Promise<string | null> {
   if (!GITHUB_TOKEN || !GITHUB_REPO) return null;
