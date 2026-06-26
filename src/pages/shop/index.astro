@@ -11,7 +11,9 @@ const products = allProducts
   .filter((product) => product.data.store === true)
   .map((product) => ({ ...product, data: product.data as ShopProductData }))
   .sort((a, b) => a.data.name.localeCompare(b.data.name));
-const featuredProducts = products.filter((product) => product.data.featured);
+const featuredProducts = products.length > 1
+  ? products.filter((product) => product.data.featured)
+  : [];
 const categories = [...new Set(products.map((product) => product.data.category))]
   .sort((a, b) => a.localeCompare(b));
 
@@ -171,7 +173,7 @@ const schema = {
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug }),
+        body: JSON.stringify({ items: [{ slug, quantity: 1 }] }),
       });
       const data = await response.json().catch(() => ({}));
       if (response.ok && data && typeof data.url === 'string') {
