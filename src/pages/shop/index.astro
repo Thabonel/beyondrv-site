@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import ShopProductCard from '../../components/ShopProductCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { categorySlug, shopProductPrice } from '../../lib/shop';
+import { categorySlug, canPurchaseOnline, isOnlinePayableFulfilment, shopProductPrice } from '../../lib/shop';
 
 const allProducts = await getCollection('products');
 type ProductEntry = typeof allProducts[number];
@@ -58,22 +58,28 @@ const schema = {
         </div>
       </div>
       <div class="shop-product-grid shop-product-grid--featured">
-        {featuredProducts.map(({ data }) => (
-          <ShopProductCard
-            name={data.name}
-            slug={data.slug}
-            description={data.description}
-            price={shopProductPrice(data.price)}
-            compareAtPrice={data.compareAtPrice}
-            saleLabel={data.saleLabel}
-            image={data.images[0]}
-            category={data.category}
-            productType={data.productType}
-            availability={data.productType === 'stock' ? data.availability : undefined}
-            sourceType={data.sourceType}
-            featured
-          />
-        ))}
+        {featuredProducts.map(({ data }) => {
+          const buyNowEnabled = data.productType === 'stock'
+            && canPurchaseOnline(data)
+            && isOnlinePayableFulfilment(data.fulfilmentType);
+          return (
+            <ShopProductCard
+              name={data.name}
+              slug={data.slug}
+              description={data.description}
+              price={shopProductPrice(data.price)}
+              compareAtPrice={data.compareAtPrice}
+              saleLabel={data.saleLabel}
+              image={data.images[0]}
+              category={data.category}
+              productType={data.productType}
+              availability={data.productType === 'stock' ? data.availability : undefined}
+              sourceType={data.sourceType}
+              featured
+              buyNowEnabled={buyNowEnabled}
+            />
+          );
+        })}
       </div>
     </section>
   )}
@@ -102,22 +108,28 @@ const schema = {
     </div>
 
     <div class="shop-product-grid" data-catalogue-grid>
-      {products.map(({ data }) => (
-        <ShopProductCard
-          name={data.name}
-          slug={data.slug}
-          description={data.description}
-          price={shopProductPrice(data.price)}
-          compareAtPrice={data.compareAtPrice}
-          saleLabel={data.saleLabel}
-          image={data.images[0]}
-          category={data.category}
-          productType={data.productType}
-          availability={data.productType === 'stock' ? data.availability : undefined}
-          sourceType={data.sourceType}
-          featured={data.featured}
-        />
-      ))}
+      {products.map(({ data }) => {
+        const buyNowEnabled = data.productType === 'stock'
+          && canPurchaseOnline(data)
+          && isOnlinePayableFulfilment(data.fulfilmentType);
+        return (
+          <ShopProductCard
+            name={data.name}
+            slug={data.slug}
+            description={data.description}
+            price={shopProductPrice(data.price)}
+            compareAtPrice={data.compareAtPrice}
+            saleLabel={data.saleLabel}
+            image={data.images[0]}
+            category={data.category}
+            productType={data.productType}
+            availability={data.productType === 'stock' ? data.availability : undefined}
+            sourceType={data.sourceType}
+            featured={data.featured}
+            buyNowEnabled={buyNowEnabled}
+          />
+        );
+      })}
     </div>
     <p class="shop-empty" id="shopEmpty" hidden>No products match your search and category.</p>
   </section>
@@ -147,6 +159,39 @@ const schema = {
     if (emptyState) emptyState.hidden = visible !== 0;
   }
 
+  async function startBuyNow(button: HTMLButtonElement) {
+    const slug = button.dataset.slug;
+    if (!slug) return;
+
+    const originalText = button.textContent ?? 'Buy now';
+    button.disabled = true;
+    button.textContent = 'Starting secure checkout\u2026';
+
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (response.ok && data && typeof data.url === 'string') {
+        window.location.href = data.url;
+        return;
+      }
+      window.alert((data && data.message) || 'We could not start checkout right now.');
+    } catch {
+      window.alert('We could not reach checkout. Please try again.');
+    }
+
+    button.disabled = false;
+    button.textContent = originalText;
+  }
+
   searchInput?.addEventListener('input', filterProducts);
   categorySelect?.addEventListener('change', filterProducts);
+  document.querySelectorAll<HTMLButtonElement>('[data-buy-now]').forEach((button) => {
+    button.addEventListener('click', () => {
+      void startBuyNow(button);
+    });
+  });
 </script>

@@ -6,6 +6,8 @@ test.describe('shop catalogue', () => {
 
     const catalogueCards = page.locator('[data-catalogue-grid] [data-shop-product]');
     await expect(catalogueCards).toHaveCount(1);
+    await expect(page.getByRole('button', { name: 'Buy now' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'View details' })).toBeVisible();
 
     await page.getByLabel('Search products').fill('Twin');
     await expect(page.locator('#shopResultCount')).toHaveText('1 product');

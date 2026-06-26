@@ -19,6 +19,8 @@ test.describe('shop fulfilment behaviour', () => {
     await expect(page.locator('[data-cart-subtotal]')).toHaveText('$188.00');
     await expect(page.getByRole('button', { name: 'Proceed to checkout' })).toBeVisible();
     await expect(page.locator('[data-cart-blocked]')).toHaveCount(0);
+    await expect(page.getByLabel('Postcode')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Get estimate' })).toBeVisible();
     await expect(page.locator('[data-shipping-postcode]')).toBeVisible();
   });
 

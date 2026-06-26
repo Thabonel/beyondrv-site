@@ -123,8 +123,12 @@ const catalogue: Record<string, CatalogueEntry> = Object.fromEntries(catalogueEn
     const allShippable = items.every((item) => catalogue[item.slug].shippable);
     const shippingStep = !blocked && allShippable
       ? `<form class="cart-shipping" data-shipping-form>
-          <label class="cart-shipping-label" for="cart-postcode">Estimate shipping</label>
-          <div class="cart-shipping-row">
+          <div class="cart-shipping-header">
+            <label class="cart-shipping-label" for="cart-postcode">Estimate shipping</label>
+            <p class="cart-shipping-help">Enter the 4-digit postcode for the delivery address, then tap Get estimate.</p>
+          </div>
+          <div class="cart-shipping-field">
+            <label class="cart-shipping-field-label" for="cart-postcode">Postcode</label>
             <input
               id="cart-postcode"
               name="postcode"
@@ -133,12 +137,12 @@ const catalogue: Record<string, CatalogueEntry> = Object.fromEntries(catalogueEn
               pattern="[0-9]*"
               autocomplete="postal-code"
               maxlength="4"
-              placeholder="Postcode"
+              placeholder="e.g. 2133"
               aria-label="Postcode"
               data-shipping-postcode
             />
-            <button type="submit" class="btn-ghost" data-shipping-estimate>Get estimate</button>
           </div>
+          <button type="submit" class="btn-primary cart-shipping-submit" data-shipping-estimate>Get estimate</button>
           <p class="cart-shipping-result" data-shipping-result role="status" aria-live="polite" hidden></p>
         </form>`
       : '';

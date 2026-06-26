@@ -15,14 +15,30 @@ interface Props {
   availability?: ShopAvailability;
   sourceType?: string;
   featured?: boolean;
+  buyNowEnabled?: boolean;
 }
 
-const { name, slug, description, price, compareAtPrice, saleLabel, image, category, productType, availability, sourceType, featured = false } = Astro.props;
+const {
+  name,
+  slug,
+  description,
+  price,
+  compareAtPrice,
+  saleLabel,
+  image,
+  category,
+  productType,
+  availability,
+  sourceType,
+  featured = false,
+  buyNowEnabled = false,
+} = Astro.props;
 const cardImage = displayImageUrl(image, 800);
 const cardSrcSet = imageSrcSet(image, [480, 800]);
 const availabilityText = availability ? availabilityLabel(availability) : '';
 const sourceText = sourceTypeLabel(sourceType);
 const badgeText = normalizeSaleLabel(saleLabel);
+const href = `/shop/${slug}/`;
 ---
 <article
   class="shop-product-card reveal"
@@ -30,7 +46,7 @@ const badgeText = normalizeSaleLabel(saleLabel);
   data-name={`${name} ${description}`.toLowerCase()}
   data-category={categorySlug(category)}
 >
-  <a href={`/shop/${slug}/`} class="shop-product-card-link">
+  <a href={href} class="shop-product-card-link shop-product-card-media-link">
     <div class="shop-product-card-image">
       <img
         src={cardImage}
@@ -43,24 +59,34 @@ const badgeText = normalizeSaleLabel(saleLabel);
       {badgeText && <span class="shop-product-badge">{badgeText}</span>}
       {!saleLabel && featured && <span class="shop-product-badge">Featured</span>}
     </div>
-    <div class="shop-product-card-body">
-      <span class="shop-product-category">{category}</span>
-      <h3>{name}</h3>
-      <p>{description}</p>
-      <p class="shop-product-meta">{sourceText}</p>
-      <div class="shop-product-card-footer">
-        <div class="shop-product-price-stack">
-          {compareAtPrice !== undefined && shopProductPrice(compareAtPrice) !== price && (
-            <span class="shop-product-compare-at">{formatShopPrice(shopProductPrice(compareAtPrice))}</span>
-          )}
-          <span class="shop-product-price">{formatShopPrice(price)}</span>
-        </div>
-        {productType === 'stock' && availability && (
-          <span class:list={['shop-stock', { 'shop-stock--available': availability === 'available_in_australia' }]}>
-            {availabilityText}
-          </span>
-        )}
-      </div>
-    </div>
   </a>
+  <div class="shop-product-card-body">
+    <span class="shop-product-category">{category}</span>
+    <h3><a href={href} class="shop-product-card-title-link">{name}</a></h3>
+    <p>{description}</p>
+    <p class="shop-product-meta">{sourceText}</p>
+    <div class="shop-product-card-footer">
+      <div class="shop-product-price-stack">
+        {compareAtPrice !== undefined && shopProductPrice(compareAtPrice) !== price && (
+          <span class="shop-product-compare-at">{formatShopPrice(shopProductPrice(compareAtPrice))}</span>
+        )}
+        <span class="shop-product-price">{formatShopPrice(price)}</span>
+      </div>
+      {productType === 'stock' && availability && (
+        <span class:list={['shop-stock', { 'shop-stock--available': availability === 'available_in_australia' }]}>
+          {availabilityText}
+        </span>
+      )}
+    </div>
+    <div class="shop-product-card-actions">
+      {buyNowEnabled ? (
+        <button type="button" class="btn-primary shop-product-buy-now" data-buy-now data-slug={slug}>
+          Buy now
+        </button>
+      ) : null}
+      <a class={buyNowEnabled ? 'btn-ghost' : 'btn-primary'} href={href}>
+        View details
+      </a>
+    </div>
+  </div>
 </article>
