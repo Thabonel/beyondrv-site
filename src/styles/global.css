@@ -628,6 +628,16 @@ nav.scrolled {
 .key-spec-value { font-size: 0.9rem; font-weight: 500; color: var(--cream); }
 
 .product-ctas { display: flex; gap: 1rem; flex-wrap: wrap; }
+.product-ctas button.btn-ghost[data-stripe-checkout] {
+  background: var(--cream);
+  border-color: var(--cream);
+  color: var(--dark);
+}
+.product-ctas button.btn-ghost[data-stripe-checkout]:hover {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: var(--white);
+}
 
 .product-description { padding: 5rem 0; }
 .product-description-body { max-width: 740px; }
