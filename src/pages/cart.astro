@@ -125,7 +125,18 @@ const catalogue: Record<string, CatalogueEntry> = Object.fromEntries(catalogueEn
       ? `<form class="cart-shipping" data-shipping-form>
           <label class="cart-shipping-label" for="cart-postcode">Estimate shipping</label>
           <div class="cart-shipping-row">
-            <input id="cart-postcode" name="postcode" inputmode="numeric" autocomplete="postal-code" maxlength="4" placeholder="Postcode" data-shipping-postcode />
+            <input
+              id="cart-postcode"
+              name="postcode"
+              type="tel"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              autocomplete="postal-code"
+              maxlength="4"
+              placeholder="Postcode"
+              aria-label="Postcode"
+              data-shipping-postcode
+            />
             <button type="submit" class="btn-ghost" data-shipping-estimate>Get estimate</button>
           </div>
           <p class="cart-shipping-result" data-shipping-result role="status" aria-live="polite" hidden></p>
