@@ -5,6 +5,7 @@ tagline: "Available for sale now, with final images and additional details comin
 price: "$68,000"
 priceBadge: "IMAGES COMING SOON"
 status: "on-sale"
+onlinePurchaseEnabled: true
 onSale: true
 featured: false
 heroImage: "/images/optimized/products/sunpatch-19xc-hardtop-couples-offroad-van/01-sunpatch-19xc-coming-soon.webp"

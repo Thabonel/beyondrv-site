@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildCatalogue, validateCheckout } from '../src/lib/checkout.ts';
+import { buildCatalogue, getProductCheckoutOptions, validateCheckout } from '../src/lib/checkout.ts';
 
 const catalogue = buildCatalogue([
   { slug: 'ship', name: 'Shippable Part', price: 500, image: '/i.webp', productType: 'stock', availability: 'available_in_australia', purchasableOnline: true, fulfilmentType: 'ship' },
@@ -28,6 +28,45 @@ test('ship + purchasable + available is allowed with trusted price/title', () =>
 test('pickup + purchasable + available is allowed', () => {
   const result = validateCheckout(catalogue, [{ slug: 'pickup', quantity: 1 }]);
   assert.equal(result.ok, true);
+});
+
+test('vehicle checkout options require an explicit online purchase flag', () => {
+  const result = getProductCheckoutOptions(
+    {
+      price: '$72,000',
+      availability: 'available_in_australia',
+      onlinePurchaseEnabled: true,
+      depositEnabled: true,
+      fullPaymentEnabled: true,
+    },
+    1 / 3,
+    ['This payment is a deposit request.'],
+  );
+
+  assert.equal(result.isEligible, true);
+  assert.equal(result.supportsDeposit, true);
+  assert.equal(result.supportsFullPrice, true);
+  assert.equal(result.salePrice, 72000);
+  assert.equal(result.depositAmount, 24000);
+  assert.equal(result.fullPriceAmount, 72000);
+  assert.deepEqual(result.legalNoticeText, ['This payment is a deposit request.']);
+});
+
+test('vehicle checkout options stay closed without an explicit online purchase flag', () => {
+  const result = getProductCheckoutOptions(
+    {
+      price: '$72,000',
+      availability: 'available_in_australia',
+      depositEnabled: true,
+      fullPaymentEnabled: true,
+    },
+    1 / 3,
+  );
+
+  assert.equal(result.isEligible, false);
+  assert.equal(result.supportsDeposit, false);
+  assert.equal(result.supportsFullPrice, false);
+  assert.equal(result.depositAmount, 0);
 });
 
 test('install fulfilment is blocked', () => {

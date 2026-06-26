@@ -5,6 +5,7 @@ tagline: "The Advent 2150 is the go-anywhere companion for 4x4 space cab utes an
 price: "$72,000"
 priceBadge: "IMMEDIATE DELIVERY"
 status: "on-sale"
+onlinePurchaseEnabled: true
 onSale: true
 featured: true
 heroImage: "/images/optimized/products/advent-2150-hardtop-slide-on/01-advent-2150-hardtop-slide-on-hero.webp"

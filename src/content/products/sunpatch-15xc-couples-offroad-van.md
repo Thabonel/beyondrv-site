@@ -5,6 +5,7 @@ tagline: Couples off-road van with 240L fresh water and 200Ah lithium battery.
 price: $63,000
 priceBadge: IMMEDIATE DELIVERY
 status: on-sale
+onlinePurchaseEnabled: true
 onSale: true
 featured: true
 heroImage: /images/optimized/products/sunpatch-15xc-couples-offroad-van/01-sunpatch-15xc-couples-offroad-van-hero.webp

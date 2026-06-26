@@ -5,6 +5,7 @@ tagline: Compact hardtop couples van for buyers who want a lighter off-road setu
 price: $39,999
 priceBadge: IMMEDIATE DELIVERY
 status: on-sale
+onlinePurchaseEnabled: true
 onSale: true
 featured: true
 heroImage: /images/optimized/products/sunpatch-12c-couples-caravan/01-sunpatch-12c-couples-caravan-hero.webp

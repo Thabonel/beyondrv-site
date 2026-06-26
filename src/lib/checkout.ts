@@ -1,3 +1,5 @@
+import { calculateDepositAmount, parseMoneyValue, STRIPE_DEPOSIT_PERCENT } from './payment.ts';
+
 export type ShopAvailability =
   | 'available_in_australia'
   | 'coming_next_container'
@@ -21,16 +23,75 @@ export function isOnlinePayableFulfilment(fulfilmentType: FulfilmentType | undef
   return fulfilmentType === 'ship' || fulfilmentType === 'pickup';
 }
 
+function isVehicleOnlinePurchaseEnabled(product: {
+  onlinePurchaseEnabled?: boolean;
+  purchasableOnline?: boolean;
+}) {
+  return product.onlinePurchaseEnabled === true || product.purchasableOnline === true;
+}
+
+function isVehicleAvailabilityEligible(availability?: ShopAvailability) {
+  return Boolean(availability && ['available_in_australia', 'coming_next_container', 'made_to_order'].includes(availability));
+}
+
+function normaliseDepositPercent(value: number) {
+  return Number.isFinite(value) && value > 0 && value <= 1 ? value : STRIPE_DEPOSIT_PERCENT;
+}
+
 export function canPurchaseVehicleOnline(product: {
   availability?: ShopAvailability;
+  onlinePurchaseEnabled?: boolean;
   purchasableOnline?: boolean;
   depositEnabled?: boolean;
   fullPaymentEnabled?: boolean;
 }, purchaseType: 'deposit' | 'full'): boolean {
-  if (!product.purchasableOnline || !product.availability) return false;
-  if (!['available_in_australia', 'coming_next_container', 'made_to_order'].includes(product.availability)) return false;
+  if (!isVehicleOnlinePurchaseEnabled(product)) return false;
+  if (!isVehicleAvailabilityEligible(product.availability)) return false;
   if (purchaseType === 'deposit') return product.depositEnabled !== false;
   return product.fullPaymentEnabled !== false;
+}
+
+export interface ProductCheckoutOptions {
+  isEligible: boolean;
+  salePrice: number;
+  depositPercentage: number;
+  depositAmount: number;
+  legalNoticeText: string[];
+  supportsDeposit: boolean;
+  supportsFullPrice: boolean;
+  fullPriceAmount: number;
+}
+
+export function getProductCheckoutOptions(product: {
+  price?: string | number;
+  availability?: ShopAvailability;
+  onlinePurchaseEnabled?: boolean;
+  purchasableOnline?: boolean;
+  depositEnabled?: boolean;
+  fullPaymentEnabled?: boolean;
+}, depositPercent = STRIPE_DEPOSIT_PERCENT, legalNoticeText: string[] = []): ProductCheckoutOptions {
+  const salePrice = parseMoneyValue(product.price ?? '');
+  const depositPercentage = normaliseDepositPercent(depositPercent);
+  const hasTrustedPrice = Number.isFinite(salePrice) && salePrice > 0;
+  const onlinePurchaseEnabled = isVehicleOnlinePurchaseEnabled(product);
+  const availabilityEligible = isVehicleAvailabilityEligible(product.availability);
+  const supportsDeposit = onlinePurchaseEnabled && availabilityEligible && hasTrustedPrice && product.depositEnabled !== false;
+  const supportsFullPrice = onlinePurchaseEnabled && availabilityEligible && hasTrustedPrice && product.fullPaymentEnabled !== false;
+  const isEligible = supportsDeposit || supportsFullPrice;
+  const noticeLines = Array.isArray(legalNoticeText)
+    ? legalNoticeText.map((line) => line.trim()).filter(Boolean)
+    : [];
+
+  return {
+    isEligible,
+    salePrice: hasTrustedPrice ? salePrice : 0,
+    depositPercentage,
+    depositAmount: supportsDeposit ? calculateDepositAmount(salePrice, depositPercentage) : 0,
+    legalNoticeText: noticeLines,
+    supportsDeposit,
+    supportsFullPrice,
+    fullPriceAmount: supportsFullPrice ? Math.max(1, Math.round(salePrice)) : 0,
+  };
 }
 
 export interface ShopManifestEntry {

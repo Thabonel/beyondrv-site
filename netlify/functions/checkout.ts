@@ -2,8 +2,7 @@ import type { Handler } from '@netlify/functions';
 import manifest from './shop-catalogue.json';
 import productManifest from './product-catalogue.json';
 import paymentSettings from '../../src/data/payment-settings.json';
-import { buildCatalogue, validateCheckout, canPurchaseVehicleOnline, type ShopManifestEntry } from '../../src/lib/checkout';
-import { calculateDepositAmount, parseMoneyValue } from '../../src/lib/payment';
+import { buildCatalogue, validateCheckout, getProductCheckoutOptions, type ShopManifestEntry } from '../../src/lib/checkout';
 import { json, siteUrl } from './stripe-shared';
 import { isRateLimited, rateLimitResponse } from './security-utils';
 
@@ -19,6 +18,7 @@ interface ProductCatalogueEntry {
   price: string;
   status: 'available' | 'on-sale' | 'coming-soon';
   availability?: 'available_in_australia' | 'coming_next_container' | 'made_to_order' | 'ask_availability' | 'unavailable';
+  onlinePurchaseEnabled?: boolean;
   purchasableOnline?: boolean;
   depositEnabled?: boolean;
   fullPaymentEnabled?: boolean;
@@ -70,7 +70,19 @@ function resolveProductPurchase(slug: string, requestedType: unknown) {
   const vehicle = productBySlug[slug];
   if (!vehicle) return null;
   const type = isCheckoutType(requestedType) ? requestedType : 'full';
-  if (!canPurchaseVehicleOnline(vehicle, type)) {
+  const checkoutOptions = getProductCheckoutOptions(
+    {
+      price: vehicle.price,
+      availability: vehicle.availability,
+      onlinePurchaseEnabled: vehicle.onlinePurchaseEnabled,
+      purchasableOnline: vehicle.purchasableOnline,
+      depositEnabled: vehicle.depositEnabled,
+      fullPaymentEnabled: vehicle.fullPaymentEnabled,
+    },
+    configuredDepositPercent(),
+  );
+
+  if (type === 'deposit' && !checkoutOptions.supportsDeposit) {
     return {
       ok: false as const,
       code: 'NOT_PURCHASABLE' as const,
@@ -78,16 +90,15 @@ function resolveProductPurchase(slug: string, requestedType: unknown) {
     };
   }
 
-  const price = parseMoneyValue(vehicle.price);
-  if (!Number.isFinite(price) || price <= 0) {
+  if (type === 'full' && !checkoutOptions.supportsFullPrice) {
     return {
       ok: false as const,
-      code: 'INVALID_PRICE' as const,
-      message: 'This item cannot be purchased online right now.',
+      code: 'NOT_PURCHASABLE' as const,
+      message: `"${vehicle.title}" is not available for online checkout yet. Please ask us about availability.`,
     };
   }
 
-  const amount = type === 'deposit' ? calculateDepositAmount(price, configuredDepositPercent()) : Math.round(price);
+  const amount = type === 'deposit' ? checkoutOptions.depositAmount : checkoutOptions.fullPriceAmount;
   if (amount <= 0) {
     return {
       ok: false as const,

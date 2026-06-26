@@ -5,6 +5,7 @@ tagline: Family hardtop off-road van, currently available with one in stock.
 price: $73,000
 priceBadge: 1 IN STOCK
 status: on-sale
+onlinePurchaseEnabled: true
 onSale: true
 featured: false
 heroImage: /images/optimized/products/sunpatch-21xf-hardtop-family-offroad-van/01-sunpatch-21xf-hardtop-family-offroad-van-hero.webp

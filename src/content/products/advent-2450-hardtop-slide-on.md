@@ -5,6 +5,7 @@ tagline: "A larger hardtop slide-on designed specifically for single cab ute pla
 price: "$77,800"
 priceBadge: "BUILD TO ORDER"
 status: "available"
+onlinePurchaseEnabled: true
 onSale: false
 featured: false
 heroImage: "/images/optimized/products/advent-2450-hardtop-slide-on/01-advent-2450-hardtop-slide-on-hero.webp"

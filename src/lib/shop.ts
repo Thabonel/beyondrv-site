@@ -1,3 +1,5 @@
+import { canPurchaseOnline, canPurchaseVehicleOnline, getProductCheckoutOptions, isOnlinePayableFulfilment, type ShopAvailability, type FulfilmentType } from './checkout';
+
 export function formatShopPrice(price: number) {
   return new Intl.NumberFormat('en-AU', {
     style: 'currency',
@@ -14,9 +16,7 @@ export function categorySlug(category: string) {
   return category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
-import { canPurchaseOnline, canPurchaseVehicleOnline, isOnlinePayableFulfilment, type ShopAvailability, type FulfilmentType } from './checkout';
-
-export { canPurchaseOnline, canPurchaseVehicleOnline, isOnlinePayableFulfilment };
+export { canPurchaseOnline, canPurchaseVehicleOnline, getProductCheckoutOptions, isOnlinePayableFulfilment };
 export type { ShopAvailability, FulfilmentType };
 
 export interface FulfilmentInfo {

@@ -35,6 +35,7 @@ const vehicleProduct = z.object({
   priceBadge:    z.string().optional(),
   status:        z.enum(['available', 'on-sale', 'coming-soon']).default('available'),
   availability:  commerceAvailability.optional(),
+  onlinePurchaseEnabled: z.boolean().optional(),
   purchasableOnline: z.boolean().optional(),
   depositEnabled: z.boolean().optional(),
   fullPaymentEnabled: z.boolean().optional(),
@@ -61,6 +62,7 @@ const vehicleProduct = z.object({
   return {
     ...product,
     availability,
+    onlinePurchaseEnabled: product.onlinePurchaseEnabled ?? product.purchasableOnline ?? false,
     purchasableOnline: product.purchasableOnline ?? availability === 'available_in_australia',
     depositEnabled: product.depositEnabled ?? availability === 'available_in_australia',
     fullPaymentEnabled: product.fullPaymentEnabled ?? availability === 'available_in_australia',
@@ -88,6 +90,7 @@ const shopBase = {
   category:    z.string().min(1),
   featured:    z.boolean().default(false),
   availability: commerceAvailability.optional(),
+  onlinePurchaseEnabled: z.boolean().default(false),
   purchasableOnline: z.boolean().default(false),
   sourceType:   z.enum(['china_container', 'local_supplier', 'workshop_stock', 'custom_made_to_order', 'other']).optional(),
   leadTimeText: z.string().optional(),
@@ -150,6 +153,9 @@ const shopProduct = z.discriminatedUnion('productType', [stockProduct, servicePr
   availability: product.productType === 'stock'
     ? product.availability
     : (product.availability ?? 'available_in_australia'),
+  onlinePurchaseEnabled: product.productType === 'stock'
+    ? (product.onlinePurchaseEnabled ?? product.purchasableOnline ?? false)
+    : (product.onlinePurchaseEnabled ?? product.purchasableOnline ?? false),
   purchasableOnline: product.productType === 'stock'
     ? (product.purchasableOnline ?? (product.availability === 'available_in_australia'))
     : (product.purchasableOnline ?? false),

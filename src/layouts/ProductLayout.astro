@@ -3,8 +3,9 @@ import BaseLayout from './BaseLayout.astro';
 import OptionalExtras from '../components/OptionalExtras';
 import type { CollectionEntry } from 'astro:content';
 import { displayImageUrl, imageSrcSet, thumbImageUrl } from '../lib/media';
-import { calculateDepositAmount, parseMoneyValue } from '../lib/payment';
-import { availabilityLabel, availabilitySchema, canPurchaseVehicleOnline, formatShopPrice, normalizeSaleLabel, sourceTypeLabel } from '../lib/shop';
+import { parseMoneyValue } from '../lib/payment';
+import { availabilityLabel, availabilitySchema, formatShopPrice, normalizeSaleLabel, sourceTypeLabel } from '../lib/shop';
+import { getProductCheckoutOptions } from '../lib/checkout';
 import { normalizeVideoUploadDate } from '../lib/structuredData.js';
 import paymentSettings from '../data/payment-settings.json';
 
@@ -97,23 +98,19 @@ const configuredDepositPercent = Number.isFinite(paymentSettings.vehicleDepositP
   : 1 / 3;
 const availability = data.availability ?? (data.status === 'coming-soon' ? 'coming_next_container' : 'available_in_australia');
 const isComingSoon = availability !== 'available_in_australia' && availability !== 'made_to_order';
-const canDeposit = canPurchaseVehicleOnline({
+const checkoutOptions = getProductCheckoutOptions({
+  price: data.price,
   availability,
+  onlinePurchaseEnabled: data.onlinePurchaseEnabled,
   purchasableOnline: data.purchasableOnline,
   depositEnabled: data.depositEnabled,
   fullPaymentEnabled: data.fullPaymentEnabled,
-}, 'deposit') && hasValidPrice;
-const canFullPayment = canPurchaseVehicleOnline({
-  availability,
-  purchasableOnline: data.purchasableOnline,
-  depositEnabled: data.depositEnabled,
-  fullPaymentEnabled: data.fullPaymentEnabled,
-}, 'full') && hasValidPrice;
-const depositAmount = canDeposit ? calculateDepositAmount(parsedPrice, configuredDepositPercent) : 0;
+}, configuredDepositPercent, paymentSettings.depositLegalNoticeBody);
+const canDeposit = checkoutOptions.supportsDeposit && hasValidPrice;
+const canFullPayment = checkoutOptions.supportsFullPrice && hasValidPrice;
+const depositAmount = checkoutOptions.depositAmount;
 const depositNoticeTitle = paymentSettings.depositLegalNoticeTitle || 'Before you pay a deposit';
-const depositNoticeBody = Array.isArray(paymentSettings.depositLegalNoticeBody)
-  ? paymentSettings.depositLegalNoticeBody.filter((line: string) => line.trim())
-  : [];
+const depositNoticeBody = checkoutOptions.legalNoticeText;
 const saleBadge = normalizeSaleLabel(data.saleLabel ?? data.priceBadge ?? '');
 const availabilityCopy = availability !== 'available_in_australia' ? availabilityLabel(availability) : '';
 const sourceCopy = sourceTypeLabel(data.sourceType);

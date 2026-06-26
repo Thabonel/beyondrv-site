@@ -4,6 +4,7 @@ category: "slide-on"
 tagline: "A hardtop ute slide-on camper with extra base length for longer tray setups."
 price: "$75,000"
 status: "available"
+onlinePurchaseEnabled: true
 onSale: false
 featured: false
 heroImage: "/images/optimized/products/advent-2300-hardtop-slide-on/01-advent-2300-hardtop-slide-on-hero.webp"
