@@ -2,8 +2,9 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { displayImageUrl, imageSrcSet } from '../../lib/media';
-import { formatShopPrice, shopProductPrice, availabilityLabel, availabilitySchema, canPurchaseOnline, isOnlinePayableFulfilment, fulfilmentInfo, sourceTypeLabel } from '../../lib/shop';
+import { formatShopPrice, shopProductPrice, availabilityLabel, canPurchaseOnline, isOnlinePayableFulfilment, fulfilmentInfo, sourceTypeLabel } from '../../lib/shop';
 import { ORDER_MAX } from '../../lib/cart';
+import { buildMerchantProduct } from '../../lib/structuredData.js';
 
 export async function getStaticPaths() {
   const allProducts = await getCollection('products');
@@ -44,22 +45,17 @@ const itemAdditionalProperty = stockData && hasItemSpecs && stockData.weight && 
   : undefined;
 const structuredData = [
   {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: data.name,
-    description: data.description,
-    image: data.images.map((image: string) => new URL(image, 'https://beyondrv.com.au').toString()),
-    category: data.category,
-    url: productUrl,
-    offers: {
-      '@type': 'Offer',
-      price: unitPrice,
-      priceCurrency: 'AUD',
+    ...buildMerchantProduct({
+      slug: data.slug,
+      name: data.name,
+      description: data.description,
       url: productUrl,
-      ...(stockData
-        ? { availability: availabilitySchema(stockData.availability) }
-        : {}),
-    },
+      image: data.images.map((image: string) => new URL(image, 'https://beyondrv.com.au').toString()),
+      price: data.price,
+      status: data.status,
+      availability: stockData ? stockData.availability : data.availability,
+      category: data.category,
+    }),
     ...(itemAdditionalProperty ? { additionalProperty: itemAdditionalProperty } : {}),
   },
   {

@@ -4,9 +4,9 @@ import OptionalExtras from '../components/OptionalExtras';
 import type { CollectionEntry } from 'astro:content';
 import { displayImageUrl, imageSrcSet, thumbImageUrl } from '../lib/media';
 import { parseMoneyValue } from '../lib/payment';
-import { availabilityLabel, availabilitySchema, formatShopPrice, normalizeSaleLabel, sourceTypeLabel } from '../lib/shop';
+import { availabilityLabel, formatShopPrice, normalizeSaleLabel, sourceTypeLabel } from '../lib/shop';
 import { getProductCheckoutOptions } from '../lib/checkout';
-import { normalizeVideoUploadDate } from '../lib/structuredData.js';
+import { buildMerchantProduct, normalizeVideoUploadDate } from '../lib/structuredData.js';
 import paymentSettings from '../data/payment-settings.json';
 
 type ProductData = CollectionEntry<'products'>['data'];
@@ -90,7 +90,6 @@ const suitabilityFieldRows = data.category === 'caravan'
       { label: 'Centre of gravity', value: suitabilityValue(suitability?.centreOfGravityMm) },
     ];
 
-const priceNum = data.price.replace(/[^0-9.]/g, '');
 const parsedPrice = parseMoneyValue(data.price);
 const hasValidPrice = Number.isFinite(parsedPrice) && parsedPrice > 0;
 const configuredDepositPercent = Number.isFinite(paymentSettings.vehicleDepositPercent) && paymentSettings.vehicleDepositPercent > 0 && paymentSettings.vehicleDepositPercent <= 1
@@ -121,81 +120,17 @@ const paymentNote = canDeposit && canFullPayment
     : canFullPayment
       ? 'Secure checkout via Stripe. Full payment available.'
       : '';
-function compactSku(slug: string) {
-  const cleaned = slug.toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-  let hash = 0;
-  for (const char of slug) hash = ((hash << 5) - hash + char.charCodeAt(0)) >>> 0;
-  const suffix = hash.toString(36).toUpperCase().padStart(6, '0').slice(-6);
-  const prefix = cleaned.slice(0, 21).replace(/-+$/g, '');
-  return `BRV-${prefix}-${suffix}`;
-}
-const merchantReturnPolicy = {
-  "@type": "MerchantReturnPolicy",
-  "applicableCountry": "AU",
-  "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted"
-};
-const pickupShippingDetails = {
-  "@type": "OfferShippingDetails",
-  "shippingDestination": {
-    "@type": "DefinedRegion",
-    "addressCountry": "AU"
-  },
-  "shippingRate": {
-    "@type": "MonetaryAmount",
-    "value": "0",
-    "currency": "AUD"
-  },
-  "deliveryTime": {
-    "@type": "ShippingDeliveryTime",
-    "handlingTime": {
-      "@type": "QuantitativeValue",
-      "minValue": 0,
-      "maxValue": 0,
-      "unitCode": "DAY"
-    },
-    "transitTime": {
-      "@type": "QuantitativeValue",
-      "minValue": 0,
-      "maxValue": 0,
-      "unitCode": "DAY"
-    }
-  },
-  "shippingLabel": "Workshop pickup or delivery arranged directly with Beyond RV."
-};
-const productSchema = {
-  "@context": "https://schema.org",
-  "@type": "Product",
-  "@id": `${productUrl}#product`,
-  "name": data.title,
-  "description": data.seoDesc ?? data.tagline,
-  "url": productUrl,
-  "sku": compactSku(product.slug),
-  "brand": { "@type": "Brand", "name": "Beyond RV" },
-  "manufacturer": { "@type": "Organization", "name": "Beyond RV", "url": "https://beyondrv.com.au/" },
-  "image": productImages,
-  "category": categoryMeta.name,
-  "itemCondition": "https://schema.org/NewCondition",
-  "areaServed": { "@type": "Country", "name": "Australia" },
-  ...(hasValidPrice && {
-  "offers": {
-      "@type": "Offer",
-      "url": productUrl,
-      "priceCurrency": "AUD",
-      "price": priceNum,
-      "priceValidUntil": "2026-12-31",
-      "itemCondition": "https://schema.org/NewCondition",
-      "availability": availabilitySchema(availability),
-      "seller": {
-        "@type": "Organization",
-        "name": "Beyond RV",
-        "url": "https://beyondrv.com.au/"
-      },
-      "areaServed": { "@type": "Country", "name": "Australia" },
-      "hasMerchantReturnPolicy": merchantReturnPolicy,
-      "shippingDetails": pickupShippingDetails
-    }
-  }),
-};
+const productSchema = buildMerchantProduct({
+  slug: product.slug,
+  name: data.title,
+  description: data.seoDesc ?? data.tagline,
+  url: productUrl,
+  image: productImages,
+  price: data.price,
+  status: data.status,
+  availability,
+  category: categoryMeta.name,
+});
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",

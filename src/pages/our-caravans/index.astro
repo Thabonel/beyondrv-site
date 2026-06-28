@@ -4,7 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import ProductComparisonTable from '../../components/ProductComparisonTable.astro';
 import { displayImageUrl } from '../../lib/media';
-import { buildProductOffer } from '../../lib/structuredData.js';
+import { buildMerchantProduct } from '../../lib/structuredData.js';
 
 const productOrder = [
   'sunpatch-12c-couples-caravan',
@@ -26,12 +26,17 @@ const schema = {
   "url": "https://beyondrv.com.au/our-caravans/",
   "hasPart": products.map(p => {
     const productUrl = `https://beyondrv.com.au/${p.slug}/`;
-    return {
-      "@type": "Product",
-      "name": p.data.title,
-      "url": productUrl,
-      "offers": buildProductOffer({ price: p.data.price, status: p.data.status, url: productUrl, availability: p.data.availability })
-    };
+    return buildMerchantProduct({
+      slug: p.slug,
+      name: p.data.title,
+      description: p.data.seoDesc ?? p.data.tagline,
+      url: productUrl,
+      image: new URL(p.data.heroImage, 'https://beyondrv.com.au').toString(),
+      price: p.data.price,
+      status: p.data.status,
+      availability: p.data.availability,
+      category: 'Off-Road Caravans',
+    });
   })
 };
 const faqSchema = {
