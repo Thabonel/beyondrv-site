@@ -4,7 +4,7 @@ import OptionalExtras from '../components/OptionalExtras';
 import type { CollectionEntry } from 'astro:content';
 import { displayImageUrl, imageSrcSet, thumbImageUrl } from '../lib/media';
 import { parseMoneyValue } from '../lib/payment';
-import { availabilityLabel, formatShopPrice, normalizeSaleLabel, sourceTypeLabel } from '../lib/shop';
+import { availabilityLabel, formatShopPrice, normalizeSaleLabel, sourceTypeLabel, availabilitySchema } from '../lib/shop';
 import { getProductCheckoutOptions } from '../lib/checkout';
 import { buildMerchantProduct, normalizeVideoUploadDate } from '../lib/structuredData.js';
 import paymentSettings from '../data/payment-settings.json';
@@ -128,7 +128,7 @@ const productSchema = buildMerchantProduct({
   image: productImages,
   price: data.price,
   status: data.status,
-  availability,
+  availability: availabilitySchema(availability),
   category: categoryMeta.name,
 });
 
