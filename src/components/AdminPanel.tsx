@@ -1502,6 +1502,7 @@ export default function AdminPanel() {
   ]);
   const [input, setInput] = useState('');
   const [activeTab, setActiveTab] = useState<PanelTab>('dashboard');
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [knowledgeInput, setKnowledgeInput] = useState('');
   const [knowledgeSearch, setKnowledgeSearch] = useState('');
   const [knowledgeProduct, setKnowledgeProduct] = useState('');
@@ -3679,6 +3680,11 @@ export default function AdminPanel() {
     return tab.replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
   }
 
+  function selectTab(tab: PanelTab) {
+    setActiveTab(tab);
+    setShowMobileMenu(false);
+  }
+
   return (
     <>
     <div style={{ height: 'calc(100vh - 60px)', padding: '1rem', fontFamily: 'inherit' }}>
@@ -3701,30 +3707,83 @@ export default function AdminPanel() {
           </div>
         </div>
         <div className="admin-mobile-nav" style={{ display: 'none', padding: '0.75rem 1rem', borderBottom: '1px solid #333', background: '#111' }}>
-          <label htmlFor="adminSectionPicker" style={{ display: 'block', color: '#888', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
-            Admin section
-          </label>
-          <select
-            id="adminSectionPicker"
-            value={activeTab}
-            onChange={e => setActiveTab(e.target.value as PanelTab)}
+          <button
+            type="button"
+            onClick={() => setShowMobileMenu(prev => !prev)}
+            aria-expanded={showMobileMenu}
+            aria-controls="adminMobileMenu"
             style={{
               width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '0.75rem',
               background: '#1a1a1a',
               color: '#fff',
               border: '1px solid #444',
-              borderRadius: '8px',
-              padding: '0.7rem 0.8rem',
+              borderRadius: '10px',
+              padding: '0.8rem 0.9rem',
               fontSize: '0.9rem',
-              fontWeight: 700,
+              fontWeight: 800,
+              cursor: 'pointer',
             }}
           >
-            {panelTabs.map(tab => (
-              <option key={tab} value={tab}>
-                {tabLabel(tab)}
-              </option>
-            ))}
-          </select>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
+              <span aria-hidden="true" style={{ display: 'inline-flex', flexDirection: 'column', gap: '3px' }}>
+                <span style={{ width: '16px', height: '2px', background: '#fff', borderRadius: '999px', display: 'block' }} />
+                <span style={{ width: '16px', height: '2px', background: '#fff', borderRadius: '999px', display: 'block' }} />
+                <span style={{ width: '16px', height: '2px', background: '#fff', borderRadius: '999px', display: 'block' }} />
+              </span>
+              <span>Menu</span>
+            </span>
+            <span style={{ color: '#aaa', fontSize: '0.76rem', fontWeight: 700 }}>{tabLabel(activeTab)}</span>
+          </button>
+          {showMobileMenu && (
+            <div
+              id="adminMobileMenu"
+              style={{
+                marginTop: '0.75rem',
+                background: '#121212',
+                border: '1px solid #333',
+                borderRadius: '12px',
+                padding: '0.6rem',
+                maxHeight: '48vh',
+                overflowY: 'auto',
+                boxShadow: '0 16px 40px rgba(0,0,0,0.45)',
+              }}
+            >
+              <div style={{ color: '#888', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '0.25rem 0.35rem 0.65rem' }}>
+                Admin sections
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                {panelTabs.map(tab => {
+                  const isActive = activeTab === tab;
+                  return (
+                    <button
+                      key={tab}
+                      type="button"
+                      onClick={() => selectTab(tab)}
+                      style={{
+                        background: isActive ? '#E8540A' : '#1a1a1a',
+                        color: isActive ? '#fff' : '#ddd',
+                        border: `1px solid ${isActive ? '#E8540A' : '#333'}`,
+                        borderRadius: '10px',
+                        padding: '0.7rem 0.55rem',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        fontWeight: 800,
+                        fontSize: '0.78rem',
+                        lineHeight: 1.2,
+                        minHeight: '3.1rem',
+                      }}
+                    >
+                      {tabLabel(tab)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
         <div className="admin-tab-bar" style={{ display: 'grid', gridTemplateColumns: 'repeat(17, minmax(0, 1fr))', borderBottom: '1px solid #333' }}>
           {panelTabs.map(tab => (
