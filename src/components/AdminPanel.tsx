@@ -3672,6 +3672,12 @@ export default function AdminPanel() {
   };
   const pendingGmailSuggestions = gmailThreads.reduce((count, thread) => count + (!thread.matchDecision ? (thread.suggestions?.length || 0) : 0), 0);
   const pendingDriveSuggestions = driveFiles.reduce((count, file) => count + (!file.matchDecision ? (file.suggestions?.length || 0) : 0), 0);
+  const panelTabs: PanelTab[] = ['dashboard', 'products', 'shop', 'orders', 'settings', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'matches', 'reports', 'pending'];
+
+  function tabLabel(tab: PanelTab) {
+    if (tab === 'pending') return `Pending (${pending.length})`;
+    return tab.replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+  }
 
   return (
     <>
@@ -3694,8 +3700,34 @@ export default function AdminPanel() {
             </button>
           </div>
         </div>
+        <div className="admin-mobile-nav" style={{ display: 'none', padding: '0.75rem 1rem', borderBottom: '1px solid #333', background: '#111' }}>
+          <label htmlFor="adminSectionPicker" style={{ display: 'block', color: '#888', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
+            Admin section
+          </label>
+          <select
+            id="adminSectionPicker"
+            value={activeTab}
+            onChange={e => setActiveTab(e.target.value as PanelTab)}
+            style={{
+              width: '100%',
+              background: '#1a1a1a',
+              color: '#fff',
+              border: '1px solid #444',
+              borderRadius: '8px',
+              padding: '0.7rem 0.8rem',
+              fontSize: '0.9rem',
+              fontWeight: 700,
+            }}
+          >
+            {panelTabs.map(tab => (
+              <option key={tab} value={tab}>
+                {tabLabel(tab)}
+              </option>
+            ))}
+          </select>
+        </div>
         <div className="admin-tab-bar" style={{ display: 'grid', gridTemplateColumns: 'repeat(17, minmax(0, 1fr))', borderBottom: '1px solid #333' }}>
-          {(['dashboard', 'products', 'shop', 'orders', 'settings', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'matches', 'reports', 'pending'] as PanelTab[]).map(tab => (
+          {panelTabs.map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -3712,7 +3744,7 @@ export default function AdminPanel() {
                 fontSize: '0.72rem',
               }}
             >
-              {tab === 'pending' ? `Pending (${pending.length})` : tab}
+              {tabLabel(tab)}
             </button>
           ))}
         </div>

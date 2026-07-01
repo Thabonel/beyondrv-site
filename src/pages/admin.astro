@@ -43,22 +43,9 @@ import AdminPanel from '../components/AdminPanel';
       }
       @media (max-width: 900px) {
         .admin-tab-bar {
-          display: flex !important;
-          overflow-x: auto;
-          overflow-y: hidden;
-          -webkit-overflow-scrolling: touch;
-          scrollbar-width: none;
-          -ms-overflow-style: none;
+          display: none !important;
         }
-        .admin-tab-bar::-webkit-scrollbar { display: none; }
-        .admin-tab-button {
-          flex: 0 0 auto;
-          min-width: 92px;
-          padding: 0.55rem 0.5rem !important;
-          font-size: 0.66rem !important;
-          line-height: 1.05;
-          white-space: normal;
-        }
+        .admin-mobile-nav { display: block !important; }
       }
     </style>
   </head>
