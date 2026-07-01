@@ -1609,6 +1609,7 @@ export default function AdminPanel() {
   const mediaFileRef = useRef<HTMLInputElement>(null);
   const newProductFileRef = useRef<HTMLInputElement>(null);
   const enquiryRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const pendingEnquiryHashRef = useRef<string | null>(null);
   const notifiedReminderIds = useRef<Set<string>>(new Set());
 
   useEffect(() => {
@@ -1678,6 +1679,39 @@ export default function AdminPanel() {
       void loadGoogleStatus();
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    function syncEnquiryHash() {
+      const hash = window.location.hash || '';
+      const match = hash.match(/^#enquiry-(.+)$/);
+      pendingEnquiryHashRef.current = match ? decodeURIComponent(match[1]) : null;
+      if (pendingEnquiryHashRef.current) {
+        setActiveTab('enquiries');
+      }
+    }
+
+    syncEnquiryHash();
+    window.addEventListener('hashchange', syncEnquiryHash);
+    return () => window.removeEventListener('hashchange', syncEnquiryHash);
+  }, []);
+
+  useEffect(() => {
+    const enquiryId = pendingEnquiryHashRef.current;
+    if (!enquiryId || activeTab !== 'enquiries' || enquiriesLoading || enquiries.length === 0) return;
+    const target = enquiries.find(enquiry => enquiry.id === enquiryId);
+    if (!target) return;
+
+    const desiredFilter = isArchivedEnquiry(target) ? 'archived' : 'all';
+    if (enquiryQueueFilter !== desiredFilter) {
+      setEnquiryQueueFilter(desiredFilter);
+      return;
+    }
+
+    if (!enquiryRefs.current[enquiryId]) return;
+
+    openEnquiry(enquiryId);
+    pendingEnquiryHashRef.current = null;
+  }, [activeTab, enquiries, enquiriesLoading, enquiryQueueFilter]);
 
   useEffect(() => {
     if (activeTab === 'matches') {
@@ -2158,6 +2192,10 @@ export default function AdminPanel() {
 
   function openEnquiry(enquiryId: string) {
     enquiryRefs.current[enquiryId]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setOpenLeadDetailId(enquiryId);
+    if (!leadDetails[enquiryId]) {
+      void loadLeadDetail(enquiryId);
+    }
   }
 
   async function lookupProductKnowledge() {
@@ -3656,11 +3694,12 @@ export default function AdminPanel() {
             </button>
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(17, minmax(0, 1fr))', borderBottom: '1px solid #333' }}>
+        <div className="admin-tab-bar" style={{ display: 'grid', gridTemplateColumns: 'repeat(17, minmax(0, 1fr))', borderBottom: '1px solid #333' }}>
           {(['dashboard', 'products', 'shop', 'orders', 'settings', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'matches', 'reports', 'pending'] as PanelTab[]).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
+              className="admin-tab-button"
               style={{
                 background: activeTab === tab ? '#E8540A' : 'transparent',
                 color: activeTab === tab ? '#fff' : '#aaa',
@@ -4832,6 +4871,7 @@ export default function AdminPanel() {
               {!enquiriesLoading && queuedEnquiries.map(enquiry => (
                 <div
                   key={enquiry.id}
+                  id={`enquiry-${enquiry.id}`}
                   data-testid={`enquiry-card-${enquiry.id}`}
                   ref={node => {
                     enquiryRefs.current[enquiry.id] = node;
@@ -5306,25 +5346,43 @@ export default function AdminPanel() {
               </button>
             </div>
             {copilotRecordsStatus && <div style={{ color: isAdminWarningStatus(copilotRecordsStatus) ? '#fb923c' : '#aaa', fontSize: '0.76rem' }}>{copilotRecordsStatus}</div>}
-            {copilotLeads.length === 0 && !copilotRecordsLoading ? (
-              <div style={{ color: '#777', fontSize: '0.82rem' }}>No Copilot leads yet. New website and manual enquiries will create them automatically.</div>
-            ) : (
-              copilotLeads.map(lead => {
-                const customer = copilotCustomers.find(item => item.id === lead.customerId);
-                return (
-                  <div key={lead.id} style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.75rem', display: 'grid', gap: '0.35rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem', alignItems: 'baseline' }}>
-                      <div style={{ color: '#fff', fontWeight: 800 }}>{customer?.name || customer?.email || customer?.phone || 'Unmatched customer'}</div>
-                      <span style={{ color: '#fb923c', border: '1px solid #7c2d12', borderRadius: '999px', padding: '0.1rem 0.45rem', fontSize: '0.66rem', fontWeight: 800, textTransform: 'uppercase' }}>{lead.status || 'new'}</span>
-                    </div>
-                    <div style={{ color: '#aaa', fontSize: '0.76rem', lineHeight: 1.45 }}>Product: {lead.productInterest || 'Not specified'} · Score: {typeof lead.score === 'number' ? lead.score : 0}</div>
-                    {lead.nextFollowUpDate && <div style={{ color: '#fb923c', fontSize: '0.74rem' }}>Next follow-up: {lead.nextFollowUpDate}</div>}
-                    {lead.notes && <div style={{ color: '#888', fontSize: '0.74rem', lineHeight: 1.45 }}>{lead.notes}</div>}
-                    <div style={{ color: '#666', fontSize: '0.68rem' }}>Source: {lead.source || 'unknown'} · Enquiry: {lead.sourceEnquiryId || 'none'} · Updated: {lead.updatedAt ? new Date(lead.updatedAt).toLocaleString() : 'Not recorded'}</div>
-                  </div>
-                );
-              })
-            )}
+              {copilotLeads.length === 0 && !copilotRecordsLoading ? (
+                <div style={{ color: '#777', fontSize: '0.82rem' }}>No Copilot leads yet. New website and manual enquiries will create them automatically.</div>
+              ) : (
+                copilotLeads.map(lead => {
+                  const customer = copilotCustomers.find(item => item.id === lead.customerId);
+                  const enquiryLink = lead.sourceEnquiryId ? `/admin#enquiry-${encodeURIComponent(lead.sourceEnquiryId)}` : '';
+                  const cardStyle = { background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.75rem', display: 'grid', gap: '0.35rem', textDecoration: 'none', color: 'inherit', cursor: enquiryLink ? 'pointer' : 'default' } as const;
+                  const content = (
+                    <>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem', alignItems: 'baseline' }}>
+                        <div style={{ color: '#fff', fontWeight: 800 }}>{customer?.name || customer?.email || customer?.phone || 'Unmatched customer'}</div>
+                        <span style={{ color: '#fb923c', border: '1px solid #7c2d12', borderRadius: '999px', padding: '0.1rem 0.45rem', fontSize: '0.66rem', fontWeight: 800, textTransform: 'uppercase' }}>{lead.status || 'new'}</span>
+                      </div>
+                      <div style={{ color: '#aaa', fontSize: '0.76rem', lineHeight: 1.45 }}>Product: {lead.productInterest || 'Not specified'} · Score: {typeof lead.score === 'number' ? lead.score : 0}</div>
+                      {lead.nextFollowUpDate && <div style={{ color: '#fb923c', fontSize: '0.74rem' }}>Next follow-up: {lead.nextFollowUpDate}</div>}
+                      {lead.notes && <div style={{ color: '#888', fontSize: '0.74rem', lineHeight: 1.45 }}>{lead.notes}</div>}
+                      <div style={{ color: '#666', fontSize: '0.68rem' }}>Source: {lead.source || 'unknown'} · Enquiry: {lead.sourceEnquiryId || 'none'} · Updated: {lead.updatedAt ? new Date(lead.updatedAt).toLocaleString() : 'Not recorded'}</div>
+                    </>
+                  );
+                  return (
+                    enquiryLink ? (
+                      <a
+                        key={lead.id}
+                        href={enquiryLink}
+                        aria-label={`Open enquiry for ${customer?.name || customer?.email || customer?.phone || 'this lead'}`}
+                        style={cardStyle}
+                      >
+                        {content}
+                      </a>
+                    ) : (
+                      <div key={lead.id} style={cardStyle}>
+                        {content}
+                      </div>
+                    )
+                  );
+                })
+              )}
           </div>
         )}
 

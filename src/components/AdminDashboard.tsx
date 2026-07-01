@@ -292,6 +292,10 @@ function StatusPill({ status }: { status: string }) {
   );
 }
 
+function enquiryHref(enquiryId: string) {
+  return `/admin#enquiry-${encodeURIComponent(enquiryId)}`;
+}
+
 export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: number }) {
   const [range, setRange] = useState('30');
   const [data, setData] = useState<DashboardData | null>(null);
@@ -451,8 +455,10 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
                   const createdLabel = item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-AU') : '';
                   const updatedLabel = item.updatedAt ? new Date(item.updatedAt).toLocaleDateString('en-AU') : '';
                   const contactLine = [item.customerEmail, item.customerPhone].filter(Boolean).join(' · ');
-                  return (
-                    <div key={item.id} style={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '6px', padding: '0.7rem', display: 'grid', gap: '0.35rem' }}>
+                  const isEnquirySource = item.sourceStore === 'customer-enquiries' && Boolean(item.sourceRecordId);
+                  const cardStyle = { background: '#1a1a1a', border: '1px solid #333', borderRadius: '6px', padding: '0.7rem', display: 'grid', gap: '0.35rem', textDecoration: 'none', color: 'inherit', cursor: isEnquirySource ? 'pointer' : 'default' } as const;
+                  const content = (
+                    <>
                       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.55rem', alignItems: 'start' }}>
                         <div style={{ minWidth: 0 }}>
                           <strong style={{ color: '#fff', fontSize: '0.8rem' }}>{item.customerName || 'Unnamed record'}</strong>
@@ -483,7 +489,23 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
                           {item.internalNotes.length > 220 ? '…' : ''}
                         </div>
                       )}
-                    </div>
+                    </>
+                  );
+                  return (
+                    isEnquirySource ? (
+                      <a
+                        key={item.id}
+                        href={enquiryHref(item.sourceRecordId)}
+                        aria-label={`Open enquiry for ${item.customerName || 'this contact'}`}
+                        style={cardStyle}
+                      >
+                        {content}
+                      </a>
+                    ) : (
+                      <div key={item.id} style={cardStyle}>
+                        {content}
+                      </div>
+                    )
                   );
                 })}
               </div>

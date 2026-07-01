@@ -28,19 +28,51 @@ import AdminPanel from '../components/AdminPanel';
         position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
         overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
       }
+      @media (max-width: 900px) {
+        header {
+          align-items: flex-start;
+          gap: 0.75rem;
+          padding: 0.75rem 0.8rem;
+          height: auto;
+          flex-wrap: wrap;
+        }
+        header img { height: 32px; }
+        header nav { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        header nav a { margin-left: 0; }
+        .admin-topbar-note { display: none; }
+      }
+      @media (max-width: 900px) {
+        .admin-tab-bar {
+          display: flex !important;
+          overflow-x: auto;
+          overflow-y: hidden;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        .admin-tab-bar::-webkit-scrollbar { display: none; }
+        .admin-tab-button {
+          flex: 0 0 auto;
+          min-width: 92px;
+          padding: 0.55rem 0.5rem !important;
+          font-size: 0.66rem !important;
+          line-height: 1.05;
+          white-space: normal;
+        }
+      }
     </style>
   </head>
   <body>
     <h1 class="sr-only">Beyond RV Admin</h1>
     <header>
-      <div style="display:flex;align-items:center;gap:1.5rem">
+      <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
         <img src="/images/site/admin-logo.png" alt="Beyond RV" width="48" height="36" loading="eager" decoding="async" />
         <nav style="display:flex">
           <a href="/admin" style="color:#fff;text-decoration:none;font-size:0.85rem;padding:0.3rem 0.75rem;background:#1a1a1a;border-radius:4px">Admin</a>
           <a href="/admin/analytics" style="color:#888;text-decoration:none;font-size:0.85rem;padding:0.3rem 0.75rem;border-radius:4px;margin-left:0.5rem">Analytics</a>
         </nav>
       </div>
-      <span>Site Admin — changes deploy directly to production</span>
+      <span class="admin-topbar-note">Site Admin — changes deploy directly to production</span>
     </header>
     <AdminPanel client:load />
   </body>
