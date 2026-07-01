@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { displayImageUrl, imageSrcSet } from '../../lib/media';
+import { displayImageUrl, imageSrcSet, thumbImageUrl } from '../../lib/media';
 import { formatShopPrice, shopProductPrice, availabilityLabel, canPurchaseOnline, isOnlinePayableFulfilment, fulfilmentInfo, sourceTypeLabel } from '../../lib/shop';
 import { ORDER_MAX } from '../../lib/cart';
 import { buildMerchantProduct } from '../../lib/structuredData.js';
@@ -18,6 +18,13 @@ export async function getStaticPaths() {
 
 interface Props {
   product: Awaited<ReturnType<typeof getCollection<'products'>>>[number];
+}
+
+interface GalleryImage {
+  original: string;
+  display: string;
+  thumb: string;
+  srcset: string;
 }
 
 const { product } = Astro.props;
@@ -68,8 +75,14 @@ const structuredData = [
     ],
   },
 ];
-const mainImage = displayImageUrl(data.images[0], 1200);
-const mainImageSrcSet = imageSrcSet(data.images[0], [480, 800, 1200]);
+const galleryImages: GalleryImage[] = data.images.map((image: string) => ({
+  original: image,
+  display: displayImageUrl(image, 1200),
+  thumb: thumbImageUrl(image),
+  srcset: imageSrcSet(image, [480, 800, 1200]),
+}));
+const mainImage = galleryImages[0]?.display ?? displayImageUrl(data.images[0], 1200);
+const mainImageSrcSet = galleryImages[0]?.srcset ?? imageSrcSet(data.images[0], [480, 800, 1200]);
 ---
 <BaseLayout
   title={data.seoTitle ?? `${data.name} | Beyond RV Shop`}
@@ -90,21 +103,48 @@ const mainImageSrcSet = imageSrcSet(data.images[0], [480, 800, 1200]);
 
     <div class="shop-detail-grid">
       <div class="shop-detail-media">
-        <img
-          class="shop-detail-main-image"
-          src={mainImage}
-          srcset={mainImageSrcSet}
-          sizes="(max-width: 900px) 100vw, 58vw"
-          alt={data.name}
-          decoding="async"
-        />
-        {data.images.length > 1 && (
-          <div class="shop-detail-gallery">
-            {data.images.slice(1).map((image: string, index: number) => (
-              <img src={displayImageUrl(image, 480)} alt={`${data.name} installation view ${index + 2}`} loading="lazy" decoding="async" />
-            ))}
+        <div class="product-gallery">
+          <div class="product-gallery-main">
+            <img
+              id="shopHeroImg"
+              src={mainImage}
+              srcset={mainImageSrcSet}
+              sizes="(max-width: 900px) 100vw, 58vw"
+              alt={data.name}
+              loading="eager"
+              decoding="async"
+              fetchpriority="high"
+            />
+            {galleryImages.length > 1 && (
+              <div class="product-gallery-controls" aria-label={`${data.name} gallery navigation`}>
+                <button class="gallery-nav-btn gallery-nav-prev" type="button" aria-label="Previous photo" data-gallery-prev>
+                  ‹
+                </button>
+                <span class="gallery-count" aria-live="polite">
+                  <span data-gallery-current>1</span> / {galleryImages.length}
+                </span>
+                <button class="gallery-nav-btn gallery-nav-next" type="button" aria-label="Next photo" data-gallery-next>
+                  ›
+                </button>
+              </div>
+            )}
           </div>
-        )}
+          {galleryImages.length > 1 && (
+            <div class="product-gallery-thumbs">
+              {galleryImages.map((image: GalleryImage, index: number) => (
+                <button
+                  class={`thumb-btn${index === 0 ? ' active' : ''}`}
+                  type="button"
+                  data-src={image.display}
+                  data-srcset={image.srcset}
+                  aria-label={`View image ${index + 1} of ${data.name}`}
+                >
+                  <img src={image.thumb} alt={`${data.name} view ${index + 1}`} loading="lazy" decoding="async" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div class="shop-detail-info">
@@ -174,6 +214,39 @@ const mainImageSrcSet = imageSrcSet(data.images[0], [480, 800, 1200]);
 
 <script>
   import { readCart, writeCart, addItem, notifyCartChange } from '../../lib/cart';
+
+  const heroImg = document.getElementById('shopHeroImg') as HTMLImageElement | null;
+  const thumbButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.thumb-btn'));
+  const galleryCurrent = document.querySelector<HTMLElement>('[data-gallery-current]');
+  let activeGalleryIndex = Math.max(0, thumbButtons.findIndex((btn) => btn.classList.contains('active')));
+
+  function showGalleryImage(index: number) {
+    if (!heroImg || thumbButtons.length === 0) return;
+
+    const nextIndex = (index + thumbButtons.length) % thumbButtons.length;
+    const nextButton = thumbButtons[nextIndex];
+    if (!nextButton?.dataset.src) return;
+
+    heroImg.src = nextButton.dataset.src;
+    if (nextButton.dataset.srcset) heroImg.srcset = nextButton.dataset.srcset;
+
+    thumbButtons.forEach((btn) => btn.classList.remove('active'));
+    nextButton.classList.add('active');
+    activeGalleryIndex = nextIndex;
+    if (galleryCurrent) galleryCurrent.textContent = String(nextIndex + 1);
+  }
+
+  thumbButtons.forEach((btn, index) => {
+    btn.addEventListener('click', () => showGalleryImage(index));
+  });
+
+  document.querySelector<HTMLButtonElement>('[data-gallery-prev]')?.addEventListener('click', () => {
+    showGalleryImage(activeGalleryIndex - 1);
+  });
+
+  document.querySelector<HTMLButtonElement>('[data-gallery-next]')?.addEventListener('click', () => {
+    showGalleryImage(activeGalleryIndex + 1);
+  });
 
   const button = document.querySelector<HTMLButtonElement>('[data-add-to-cart]');
   const feedback = document.querySelector<HTMLElement>('[data-add-feedback]');
