@@ -2,13 +2,22 @@ const COOKIE_NAME = 'brv_admin_auth';
 const TOKEN_VERSION = 'v1';
 
 function parseCookies(header = '') {
-  return Object.fromEntries(
-    header
-      .split(';')
-      .map((part) => part.trim().split('='))
-      .filter(([key, value]) => key && value)
-      .map(([key, value]) => [key, decodeURIComponent(value)])
-  );
+  const cookies: Record<string, string> = {};
+  for (const part of header.split(';')) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+    const separatorIndex = trimmed.indexOf('=');
+    if (separatorIndex === -1) continue;
+    const key = trimmed.slice(0, separatorIndex).trim();
+    const rawValue = trimmed.slice(separatorIndex + 1);
+    if (!key) continue;
+    try {
+      cookies[key] = decodeURIComponent(rawValue);
+    } catch {
+      cookies[key] = rawValue;
+    }
+  }
+  return cookies;
 }
 
 function base64Url(bytes: ArrayBuffer) {
@@ -39,23 +48,27 @@ async function isValidToken(token: string, secret: string) {
 }
 
 export default async function adminGate(request: Request) {
-  const expected = Netlify.env.get('ADMIN_PASSWORD');
-  const secret = Netlify.env.get('ADMIN_COOKIE_SECRET') || expected;
-  const cookies = parseCookies(request.headers.get('cookie') ?? '');
-  const token = cookies[COOKIE_NAME] ?? '';
-  const secrets = Array.from(new Set([secret, expected].filter(Boolean))) as string[];
-  let isAllowed = false;
-  if (expected) {
-    for (const candidate of secrets) {
-      if (await isValidToken(token, candidate)) {
-        isAllowed = true;
-        break;
+  try {
+    const expected = globalThis.Netlify?.env?.get('ADMIN_PASSWORD') ?? '';
+    const secret = globalThis.Netlify?.env?.get('ADMIN_COOKIE_SECRET') || expected;
+    const cookies = parseCookies(request.headers.get('cookie') ?? '');
+    const token = cookies[COOKIE_NAME] ?? '';
+    const secrets = Array.from(new Set([secret, expected].filter(Boolean))) as string[];
+    let isAllowed = false;
+    if (expected) {
+      for (const candidate of secrets) {
+        if (await isValidToken(token, candidate)) {
+          isAllowed = true;
+          break;
+        }
       }
     }
-  }
 
-  if (isAllowed) {
-    return;
+    if (isAllowed) {
+      return;
+    }
+  } catch (error) {
+    console.warn('admin-gate: auth check failed, redirecting to login', error);
   }
 
   const url = new URL(request.url);
