@@ -3706,7 +3706,7 @@ export default function AdminPanel() {
             </button>
           </div>
         </div>
-        <div className="admin-mobile-nav" style={{ display: 'none', padding: '0.75rem 1rem', borderBottom: '1px solid #333', background: '#111' }}>
+        <div className="admin-mobile-nav" style={{ display: 'block', padding: '0.75rem 1rem', borderBottom: '1px solid #333', background: '#111' }}>
           <button
             type="button"
             onClick={() => setShowMobileMenu(prev => !prev)}
@@ -3722,21 +3722,21 @@ export default function AdminPanel() {
               color: '#fff',
               border: '1px solid #444',
               borderRadius: '10px',
-              padding: '0.8rem 0.9rem',
-              fontSize: '0.9rem',
+              padding: '0.85rem 1rem',
+              fontSize: '0.95rem',
               fontWeight: 800,
               cursor: 'pointer',
             }}
           >
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
-              <span aria-hidden="true" style={{ display: 'inline-flex', flexDirection: 'column', gap: '3px' }}>
-                <span style={{ width: '16px', height: '2px', background: '#fff', borderRadius: '999px', display: 'block' }} />
-                <span style={{ width: '16px', height: '2px', background: '#fff', borderRadius: '999px', display: 'block' }} />
-                <span style={{ width: '16px', height: '2px', background: '#fff', borderRadius: '999px', display: 'block' }} />
+              <span aria-hidden="true" style={{ display: 'inline-flex', flexDirection: 'column', gap: '4px' }}>
+                <span style={{ width: '18px', height: '2px', background: '#fff', borderRadius: '999px', display: 'block' }} />
+                <span style={{ width: '18px', height: '2px', background: '#fff', borderRadius: '999px', display: 'block' }} />
+                <span style={{ width: '18px', height: '2px', background: '#fff', borderRadius: '999px', display: 'block' }} />
               </span>
               <span>Menu</span>
             </span>
-            <span style={{ color: '#aaa', fontSize: '0.76rem', fontWeight: 700 }}>{tabLabel(activeTab)}</span>
+            <span style={{ color: '#aaa', fontSize: '0.8rem', fontWeight: 700 }}>{tabLabel(activeTab)}</span>
           </button>
           {showMobileMenu && (
             <div
@@ -3746,16 +3746,16 @@ export default function AdminPanel() {
                 background: '#121212',
                 border: '1px solid #333',
                 borderRadius: '12px',
-                padding: '0.6rem',
-                maxHeight: '48vh',
+                padding: '0.5rem',
+                maxHeight: '60vh',
                 overflowY: 'auto',
                 boxShadow: '0 16px 40px rgba(0,0,0,0.45)',
               }}
             >
-              <div style={{ color: '#888', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '0.25rem 0.35rem 0.65rem' }}>
+              <div style={{ color: '#888', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '0.35rem 0.55rem 0.55rem' }}>
                 Admin sections
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 {panelTabs.map(tab => {
                   const isActive = activeTab === tab;
                   return (
@@ -3764,17 +3764,16 @@ export default function AdminPanel() {
                       type="button"
                       onClick={() => selectTab(tab)}
                       style={{
-                        background: isActive ? '#E8540A' : '#1a1a1a',
+                        background: isActive ? '#E8540A' : 'transparent',
                         color: isActive ? '#fff' : '#ddd',
-                        border: `1px solid ${isActive ? '#E8540A' : '#333'}`,
-                        borderRadius: '10px',
-                        padding: '0.7rem 0.55rem',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '0.8rem 0.75rem',
                         textAlign: 'left',
                         cursor: 'pointer',
-                        fontWeight: 800,
-                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        fontSize: '0.9rem',
                         lineHeight: 1.2,
-                        minHeight: '3.1rem',
                       }}
                     >
                       {tabLabel(tab)}
@@ -3784,28 +3783,6 @@ export default function AdminPanel() {
               </div>
             </div>
           )}
-        </div>
-        <div className="admin-tab-bar" style={{ display: 'grid', gridTemplateColumns: 'repeat(17, minmax(0, 1fr))', borderBottom: '1px solid #333' }}>
-          {panelTabs.map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className="admin-tab-button"
-              style={{
-                background: activeTab === tab ? '#E8540A' : 'transparent',
-                color: activeTab === tab ? '#fff' : '#aaa',
-                border: 'none',
-                borderRight: tab !== 'pending' ? '1px solid #333' : 'none',
-                padding: '0.75rem 0.25rem',
-                cursor: 'pointer',
-                fontWeight: 700,
-                textTransform: 'capitalize',
-                fontSize: '0.72rem',
-              }}
-            >
-              {tabLabel(tab)}
-            </button>
-          ))}
         </div>
 
         {activeTab === 'dashboard' && (
