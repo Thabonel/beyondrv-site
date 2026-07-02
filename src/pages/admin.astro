@@ -46,6 +46,31 @@ import AdminPanel from '../components/AdminPanel';
           display: none !important;
         }
         .admin-mobile-nav { display: block !important; }
+        .admin-new-product-form {
+          padding: 0.75rem !important;
+          gap: 0.65rem !important;
+        }
+        .admin-new-product-form .admin-form-grid,
+        .admin-new-product-form .admin-form-grid--two,
+        .admin-new-product-form .admin-form-grid--three,
+        .admin-new-product-form .admin-form-grid--four,
+        .admin-new-product-form .admin-form-grid--image {
+          grid-template-columns: 1fr !important;
+        }
+        .admin-new-product-form .admin-shop-details {
+          padding: 0.5rem !important;
+        }
+        .admin-new-product-form .admin-form-header {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .admin-new-product-form input,
+        .admin-new-product-form select,
+        .admin-new-product-form textarea {
+          width: 100%;
+          min-width: 0;
+          font-size: 16px !important;
+        }
       }
     </style>
   </head>

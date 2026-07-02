@@ -4172,8 +4172,8 @@ export default function AdminPanel() {
                 </div>
               </div>
             )}
-            {!editProduct && showNewProductForm && <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.85rem', display: 'grid', gap: '0.5rem', alignContent: 'start', background: '#141414' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+            {!editProduct && showNewProductForm && <div className="admin-new-product-form" style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.85rem', display: 'grid', gap: '0.5rem', alignContent: 'start', background: '#141414' }}>
+              <div className="admin-form-grid admin-form-grid--two" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
                 <button
                   type="button"
                   onClick={() => {
@@ -4196,7 +4196,7 @@ export default function AdminPanel() {
                 </button>
               </div>
               <input value={newProduct.title} onChange={e => setNewProduct(p => ({ ...p, title: e.target.value }))} placeholder={newProduct.mode === 'shop' ? 'Shop item title' : 'Product title'} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+              <div className="admin-form-grid admin-form-grid--two" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
                 {newProduct.mode === 'business' ? (
                   <select value={newProduct.category} onChange={e => setNewProduct(p => ({ ...p, category: e.target.value }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
                     <option value="slide-on">Slide-on</option>
@@ -4212,12 +4212,12 @@ export default function AdminPanel() {
               {newProduct.mode === 'business' ? (
                 <textarea value={newProduct.keySpecs} onChange={e => setNewProduct(p => ({ ...p, keySpecs: e.target.value }))} placeholder="Key specs, one per line" rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
               ) : (
-                <div style={{ display: 'grid', gap: '0.45rem', border: '1px solid #333', borderRadius: '6px', padding: '0.6rem', background: '#101010' }}>
+                <div className="admin-shop-details" style={{ display: 'grid', gap: '0.45rem', border: '1px solid #333', borderRadius: '6px', padding: '0.6rem', background: '#101010' }}>
                   <div>
                     <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.78rem' }}>Shop Details</div>
                     <div style={{ color: '#777', fontSize: '0.68rem', marginTop: '0.15rem', lineHeight: 1.35 }}>Keep this simple. The owner only needs enough detail to create a clean shop entry.</div>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.4rem' }}>
+                  <div className="admin-form-grid admin-form-grid--three" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.4rem' }}>
                     <select value={newProduct.productType} onChange={e => setNewProduct(p => ({ ...p, productType: e.target.value as ShopProductType }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
                       <option value="stock">Stock item</option>
                       <option value="service">Service item</option>
@@ -4235,7 +4235,7 @@ export default function AdminPanel() {
                       <option value="oversized">Oversized</option>
                     </select>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem' }}>
+                  <div className="admin-form-grid admin-form-grid--two" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem' }}>
                     <select value={newProduct.availability} onChange={e => setNewProduct(p => ({ ...p, availability: e.target.value as CommerceAvailability }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
                       <option value="available_in_australia">Available in Australia</option>
                       <option value="coming_next_container">Coming next container</option>
@@ -4260,22 +4260,22 @@ export default function AdminPanel() {
                   </div>
                   {newProduct.productType === 'stock' && (
                     <>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+                      <div className="admin-form-grid admin-form-grid--two" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
                         <input value={newProduct.weight} onChange={e => setNewProduct(p => ({ ...p, weight: e.target.value }))} placeholder="Weight kg" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.35rem' }}>
+                        <div className="admin-form-grid admin-form-grid--three" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.35rem' }}>
                           <input value={newProduct.dimensionLength} onChange={e => setNewProduct(p => ({ ...p, dimensionLength: e.target.value }))} placeholder="L cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                           <input value={newProduct.dimensionWidth} onChange={e => setNewProduct(p => ({ ...p, dimensionWidth: e.target.value }))} placeholder="W cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                           <input value={newProduct.dimensionHeight} onChange={e => setNewProduct(p => ({ ...p, dimensionHeight: e.target.value }))} placeholder="H cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                         </div>
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem' }}>
+                      <div className="admin-form-grid admin-form-grid--two" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem' }}>
                         <input value={newProduct.pickupLocation} onChange={e => setNewProduct(p => ({ ...p, pickupLocation: e.target.value }))} placeholder="Pickup location" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                         <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#ddd', fontSize: '0.78rem' }}>
                           <input type="checkbox" checked={newProduct.requiresInstallation} onChange={e => setNewProduct(p => ({ ...p, requiresInstallation: e.target.checked }))} />
                           Requires installation
                         </label>
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '0.4rem' }}>
+                      <div className="admin-form-grid admin-form-grid--four" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '0.4rem' }}>
                         <input value={newProduct.packedWeightKg} onChange={e => setNewProduct(p => ({ ...p, packedWeightKg: e.target.value }))} placeholder="Packed weight kg" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                         <input value={newProduct.packedLengthCm} onChange={e => setNewProduct(p => ({ ...p, packedLengthCm: e.target.value }))} placeholder="Packed L cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                         <input value={newProduct.packedWidthCm} onChange={e => setNewProduct(p => ({ ...p, packedWidthCm: e.target.value }))} placeholder="Packed W cm" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
@@ -4289,9 +4289,9 @@ export default function AdminPanel() {
                   )}
                 </div>
               )}
-              <textarea value={newProduct.description} onChange={e => setNewProduct(p => ({ ...p, description: e.target.value }))} placeholder={newProduct.mode === 'shop' ? 'Shop description' : 'Product description'} rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
+              <textarea value={newProduct.description} onChange={e => setNewProduct(p => ({ ...p, description: e.target.value }))} placeholder={newProduct.mode === 'shop' ? 'Shop description' : 'Product description'} rows={5} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
               <div style={{ display: 'grid', gap: '0.45rem', border: '1px solid #333', borderRadius: '6px', padding: '0.55rem', background: '#101010' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.65rem' }}>
+                <div className="admin-form-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.65rem' }}>
                   <div>
                     <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.78rem' }}>Product Photos</div>
                     <div style={{ color: '#777', fontSize: '0.68rem', marginTop: '0.15rem' }}>{newProduct.title.trim() ? `Uploads will be saved under ${slugifyTitle(newProduct.title)}` : 'Enter the product title first, then upload photos.'}</div>
@@ -4303,7 +4303,7 @@ export default function AdminPanel() {
                 </div>
                 {newProductMediaStatus && <div style={{ color: newProductMediaStatus.includes('failed') || newProductMediaStatus.includes('Enter') ? '#fb923c' : '#aaa', fontSize: '0.7rem' }}>{newProductMediaStatus}</div>}
                 {newProduct.heroImage && (
-                  <div style={{ display: 'grid', gridTemplateColumns: '120px minmax(0, 1fr)', gap: '0.5rem', alignItems: 'center' }}>
+                  <div className="admin-form-grid admin-form-grid--image" style={{ display: 'grid', gridTemplateColumns: '120px minmax(0, 1fr)', gap: '0.5rem', alignItems: 'center' }}>
                     <ProductImagePreview src={newProduct.heroImage} title={`${newProduct.title} hero`} />
                     <div style={{ display: 'grid', gap: '0.3rem', minWidth: 0 }}>
                       <div style={{ color: '#aaa', fontSize: '0.72rem', fontWeight: 700 }}>Hero Image</div>
@@ -4330,7 +4330,7 @@ export default function AdminPanel() {
                   />
                 )}
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+              <div className="admin-form-grid admin-form-grid--two" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
                 <button onClick={() => setShowNewProductForm(false)} style={{ background: '#222', color: '#aaa', border: '1px solid #444', borderRadius: '6px', padding: '0.6rem', cursor: 'pointer', fontWeight: 700 }}>
                   Cancel
                 </button>
