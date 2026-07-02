@@ -670,6 +670,8 @@ interface Testimonial {
   sortOrder: number;
 }
 
+const DEFAULT_PICKUP_LOCATION = '77 Coleyville Rd, Mutdapilly QLD 4307';
+
 const VERDICT_STYLE: Record<JudgeDecision, { label: string; color: string; border: string }> = {
   allow:    { label: '✓ Approved',  color: '#4ade80', border: '1px solid #1a3a1a' },
   escalate: { label: '⚠ Escalated', color: '#fb923c', border: '1px solid #3a2010' },
@@ -709,7 +711,7 @@ const EMPTY_PRODUCT_FORM: NewProductForm = {
   dimensionLength: '',
   dimensionWidth: '',
   dimensionHeight: '',
-  pickupLocation: '',
+  pickupLocation: DEFAULT_PICKUP_LOCATION,
   requiresInstallation: false,
   packedWeightKg: '',
   packedLengthCm: '',
@@ -4165,7 +4167,7 @@ export default function AdminPanel() {
                   type="button"
                   onClick={() => {
                     setNewProductMode('shop');
-                    setNewProduct(prev => ({ ...EMPTY_PRODUCT_FORM, ...prev, mode: 'shop', productType: prev.productType ?? 'stock', fulfilmentType: prev.fulfilmentType ?? 'ship', shippingSize: prev.shippingSize ?? 'medium' }));
+                    setNewProduct(prev => ({ ...EMPTY_PRODUCT_FORM, ...prev, mode: 'shop', productType: prev.productType ?? 'stock', fulfilmentType: prev.fulfilmentType ?? 'pickup', shippingSize: prev.shippingSize ?? 'medium', pickupLocation: prev.pickupLocation || DEFAULT_PICKUP_LOCATION }));
                   }}
                   style={{ background: newProduct.mode === 'shop' ? '#E8540A' : '#222', color: '#fff', border: '1px solid #444', borderRadius: '6px', padding: '0.5rem', cursor: 'pointer', fontWeight: 700 }}
                 >
@@ -4246,7 +4248,7 @@ export default function AdminPanel() {
                         </div>
                       </div>
                       <div className="admin-form-grid admin-form-grid--two" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem' }}>
-                        <input value={newProduct.pickupLocation} onChange={e => setNewProduct(p => ({ ...p, pickupLocation: e.target.value }))} placeholder="Pickup location" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                        <input value={newProduct.pickupLocation} readOnly style={{ background: '#1a1a1a', border: '1px solid #444', color: '#aaa', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                         <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#ddd', fontSize: '0.78rem' }}>
                           <input type="checkbox" checked={newProduct.requiresInstallation} onChange={e => setNewProduct(p => ({ ...p, requiresInstallation: e.target.checked }))} />
                           Requires installation
@@ -4266,7 +4268,7 @@ export default function AdminPanel() {
                   )}
                 </div>
               )}
-              <textarea value={newProduct.description} onChange={e => setNewProduct(p => ({ ...p, description: e.target.value }))} placeholder={newProduct.mode === 'shop' ? 'Shop description' : 'Product description'} rows={5} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
+              <textarea value={newProduct.description} onChange={e => setNewProduct(p => ({ ...p, description: e.target.value }))} placeholder={newProduct.mode === 'shop' ? 'Item description' : 'Product description'} rows={5} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4, minHeight: '6rem' }} />
               <div style={{ display: 'grid', gap: '0.45rem', border: '1px solid #333', borderRadius: '6px', padding: '0.55rem', background: '#101010' }}>
                 <div className="admin-form-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.65rem' }}>
                   <div>
@@ -4275,9 +4277,6 @@ export default function AdminPanel() {
                   </div>
                   <label
                     htmlFor="newProductPhotoUpload"
-                    onClick={e => {
-                      if (mediaLoading || !newProduct.title.trim()) e.preventDefault();
-                    }}
                     aria-disabled={mediaLoading || !newProduct.title.trim()}
                     style={{
                       display: 'inline-flex',
@@ -4295,19 +4294,31 @@ export default function AdminPanel() {
                       whiteSpace: 'nowrap',
                       touchAction: 'manipulation',
                       userSelect: 'none',
+                      pointerEvents: mediaLoading || !newProduct.title.trim() ? 'none' : 'auto',
                     }}
                   >
                     Upload Photos
+                    <input
+                      id="newProductPhotoUpload"
+                      ref={newProductFileRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      disabled={mediaLoading || !newProduct.title.trim()}
+                      style={{
+                        position: 'absolute',
+                        width: '1px',
+                        height: '1px',
+                        padding: 0,
+                        margin: '-1px',
+                        overflow: 'hidden',
+                        clip: 'rect(0, 0, 0, 0)',
+                        whiteSpace: 'nowrap',
+                        border: 0,
+                      }}
+                      onChange={uploadNewProductMedia}
+                    />
                   </label>
-                  <input
-                    id="newProductPhotoUpload"
-                    ref={newProductFileRef}
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    style={{ display: 'none' }}
-                    onChange={uploadNewProductMedia}
-                  />
                 </div>
                 {newProductMediaStatus && <div style={{ color: newProductMediaStatus.includes('failed') || newProductMediaStatus.includes('Enter') ? '#fb923c' : '#aaa', fontSize: '0.7rem' }}>{newProductMediaStatus}</div>}
                 {newProduct.heroImage && (
