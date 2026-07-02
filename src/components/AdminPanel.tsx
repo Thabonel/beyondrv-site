@@ -3907,7 +3907,7 @@ export default function AdminPanel() {
               </div>
             )}
             {editProduct && (
-              <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.85rem', display: 'grid', gap: '0.6rem', alignContent: 'start', background: '#141414' }}>
+              <div className="admin-edit-product-form" style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.85rem', display: 'grid', gap: '0.6rem', alignContent: 'start', background: '#141414' }}>
                 <input value={editProduct.title} onChange={e => setEditProduct(p => p && ({ ...p, title: e.target.value }))} placeholder="Title" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                 <input
                   value={editProduct.category}
@@ -3915,7 +3915,7 @@ export default function AdminPanel() {
                   placeholder={editProduct.store ? 'Shop category, e.g. Air Systems' : 'Category'}
                   style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}
                 />
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.4rem' }}>
+                <div className="admin-form-grid admin-form-grid--three" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.4rem' }}>
                   <input value={editProduct.price} onChange={e => setEditProduct(p => p && ({ ...p, price: e.target.value }))} placeholder="$72,000" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                   <input value={editProduct.compareAtPrice} onChange={e => setEditProduct(p => p && ({ ...p, compareAtPrice: e.target.value }))} placeholder="Original price / was price" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                   <select value={editProduct.status} onChange={e => setEditProduct(p => p && ({ ...p, status: e.target.value as ProductStatus }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
@@ -3928,7 +3928,7 @@ export default function AdminPanel() {
                   setProductEditStatus('');
                   setEditProduct(p => p && ({ ...p, tagline: e.target.value }));
                 }} placeholder={editProduct.store ? 'Short shop description' : 'Tagline'} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '0.4rem' }}>
+                <div className="admin-form-grid admin-form-grid--two" style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '0.4rem' }}>
                   <input value={editProduct.saleLabel} onChange={e => setEditProduct(p => p && ({ ...p, saleLabel: e.target.value }))} placeholder="Sale label" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                   <select value={editProduct.availability} onChange={e => setEditProduct(p => p && ({ ...p, availability: e.target.value as CommerceAvailability }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
                     <option value="available_in_australia">Available in Australia</option>
@@ -3938,7 +3938,7 @@ export default function AdminPanel() {
                     <option value="unavailable">Unavailable</option>
                   </select>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem' }}>
+                <div className="admin-form-grid admin-form-grid--two" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem' }}>
                   <select value={editProduct.sourceType} onChange={e => setEditProduct(p => p && ({ ...p, sourceType: e.target.value as SourceType }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
                     <option value="other">Source type</option>
                     <option value="china_container">China container</option>
@@ -3958,7 +3958,7 @@ export default function AdminPanel() {
                       <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.78rem' }}>Shop Details</div>
                       <div style={{ color: '#777', fontSize: '0.68rem', marginTop: '0.15rem', lineHeight: 1.35 }}>Item specs are shown on the product page. Postage specs are the packed box/carton details used for shipping estimates.</div>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.4rem' }}>
+                    <div className="admin-form-grid admin-form-grid--three" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.4rem' }}>
                       <select value={editProduct.productType} onChange={e => setEditProduct(p => p && ({ ...p, productType: e.target.value as ShopProductType }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
                         <option value="stock">Stock item</option>
                         <option value="service">Service item</option>
@@ -3981,12 +3981,12 @@ export default function AdminPanel() {
                         <div style={{ color: '#eee', fontWeight: 700, fontSize: '0.73rem', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Item specs shown on product page</div>
                         <div style={{ color: '#777', fontSize: '0.66rem', marginTop: '0.12rem', lineHeight: 1.35 }}>Use the actual item size and item weight before packaging.</div>
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem' }}>
+                      <div className="admin-form-grid admin-form-grid--two" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem' }}>
                         <label style={{ display: 'grid', gap: '0.2rem', color: '#aaa', fontSize: '0.66rem' }}>
                           Item weight (kg)
                           <input value={editProduct.weight} onChange={e => setEditProduct(p => p && ({ ...p, weight: e.target.value }))} placeholder="Actual item weight" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                         </label>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.35rem' }}>
+                        <div className="admin-form-grid admin-form-grid--three" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.35rem' }}>
                           <label style={{ display: 'grid', gap: '0.2rem', color: '#aaa', fontSize: '0.66rem' }}>
                             Item L (cm)
                             <input value={editProduct.dimensionLength} onChange={e => setEditProduct(p => p && ({ ...p, dimensionLength: e.target.value }))} placeholder="Length" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
@@ -4002,7 +4002,7 @@ export default function AdminPanel() {
                         </div>
                       </div>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem' }}>
+                    <div className="admin-form-grid admin-form-grid--two" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.4rem' }}>
                       <input value={editProduct.pickupLocation} onChange={e => setEditProduct(p => p && ({ ...p, pickupLocation: e.target.value }))} placeholder="Pickup location" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                       <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#ddd', fontSize: '0.78rem' }}>
                         <input type="checkbox" checked={editProduct.requiresInstallation} onChange={e => setEditProduct(p => p && ({ ...p, requiresInstallation: e.target.checked }))} />
@@ -4014,7 +4014,7 @@ export default function AdminPanel() {
                         <div style={{ color: '#eee', fontWeight: 700, fontSize: '0.73rem', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Postage / packed box specs</div>
                         <div style={{ color: '#777', fontSize: '0.66rem', marginTop: '0.12rem', lineHeight: 1.35 }}>Use the boxed/carton size and packed weight. These can be bigger and heavier than the item.</div>
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '0.4rem' }}>
+                    <div className="admin-form-grid admin-form-grid--four" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '0.4rem' }}>
                         <label style={{ display: 'grid', gap: '0.2rem', color: '#aaa', fontSize: '0.66rem' }}>
                           Boxed weight (kg)
                           <input value={editProduct.packedWeightKg} onChange={e => setEditProduct(p => p && ({ ...p, packedWeightKg: e.target.value }))} placeholder="Packed weight" inputMode="decimal" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
@@ -4296,10 +4296,41 @@ export default function AdminPanel() {
                     <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.78rem' }}>Product Photos</div>
                     <div style={{ color: '#777', fontSize: '0.68rem', marginTop: '0.15rem' }}>{newProduct.title.trim() ? `Uploads will be saved under ${slugifyTitle(newProduct.title)}` : 'Enter the product title first, then upload photos.'}</div>
                   </div>
-                  <button type="button" onClick={() => newProductFileRef.current?.click()} disabled={mediaLoading || !newProduct.title.trim()} style={{ background: '#222', color: mediaLoading || !newProduct.title.trim() ? '#666' : '#fff', border: '1px solid #444', borderRadius: '6px', padding: '0.42rem 0.65rem', cursor: mediaLoading || !newProduct.title.trim() ? 'not-allowed' : 'pointer', fontSize: '0.72rem', fontWeight: 700 }}>
+                  <label
+                    htmlFor="newProductPhotoUpload"
+                    onClick={e => {
+                      if (mediaLoading || !newProduct.title.trim()) e.preventDefault();
+                    }}
+                    aria-disabled={mediaLoading || !newProduct.title.trim()}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minHeight: '2.6rem',
+                      background: mediaLoading || !newProduct.title.trim() ? '#222' : '#E8540A',
+                      color: mediaLoading || !newProduct.title.trim() ? '#666' : '#fff',
+                      border: `1px solid ${mediaLoading || !newProduct.title.trim() ? '#444' : '#E8540A'}`,
+                      borderRadius: '8px',
+                      padding: '0.55rem 0.8rem',
+                      cursor: mediaLoading || !newProduct.title.trim() ? 'not-allowed' : 'pointer',
+                      fontSize: '0.78rem',
+                      fontWeight: 800,
+                      whiteSpace: 'nowrap',
+                      touchAction: 'manipulation',
+                      userSelect: 'none',
+                    }}
+                  >
                     Upload Photos
-                  </button>
-                  <input ref={newProductFileRef} type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={uploadNewProductMedia} />
+                  </label>
+                  <input
+                    id="newProductPhotoUpload"
+                    ref={newProductFileRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    style={{ display: 'none' }}
+                    onChange={uploadNewProductMedia}
+                  />
                 </div>
                 {newProductMediaStatus && <div style={{ color: newProductMediaStatus.includes('failed') || newProductMediaStatus.includes('Enter') ? '#fb923c' : '#aaa', fontSize: '0.7rem' }}>{newProductMediaStatus}</div>}
                 {newProduct.heroImage && (
@@ -6029,8 +6060,8 @@ export default function AdminPanel() {
         aria-modal="true"
         style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.72)', zIndex: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
       >
-        <div style={{ width: 'min(780px, 100%)', maxHeight: '90vh', overflowY: 'auto', background: '#111', color: '#fff', border: '1px solid #333', borderRadius: '8px', boxShadow: '0 24px 80px rgba(0,0,0,0.45)' }}>
-          <div style={{ position: 'sticky', top: 0, background: '#111', borderBottom: '1px solid #333', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+        <div className="admin-order-modal" style={{ width: 'min(780px, 100%)', maxHeight: '90vh', overflowY: 'auto', background: '#111', color: '#fff', border: '1px solid #333', borderRadius: '8px', boxShadow: '0 24px 80px rgba(0,0,0,0.45)' }}>
+          <div className="admin-form-header" style={{ position: 'sticky', top: 0, background: '#111', borderBottom: '1px solid #333', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
             <div>
               <h2 style={{ margin: 0, fontSize: '1.05rem' }}>{orderForm.id ? 'Edit Order' : 'Add Order'}</h2>
               <div style={{ color: '#888', fontSize: '0.76rem', marginTop: '0.15rem' }}>Keep this lightweight: customer, product, status, dates, and the next action.</div>
@@ -6043,7 +6074,7 @@ export default function AdminPanel() {
             </button>
           </div>
           <div style={{ padding: '1rem', display: 'grid', gap: '0.6rem' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+            <div className="admin-form-grid admin-form-grid--two" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
               <input value={orderForm.customerName} onChange={e => setOrderForm(p => p && ({ ...p, customerName: e.target.value }))} placeholder="Customer name" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.52rem', fontSize: '0.82rem' }} />
               <input value={orderForm.customerPhone} onChange={e => setOrderForm(p => p && ({ ...p, customerPhone: e.target.value }))} placeholder="Phone" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.52rem', fontSize: '0.82rem' }} />
             </div>
@@ -6053,13 +6084,13 @@ export default function AdminPanel() {
               <input value={orderForm.shippingName ?? ''} onChange={e => setOrderForm(p => p && ({ ...p, shippingName: e.target.value }))} placeholder="Delivery name" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }} />
               <input value={orderForm.shippingAddressLine1 ?? ''} onChange={e => setOrderForm(p => p && ({ ...p, shippingAddressLine1: e.target.value }))} placeholder="Address line 1" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }} />
               <input value={orderForm.shippingAddressLine2 ?? ''} onChange={e => setOrderForm(p => p && ({ ...p, shippingAddressLine2: e.target.value }))} placeholder="Address line 2" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }} />
-              <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.7fr 0.6fr 0.6fr', gap: '0.4rem' }}>
+              <div className="admin-form-grid admin-form-grid--four" style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.7fr 0.6fr 0.6fr', gap: '0.4rem' }}>
                 <input value={orderForm.shippingCity ?? ''} onChange={e => setOrderForm(p => p && ({ ...p, shippingCity: e.target.value }))} placeholder="City / suburb" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }} />
                 <input value={orderForm.shippingState ?? ''} onChange={e => setOrderForm(p => p && ({ ...p, shippingState: e.target.value }))} placeholder="State" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }} />
                 <input value={orderForm.shippingPostcode ?? ''} onChange={e => setOrderForm(p => p && ({ ...p, shippingPostcode: e.target.value }))} placeholder="Postcode" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }} />
                 <input value={orderForm.shippingCountry ?? ''} onChange={e => setOrderForm(p => p && ({ ...p, shippingCountry: e.target.value }))} placeholder="Country" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+              <div className="admin-form-grid admin-form-grid--two" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
                 <select value={orderForm.shippingMethod ?? 'australia_post'} onChange={e => setOrderForm(p => p && ({ ...p, shippingMethod: e.target.value as ShippingMethod }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }}>
                   <option value="australia_post">Australia Post</option>
                   <option value="brisbane_local_delivery">Brisbane ute delivery</option>
@@ -6078,7 +6109,7 @@ export default function AdminPanel() {
                   style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }}
                 />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+              <div className="admin-form-grid admin-form-grid--two" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
                 <input value={orderForm.shippingCarrier ?? ''} onChange={e => setOrderForm(p => p && ({ ...p, shippingCarrier: e.target.value }))} placeholder="Carrier" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }} />
                 <input value={orderForm.shippingService ?? ''} onChange={e => setOrderForm(p => p && ({ ...p, shippingService: e.target.value }))} placeholder="Service" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.48rem', fontSize: '0.8rem' }} />
               </div>
@@ -6092,7 +6123,7 @@ export default function AdminPanel() {
                 <option value="blocked">Blocked</option>
               </select>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+            <div className="admin-form-grid admin-form-grid--two" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
               <select
                 value={orderForm.productSlug}
                 onChange={e => {
@@ -6114,7 +6145,7 @@ export default function AdminPanel() {
               </select>
               <input value={orderForm.productTitle} onChange={e => setOrderForm(p => p && ({ ...p, productTitle: e.target.value }))} placeholder="Product / custom build" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.52rem', fontSize: '0.82rem' }} />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
+            <div className="admin-form-grid admin-form-grid--three" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
               <select value={orderForm.orderType} onChange={e => setOrderForm(p => p && ({ ...p, orderType: e.target.value as OrderType }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.52rem', fontSize: '0.82rem' }}>
                 {Object.entries(ORDER_TYPE_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
               </select>

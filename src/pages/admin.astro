@@ -71,6 +71,48 @@ import AdminPanel from '../components/AdminPanel';
           min-width: 0;
           font-size: 16px !important;
         }
+        .admin-edit-product-form,
+        .admin-order-modal {
+          width: calc(100vw - 1rem) !important;
+          max-width: calc(100vw - 1rem) !important;
+        }
+        .admin-edit-product-form {
+          padding: 0.75rem !important;
+          gap: 0.65rem !important;
+        }
+        .admin-edit-product-form .admin-form-grid,
+        .admin-edit-product-form .admin-form-grid--two,
+        .admin-edit-product-form .admin-form-grid--three,
+        .admin-edit-product-form .admin-form-grid--four,
+        .admin-edit-product-form .admin-form-grid--image,
+        .admin-order-modal .admin-form-grid,
+        .admin-order-modal .admin-form-grid--two,
+        .admin-order-modal .admin-form-grid--three,
+        .admin-order-modal .admin-form-grid--four {
+          grid-template-columns: 1fr !important;
+        }
+        .admin-order-modal > div {
+          max-height: 92vh !important;
+        }
+        .admin-edit-product-form .admin-form-header,
+        .admin-order-modal .admin-form-header {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .admin-edit-product-form input,
+        .admin-edit-product-form select,
+        .admin-edit-product-form textarea,
+        .admin-order-modal input,
+        .admin-order-modal select,
+        .admin-order-modal textarea {
+          width: 100%;
+          min-width: 0;
+          font-size: 16px !important;
+        }
+        .admin-edit-product-form textarea,
+        .admin-order-modal textarea {
+          min-height: 6rem;
+        }
       }
     </style>
   </head>
