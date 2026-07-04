@@ -3943,7 +3943,11 @@ export default function AdminPanel() {
                   <button onClick={() => {
                     const mode = activeTab === 'shop' ? 'shop' : 'business';
                     setNewProductMode(mode);
-                    setNewProduct({ ...EMPTY_PRODUCT_FORM, mode });
+                    setNewProduct({
+                      ...EMPTY_PRODUCT_FORM,
+                      mode,
+                      ...(mode === 'shop' ? { category: '', fulfilmentType: 'pickup' as ShopFulfilmentType, pickupLocation: DEFAULT_PICKUP_LOCATION } : {}),
+                    });
                     setNewProductStatus('');
                     setShowNewProductForm(true);
                   }} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.46rem 0.7rem', cursor: 'pointer', fontWeight: 700 }}>
@@ -4293,7 +4297,17 @@ export default function AdminPanel() {
                   type="button"
                   onClick={() => {
                     setNewProductMode('shop');
-                    setNewProduct(prev => ({ ...EMPTY_PRODUCT_FORM, ...prev, mode: 'shop', productType: prev.productType ?? 'stock', fulfilmentType: prev.fulfilmentType ?? 'pickup', shippingSize: prev.shippingSize ?? 'medium', pickupLocation: prev.pickupLocation || DEFAULT_PICKUP_LOCATION }));
+                    setNewProductStatus('');
+                    setNewProduct(prev => ({
+                      ...EMPTY_PRODUCT_FORM,
+                      ...prev,
+                      mode: 'shop',
+                      category: prev.mode === 'shop' ? prev.category : '',
+                      productType: prev.productType ?? 'stock',
+                      fulfilmentType: prev.mode === 'shop' ? prev.fulfilmentType : 'pickup',
+                      shippingSize: prev.shippingSize ?? 'medium',
+                      pickupLocation: prev.pickupLocation || DEFAULT_PICKUP_LOCATION,
+                    }));
                   }}
                   style={{ background: newProduct.mode === 'shop' ? '#E8540A' : '#222', color: '#fff', border: '1px solid #444', borderRadius: '6px', padding: '0.5rem', cursor: 'pointer', fontWeight: 700 }}
                 >
@@ -4475,12 +4489,25 @@ export default function AdminPanel() {
                   />
                 )}
               </div>
+              {newProductStatus && (
+                <div style={{
+                  background: newProductStatus.toLowerCase().includes('queued') ? '#052e16' : '#2a1410',
+                  border: newProductStatus.toLowerCase().includes('queued') ? '1px solid #14532d' : '1px solid #7c2d12',
+                  color: newProductStatus.toLowerCase().includes('queued') ? '#86efac' : '#fed7aa',
+                  borderRadius: '6px',
+                  padding: '0.55rem',
+                  fontSize: '0.76rem',
+                  lineHeight: 1.4,
+                }}>
+                  {newProductStatus}
+                </div>
+              )}
               <div className="admin-form-grid admin-form-grid--two" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
                 <button type="button" onClick={() => setShowNewProductForm(false)} style={{ background: '#222', color: '#aaa', border: '1px solid #444', borderRadius: '6px', padding: '0.6rem', cursor: 'pointer', fontWeight: 700 }}>
                   Cancel
                 </button>
-                <button type="button" onClick={queueNewProduct} disabled={loading} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.6rem', cursor: 'pointer', fontWeight: 700 }}>
-                  {newProduct.mode === 'shop' ? 'Queue Shop Item' : 'Queue Product Draft'}
+                <button type="button" onClick={queueNewProduct} disabled={loading} style={{ background: loading ? '#7c3a10' : '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.6rem', cursor: loading ? 'wait' : 'pointer', fontWeight: 700 }}>
+                  {loading ? 'Queueing...' : newProduct.mode === 'shop' ? 'Queue Shop Item' : 'Queue Product Draft'}
                 </button>
               </div>
             </div>}
