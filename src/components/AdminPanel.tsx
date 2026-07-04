@@ -128,9 +128,9 @@ interface ProductRecord {
   containerEtaDate?: string;
   weight?: number;
   dimensions?: {
-    length: number;
-    width: number;
-    height: number;
+    length?: number;
+    width?: number;
+    height?: number;
   };
   pickupLocation?: string;
   requiresInstallation?: boolean;
@@ -859,6 +859,40 @@ const SHOP_SHIPPING_DATA_STATUS_LABELS: Record<ShopShippingDataStatus, string> =
   estimated: 'Estimated',
   confirmed: 'Confirmed',
 };
+
+function optionalPositiveNumber(value: string) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+}
+
+function partialDimensionsFromForm(form: Pick<NewProductForm, 'dimensionLength' | 'dimensionWidth' | 'dimensionHeight'>) {
+  const dimensions = {
+    length: optionalPositiveNumber(form.dimensionLength),
+    width: optionalPositiveNumber(form.dimensionWidth),
+    height: optionalPositiveNumber(form.dimensionHeight),
+  };
+  return dimensions.length !== undefined || dimensions.width !== undefined || dimensions.height !== undefined
+    ? dimensions
+    : undefined;
+}
+
+function formatPartialDimensions(form: Pick<NewProductForm, 'dimensionLength' | 'dimensionWidth' | 'dimensionHeight'>) {
+  const parts = [
+    form.dimensionLength.trim() ? `length ${form.dimensionLength.trim()} cm` : '',
+    form.dimensionWidth.trim() ? `width ${form.dimensionWidth.trim()} cm` : '',
+    form.dimensionHeight.trim() ? `height ${form.dimensionHeight.trim()} cm` : '',
+  ].filter(Boolean);
+  return parts.length ? parts.join(', ') : 'not provided';
+}
+
+function formatPackedDimensions(form: Pick<NewProductForm, 'packedLengthCm' | 'packedWidthCm' | 'packedHeightCm'>) {
+  const parts = [
+    form.packedLengthCm.trim() ? `length ${form.packedLengthCm.trim()} cm` : '',
+    form.packedWidthCm.trim() ? `width ${form.packedWidthCm.trim()} cm` : '',
+    form.packedHeightCm.trim() ? `height ${form.packedHeightCm.trim()} cm` : '',
+  ].filter(Boolean);
+  return parts.length ? parts.join(', ') : 'none';
+}
 
 function emptyOrderForm(): OrderForm {
   return {
@@ -2932,6 +2966,8 @@ export default function AdminPanel() {
       leadTimeText: form.leadTimeText.trim(),
       containerEtaText: form.containerEtaText.trim(),
       containerEtaDate: form.containerEtaDate.trim(),
+      weight: optionalPositiveNumber(form.weight),
+      dimensions: partialDimensionsFromForm(form),
       pickupLocation: form.pickupLocation.trim(),
       requiresInstallation: form.requiresInstallation,
       packedWeightKg: form.packedWeightKg ? Number(form.packedWeightKg) : undefined,
@@ -3267,13 +3303,13 @@ export default function AdminPanel() {
         `Fulfilment type: ${newProduct.fulfilmentType}\n` +
         `Shipping size: ${newProduct.shippingSize}\n` +
         `Actual item weight kg, before packaging: ${newProduct.weight.trim() || 'not provided'}\n` +
-        `Actual item dimensions cm, before packaging: ${newProduct.dimensionLength.trim() && newProduct.dimensionWidth.trim() && newProduct.dimensionHeight.trim() ? `${newProduct.dimensionLength.trim()} x ${newProduct.dimensionWidth.trim()} x ${newProduct.dimensionHeight.trim()}` : 'not provided'}\n` +
+        `Actual item dimensions cm, before packaging: ${formatPartialDimensions(newProduct)}\n` +
         `Pickup location: ${newProduct.pickupLocation.trim() || 'none'}\n` +
         `Requires installation: ${newProduct.requiresInstallation ? 'yes' : 'no'}\n` +
         `Packed weight kg: ${newProduct.fulfilmentType === 'ship' ? newProduct.packedWeightKg.trim() : 'none'}\n` +
-        `Packed dimensions cm: ${newProduct.fulfilmentType === 'ship' ? `${newProduct.packedLengthCm.trim()} x ${newProduct.packedWidthCm.trim()} x ${newProduct.packedHeightCm.trim()}` : 'none'}\n` +
+        `Packed dimensions cm: ${newProduct.fulfilmentType === 'ship' ? formatPackedDimensions(newProduct) : 'none'}\n` +
         `Shipping data status: ${newProduct.fulfilmentType === 'ship' ? newProduct.shippingDataStatus : 'none'}\n` +
-        `Do not copy packed box specs into item specs. If actual item specs are not provided, omit weight and dimensions from frontmatter.`
+        `Do not copy packed box specs into item specs. If only some actual item dimensions are provided, include only those known dimension fields and do not invent missing length, width, or height. If actual item specs are not provided, omit weight and dimensions from frontmatter.`
       : `\nProduct type: service\nFulfilment type: ${newProduct.fulfilmentType}\nShipping size: none\n`;
 
     if (newProduct.mode === 'business') {

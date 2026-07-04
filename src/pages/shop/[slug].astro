@@ -36,19 +36,24 @@ const stockLabel = stockData ? availabilityLabel(stockData.availability) : null;
 const fulfilment = stockData ? fulfilmentInfo(stockData.fulfilmentType) : null;
 const sourceType = stockData?.sourceType ?? 'other';
 const sourceTypeText = stockData ? sourceTypeLabel(sourceType) : '';
-const hasItemSpecs = Boolean(stockData?.weight && stockData?.dimensions);
+const formatItemDimensions = (dimensions: { length?: number; width?: number; height?: number } | undefined) => {
+  if (!dimensions) return '';
+  return [
+    dimensions.length !== undefined ? `Length ${dimensions.length} cm` : '',
+    dimensions.width !== undefined ? `Width ${dimensions.width} cm` : '',
+    dimensions.height !== undefined ? `Height ${dimensions.height} cm` : '',
+  ].filter(Boolean).join(' · ');
+};
+const itemDimensionsText = stockData ? formatItemDimensions(stockData.dimensions) : '';
+const hasItemSpecs = Boolean(stockData?.weight || itemDimensionsText);
 const { Content } = await product.render();
 const unitPrice = shopProductPrice(data.price);
 const productUrl = `https://beyondrv.com.au/shop/${data.slug}/`;
-const itemAdditionalProperty = stockData && hasItemSpecs && stockData.weight && stockData.dimensions
+const itemAdditionalProperty = stockData && hasItemSpecs
   ? [
-      { '@type': 'PropertyValue', name: 'Item weight', value: `${stockData.weight} kg` },
-      {
-        '@type': 'PropertyValue',
-        name: 'Item dimensions',
-        value: `${stockData.dimensions.length} × ${stockData.dimensions.width} × ${stockData.dimensions.height} cm`,
-      },
-    ]
+      stockData.weight ? { '@type': 'PropertyValue', name: 'Item weight', value: `${stockData.weight} kg` } : null,
+      itemDimensionsText ? { '@type': 'PropertyValue', name: 'Item dimensions', value: itemDimensionsText } : null,
+    ].filter(Boolean)
   : undefined;
 const structuredData = [
   {
@@ -173,10 +178,10 @@ const mainImageSrcSet = galleryImages[0]?.srcset ?? imageSrcSet(data.images[0], 
         {stockData?.containerEtaDate && <p class="shop-detail-meta">ETA date: {stockData.containerEtaDate}</p>}
         {stockData?.sourceType && <p class="shop-detail-meta">{sourceTypeText}</p>}
 
-        {stockData && hasItemSpecs && stockData.weight && stockData.dimensions && (
+        {stockData && hasItemSpecs && (
           <dl class="shop-product-specs">
-            <div><dt>Item weight</dt><dd>{stockData.weight} kg</dd></div>
-            <div><dt>Item dimensions</dt><dd>{stockData.dimensions.length} &times; {stockData.dimensions.width} &times; {stockData.dimensions.height} cm</dd></div>
+            {stockData.weight && <div><dt>Item weight</dt><dd>{stockData.weight} kg</dd></div>}
+            {itemDimensionsText && <div><dt>Item dimensions</dt><dd>{itemDimensionsText}</dd></div>}
           </dl>
         )}
 

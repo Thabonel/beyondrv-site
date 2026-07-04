@@ -105,10 +105,13 @@ const stockProduct = z.object({
   productType:   z.literal('stock'),
   weight:        z.number().positive().optional(),
   dimensions:    z.object({
-    length: z.number().positive(),
-    width:  z.number().positive(),
-    height: z.number().positive(),
-  }).optional(),
+    length: z.number().positive().optional(),
+    width:  z.number().positive().optional(),
+    height: z.number().positive().optional(),
+  }).refine(
+    dimensions => dimensions.length !== undefined || dimensions.width !== undefined || dimensions.height !== undefined,
+    { message: 'Dimensions must include at least one of length, width, or height.' }
+  ).optional(),
   availability:  z.enum(['available_in_australia', 'coming_next_container', 'made_to_order', 'ask_availability', 'unavailable']),
   purchasableOnline: z.boolean().default(false),
   fulfilmentType: z.enum(['ship', 'pickup', 'install', 'quote_required']).default('quote_required'),
