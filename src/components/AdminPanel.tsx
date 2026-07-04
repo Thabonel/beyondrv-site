@@ -158,6 +158,11 @@ interface ProductRecord {
   suitabilityData?: SuitabilityData;
 }
 
+interface QueuedShopDraft extends ProductRecord {
+  pendingPath?: string;
+  pendingLabel?: string;
+}
+
 interface SuitabilityData {
   status: SuitabilityDataStatus;
   dryWeightKg?: string;
@@ -1518,11 +1523,13 @@ export default function AdminPanel() {
   const [productFilter, setProductFilter] = useState('');
   const [shopFilter, setShopFilter] = useState('');
   const [productsLoading, setProductsLoading] = useState(true);
+  const [queuedShopDrafts, setQueuedShopDrafts] = useState<QueuedShopDraft[]>([]);
   const [newProduct, setNewProduct] = useState<NewProductForm>(EMPTY_PRODUCT_FORM);
   const [showNewProductForm, setShowNewProductForm] = useState(false);
   const [newProductMode, setNewProductMode] = useState<'business' | 'shop'>('business');
   const [editProduct, setEditProduct] = useState<EditProductForm | null>(null);
   const [productEditStatus, setProductEditStatus] = useState('');
+  const [newProductStatus, setNewProductStatus] = useState('');
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersStatus, setOrdersStatus] = useState('');
@@ -1653,6 +1660,14 @@ export default function AdminPanel() {
   }, [mediaSlug, mediaScope]);
 
   useEffect(() => {
+    setQueuedShopDrafts(prev => prev.filter(draft => {
+      if (products.some(product => product.slug === draft.slug)) return false;
+      if (!draft.pendingPath) return true;
+      return pending.some(change => change.path === draft.pendingPath);
+    }));
+  }, [pending, products]);
+
+  useEffect(() => {
     if (activeTab === 'enquiries') {
       void loadEnquiries();
       void loadContactConfig();
@@ -1752,8 +1767,8 @@ export default function AdminPanel() {
     }
   }, [activeTab, browserRemindersEnabled, enquiries]);
 
-  async function sendMessage(text: string) {
-    if (!text.trim() || loading) return;
+  async function sendMessage(text: string): Promise<{ text: string; pendingChanges: PendingChange[] } | null> {
+    if (!text.trim() || loading) return null;
     setInput('');
     setLoading(true);
 
@@ -1767,7 +1782,7 @@ export default function AdminPanel() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: newMessages }),
       });
-      if (redirectToLoginIfUnauthorized(res)) return;
+      if (redirectToLoginIfUnauthorized(res)) return null;
       const data = await res.json() as { text: string; pendingChanges: PendingChange[] };
       if (!res.ok) throw new Error(data.text ?? 'Admin AI request failed');
 
@@ -1784,8 +1799,10 @@ export default function AdminPanel() {
           return updated;
         });
       }
+      return data;
     } catch {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, something went wrong. Please try again.' }]);
+      return null;
     } finally {
       setLoading(false);
     }
@@ -2891,6 +2908,45 @@ export default function AdminPanel() {
     };
   }
 
+  function queuedShopDraftFromForm(form: NewProductForm, slug: string): QueuedShopDraft {
+    const gallery = parseGalleryText(form.galleryText);
+    const availability = form.availability;
+    return {
+      store: true,
+      slug,
+      title: form.title.trim(),
+      name: form.title.trim(),
+      description: form.description.trim(),
+      price: form.price.trim(),
+      category: form.category.trim(),
+      tagline: form.tagline.trim(),
+      status: 'available',
+      productType: form.productType,
+      availability,
+      purchasableOnline: form.purchasableOnline,
+      depositEnabled: form.depositEnabled,
+      fullPaymentEnabled: form.fullPaymentEnabled,
+      sourceType: form.sourceType,
+      fulfilmentType: form.fulfilmentType,
+      shippingSize: form.shippingSize,
+      leadTimeText: form.leadTimeText.trim(),
+      containerEtaText: form.containerEtaText.trim(),
+      containerEtaDate: form.containerEtaDate.trim(),
+      pickupLocation: form.pickupLocation.trim(),
+      requiresInstallation: form.requiresInstallation,
+      packedWeightKg: form.packedWeightKg ? Number(form.packedWeightKg) : undefined,
+      packedLengthCm: form.packedLengthCm ? Number(form.packedLengthCm) : undefined,
+      packedWidthCm: form.packedWidthCm ? Number(form.packedWidthCm) : undefined,
+      packedHeightCm: form.packedHeightCm ? Number(form.packedHeightCm) : undefined,
+      shippingDataStatus: form.shippingDataStatus,
+      featured: false,
+      onSale: false,
+      heroImage: form.heroImage.trim(),
+      gallery,
+      galleryCount: gallery.length,
+    };
+  }
+
   function applyMediaToProduct(url: string, mode: 'hero' | 'gallery') {
     if (mediaScope !== 'products') {
       setMediaStatus('Choose a product target before using Hero or Gallery.');
@@ -3141,7 +3197,7 @@ export default function AdminPanel() {
       .finally(() => setLoading(false));
   }
 
-  function queueNewProduct() {
+  async function queueNewProduct() {
     const gallery = parseGalleryText(newProduct.galleryText);
     const missing = [
       !newProduct.title.trim() && 'title',
@@ -3195,8 +3251,24 @@ export default function AdminPanel() {
       return;
     }
 
-    setActiveTab('pending');
+    const proposedPath = `src/content/products/accessories/${proposedSlug}.md`;
+    const stockInstructions = newProduct.productType === 'stock'
+      ? `\nProduct type: stock\n` +
+        `Fulfilment type: ${newProduct.fulfilmentType}\n` +
+        `Shipping size: ${newProduct.shippingSize}\n` +
+        `Actual item weight kg, before packaging: ${newProduct.weight.trim() || 'not provided'}\n` +
+        `Actual item dimensions cm, before packaging: ${newProduct.dimensionLength.trim() && newProduct.dimensionWidth.trim() && newProduct.dimensionHeight.trim() ? `${newProduct.dimensionLength.trim()} x ${newProduct.dimensionWidth.trim()} x ${newProduct.dimensionHeight.trim()}` : 'not provided'}\n` +
+        `Pickup location: ${newProduct.pickupLocation.trim() || 'none'}\n` +
+        `Requires installation: ${newProduct.requiresInstallation ? 'yes' : 'no'}\n` +
+        `Packed weight kg: ${newProduct.fulfilmentType === 'ship' ? newProduct.packedWeightKg.trim() : 'none'}\n` +
+        `Packed dimensions cm: ${newProduct.fulfilmentType === 'ship' ? `${newProduct.packedLengthCm.trim()} x ${newProduct.packedWidthCm.trim()} x ${newProduct.packedHeightCm.trim()}` : 'none'}\n` +
+        `Shipping data status: ${newProduct.fulfilmentType === 'ship' ? newProduct.shippingDataStatus : 'none'}\n` +
+        `Do not copy packed box specs into item specs. If actual item specs are not provided, omit weight and dimensions from frontmatter.`
+      : `\nProduct type: service\nFulfilment type: ${newProduct.fulfilmentType}\nShipping size: none\n`;
+
     if (newProduct.mode === 'business') {
+      setShowChatDrawer(true);
+      setActiveTab('pending');
       const videoInstructions = videoId
         ? `YouTube video frontmatter:\n` +
           `id: ${videoId}\n` +
@@ -3233,20 +3305,6 @@ export default function AdminPanel() {
         `Use exactly the supplied hero image and gallery order. Store only the clean YouTube video ID in youtubeVideo.id. Do not invent image URLs or video metadata.`
       );
     } else {
-      const stockInstructions = newProduct.productType === 'stock'
-        ? `\nProduct type: stock\n` +
-          `Fulfilment type: ${newProduct.fulfilmentType}\n` +
-          `Shipping size: ${newProduct.shippingSize}\n` +
-          `Actual item weight kg, before packaging: ${newProduct.weight.trim() || 'not provided'}\n` +
-          `Actual item dimensions cm, before packaging: ${newProduct.dimensionLength.trim() && newProduct.dimensionWidth.trim() && newProduct.dimensionHeight.trim() ? `${newProduct.dimensionLength.trim()} x ${newProduct.dimensionWidth.trim()} x ${newProduct.dimensionHeight.trim()}` : 'not provided'}\n` +
-          `Pickup location: ${newProduct.pickupLocation.trim() || 'none'}\n` +
-          `Requires installation: ${newProduct.requiresInstallation ? 'yes' : 'no'}\n` +
-          `Packed weight kg: ${newProduct.fulfilmentType === 'ship' ? newProduct.packedWeightKg.trim() : 'none'}\n` +
-          `Packed dimensions cm: ${newProduct.fulfilmentType === 'ship' ? `${newProduct.packedLengthCm.trim()} x ${newProduct.packedWidthCm.trim()} x ${newProduct.packedHeightCm.trim()}` : 'none'}\n` +
-          `Shipping data status: ${newProduct.fulfilmentType === 'ship' ? newProduct.shippingDataStatus : 'none'}\n` +
-          `Do not copy packed box specs into item specs. If actual item specs are not provided, omit weight and dimensions from frontmatter.`
-        : `\nProduct type: service\nFulfilment type: ${newProduct.fulfilmentType}\nShipping size: none\n`;
-
       sendMessage(
         `Create a new shop item markdown file under src/content/products/accessories/ using the shop schema.\n\n` +
         `Title: ${newProduct.title.trim()}\n` +
@@ -3266,9 +3324,59 @@ export default function AdminPanel() {
         `Keep the file simple and owner-friendly. Use store: true and fill only the fields needed by the shop schema. ` +
         `Do not add business-product-only fields such as keySpecs or YouTube metadata.`
       );
+      setNewProduct(EMPTY_PRODUCT_FORM);
+      setShowNewProductForm(false);
+      return;
     }
-    setNewProduct(EMPTY_PRODUCT_FORM);
+
+    const queuedDraft = queuedShopDraftFromForm(newProduct, proposedSlug);
+    setQueuedShopDrafts(prev => [
+      {
+        ...queuedDraft,
+        pendingLabel: 'Queued shop item',
+      },
+      ...prev.filter(item => item.slug !== proposedSlug),
+    ]);
+    setNewProductStatus('');
+    setShowChatDrawer(false);
+    setActiveTab('shop');
     setShowNewProductForm(false);
+
+    const result = await sendMessage(
+      `Create a new shop item markdown file under src/content/products/accessories/ using the shop schema.\n\n` +
+      `Title: ${newProduct.title.trim()}\n` +
+      `Slug: use a URL-safe slug based on the title.\n` +
+      `Category: ${newProduct.category.trim()}\n` +
+      `Price: ${newProduct.price.trim()}\n` +
+      `Tagline: ${newProduct.tagline.trim()}\n` +
+      `Description/body copy: ${newProduct.description.trim()}\n` +
+      `Hero image: ${newProduct.heroImage.trim()}\n` +
+      `Gallery order, one image per line:\n${gallery.join('\n')}\n` +
+      `Availability: ${newProduct.availability}\n` +
+      `Online purchase: ${newProduct.purchasableOnline ? 'yes' : 'no'}\n` +
+      `Source type: ${newProduct.sourceType}\n` +
+      `Public lead time: ${newProduct.leadTimeText.trim() || 'none'}\n` +
+      `Public container ETA: ${newProduct.containerEtaText.trim() || 'none'}\n` +
+      `Public container ETA date: ${newProduct.containerEtaDate.trim() || 'none'}${stockInstructions}\n\n` +
+      `Keep the file simple and owner-friendly. Use store: true and fill only the fields needed by the shop schema. ` +
+      `Do not add business-product-only fields such as keySpecs or YouTube metadata.`
+    );
+
+    const queuedChange = result?.pendingChanges?.find(change => change.path === proposedPath)
+      ?? result?.pendingChanges?.find(change => change.path.endsWith(`/${proposedSlug}.md`));
+
+    if (!queuedChange) {
+      setQueuedShopDrafts(prev => prev.filter(item => item.slug !== proposedSlug));
+      setNewProductStatus('The shop item could not be queued. Try again.');
+      return;
+    }
+
+    setQueuedShopDrafts(prev => prev.map(item => item.slug === proposedSlug ? {
+      ...item,
+      pendingPath: queuedChange.path,
+      pendingLabel: queuedChange.description || 'Queued in Pending',
+    } : item));
+    setNewProduct(EMPTY_PRODUCT_FORM);
   }
 
   function updateRecentBuild(id: string, patch: Partial<RecentBuild>) {
@@ -3544,6 +3652,12 @@ export default function AdminPanel() {
       .toLowerCase()
       .includes(q);
   });
+  const visibleQueuedShopDrafts = queuedShopDrafts.filter(draft => {
+    if (products.some(product => product.slug === draft.slug)) return false;
+    if (!draft.pendingPath) return true;
+    return pending.some(change => change.path === draft.pendingPath);
+  });
+  const shopDisplayProducts = [...visibleQueuedShopDrafts, ...filteredShopProducts];
   const businessSections = [
     { key: 'caravan', label: 'Caravans', items: filteredBusinessProducts.filter(product => product.category === 'caravan') },
     { key: 'slide-on', label: 'Slide-ons', items: filteredBusinessProducts.filter(product => product.category === 'slide-on') },
@@ -3551,11 +3665,12 @@ export default function AdminPanel() {
   ];
   const otherBusinessProducts = filteredBusinessProducts.filter(product => !['caravan', 'slide-on', 'expedition'].includes(String(product.category)));
   const shopSections = [
-    { key: 'stock', label: 'Shop stock items', items: filteredShopProducts.filter(product => product.productType === 'stock') },
-    { key: 'service', label: 'Shop services', items: filteredShopProducts.filter(product => product.productType === 'service') },
+    { key: 'stock', label: 'Shop stock items', items: shopDisplayProducts.filter(product => product.productType === 'stock') },
+    { key: 'service', label: 'Shop services', items: shopDisplayProducts.filter(product => product.productType === 'service') },
   ];
   const renderProductCard = (product: ProductRecord, variant: 'business' | 'shop') => {
     const isShop = variant === 'shop';
+    const isQueuedDraft = isShop && Boolean((product as QueuedShopDraft).pendingLabel);
     const metaParts = isShop
       ? [
           'Shop item',
@@ -3584,14 +3699,26 @@ export default function AdminPanel() {
     const actionColumns = isShop ? '1fr' : product.onSale || product.status === 'on-sale' ? '1fr 1fr 1fr' : '1fr 1fr';
 
     return (
-      <div key={product.slug} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', overflow: 'hidden', flexShrink: 0, display: 'grid', gridTemplateColumns: '150px minmax(0, 1fr)' }}>
+      <div key={product.slug} style={{ background: isQueuedDraft ? '#20140c' : '#1a1a1a', border: isQueuedDraft ? '1px solid #7c3a10' : '1px solid #303030', borderRadius: '6px', overflow: 'hidden', flexShrink: 0, display: 'grid', gridTemplateColumns: '150px minmax(0, 1fr)' }}>
         <AdminProductThumb src={product.heroImage} title={product.title} />
         <div style={{ padding: '0.65rem 0.7rem', minWidth: 0, display: 'grid', gap: '0.35rem', alignContent: 'center' }}>
-          <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem', lineHeight: 1.25 }}>{product.title}</div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
+            <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem', lineHeight: 1.25, minWidth: 0 }}>{product.title}</div>
+            {isQueuedDraft && (
+              <span style={{ background: '#7c3a10', color: '#fed7aa', border: '1px solid #fb923c', borderRadius: '999px', padding: '0.14rem 0.45rem', fontSize: '0.66rem', fontWeight: 800, whiteSpace: 'nowrap' }}>
+                {(product as QueuedShopDraft).pendingLabel ?? 'Pending'}
+              </span>
+            )}
+          </div>
           <div style={{ color: '#aaa', fontSize: '0.74rem' }}>
             {metaParts.filter(Boolean).join(' · ')}
           </div>
-          {product.store && product.productType === 'stock' && (
+          {isQueuedDraft && (
+            <div style={{ color: '#fb923c', fontSize: '0.7rem', lineHeight: 1.4 }}>
+              Queued locally and waiting in Pending Changes.
+            </div>
+          )}
+          {product.store && product.productType === 'stock' && !isQueuedDraft && (
             <div style={{ color: '#888', fontSize: '0.7rem', lineHeight: 1.4 }}>
               {product.fulfilmentType === 'ship'
                 ? 'Ship-ready stock item with packed shipping dimensions saved for checkout and Australia Post.'
@@ -3815,7 +3942,10 @@ export default function AdminPanel() {
                   </button>
                 )}
                 {showNewProductForm && !editProduct && (
-                  <button onClick={() => setShowNewProductForm(false)} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '6px', padding: '0.42rem 0.6rem', cursor: 'pointer', fontWeight: 700 }}>
+                  <button onClick={() => {
+                    setShowNewProductForm(false);
+                    setNewProductStatus('');
+                  }} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '6px', padding: '0.42rem 0.6rem', cursor: 'pointer', fontWeight: 700 }}>
                     Back
                   </button>
                 )}
@@ -3824,6 +3954,7 @@ export default function AdminPanel() {
                     const mode = activeTab === 'shop' ? 'shop' : 'business';
                     setNewProductMode(mode);
                     setNewProduct({ ...EMPTY_PRODUCT_FORM, mode });
+                    setNewProductStatus('');
                     setShowNewProductForm(true);
                   }} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.46rem 0.7rem', cursor: 'pointer', fontWeight: 700 }}>
                     {activeTab === 'shop' ? 'Add Shop Item' : 'Add Product'}
@@ -3837,6 +3968,11 @@ export default function AdminPanel() {
                   placeholder={activeTab === 'shop' ? 'Search shop items...' : 'Search products...'}
                   style={{ width: '100%', boxSizing: 'border-box', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem 0.65rem', fontSize: '0.82rem', outline: 'none' }}
                 />
+              )}
+              {newProductStatus && !editProduct && !showNewProductForm && (
+                <div style={{ marginTop: '0.55rem', background: '#2a1410', border: '1px solid #7c2d12', color: '#fed7aa', borderRadius: '6px', padding: '0.5rem 0.65rem', fontSize: '0.76rem', lineHeight: 1.4 }}>
+                  {newProductStatus}
+                </div>
               )}
             </div>
             {!editProduct && !showNewProductForm && (
@@ -4350,10 +4486,10 @@ export default function AdminPanel() {
                 )}
               </div>
               <div className="admin-form-grid admin-form-grid--two" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
-                <button onClick={() => setShowNewProductForm(false)} style={{ background: '#222', color: '#aaa', border: '1px solid #444', borderRadius: '6px', padding: '0.6rem', cursor: 'pointer', fontWeight: 700 }}>
+                <button type="button" onClick={() => setShowNewProductForm(false)} style={{ background: '#222', color: '#aaa', border: '1px solid #444', borderRadius: '6px', padding: '0.6rem', cursor: 'pointer', fontWeight: 700 }}>
                   Cancel
                 </button>
-                <button onClick={queueNewProduct} disabled={loading} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.6rem', cursor: 'pointer', fontWeight: 700 }}>
+                <button type="button" onClick={queueNewProduct} disabled={loading} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.6rem', cursor: 'pointer', fontWeight: 700 }}>
                   {newProduct.mode === 'shop' ? 'Queue Shop Item' : 'Queue Product Draft'}
                 </button>
               </div>
