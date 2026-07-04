@@ -3215,13 +3215,17 @@ export default function AdminPanel() {
     ].filter(Boolean);
 
     if (missing.length) {
-      setMessages(prev => [...prev, { role: 'assistant', content: `The new product form needs: ${missing.join(', ')}.` }]);
+      const message = `The new product form needs: ${missing.join(', ')}.`;
+      setNewProductStatus(message);
+      setMessages(prev => [...prev, { role: 'assistant', content: message }]);
       return;
     }
 
     const proposedSlug = slugifyTitle(newProduct.title);
     if (products.some(product => product.slug === proposedSlug)) {
-      setMessages(prev => [...prev, { role: 'assistant', content: `A product already uses the slug "${proposedSlug}". Change the title or ask me to edit the existing product instead.` }]);
+      const message = `A product already uses the slug "${proposedSlug}". Change the title or ask me to edit the existing product instead.`;
+      setNewProductStatus(message);
+      setMessages(prev => [...prev, { role: 'assistant', content: message }]);
       return;
     }
 
@@ -3237,17 +3241,23 @@ export default function AdminPanel() {
     );
 
     if (hasVideoFields && !newProduct.youtubeVideoUrl.trim()) {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Add a YouTube URL for the new product video, or clear all video fields.' }]);
+      const message = 'Add a YouTube URL for the new product video, or clear all video fields.';
+      setNewProductStatus(message);
+      setMessages(prev => [...prev, { role: 'assistant', content: message }]);
       return;
     }
 
     if (newProduct.youtubeVideoUrl.trim() && !isValidYouTubeVideoId(videoId)) {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'The YouTube video URL does not look valid. Paste a normal YouTube, youtu.be, Shorts, embed URL, or a clean video ID.' }]);
+      const message = 'The YouTube video URL does not look valid. Paste a normal YouTube, youtu.be, Shorts, embed URL, or a clean video ID.';
+      setNewProductStatus(message);
+      setMessages(prev => [...prev, { role: 'assistant', content: message }]);
       return;
     }
 
     if (newProduct.mode === 'business' && videoId && !newProduct.youtubeVideoTitle.trim()) {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Add a short video title before queueing the new product draft.' }]);
+      const message = 'Add a short video title before queueing the new product draft.';
+      setNewProductStatus(message);
+      setMessages(prev => [...prev, { role: 'assistant', content: message }]);
       return;
     }
 
@@ -3303,26 +3313,6 @@ export default function AdminPanel() {
         `${videoInstructions}\n\n` +
         `Use a URL-safe slug based on the title. Before proposing the new file, list src/content/products and confirm the slug does not already exist. ` +
         `Use exactly the supplied hero image and gallery order. Store only the clean YouTube video ID in youtubeVideo.id. Do not invent image URLs or video metadata.`
-      );
-    } else {
-      sendMessage(
-        `Create a new shop item markdown file under src/content/products/accessories/ using the shop schema.\n\n` +
-        `Title: ${newProduct.title.trim()}\n` +
-        `Slug: use a URL-safe slug based on the title.\n` +
-        `Category: ${newProduct.category.trim()}\n` +
-        `Price: ${newProduct.price.trim()}\n` +
-        `Tagline: ${newProduct.tagline.trim()}\n` +
-        `Description/body copy: ${newProduct.description.trim()}\n` +
-        `Hero image: ${newProduct.heroImage.trim()}\n` +
-        `Gallery order, one image per line:\n${gallery.join('\n')}\n` +
-        `Availability: ${newProduct.availability}\n` +
-        `Online purchase: ${newProduct.purchasableOnline ? 'yes' : 'no'}\n` +
-        `Source type: ${newProduct.sourceType}\n` +
-        `Public lead time: ${newProduct.leadTimeText.trim() || 'none'}\n` +
-        `Public container ETA: ${newProduct.containerEtaText.trim() || 'none'}\n` +
-        `Public container ETA date: ${newProduct.containerEtaDate.trim() || 'none'}${stockInstructions}\n\n` +
-        `Keep the file simple and owner-friendly. Use store: true and fill only the fields needed by the shop schema. ` +
-        `Do not add business-product-only fields such as keySpecs or YouTube metadata.`
       );
       setNewProduct(EMPTY_PRODUCT_FORM);
       setShowNewProductForm(false);
