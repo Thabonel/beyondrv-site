@@ -8,7 +8,7 @@ status: available
 onlinePurchaseEnabled: true
 onSale: false
 featured: false
-heroImage: /images/optimized/products/advent-2450-hardtop-slide-on/01-advent-2450-hardtop-slide-on-hero.webp
+heroImage: /media/products/advent-2450-hardtop-slide-on/1784267060833-85158ce8-fce4-4bbe-a326-1c8fea69c943-img_0609.webp
 gallery:
   - /images/optimized/products/advent-2450-hardtop-slide-on/02-advent-2450-04-1024x576.webp
   - /images/optimized/products/advent-2450-hardtop-slide-on/03-advent-2450-05-1024x678.webp
