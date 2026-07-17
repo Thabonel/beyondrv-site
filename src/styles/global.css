@@ -647,10 +647,24 @@ nav.scrolled {
   color: var(--white);
 }
 
-.product-description { padding: 5rem 0; }
-.product-description-body { max-width: 740px; }
+.product-hero-description {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+.product-hero-description h2 {
+  margin: 1.75rem 0 0.75rem;
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  line-height: 1.1;
+}
+.product-hero-description a {
+  color: var(--orange);
+  text-underline-offset: 0.18em;
+}
 .product-suitability-section {
-  padding: 0 0 5rem;
+  padding: 5rem 0;
 }
 .product-suitability-card {
   max-width: 980px;

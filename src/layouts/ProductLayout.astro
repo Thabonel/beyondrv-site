@@ -319,6 +319,17 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
         </p>
       )}
       <p class="product-payment-error" data-payment-error role="alert" hidden></p>
+
+      <div class="product-hero-description prose">
+        <slot />
+        <h2>Is this the right build for you?</h2>
+        <p>
+          This {data.category === 'caravan' ? 'off-road caravan' : data.category === 'expedition' ? 'expedition camper' : 'slide-on camper'} is best assessed against your vehicle, payload, travel style, and the terrain you expect to cover.
+          If you are comparing sizes, tow weights, tray fitment, or custom options, start with the
+          <a href={categoryMeta.url}>{categoryMeta.name.toLowerCase()}</a> range or send the team an
+          <a href={enquiryUrl}>enquiry for this product</a>.
+        </p>
+      </div>
     </div>
   </section>
 
@@ -345,19 +356,6 @@ const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
       </div>
     </div>
   )}
-
-  <section class="product-description container">
-    <div class="product-description-body prose">
-      <slot />
-      <h2>Is this the right build for you?</h2>
-      <p>
-        This {data.category === 'caravan' ? 'off-road caravan' : data.category === 'expedition' ? 'expedition camper' : 'slide-on camper'} is best assessed against your vehicle, payload, travel style, and the terrain you expect to cover.
-        If you are comparing sizes, tow weights, tray fitment, or custom options, start with the
-        <a href={categoryMeta.url}>{categoryMeta.name.toLowerCase()}</a> range or send the team an
-        <a href={enquiryUrl}>enquiry for this product</a>.
-      </p>
-    </div>
-  </section>
 
   <section class="product-suitability-section container">
     <div class="product-suitability-card">
