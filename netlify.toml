@@ -93,7 +93,7 @@
 
 [[redirects]]
   from   = "/media/*"
-  to     = "/.netlify/functions/media-serve?key=:splat"
+  to     = "/.netlify/functions/media-serve/:splat"
   status = 200
 
 [[redirects]]

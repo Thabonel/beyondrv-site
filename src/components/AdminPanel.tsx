@@ -1180,6 +1180,7 @@ function slugifyTitle(title: string) {
 function adminImageUrl(src: string) {
   if (!src) return '';
   if (src.startsWith('/images/optimized/')) return src;
+  if (src.startsWith('/media/')) return src;
   if (src.startsWith('/images/products/')) return src;
   return `/.netlify/images?url=${encodeURIComponent(src)}&w=800`;
 }
@@ -1563,6 +1564,7 @@ export default function AdminPanel() {
   const [newProductMode, setNewProductMode] = useState<'business' | 'shop'>('business');
   const [editProduct, setEditProduct] = useState<EditProductForm | null>(null);
   const [productEditStatus, setProductEditStatus] = useState('');
+  const [editProductMediaStatus, setEditProductMediaStatus] = useState('');
   const [newProductStatus, setNewProductStatus] = useState('');
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
@@ -1651,6 +1653,7 @@ export default function AdminPanel() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const mediaFileRef = useRef<HTMLInputElement>(null);
+  const editProductFileRef = useRef<HTMLInputElement>(null);
   const newProductFileRef = useRef<HTMLInputElement>(null);
   const enquiryRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const pendingEnquiryHashRef = useRef<string | null>(null);
@@ -2852,6 +2855,45 @@ export default function AdminPanel() {
     }
   }
 
+  async function uploadEditProductMedia(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length || !editProduct) return;
+
+    const { slug, title, heroImage } = editProduct;
+    setMediaLoading(true);
+    setEditProductMediaStatus(`Uploading ${files.length} photo${files.length === 1 ? '' : 's'}...`);
+
+    try {
+      const uploadedUrls: string[] = [];
+      for (const file of files) {
+        uploadedUrls.push(await uploadProductImage(slug, file, title));
+      }
+
+      const gallery = parseGalleryText(editProduct.galleryText);
+      const nextGallery = [...gallery];
+      for (const url of uploadedUrls) {
+        if (url && !nextGallery.includes(url)) nextGallery.push(url);
+      }
+      const updatedProduct = {
+        ...editProduct,
+        heroImage: editProduct.heroImage || uploadedUrls[0] || heroImage,
+        galleryText: formatGalleryText(nextGallery),
+      };
+
+      setEditProduct(updatedProduct);
+      setEditProductMediaStatus('Photo uploaded. Saving the product edit...');
+      const queued = await queueStructuredEdit(updatedProduct, { photoUpload: true });
+      if (!queued) {
+        setEditProductMediaStatus('Photo uploaded, but the product edit could not be saved. Check the message below and try Queue Edit.');
+      }
+    } catch (err) {
+      setEditProductMediaStatus(err instanceof Error ? err.message : 'Photo upload failed.');
+    } finally {
+      setMediaLoading(false);
+      if (editProductFileRef.current) editProductFileRef.current.value = '';
+    }
+  }
+
   async function deleteMedia(key: string) {
     const ok = window.confirm('Delete this uploaded image? Product pages using this image will need their gallery updated first.');
     if (!ok) return;
@@ -3048,166 +3090,170 @@ export default function AdminPanel() {
   function startStructuredEdit(product: ProductRecord) {
     setEditProduct(editFormFromProduct(product));
     setProductEditStatus('');
+    setEditProductMediaStatus('');
     setActiveTab(product.store ? 'shop' : 'products');
   }
 
-  function queueStructuredEdit() {
-    if (!editProduct) return;
+  function queueStructuredEdit(
+    productForm: EditProductForm | null = editProduct,
+    options: { photoUpload?: boolean } = {}
+  ): Promise<boolean> {
+    if (!productForm) return Promise.resolve(false);
     const missing = [
-      !editProduct.title.trim() && 'title',
-      !editProduct.price.trim() && 'price',
-      !editProduct.tagline.trim() && 'tagline',
-      !editProduct.heroImage.trim() && 'hero image',
+      !productForm.title.trim() && 'title',
+      !productForm.price.trim() && 'price',
+      !productForm.tagline.trim() && 'tagline',
+      !productForm.heroImage.trim() && 'hero image',
     ].filter(Boolean);
 
     if (missing.length) {
       const message = `The product edit form needs: ${missing.join(', ')}.`;
       setProductEditStatus(message);
       setMessages(prev => [...prev, { role: 'assistant', content: message }]);
-      return;
+      return Promise.resolve(false);
     }
 
-    if (editProduct.store && editProduct.productType === 'stock') {
+    if (productForm.store && productForm.productType === 'stock') {
       const stockMissing = [
-        editProduct.fulfilmentType === 'ship' && !editProduct.packedWeightKg.trim() && 'packed weight',
-        editProduct.fulfilmentType === 'ship' && !editProduct.packedLengthCm.trim() && 'packed length',
-        editProduct.fulfilmentType === 'ship' && !editProduct.packedWidthCm.trim() && 'packed width',
-        editProduct.fulfilmentType === 'ship' && !editProduct.packedHeightCm.trim() && 'packed height',
+        productForm.fulfilmentType === 'ship' && !productForm.packedWeightKg.trim() && 'packed weight',
+        productForm.fulfilmentType === 'ship' && !productForm.packedLengthCm.trim() && 'packed length',
+        productForm.fulfilmentType === 'ship' && !productForm.packedWidthCm.trim() && 'packed width',
+        productForm.fulfilmentType === 'ship' && !productForm.packedHeightCm.trim() && 'packed height',
       ].filter(Boolean);
       if (stockMissing.length) {
         const message = `Shop stock items need: ${stockMissing.join(', ')}.`;
         setProductEditStatus(message);
         setMessages(prev => [...prev, { role: 'assistant', content: message }]);
-        return;
+        return Promise.resolve(false);
       }
     }
 
-    const gallery = parseGalleryText(editProduct.galleryText);
+    const gallery = parseGalleryText(productForm.galleryText);
     const knownSlugs = new Set(products.map(product => product.slug));
-    const invalidRelated = editProduct.relatedSlugs.filter(slug => !knownSlugs.has(slug));
-    const videoId = extractYouTubeVideoId(editProduct.youtubeVideoUrl);
+    const invalidRelated = productForm.relatedSlugs.filter(slug => !knownSlugs.has(slug));
+    const videoId = extractYouTubeVideoId(productForm.youtubeVideoUrl);
     const hasVideoFields = Boolean(
-      editProduct.youtubeVideoUrl.trim() ||
-      editProduct.youtubeVideoTitle.trim() ||
-      editProduct.youtubeVideoDescription.trim() ||
-      editProduct.youtubeVideoThumbnail.trim() ||
-      editProduct.youtubeVideoUploadDate.trim() ||
-      editProduct.youtubeVideoDuration.trim() ||
-      editProduct.youtubeVideoTranscriptSummary.trim()
+      productForm.youtubeVideoUrl.trim() ||
+      productForm.youtubeVideoTitle.trim() ||
+      productForm.youtubeVideoDescription.trim() ||
+      productForm.youtubeVideoThumbnail.trim() ||
+      productForm.youtubeVideoUploadDate.trim() ||
+      productForm.youtubeVideoDuration.trim() ||
+      productForm.youtubeVideoTranscriptSummary.trim()
     );
 
     if (gallery.length === 0) {
       const message = 'The gallery must contain at least one image URL or path.';
       setProductEditStatus(message);
       setMessages(prev => [...prev, { role: 'assistant', content: message }]);
-      return;
+      return Promise.resolve(false);
     }
 
     if (invalidRelated.length) {
       const message = `These related product slugs are not valid: ${invalidRelated.join(', ')}.`;
       setProductEditStatus(message);
       setMessages(prev => [...prev, { role: 'assistant', content: message }]);
-      return;
+      return Promise.resolve(false);
     }
 
-    if (hasVideoFields && !editProduct.youtubeVideoUrl.trim()) {
+    if (hasVideoFields && !productForm.youtubeVideoUrl.trim()) {
       const message = 'Add a YouTube URL for the product video, or clear all video fields.';
       setProductEditStatus(message);
       setMessages(prev => [...prev, { role: 'assistant', content: message }]);
-      return;
+      return Promise.resolve(false);
     }
 
-    if (editProduct.youtubeVideoUrl.trim() && !isValidYouTubeVideoId(videoId)) {
+    if (productForm.youtubeVideoUrl.trim() && !isValidYouTubeVideoId(videoId)) {
       const message = 'The YouTube video URL does not look valid. Paste a normal YouTube, youtu.be, Shorts, embed URL, or a clean video ID.';
       setProductEditStatus(message);
       setMessages(prev => [...prev, { role: 'assistant', content: message }]);
-      return;
+      return Promise.resolve(false);
     }
 
-    if (videoId && !editProduct.youtubeVideoTitle.trim()) {
+    if (videoId && !productForm.youtubeVideoTitle.trim()) {
       const message = 'Add a short video title before queueing the product edit.';
       setProductEditStatus(message);
       setMessages(prev => [...prev, { role: 'assistant', content: message }]);
-      return;
+      return Promise.resolve(false);
     }
 
     setLoading(true);
     setProductEditStatus('Queueing product edit...');
-    adminFetch('/.netlify/functions/admin-product-edit', {
+    return adminFetch('/.netlify/functions/admin-product-edit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-          slug: editProduct.slug,
-          title: editProduct.title.trim(),
-          category: editProduct.category.trim(),
-          price: editProduct.price.trim(),
-          compareAtPrice: editProduct.compareAtPrice.trim(),
-          saleLabel: editProduct.saleLabel.trim(),
-          status: editProduct.status,
-          productType: editProduct.productType,
-          availability: editProduct.availability,
-          purchasableOnline: editProduct.purchasableOnline,
-          depositEnabled: editProduct.depositEnabled,
-          fullPaymentEnabled: editProduct.fullPaymentEnabled,
-          sourceType: editProduct.sourceType,
-          fulfilmentType: editProduct.fulfilmentType,
-          shippingSize: editProduct.shippingSize,
-          leadTimeText: editProduct.leadTimeText.trim(),
-          containerEtaText: editProduct.containerEtaText.trim(),
-          containerEtaDate: editProduct.containerEtaDate.trim(),
-          weight: editProduct.weight.trim(),
-          dimensionLength: editProduct.dimensionLength.trim(),
-          dimensionWidth: editProduct.dimensionWidth.trim(),
-          dimensionHeight: editProduct.dimensionHeight.trim(),
-          pickupLocation: editProduct.pickupLocation.trim(),
-          requiresInstallation: editProduct.requiresInstallation,
-          packedWeightKg: editProduct.packedWeightKg.trim(),
-          packedLengthCm: editProduct.packedLengthCm.trim(),
-          packedWidthCm: editProduct.packedWidthCm.trim(),
-          packedHeightCm: editProduct.packedHeightCm.trim(),
-          shippingDataStatus: editProduct.shippingDataStatus,
-          onSale: editProduct.onSale,
-          featured: editProduct.featured,
-          tagline: editProduct.tagline.trim(),
-          heroImage: editProduct.heroImage.trim(),
+          slug: productForm.slug,
+          title: productForm.title.trim(),
+          category: productForm.category.trim(),
+          price: productForm.price.trim(),
+          compareAtPrice: productForm.compareAtPrice.trim(),
+          saleLabel: productForm.saleLabel.trim(),
+          status: productForm.status,
+          productType: productForm.productType,
+          availability: productForm.availability,
+          purchasableOnline: productForm.purchasableOnline,
+          depositEnabled: productForm.depositEnabled,
+          fullPaymentEnabled: productForm.fullPaymentEnabled,
+          sourceType: productForm.sourceType,
+          fulfilmentType: productForm.fulfilmentType,
+          shippingSize: productForm.shippingSize,
+          leadTimeText: productForm.leadTimeText.trim(),
+          containerEtaText: productForm.containerEtaText.trim(),
+          containerEtaDate: productForm.containerEtaDate.trim(),
+          weight: productForm.weight.trim(),
+          dimensionLength: productForm.dimensionLength.trim(),
+          dimensionWidth: productForm.dimensionWidth.trim(),
+          dimensionHeight: productForm.dimensionHeight.trim(),
+          pickupLocation: productForm.pickupLocation.trim(),
+          requiresInstallation: productForm.requiresInstallation,
+          packedWeightKg: productForm.packedWeightKg.trim(),
+          packedLengthCm: productForm.packedLengthCm.trim(),
+          packedWidthCm: productForm.packedWidthCm.trim(),
+          packedHeightCm: productForm.packedHeightCm.trim(),
+          shippingDataStatus: productForm.shippingDataStatus,
+          onSale: productForm.onSale,
+          featured: productForm.featured,
+          tagline: productForm.tagline.trim(),
+          heroImage: productForm.heroImage.trim(),
           gallery,
-          relatedSlugs: editProduct.relatedSlugs,
-          internalStockEstimate: editProduct.internalStockEstimate.trim(),
-          targetAustraliaStock: editProduct.targetAustraliaStock.trim(),
-          containerReorderQuantity: editProduct.containerReorderQuantity.trim(),
-          minimumComfortStock: editProduct.minimumComfortStock.trim(),
-          lastStockCheckedAt: editProduct.lastStockCheckedAt.trim(),
-          lastStockCheckedBy: editProduct.lastStockCheckedBy.trim(),
-          containerEligible: editProduct.containerEligible,
-          usualContainerLeadTimeDays: editProduct.usualContainerLeadTimeDays.trim(),
-          supplierNotes: editProduct.supplierNotes.trim(),
+          relatedSlugs: productForm.relatedSlugs,
+          internalStockEstimate: productForm.internalStockEstimate.trim(),
+          targetAustraliaStock: productForm.targetAustraliaStock.trim(),
+          containerReorderQuantity: productForm.containerReorderQuantity.trim(),
+          minimumComfortStock: productForm.minimumComfortStock.trim(),
+          lastStockCheckedAt: productForm.lastStockCheckedAt.trim(),
+          lastStockCheckedBy: productForm.lastStockCheckedBy.trim(),
+          containerEligible: productForm.containerEligible,
+          usualContainerLeadTimeDays: productForm.usualContainerLeadTimeDays.trim(),
+          supplierNotes: productForm.supplierNotes.trim(),
           youtubeVideo: videoId
             ? {
-              url: editProduct.youtubeVideoUrl.trim(),
-              title: editProduct.youtubeVideoTitle.trim(),
-              description: editProduct.youtubeVideoDescription.trim(),
-              thumbnail: editProduct.youtubeVideoThumbnail.trim(),
-              uploadDate: editProduct.youtubeVideoUploadDate.trim(),
-              duration: editProduct.youtubeVideoDuration.trim(),
-              transcriptSummary: editProduct.youtubeVideoTranscriptSummary.trim(),
+              url: productForm.youtubeVideoUrl.trim(),
+              title: productForm.youtubeVideoTitle.trim(),
+              description: productForm.youtubeVideoDescription.trim(),
+              thumbnail: productForm.youtubeVideoThumbnail.trim(),
+              uploadDate: productForm.youtubeVideoUploadDate.trim(),
+              duration: productForm.youtubeVideoDuration.trim(),
+              transcriptSummary: productForm.youtubeVideoTranscriptSummary.trim(),
             }
           : null,
         suitabilityData: {
-          status: editProduct.suitabilityStatus,
-          dryWeightKg: editProduct.suitabilityDryWeightKg.trim(),
-          estimatedLoadedWeightKg: editProduct.suitabilityEstimatedLoadedWeightKg.trim(),
-          requiredTrayLengthMm: editProduct.suitabilityRequiredTrayLengthMm.trim(),
-          requiredTrayWidthMm: editProduct.suitabilityRequiredTrayWidthMm.trim(),
-          centreOfGravityMm: editProduct.suitabilityCentreOfGravityMm.trim(),
-          atmKg: editProduct.suitabilityAtmKg.trim(),
-          gtmKg: editProduct.suitabilityGtmKg.trim(),
-          towBallWeightKg: editProduct.suitabilityTowBallWeightKg.trim(),
-          notes: editProduct.suitabilityNotes.trim(),
+          status: productForm.suitabilityStatus,
+          dryWeightKg: productForm.suitabilityDryWeightKg.trim(),
+          estimatedLoadedWeightKg: productForm.suitabilityEstimatedLoadedWeightKg.trim(),
+          requiredTrayLengthMm: productForm.suitabilityRequiredTrayLengthMm.trim(),
+          requiredTrayWidthMm: productForm.suitabilityRequiredTrayWidthMm.trim(),
+          centreOfGravityMm: productForm.suitabilityCentreOfGravityMm.trim(),
+          atmKg: productForm.suitabilityAtmKg.trim(),
+          gtmKg: productForm.suitabilityGtmKg.trim(),
+          towBallWeightKg: productForm.suitabilityTowBallWeightKg.trim(),
+          notes: productForm.suitabilityNotes.trim(),
         },
       }),
     })
       .then(async res => {
-        if (redirectToLoginIfUnauthorized(res)) return;
+        if (redirectToLoginIfUnauthorized(res)) return false;
         const data = await res.json() as { pendingChange?: PendingChange; error?: string };
         if (!res.ok || !data.pendingChange) throw new Error(data.error ?? 'Could not queue product edit');
         setPending(prev => {
@@ -3219,16 +3265,20 @@ export default function AdminPanel() {
           }
           return [...prev, data.pendingChange!];
         });
-        const message = `${editProduct.title.trim()} edit queued. Open Pending to review and deploy it.`;
+        const message = options.photoUpload
+          ? `${productForm.title.trim()} photo saved to Pending. Review it, then click Deploy.`
+          : `${productForm.title.trim()} edit queued. Open Pending to review and deploy it.`;
         setProductEditStatus(message);
         setMessages(prev => [...prev, { role: 'assistant', content: message }]);
         setEditProduct(null);
         setActiveTab('pending');
+        return true;
       })
       .catch(err => {
         const message = err instanceof Error ? err.message : 'Could not queue product edit.';
         setProductEditStatus(message);
         setMessages(prev => [...prev, { role: 'assistant', content: message }]);
+        return false;
       })
       .finally(() => setLoading(false));
   }
@@ -3963,7 +4013,10 @@ export default function AdminPanel() {
                   {editProduct && <div style={{ color: '#888', fontSize: '0.74rem', marginTop: '0.18rem' }}>{editProduct.slug}</div>}
                 </div>
                 {editProduct && (
-                  <button onClick={() => setEditProduct(null)} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '6px', padding: '0.42rem 0.6rem', cursor: 'pointer', fontWeight: 700 }}>
+                  <button onClick={() => {
+                    setEditProduct(null);
+                    setEditProductMediaStatus('');
+                  }} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '6px', padding: '0.42rem 0.6rem', cursor: 'pointer', fontWeight: 700 }}>
                     Back
                   </button>
                 )}
@@ -4227,6 +4280,35 @@ export default function AdminPanel() {
                   <input value={editProduct.usualContainerLeadTimeDays} onChange={e => setEditProduct(p => p && ({ ...p, usualContainerLeadTimeDays: e.target.value }))} placeholder="Usual container lead time days" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                 </div>
                 <textarea value={editProduct.supplierNotes} onChange={e => setEditProduct(p => p && ({ ...p, supplierNotes: e.target.value }))} placeholder="Private supplier or order notes" rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
+                <div style={{ display: 'grid', gap: '0.35rem', border: '1px solid #333', borderRadius: '6px', padding: '0.6rem', background: '#101010' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
+                    <div>
+                      <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.78rem' }}>Quick Photo Upload</div>
+                      <div style={{ color: '#777', fontSize: '0.68rem', marginTop: '0.12rem', lineHeight: 1.35 }}>Upload straight into this product, then the photo is added to the gallery below.</div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => editProductFileRef.current?.click()}
+                      disabled={mediaLoading}
+                      style={{ background: mediaLoading ? '#333' : '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.52rem 0.75rem', cursor: mediaLoading ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: '0.75rem', whiteSpace: 'nowrap' }}
+                    >
+                      Add Photo
+                    </button>
+                  </div>
+                  <input
+                    ref={editProductFileRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    multiple
+                    style={{ display: 'none' }}
+                    onChange={uploadEditProductMedia}
+                  />
+                  {editProductMediaStatus && (
+                    <div style={{ color: editProductMediaStatus.toLowerCase().includes('fail') || editProductMediaStatus.toLowerCase().includes('error') ? '#fb923c' : '#8f8', fontSize: '0.74rem', lineHeight: 1.35 }}>
+                      {editProductMediaStatus}
+                    </div>
+                  )}
+                </div>
                 <ProductGalleryEditor
                   heroImage={editProduct.heroImage}
                   galleryText={editProduct.galleryText}
@@ -4308,10 +4390,11 @@ export default function AdminPanel() {
                   <button onClick={() => {
                     setEditProduct(null);
                     setProductEditStatus('');
+                    setEditProductMediaStatus('');
                   }} style={{ background: '#222', color: '#aaa', border: '1px solid #444', borderRadius: '6px', padding: '0.55rem', cursor: 'pointer', fontWeight: 700 }}>
                     Cancel
                   </button>
-                  <button onClick={queueStructuredEdit} disabled={loading} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.55rem', cursor: 'pointer', fontWeight: 700 }}>
+                  <button onClick={() => void queueStructuredEdit()} disabled={loading} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.55rem', cursor: 'pointer', fontWeight: 700 }}>
                     Queue Edit
                   </button>
                 </div>

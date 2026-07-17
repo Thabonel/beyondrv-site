@@ -40,6 +40,7 @@ gallery:
   - /images/optimized/products/advent-2450-hardtop-slide-on/29-advent-2450-new-09-1024x678.webp
   - /images/optimized/products/advent-2450-hardtop-slide-on/30-advent-2450-new-08-1024x678.webp
   - /media/products/advent-2450-hardtop-slide-on/1784267546020-f6063797-084c-4607-8fdf-5d5197a739de-img_0610.webp
+  - /media/products/advent-2450-hardtop-slide-on/1784267060833-85158ce8-fce4-4bbe-a326-1c8fea69c943-img_0609.webp
 keySpecs:
   - label: Base
     value: 2450mm x 2000mm
