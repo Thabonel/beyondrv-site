@@ -1683,11 +1683,11 @@ export default function AdminPanel() {
   useEffect(() => {
     const textarea = chatInputRef.current;
     if (!textarea) return;
-    const maxHeight = Math.min(window.innerHeight * 0.4, 320);
+    const maxHeight = Math.min(window.innerHeight * 0.5, 360);
     textarea.style.height = 'auto';
     textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
     textarea.style.overflowY = textarea.scrollHeight > maxHeight ? 'auto' : 'hidden';
-  }, [input]);
+  }, [input, showChatDrawer]);
 
   useEffect(() => {
     let cancelled = false;
@@ -6342,32 +6342,38 @@ export default function AdminPanel() {
             )}
             <div ref={bottomRef} />
           </div>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.5rem', padding: '0.75rem', borderTop: '1px solid #333' }}>
-            <button
-              onClick={() => fileRef.current?.click()}
-              style={{ minHeight: '40px', background: '#222', border: '1px solid #444', color: '#aaa', borderRadius: '6px', padding: '0 0.75rem', cursor: 'pointer', fontSize: '1.1rem' }}
-              title="Upload image"
-            >+</button>
+          <div style={{ padding: '0.75rem', borderTop: '1px solid #333' }}>
             <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
-            <textarea
-              ref={chatInputRef}
-              data-testid="admin-chat-input"
-              rows={1}
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => {
-                if (e.key !== 'Enter' || e.shiftKey) return;
-                e.preventDefault();
-                if (!loading && input.trim()) void sendMessage(input);
-              }}
-              placeholder="Ask about leads, SEO, or site changes..."
-              style={{ flex: 1, minWidth: 0, minHeight: '40px', maxHeight: 'min(40vh, 320px)', resize: 'none', overflowY: 'hidden', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem 0.75rem', fontFamily: 'inherit', fontSize: '0.9rem', lineHeight: 1.45, outline: 'none' }}
-            />
-            <button
-              onClick={() => sendMessage(input)}
-              disabled={loading || !input.trim()}
-              style={{ minHeight: '40px', background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0 1rem', cursor: loading || !input.trim() ? 'not-allowed' : 'pointer', fontWeight: 600 }}
-            >Send</button>
+            <div data-testid="admin-chat-composer" style={{ display: 'grid', overflow: 'hidden', background: '#1a1a1a', border: '1px solid #444', borderRadius: '14px', boxShadow: '0 8px 28px rgba(0,0,0,0.22)' }}>
+              <textarea
+                ref={chatInputRef}
+                data-testid="admin-chat-input"
+                rows={3}
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key !== 'Enter' || e.shiftKey) return;
+                  e.preventDefault();
+                  if (!loading && input.trim()) void sendMessage(input);
+                }}
+                placeholder="Ask AI to update the site, check leads, or improve content..."
+                style={{ width: '100%', minWidth: 0, minHeight: '88px', maxHeight: 'min(50vh, 360px)', resize: 'none', overflowY: 'hidden', background: 'transparent', border: 'none', color: '#fff', padding: '0.85rem 0.9rem 0.4rem', fontFamily: 'inherit', fontSize: '0.92rem', lineHeight: 1.5, outline: 'none' }}
+              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.35rem 0.45rem 0.45rem' }}>
+                <button
+                  onClick={() => fileRef.current?.click()}
+                  style={{ width: '36px', height: '36px', flexShrink: 0, background: '#242424', border: '1px solid #444', color: '#ddd', borderRadius: '50%', cursor: 'pointer', fontSize: '1.2rem', lineHeight: 1 }}
+                  title="Upload image"
+                  aria-label="Upload image"
+                >+</button>
+                <span style={{ flex: 1, color: '#777', fontSize: '0.68rem' }}>Enter to send / Shift+Enter for a new line</span>
+                <button
+                  onClick={() => sendMessage(input)}
+                  disabled={loading || !input.trim()}
+                  style={{ minHeight: '36px', background: '#E8540A', color: '#fff', border: 'none', borderRadius: '999px', padding: '0 1rem', cursor: loading || !input.trim() ? 'not-allowed' : 'pointer', opacity: loading || !input.trim() ? 0.45 : 1, fontWeight: 700 }}
+                >Send</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

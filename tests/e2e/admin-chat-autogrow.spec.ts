@@ -12,6 +12,7 @@ test('admin chat message box grows as a multiline message is entered', async ({ 
 
   const messageBox = page.getByTestId('admin-chat-input');
   const initialHeight = await messageBox.evaluate(element => element.getBoundingClientRect().height);
+  expect(initialHeight).toBeGreaterThanOrEqual(88);
   const message = [
     'Replace the oldest recent build with the Advent 2450.',
     'Use the current product hero image and product link.',
