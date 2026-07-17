@@ -96,7 +96,7 @@ export const handler: Handler = async (event) => {
         return {
           key: blob.key,
           url: mediaUrl(blob.key),
-          optimizedUrl: `/.netlify/images?url=${encodeURIComponent(mediaUrl(blob.key))}&w=1200&fit=cover`,
+          optimizedUrl: `/.netlify/images?url=${encodeURIComponent(mediaUrl(blob.key))}&w=1200`,
           metadata: metadata?.metadata ?? {},
           etag: blob.etag,
         };

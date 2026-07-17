@@ -105,7 +105,7 @@ export const handler: Handler = async (event) => {
     body: JSON.stringify({
       key,
       url: `/media/${key}`,
-      optimizedUrl: `/.netlify/images?url=${encodeURIComponent(`/media/${key}`)}&w=1200&fit=cover`,
+      optimizedUrl: `/.netlify/images?url=${encodeURIComponent(`/media/${key}`)}&w=1200`,
       alt,
       filename,
       contentType,

@@ -1181,7 +1181,7 @@ function adminImageUrl(src: string) {
   if (!src) return '';
   if (src.startsWith('/images/optimized/')) return src;
   if (src.startsWith('/images/products/')) return src;
-  return `/.netlify/images?url=${encodeURIComponent(src)}&w=800&fit=cover`;
+  return `/.netlify/images?url=${encodeURIComponent(src)}&w=800`;
 }
 
 function parseGalleryText(text: string) {
