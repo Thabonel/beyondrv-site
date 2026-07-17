@@ -4,6 +4,7 @@ import initialRecentBuilds from '../data/homepage/recent-builds.json';
 import initialTestimonials from '../data/homepage/testimonials.json';
 import initialPaymentSettings from '../data/payment-settings.json';
 import { adminFetch, clearAdminToken } from '../lib/adminApi';
+import { replaceProductHero } from '../lib/productImages';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -1290,7 +1291,7 @@ function ProductGalleryEditor({
   heroImage?: string;
   galleryText: string;
   onGalleryTextChange: (next: string) => void;
-  onHeroImageChange?: (next: string) => void;
+  onHeroImageChange?: (nextHero: string, nextGalleryText: string) => void;
 }) {
   const [newImage, setNewImage] = useState('');
   const gallery = parseGalleryText(galleryText);
@@ -1314,9 +1315,16 @@ function ProductGalleryEditor({
   function addImage() {
     const trimmed = newImage.trim();
     if (!trimmed || gallery.includes(trimmed)) return;
-    updateGallery([...gallery, trimmed]);
-    if (!heroImage && onHeroImageChange) onHeroImageChange(trimmed);
+    const nextGallery = [...gallery, trimmed];
+    updateGallery(nextGallery);
+    if (!heroImage && onHeroImageChange) onHeroImageChange(trimmed, formatGalleryText(nextGallery));
     setNewImage('');
+  }
+
+  function setHero(image: string) {
+    if (!onHeroImageChange) return;
+    const replacement = replaceProductHero(heroImage, image, gallery);
+    onHeroImageChange(replacement.heroImage, formatGalleryText(replacement.gallery));
   }
 
   return (
@@ -1327,7 +1335,7 @@ function ProductGalleryEditor({
       </div>
       <div style={{ display: 'grid', gap: '0.4rem', maxHeight: '360px', overflowY: 'auto', border: '1px solid #333', borderRadius: '6px', padding: '0.45rem', background: '#101010' }}>
         {gallery.map((image, index) => (
-          <div key={`${image}-${index}`} style={{ display: 'grid', gridTemplateColumns: '84px minmax(0, 1fr)', gap: '0.55rem', alignItems: 'center', padding: '0.45rem', border: '1px solid #282828', borderRadius: '6px', background: '#181818' }}>
+          <div key={`${image}-${index}`} data-gallery-image={image} data-gallery-position={index + 1} style={{ display: 'grid', gridTemplateColumns: '84px minmax(0, 1fr)', gap: '0.55rem', alignItems: 'center', padding: '0.45rem', border: '1px solid #282828', borderRadius: '6px', background: '#181818' }}>
             <ProductImagePreview src={image} title={`Gallery image ${index + 1}`} />
             <div style={{ minWidth: 0, display: 'grid', gap: '0.35rem' }}>
               <div style={{ display: 'flex', gap: '0.45rem', alignItems: 'center', minWidth: 0 }}>
@@ -1337,7 +1345,7 @@ function ProductGalleryEditor({
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '0.3rem' }}>
                 <button type="button" onClick={() => moveImage(index, -1)} disabled={index === 0} style={{ background: '#222', color: index === 0 ? '#666' : '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.34rem', cursor: index === 0 ? 'not-allowed' : 'pointer', fontSize: '0.68rem', fontWeight: 700 }}>Up</button>
                 <button type="button" onClick={() => moveImage(index, 1)} disabled={index === gallery.length - 1} style={{ background: '#222', color: index === gallery.length - 1 ? '#666' : '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.34rem', cursor: index === gallery.length - 1 ? 'not-allowed' : 'pointer', fontSize: '0.68rem', fontWeight: 700 }}>Down</button>
-                <button type="button" onClick={() => onHeroImageChange?.(image)} disabled={!onHeroImageChange} style={{ background: '#222', color: !onHeroImageChange ? '#666' : '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.34rem', cursor: !onHeroImageChange ? 'not-allowed' : 'pointer', fontSize: '0.68rem', fontWeight: 700 }}>Set Hero</button>
+                <button type="button" data-set-hero onClick={() => setHero(image)} disabled={!onHeroImageChange} style={{ background: '#222', color: !onHeroImageChange ? '#666' : '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.34rem', cursor: !onHeroImageChange ? 'not-allowed' : 'pointer', fontSize: '0.68rem', fontWeight: 700 }}>Set Hero</button>
                 <button type="button" onClick={() => removeImage(index)} style={{ background: '#2a1410', color: '#fb923c', border: '1px solid #63301f', borderRadius: '5px', padding: '0.34rem', cursor: 'pointer', fontSize: '0.68rem', fontWeight: 700 }}>Remove</button>
               </div>
             </div>
@@ -3035,8 +3043,10 @@ export default function AdminPanel() {
     const form = editFormFromProduct(product);
 
     if (mode === 'hero') {
-      form.heroImage = url;
-      form.notes = 'Set the uploaded image as the product hero image.';
+      const replacement = replaceProductHero(form.heroImage, url, parseGalleryText(form.galleryText));
+      form.heroImage = replacement.heroImage;
+      form.galleryText = formatGalleryText(replacement.gallery);
+      form.notes = 'Set the uploaded image as the product hero image and preserve the previous hero in the gallery.';
     } else {
       const gallery = parseGalleryText(form.galleryText);
       if (!gallery.includes(url)) gallery.push(url);
@@ -4313,7 +4323,7 @@ export default function AdminPanel() {
                   heroImage={editProduct.heroImage}
                   galleryText={editProduct.galleryText}
                   onGalleryTextChange={galleryText => setEditProduct(p => p && ({ ...p, galleryText }))}
-                  onHeroImageChange={heroImage => setEditProduct(p => p && ({ ...p, heroImage }))}
+                  onHeroImageChange={(heroImage, galleryText) => setEditProduct(p => p && ({ ...p, heroImage, galleryText }))}
                 />
                 {!editProduct.store && (
                   <>
@@ -4593,7 +4603,7 @@ export default function AdminPanel() {
                   heroImage={newProduct.heroImage}
                   galleryText={newProduct.galleryText}
                   onGalleryTextChange={galleryText => setNewProduct(p => ({ ...p, galleryText }))}
-                  onHeroImageChange={heroImage => setNewProduct(p => ({ ...p, heroImage }))}
+                  onHeroImageChange={(heroImage, galleryText) => setNewProduct(p => ({ ...p, heroImage, galleryText }))}
                 />
                 {newProduct.mode === 'business' && (
                   <ProductVideoEditor
@@ -6512,7 +6522,7 @@ export default function AdminPanel() {
               <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
                 <li>Open the Products tab and search for the product.</li>
                 <li>Use Edit to change safe fields like price, status, tagline, sale state, featured state, hero image, gallery order, or related products.</li>
-                <li>Use Gallery Photos to see the images in order. Move photos up or down, remove photos, add a new image path, or set a gallery photo as the hero image.</li>
+                <li>Use Gallery Photos to see the images in order. Move photos up or down, remove photos, add a new image path, or set a gallery photo as the hero image. Set Hero swaps that photo with the current hero, so neither image is lost.</li>
                 <li>Use Product Video to paste the YouTube URL for a walkthrough. Normal YouTube links, youtu.be links, Shorts links, and embed links are accepted.</li>
                 <li>Add a clear video title. The admin will detect the video ID, show a preview, and queue the video metadata with the product edit.</li>
                 <li>To remove a video from a product, clear the Product Video fields before queueing the edit.</li>
