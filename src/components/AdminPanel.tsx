@@ -1563,6 +1563,7 @@ export default function AdminPanel() {
   const [newProductMode, setNewProductMode] = useState<'business' | 'shop'>('business');
   const [editProduct, setEditProduct] = useState<EditProductForm | null>(null);
   const [productEditStatus, setProductEditStatus] = useState('');
+  const [editProductMediaStatus, setEditProductMediaStatus] = useState('');
   const [newProductStatus, setNewProductStatus] = useState('');
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
@@ -1651,6 +1652,7 @@ export default function AdminPanel() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const mediaFileRef = useRef<HTMLInputElement>(null);
+  const editProductFileRef = useRef<HTMLInputElement>(null);
   const newProductFileRef = useRef<HTMLInputElement>(null);
   const enquiryRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const pendingEnquiryHashRef = useRef<string | null>(null);
@@ -2852,6 +2854,43 @@ export default function AdminPanel() {
     }
   }
 
+  async function uploadEditProductMedia(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length || !editProduct) return;
+
+    const { slug, title, heroImage } = editProduct;
+    setMediaLoading(true);
+    setEditProductMediaStatus(`Uploading ${files.length} photo${files.length === 1 ? '' : 's'}...`);
+
+    try {
+      const uploadedUrls: string[] = [];
+      for (const file of files) {
+        uploadedUrls.push(await uploadProductImage(slug, file, title));
+      }
+
+      setEditProduct(prev => {
+        if (!prev) return prev;
+        const gallery = parseGalleryText(prev.galleryText);
+        const nextGallery = [...gallery];
+        for (const url of uploadedUrls) {
+          if (url && !nextGallery.includes(url)) nextGallery.push(url);
+        }
+        return {
+          ...prev,
+          heroImage: prev.heroImage || uploadedUrls[0] || heroImage,
+          galleryText: formatGalleryText(nextGallery),
+        };
+      });
+
+      setEditProductMediaStatus('Photo uploaded and added to this product.');
+    } catch (err) {
+      setEditProductMediaStatus(err instanceof Error ? err.message : 'Photo upload failed.');
+    } finally {
+      setMediaLoading(false);
+      if (editProductFileRef.current) editProductFileRef.current.value = '';
+    }
+  }
+
   async function deleteMedia(key: string) {
     const ok = window.confirm('Delete this uploaded image? Product pages using this image will need their gallery updated first.');
     if (!ok) return;
@@ -3048,6 +3087,7 @@ export default function AdminPanel() {
   function startStructuredEdit(product: ProductRecord) {
     setEditProduct(editFormFromProduct(product));
     setProductEditStatus('');
+    setEditProductMediaStatus('');
     setActiveTab(product.store ? 'shop' : 'products');
   }
 
@@ -3963,7 +4003,10 @@ export default function AdminPanel() {
                   {editProduct && <div style={{ color: '#888', fontSize: '0.74rem', marginTop: '0.18rem' }}>{editProduct.slug}</div>}
                 </div>
                 {editProduct && (
-                  <button onClick={() => setEditProduct(null)} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '6px', padding: '0.42rem 0.6rem', cursor: 'pointer', fontWeight: 700 }}>
+                  <button onClick={() => {
+                    setEditProduct(null);
+                    setEditProductMediaStatus('');
+                  }} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '6px', padding: '0.42rem 0.6rem', cursor: 'pointer', fontWeight: 700 }}>
                     Back
                   </button>
                 )}
@@ -4227,6 +4270,35 @@ export default function AdminPanel() {
                   <input value={editProduct.usualContainerLeadTimeDays} onChange={e => setEditProduct(p => p && ({ ...p, usualContainerLeadTimeDays: e.target.value }))} placeholder="Usual container lead time days" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                 </div>
                 <textarea value={editProduct.supplierNotes} onChange={e => setEditProduct(p => p && ({ ...p, supplierNotes: e.target.value }))} placeholder="Private supplier or order notes" rows={3} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', lineHeight: 1.4 }} />
+                <div style={{ display: 'grid', gap: '0.35rem', border: '1px solid #333', borderRadius: '6px', padding: '0.6rem', background: '#101010' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
+                    <div>
+                      <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.78rem' }}>Quick Photo Upload</div>
+                      <div style={{ color: '#777', fontSize: '0.68rem', marginTop: '0.12rem', lineHeight: 1.35 }}>Upload straight into this product, then the photo is added to the gallery below.</div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => editProductFileRef.current?.click()}
+                      disabled={mediaLoading}
+                      style={{ background: mediaLoading ? '#333' : '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.52rem 0.75rem', cursor: mediaLoading ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: '0.75rem', whiteSpace: 'nowrap' }}
+                    >
+                      Add Photo
+                    </button>
+                  </div>
+                  <input
+                    ref={editProductFileRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    multiple
+                    style={{ display: 'none' }}
+                    onChange={uploadEditProductMedia}
+                  />
+                  {editProductMediaStatus && (
+                    <div style={{ color: editProductMediaStatus.toLowerCase().includes('fail') || editProductMediaStatus.toLowerCase().includes('error') ? '#fb923c' : '#8f8', fontSize: '0.74rem', lineHeight: 1.35 }}>
+                      {editProductMediaStatus}
+                    </div>
+                  )}
+                </div>
                 <ProductGalleryEditor
                   heroImage={editProduct.heroImage}
                   galleryText={editProduct.galleryText}
@@ -4308,6 +4380,7 @@ export default function AdminPanel() {
                   <button onClick={() => {
                     setEditProduct(null);
                     setProductEditStatus('');
+                    setEditProductMediaStatus('');
                   }} style={{ background: '#222', color: '#aaa', border: '1px solid #444', borderRadius: '6px', padding: '0.55rem', cursor: 'pointer', fontWeight: 700 }}>
                     Cancel
                   </button>
