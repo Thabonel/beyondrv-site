@@ -585,7 +585,7 @@ nav.scrolled {
 .thumb-btn:hover { border-color: var(--orange); }
 
 .product-hero-info {
-  display: flex; flex-direction: column; justify-content: center;
+  display: flex; flex-direction: column; justify-content: flex-start;
   padding: 4rem var(--gutter);
   background: var(--dark);
   border-left: 1px solid var(--border);
