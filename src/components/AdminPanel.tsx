@@ -1497,6 +1497,14 @@ function redirectToLoginIfUnauthorized(res: Response) {
   return false;
 }
 
+async function fetchAdminProducts() {
+  const res = await adminFetch('/.netlify/functions/admin-products', { cache: 'no-store' });
+  if (redirectToLoginIfUnauthorized(res)) return null;
+  if (!res.ok) throw new Error('Could not load products');
+  const data = await res.json() as { products: ProductRecord[] };
+  return data.products ?? [];
+}
+
 async function readAdminJson<T>(res: Response, fallbackError: string): Promise<T> {
   const text = await res.text();
   try {
@@ -1675,11 +1683,8 @@ export default function AdminPanel() {
     let cancelled = false;
     async function loadProducts() {
       try {
-        const res = await adminFetch('/.netlify/functions/admin-products');
-        if (redirectToLoginIfUnauthorized(res)) return;
-        if (!res.ok) throw new Error('Could not load products');
-        const data = await res.json() as { products: ProductRecord[] };
-        if (!cancelled) setProducts(data.products ?? []);
+        const freshProducts = await fetchAdminProducts();
+        if (!cancelled && freshProducts) setProducts(freshProducts);
       } catch {
         if (!cancelled) {
           setMessages(prev => [...prev, { role: 'assistant', content: 'I could not load the product manager list. The chat can still make changes if you type the product name.' }]);
@@ -1692,6 +1697,30 @@ export default function AdminPanel() {
     loadProducts();
     return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => {
+    if (activeTab !== 'homepage') return;
+    let cancelled = false;
+
+    async function refreshHomepageProducts() {
+      setProductsLoading(true);
+      setHomepageStatus('Refreshing current product images...');
+      try {
+        const freshProducts = await fetchAdminProducts();
+        if (!cancelled && freshProducts) {
+          setProducts(freshProducts);
+          setHomepageStatus('Product images are current. Select a product below.');
+        }
+      } catch {
+        if (!cancelled) setHomepageStatus('Could not refresh product images. Close and reopen Homepage before selecting a product.');
+      } finally {
+        if (!cancelled) setProductsLoading(false);
+      }
+    }
+
+    void refreshHomepageProducts();
+    return () => { cancelled = true; };
+  }, [activeTab]);
 
   useEffect(() => {
     if (!productsLoading && !mediaSlug && products[0]) {
@@ -4939,7 +4968,7 @@ export default function AdminPanel() {
                   </button>
                 </div>
                 {orderedItems(recentBuilds).map((build, index) => (
-                  <div key={build.id} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', padding: '0.7rem', display: 'grid', gap: '0.45rem' }}>
+                  <div key={build.id} data-recent-build-id={build.id} style={{ background: '#1a1a1a', border: '1px solid #303030', borderRadius: '6px', padding: '0.7rem', display: 'grid', gap: '0.45rem' }}>
                     {build.image && (
                       <div style={{ width: '180px', maxWidth: '100%', height: '120px', background: '#0b0b0b', border: '1px solid #303030', borderRadius: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                         <img src={adminImageUrl(build.image)} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
@@ -4952,16 +4981,18 @@ export default function AdminPanel() {
                       <button onClick={() => removeRecentBuild(build.id)} style={{ background: '#2a1410', color: '#fb923c', border: '1px solid #63301f', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer' }}>×</button>
                     </div>
                     <select
+                      data-recent-build-product
                       value={build.productSlug ?? ''}
                       onChange={e => applyProductToRecentBuild(build.id, e.target.value)}
+                      disabled={productsLoading}
                       style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.45rem', fontSize: '0.76rem' }}
                     >
-                      <option value="">Use product hero image...</option>
+                      <option value="">{productsLoading ? 'Refreshing product images...' : 'Use current product hero image...'}</option>
                       {products.map(product => (
                         <option key={product.slug} value={product.slug}>{product.title}</option>
                       ))}
                     </select>
-                    <input value={build.image} onChange={e => updateRecentBuild(build.id, { image: e.target.value })} placeholder="Image path" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.45rem', fontSize: '0.76rem' }} />
+                    <input data-recent-build-image value={build.image} onChange={e => updateRecentBuild(build.id, { image: e.target.value })} placeholder="Image path" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.45rem', fontSize: '0.76rem' }} />
                     <input value={build.alt} onChange={e => updateRecentBuild(build.id, { alt: e.target.value })} placeholder="Image alt text" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.45rem', fontSize: '0.76rem' }} />
                     <input value={build.link ?? ''} onChange={e => updateRecentBuild(build.id, { link: e.target.value })} placeholder="/product-link/" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.45rem', fontSize: '0.76rem' }} />
                     <textarea

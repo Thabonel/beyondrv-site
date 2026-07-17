@@ -11,7 +11,10 @@ export const handler: Handler = async (event) => {
 
   return {
     statusCode: 200,
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store, max-age=0',
+    },
     body: JSON.stringify({ products: catalogue }),
   };
 };
