@@ -1668,6 +1668,7 @@ export default function AdminPanel() {
   const [deployResults, setDeployResults] = useState<string>('');
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const chatInputRef = useRef<HTMLTextAreaElement>(null);
   const mediaFileRef = useRef<HTMLInputElement>(null);
   const editProductFileRef = useRef<HTMLInputElement>(null);
   const newProductFileRef = useRef<HTMLInputElement>(null);
@@ -1678,6 +1679,15 @@ export default function AdminPanel() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    const textarea = chatInputRef.current;
+    if (!textarea) return;
+    const maxHeight = Math.min(window.innerHeight * 0.4, 320);
+    textarea.style.height = 'auto';
+    textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
+    textarea.style.overflowY = textarea.scrollHeight > maxHeight ? 'auto' : 'hidden';
+  }, [input]);
 
   useEffect(() => {
     let cancelled = false;
@@ -6332,24 +6342,31 @@ export default function AdminPanel() {
             )}
             <div ref={bottomRef} />
           </div>
-          <div style={{ display: 'flex', gap: '0.5rem', padding: '0.75rem', borderTop: '1px solid #333' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.5rem', padding: '0.75rem', borderTop: '1px solid #333' }}>
             <button
               onClick={() => fileRef.current?.click()}
-              style={{ background: '#222', border: '1px solid #444', color: '#aaa', borderRadius: '6px', padding: '0 0.75rem', cursor: 'pointer', fontSize: '1.1rem' }}
+              style={{ minHeight: '40px', background: '#222', border: '1px solid #444', color: '#aaa', borderRadius: '6px', padding: '0 0.75rem', cursor: 'pointer', fontSize: '1.1rem' }}
               title="Upload image"
             >+</button>
             <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
-            <input
+            <textarea
+              ref={chatInputRef}
+              data-testid="admin-chat-input"
+              rows={1}
               value={input}
               onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage(input)}
+              onKeyDown={e => {
+                if (e.key !== 'Enter' || e.shiftKey) return;
+                e.preventDefault();
+                if (!loading && input.trim()) void sendMessage(input);
+              }}
               placeholder="Ask about leads, SEO, or site changes..."
-              style={{ flex: 1, background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem 0.75rem', fontSize: '0.9rem', outline: 'none', minWidth: 0 }}
+              style={{ flex: 1, minWidth: 0, minHeight: '40px', maxHeight: 'min(40vh, 320px)', resize: 'none', overflowY: 'hidden', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem 0.75rem', fontFamily: 'inherit', fontSize: '0.9rem', lineHeight: 1.45, outline: 'none' }}
             />
             <button
               onClick={() => sendMessage(input)}
               disabled={loading || !input.trim()}
-              style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0 1rem', cursor: loading || !input.trim() ? 'not-allowed' : 'pointer', fontWeight: 600 }}
+              style={{ minHeight: '40px', background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0 1rem', cursor: loading || !input.trim() ? 'not-allowed' : 'pointer', fontWeight: 600 }}
             >Send</button>
           </div>
         </div>
