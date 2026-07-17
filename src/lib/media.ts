@@ -28,7 +28,10 @@ function optimizedProductVariant(src: string, width: number) {
 
 export function displayImageUrl(src: string, width = 1200, fit: 'contain' | 'cover' | 'fill' = 'cover') {
   if (isOptimizedProductImage(src)) return optimizedProductVariant(src, width);
-  if (!src.startsWith('/media/') && !src.startsWith('/images/') && !src.startsWith('/wp-content/uploads/')) {
+  if (src.startsWith('/media/')) {
+    return src;
+  }
+  if (!src.startsWith('/images/') && !src.startsWith('/wp-content/uploads/')) {
     return src;
   }
   const params = new URLSearchParams({

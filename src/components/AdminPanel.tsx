@@ -1180,6 +1180,7 @@ function slugifyTitle(title: string) {
 function adminImageUrl(src: string) {
   if (!src) return '';
   if (src.startsWith('/images/optimized/')) return src;
+  if (src.startsWith('/media/')) return src;
   if (src.startsWith('/images/products/')) return src;
   return `/.netlify/images?url=${encodeURIComponent(src)}&w=800`;
 }
@@ -2882,7 +2883,7 @@ export default function AdminPanel() {
         };
       });
 
-      setEditProductMediaStatus('Photo uploaded and added to this product.');
+      setEditProductMediaStatus('Photo uploaded to this draft. Click Queue Edit to save it.');
     } catch (err) {
       setEditProductMediaStatus(err instanceof Error ? err.message : 'Photo upload failed.');
     } finally {
