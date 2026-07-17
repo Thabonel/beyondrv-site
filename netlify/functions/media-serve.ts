@@ -4,13 +4,30 @@ import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreErro
 const STORE_NAME = 'product-media';
 const SAFE_MEDIA_KEY = /^(?:products|pages)\/[a-z0-9._/-]{1,480}$/;
 
+function mediaKeyFromEvent(event: Parameters<Handler>[0]) {
+  const queryKey = event.queryStringParameters?.key ?? '';
+  if (SAFE_MEDIA_KEY.test(queryKey) && !queryKey.includes('..') && !queryKey.includes('//')) {
+    return queryKey;
+  }
+
+  const path = event.path ?? '';
+  const markers = ['/media/', '/media-serve/'];
+  const marker = markers.find(value => path.includes(value));
+  if (!marker) return queryKey;
+  try {
+    return decodeURIComponent(path.slice(path.indexOf(marker) + marker.length));
+  } catch {
+    return '';
+  }
+}
+
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'GET' && event.httpMethod !== 'HEAD') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
   const blobConnection = connectBlobStore(event);
 
-  const key = event.queryStringParameters?.key ?? '';
+  const key = mediaKeyFromEvent(event);
   if (!SAFE_MEDIA_KEY.test(key) || key.includes('..') || key.includes('//')) {
     return { statusCode: 400, body: 'Invalid media key' };
   }
