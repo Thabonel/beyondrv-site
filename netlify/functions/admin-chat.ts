@@ -8,6 +8,7 @@ import {
   buildOwnerIntent,
   findProductMatches,
   parseJudgeVerdict,
+  productCatalogueEntries,
   resolveGitHubBranch,
   resolveProductMetadata,
   validateRecentBuildProductReferences,
@@ -269,7 +270,7 @@ async function findProductsTool(queryValue: unknown, limitValue: unknown) {
     };
   }
 
-  const products = (catalogue as { products?: ProductCatalogueEntry[] }).products ?? [];
+  const products = productCatalogueEntries(catalogue);
   const matches = findProductMatches(products, query, limit);
   const resolved = await Promise.all(matches.map(async product => {
     const sourcePath = `src/content/products/${product.slug}.md`;
@@ -552,7 +553,12 @@ async function getSeoHealthTool() {
     fetchText(`${SITE_URL}/llms.txt`),
   ]);
   const urls = extractUrls(sitemap.text);
-  const products = (catalogue as { products?: Array<{ slug: string; title: string; status?: string; galleryCount?: number; seoTitle?: string; seoDesc?: string }> }).products ?? [];
+  const products = productCatalogueEntries(catalogue) as Array<ProductCatalogueEntry & {
+    status?: string;
+    galleryCount?: number;
+    seoTitle?: string;
+    seoDesc?: string;
+  }>;
   const weakProducts = products
     .filter(product => (product.galleryCount ?? 0) < 3 || !product.seoTitle || !product.seoDesc)
     .slice(0, 8)

@@ -6,10 +6,20 @@ import {
   buildOwnerIntent,
   findProductMatches,
   parseJudgeVerdict,
+  productCatalogueEntries,
   resolveGitHubBranch,
   resolveProductMetadata,
   validateRecentBuildProductReferences,
 } from '../netlify/functions/admin-chat-core.ts';
+
+test('generated product catalogue array is available to Admin AI lookup', () => {
+  const rawCatalogue = JSON.parse(readFileSync('netlify/functions/product-catalogue.json', 'utf8')) as unknown;
+  const products = productCatalogueEntries(rawCatalogue);
+  const [match] = findProductMatches(products, 'Advent 2450');
+
+  assert.ok(products.length > 0);
+  assert.equal(match.slug, 'advent-2450-hardtop-slide-on');
+});
 
 test('buildOwnerIntent keeps the full owner instruction sequence', () => {
   const intent = buildOwnerIntent([

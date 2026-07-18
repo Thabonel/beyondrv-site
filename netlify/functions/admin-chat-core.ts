@@ -24,6 +24,20 @@ export type ProductCatalogueEntry = {
   gallery?: string[];
 };
 
+export function productCatalogueEntries(value: unknown): ProductCatalogueEntry[] {
+  const entries = Array.isArray(value)
+    ? value
+    : value && typeof value === 'object' && Array.isArray((value as { products?: unknown }).products)
+      ? (value as { products: unknown[] }).products
+      : [];
+
+  return entries.filter((entry): entry is ProductCatalogueEntry => (
+    Boolean(entry) &&
+    typeof entry === 'object' &&
+    typeof (entry as { slug?: unknown }).slug === 'string'
+  ));
+}
+
 export type ResolvedProduct = {
   slug: string;
   title: string;
