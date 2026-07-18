@@ -11,7 +11,7 @@ import {
   productCatalogueEntries,
   resolveGitHubBranch,
   resolveProductMetadata,
-  validateRecentBuildProductReferences,
+  validateRecentBuildReplacement,
   type AdminChatMessage,
   type JudgeDecision,
   type JudgeVerdict,
@@ -166,28 +166,38 @@ ${proposal.proposed_action.grounding_evidence || 'No dedicated grounding lookup 
 </grounding_evidence>
 </proposed_change>`;
 
-  const response = await client.responses.create({
-    model: JUDGE_MODEL,
-    instructions: JUDGE_POLICY,
-    input: evidenceBlock,
-    max_output_tokens: 1024,
-    reasoning: { effort: 'low' },
-    text: {
-      format: {
-        type: 'json_schema',
-        name: 'admin_change_verdict',
-        description: 'A validated safety decision for a proposed Beyond RV site change.',
-        strict: true,
-        schema: JUDGE_VERDICT_SCHEMA,
+  try {
+    const response = await client.responses.create({
+      model: JUDGE_MODEL,
+      instructions: JUDGE_POLICY,
+      input: evidenceBlock,
+      max_output_tokens: 1024,
+      reasoning: { effort: 'low' },
+      text: {
+        format: {
+          type: 'json_schema',
+          name: 'admin_change_verdict',
+          description: 'A validated safety decision for a proposed Beyond RV site change.',
+          strict: true,
+          schema: JUDGE_VERDICT_SCHEMA,
+        },
       },
-    },
-  });
+    });
 
-  const verdict = parseJudgeVerdict(response.output_text || '{}');
-  if (verdict.risk_flags.includes('judge_parse_error') || verdict.risk_flags.includes('judge_schema_error')) {
-    console.error('[judge] invalid verdict', response.output_text);
+    const verdict = parseJudgeVerdict(response.output_text || '{}');
+    if (verdict.risk_flags.includes('judge_parse_error') || verdict.risk_flags.includes('judge_schema_error')) {
+      console.error('[judge] invalid verdict', response.output_text);
+    }
+    return verdict;
+  } catch (error) {
+    console.error('[judge] request failed', error instanceof Error ? error.message : String(error));
+    return {
+      decision: 'block',
+      rationale: 'The safety judge could not complete its review.',
+      risk_flags: ['judge_api_error'],
+      block_reason: 'The safety check was temporarily unavailable. No change was queued; please try again.',
+    };
   }
-  return verdict;
 }
 
 // ─── System prompt & tools ────────────────────────────────────────────────────
@@ -658,34 +668,36 @@ CURRENT DATE:
   const pendingChanges: PendingChange[] = [];
   let finalText = '';
 
-  for (let i = 0; i < 10; i++) {
-    const response = await client.responses.create({
-      model: ADMIN_MODEL,
-      instructions,
-      tools,
-      input: currentInput as never,
-      previous_response_id: responseId,
-      max_output_tokens: 4096,
-    } as never);
+  try {
+    for (let i = 0; i < 10; i++) {
+      const response = await client.responses.create({
+        model: ADMIN_MODEL,
+        instructions,
+        tools,
+        input: currentInput as never,
+        previous_response_id: responseId,
+        max_output_tokens: 4096,
+        reasoning: { effort: 'low' },
+      } as never);
 
-    responseId = response.id;
+      responseId = response.id;
 
-    for (const item of response.output as Array<Record<string, any>>) {
-      if (item.type === 'message') {
-        for (const content of item.content ?? []) {
-          if (content.type === 'output_text') finalText += content.text;
+      for (const item of response.output as Array<Record<string, any>>) {
+        if (item.type === 'message') {
+          for (const content of item.content ?? []) {
+            if (content.type === 'output_text') finalText += content.text;
+          }
         }
       }
-    }
 
-    const functionCalls = (response.output as Array<Record<string, any>>)
-      .filter(item => item.type === 'function_call');
+      const functionCalls = (response.output as Array<Record<string, any>>)
+        .filter(item => item.type === 'function_call');
 
-    if (functionCalls.length === 0) break;
+      if (functionCalls.length === 0) break;
 
-    const toolResults: Array<{ type: 'function_call_output'; call_id: string; output: string }> = [];
+      const toolResults: Array<{ type: 'function_call_output'; call_id: string; output: string }> = [];
 
-    for (const call of functionCalls) {
+      for (const call of functionCalls) {
         let result = '';
         let input: Record<string, unknown> = {};
         try {
@@ -721,13 +733,19 @@ CURRENT DATE:
             result = 'Error: path, complete content, and a specific description are required.';
           }
 
+          let deterministicApproval = false;
           if (!result && path === 'src/data/homepage/recent-builds.json') {
             if (resolvedProducts.size === 0) {
               result = 'PRODUCT LOOKUP REQUIRED: Use find_products to resolve the exact product metadata before proposing a Recent Builds change.';
             } else {
-              const referenceIssues = validateRecentBuildProductReferences(content, [...resolvedProducts.values()]);
+              const currentContent = readCache[path];
+              const referenceIssues = currentContent === null
+                ? ['The existing Recent Builds file could not be read.']
+                : validateRecentBuildReplacement(currentContent, content, ownerIntent, [...resolvedProducts.values()]);
               if (referenceIssues.length > 0) {
                 result = `GROUNDING ERROR: The proposed Recent Builds change uses product values that do not match the current site data:\n- ${referenceIssues.join('\n- ')}\nUse the exact find_products results and try again.`;
+              } else {
+                deterministicApproval = true;
               }
             }
           }
@@ -751,7 +769,13 @@ CURRENT DATE:
               },
             };
 
-            const verdict = await runJudge(proposal);
+            const verdict: JudgeVerdict = deterministicApproval
+              ? {
+                  decision: 'allow',
+                  rationale: 'The Recent Builds replacement passed deterministic product, position, and preservation checks.',
+                  risk_flags: ['deterministic_product_grounding'],
+                }
+              : await runJudge(proposal);
 
             if (verdict.decision === 'allow' || verdict.decision === 'escalate') {
               pendingChanges.push({
@@ -802,9 +826,22 @@ CURRENT DATE:
           call_id: call.call_id,
           output: result,
         });
-    }
+      }
 
-    currentInput = toolResults;
+      currentInput = toolResults;
+    }
+  } catch (error) {
+    console.error('[admin-chat] request failed', error instanceof Error ? error.message : String(error));
+    return {
+      statusCode: pendingChanges.length > 0 ? 200 : 502,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: pendingChanges.length > 0
+          ? 'The change was queued, but the assistant could not complete its final response. Review it carefully in Pending Changes.'
+          : 'Admin AI could not complete that request. No change was queued; please try again.',
+        pendingChanges,
+      }),
+    };
   }
 
   return {

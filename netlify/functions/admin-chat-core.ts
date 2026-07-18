@@ -251,17 +251,23 @@ type RecentBuildRecord = {
   title?: unknown;
   image?: unknown;
   link?: unknown;
+  isVisible?: unknown;
+  sortOrder?: unknown;
+  productSlug?: unknown;
 };
 
-export function validateRecentBuildProductReferences(content: string, products: ResolvedProduct[]) {
-  let entries: RecentBuildRecord[];
+function parseRecentBuilds(content: string) {
   try {
     const parsed = JSON.parse(content) as unknown;
-    if (!Array.isArray(parsed)) return ['Recent Builds content must be a JSON array.'];
-    entries = parsed as RecentBuildRecord[];
+    return Array.isArray(parsed) ? parsed as RecentBuildRecord[] : null;
   } catch {
-    return ['Recent Builds content is not valid JSON.'];
+    return null;
   }
+}
+
+export function validateRecentBuildProductReferences(content: string, products: ResolvedProduct[]) {
+  const entries = parseRecentBuilds(content);
+  if (!entries) return ['Recent Builds content must be a valid JSON array.'];
 
   const issues: string[] = [];
   for (const product of products) {
@@ -276,6 +282,15 @@ export function validateRecentBuildProductReferences(content: string, products: 
     for (const entry of matches) {
       const link = typeof entry.link === 'string' ? entry.link : '';
       const image = typeof entry.image === 'string' ? entry.image : '';
+      const id = typeof entry.id === 'string' ? entry.id : '';
+      const productSlug = typeof entry.productSlug === 'string' ? entry.productSlug : '';
+      const title = typeof entry.title === 'string' ? entry.title : '';
+      if (title !== product.title) {
+        issues.push(`${product.title} must use the exact existing product title.`);
+      }
+      if (id !== product.slug || productSlug !== product.slug) {
+        issues.push(`${product.title} must use ${product.slug} for both id and productSlug.`);
+      }
       if (link !== product.pagePath) {
         issues.push(`${product.title} must use the existing page path ${product.pagePath}, not ${link || '(blank)'}.`);
       }
@@ -287,4 +302,48 @@ export function validateRecentBuildProductReferences(content: string, products: 
   }
 
   return issues;
+}
+
+export function validateRecentBuildReplacement(
+  currentContent: string,
+  newContent: string,
+  ownerIntent: string,
+  products: ResolvedProduct[],
+) {
+  const currentEntries = parseRecentBuilds(currentContent);
+  const newEntries = parseRecentBuilds(newContent);
+  if (!currentEntries || !newEntries) return ['Current and proposed Recent Builds content must be valid JSON arrays.'];
+  if (currentEntries.length !== newEntries.length) return ['A replacement must not add or remove Recent Builds items.'];
+
+  const changedIndexes = currentEntries
+    .map((entry, index) => JSON.stringify(entry) === JSON.stringify(newEntries[index]) ? -1 : index)
+    .filter(index => index >= 0);
+  if (changedIndexes.length !== 1) return ['A Recent Builds replacement must change exactly one item.'];
+
+  const changedIndex = changedIndexes[0];
+  const ordinalMatch = ownerIntent.toLowerCase().match(/\b(\d+)(?:st|nd|rd|th)\b/);
+  if (ordinalMatch && Number(ordinalMatch[1]) !== changedIndex + 1) {
+    return [`The owner requested item ${Number(ordinalMatch[1])}, but the proposal changes item ${changedIndex + 1}.`];
+  }
+
+  const currentEntry = currentEntries[changedIndex];
+  const newEntry = newEntries[changedIndex];
+  if (currentEntry.sortOrder !== newEntry.sortOrder) return ['The replacement must preserve the existing sortOrder.'];
+  if (currentEntry.isVisible !== newEntry.isVisible) return ['The replacement must preserve the existing isVisible value.'];
+
+  const referenceIssues = validateRecentBuildProductReferences(newContent, products);
+  if (referenceIssues.length > 0) return referenceIssues;
+
+  const matchedProduct = products.find(product => (
+    newEntry.id === product.slug ||
+    newEntry.productSlug === product.slug ||
+    newEntry.link === product.pagePath ||
+    normaliseSearch(typeof newEntry.title === 'string' ? newEntry.title : '') === normaliseSearch(product.title)
+  ));
+  if (!matchedProduct) return ['The changed item does not match a product returned by find_products.'];
+  if (/\bcurrent\s+(?:product\s+)?hero\b/i.test(ownerIntent) && newEntry.image !== matchedProduct.heroImage) {
+    return [`${matchedProduct.title} must use its current hero image ${matchedProduct.heroImage}.`];
+  }
+
+  return [];
 }

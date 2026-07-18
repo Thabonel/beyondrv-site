@@ -9,6 +9,7 @@ import {
   productCatalogueEntries,
   resolveGitHubBranch,
   resolveProductMetadata,
+  validateRecentBuildReplacement,
   validateRecentBuildProductReferences,
 } from '../netlify/functions/admin-chat-core.ts';
 
@@ -114,7 +115,7 @@ test('Recent Builds rejects fabricated product paths and accepts current product
     link: '/advent-2450-hardtop-ute/',
   } : entry);
   const incorrectIssues = validateRecentBuildProductReferences(JSON.stringify(incorrect), [metadata]);
-  assert.equal(incorrectIssues.length, 2);
+  assert.ok(incorrectIssues.length >= 2);
   assert.match(incorrectIssues.join('\n'), /advent-2450-hardtop-slide-on/);
   assert.match(incorrectIssues.join('\n'), /Current hero/);
 
@@ -124,6 +125,43 @@ test('Recent Builds rejects fabricated product paths and accepts current product
     title: metadata.title,
     image: metadata.heroImage,
     link: metadata.pagePath,
+    productSlug: metadata.slug,
   } : entry);
   assert.deepEqual(validateRecentBuildProductReferences(JSON.stringify(corrected), [metadata]), []);
+});
+
+test('Recent Builds replacement is deterministically approved only for one grounded item', () => {
+  const currentContent = readFileSync('src/data/homepage/recent-builds.json', 'utf8');
+  const current = JSON.parse(currentContent) as Array<Record<string, unknown>>;
+  const productContent = readFileSync('src/content/products/advent-2450-hardtop-slide-on.md', 'utf8');
+  const product = resolveProductMetadata({
+    slug: 'advent-2450-hardtop-slide-on',
+    title: 'Advent 2450 Hardtop Ute Slide-On Camper',
+  }, productContent);
+  const proposed = current.map((entry, index) => index === 2 ? {
+    id: product.slug,
+    title: product.title,
+    image: product.heroImage,
+    alt: 'Advent 2450 Hardtop Ute Slide-On Camper build at Beyond RV',
+    tags: ['Built for a Ford Super Duty', ...((entry.tags as string[]) ?? []).slice(1)],
+    link: product.pagePath,
+    isVisible: entry.isVisible,
+    sortOrder: entry.sortOrder,
+    productSlug: product.slug,
+  } : entry);
+
+  assert.deepEqual(validateRecentBuildReplacement(
+    currentContent,
+    JSON.stringify(proposed),
+    'Replace the 3rd item and use the current hero image.',
+    [product],
+  ), []);
+
+  proposed[2].sortOrder = 9;
+  assert.match(validateRecentBuildReplacement(
+    currentContent,
+    JSON.stringify(proposed),
+    'Replace the 3rd item and use the current hero image.',
+    [product],
+  ).join('\n'), /preserve the existing sortOrder/);
 });

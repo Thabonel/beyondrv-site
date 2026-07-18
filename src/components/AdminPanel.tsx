@@ -1867,15 +1867,22 @@ export default function AdminPanel() {
         body: JSON.stringify({ messages: newMessages }),
       });
       if (redirectToLoginIfUnauthorized(res)) return null;
-      const data = await res.json() as { text: string; pendingChanges: PendingChange[] };
-      if (!res.ok) throw new Error(data.text ?? 'Admin AI request failed');
+      const data = await res.json() as { text?: string; pendingChanges?: PendingChange[] };
+      if (!res.ok) {
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: data.text ?? 'Admin AI could not complete that request. No change was queued; please try again.',
+        }]);
+        return null;
+      }
 
-      setMessages(prev => [...prev, { role: 'assistant', content: data.text }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: data.text ?? 'Request completed.' }]);
 
-      if (data.pendingChanges?.length) {
+      const responsePendingChanges = data.pendingChanges ?? [];
+      if (responsePendingChanges.length) {
         setPending(prev => {
           const updated = [...prev];
-          for (const change of data.pendingChanges) {
+          for (const change of responsePendingChanges) {
             const idx = updated.findIndex(p => p.path === change.path);
             if (idx >= 0) updated[idx] = change;
             else updated.push(change);
@@ -1883,7 +1890,10 @@ export default function AdminPanel() {
           return updated;
         });
       }
-      return data;
+      return {
+        text: data.text ?? 'Request completed.',
+        pendingChanges: responsePendingChanges,
+      };
     } catch {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, something went wrong. Please try again.' }]);
       return null;
