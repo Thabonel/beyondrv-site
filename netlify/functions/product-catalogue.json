@@ -59,6 +59,7 @@
     "title": "Custom 3.5m Electric Pop-Top Truck Camper",
     "name": "Custom 3.5m Electric Pop-Top Truck Camper",
     "price": "From $49,999",
+    "saleLabel": "SOLD",
     "status": "on-sale",
     "category": "expedition",
     "tagline": "Custom 3.5m electric pop-top truck camper currently available from $49,999.",
@@ -91,6 +92,12 @@
       "3-5m-diy-camper-box-with-cabover-and-underfloor-storage",
       "expedition/4-7m-hardtop-truck-camper"
     ],
+    "availability": "available_in_australia",
+    "purchasableOnline": true,
+    "depositEnabled": true,
+    "fullPaymentEnabled": true,
+    "sourceType": "other",
+    "containerEligible": false,
     "suitabilityData": {
       "status": "draft"
     },
@@ -328,7 +335,7 @@
     "description": "The **Advent 2450** remains part of the ute slide-on range as a build-to-order model. It is designed for single cab utes and is no longer presented as in-stock or on sale.",
     "featured": false,
     "onSale": false,
-    "heroImage": "/images/optimized/products/advent-2450-hardtop-slide-on/01-advent-2450-hardtop-slide-on-hero.webp",
+    "heroImage": "/media/products/advent-2450-hardtop-slide-on/1784267060833-85158ce8-fce4-4bbe-a326-1c8fea69c943-img_0609.webp",
     "gallery": [
       "/images/optimized/products/advent-2450-hardtop-slide-on/02-advent-2450-04-1024x576.webp",
       "/images/optimized/products/advent-2450-hardtop-slide-on/03-advent-2450-05-1024x678.webp",
@@ -358,20 +365,31 @@
       "/images/optimized/products/advent-2450-hardtop-slide-on/27-advent-2450-new-01-1024x678.webp",
       "/images/optimized/products/advent-2450-hardtop-slide-on/28-advent-2450-new-18-1024x678.webp",
       "/images/optimized/products/advent-2450-hardtop-slide-on/29-advent-2450-new-09-1024x678.webp",
-      "/images/optimized/products/advent-2450-hardtop-slide-on/30-advent-2450-new-08-1024x678.webp"
+      "/images/optimized/products/advent-2450-hardtop-slide-on/30-advent-2450-new-08-1024x678.webp",
+      "/media/products/advent-2450-hardtop-slide-on/1784267546020-f6063797-084c-4607-8fdf-5d5197a739de-img_0610.webp",
+      "/media/products/advent-2450-hardtop-slide-on/1784267060833-85158ce8-fce4-4bbe-a326-1c8fea69c943-img_0609.webp"
     ],
-    "galleryCount": 29,
+    "galleryCount": 31,
     "relatedSlugs": [
       "advent-2150-hardtop-slide-on",
       "advent-2300-hardtop-slide-on",
       "7ft-electric-poptop-slide-on"
     ],
+    "availability": "available_in_australia",
     "onlinePurchaseEnabled": true,
+    "purchasableOnline": true,
+    "depositEnabled": true,
+    "fullPaymentEnabled": true,
+    "sourceType": "other",
+    "containerEligible": false,
     "youtubeVideo": {
       "id": "B8up0wM7f3w",
       "title": "Beyond RV Advent 2450 Walkthrough",
       "description": "Video walkthrough for the Beyond RV Advent 2450 hardtop ute slide-on camper.",
       "startSeconds": 23
+    },
+    "suitabilityData": {
+      "status": "draft"
     },
     "keySpecs": [
       {

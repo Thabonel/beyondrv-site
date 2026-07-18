@@ -20,7 +20,7 @@ const POSTHOG_BASE = POSTHOG_PROJECT_ID
   : '';
 const openAiKey = process.env.OPENAI_API_KEY;
 const openAiClient = openAiKey ? new OpenAI({ apiKey: openAiKey }) : null;
-const INSIGHTS_MODEL = process.env.OPENAI_MARKETING_INSIGHTS_MODEL ?? process.env.OPENAI_ADMIN_MODEL ?? 'gpt-5-mini';
+const INSIGHTS_MODEL = process.env.OPENAI_MARKETING_INSIGHTS_MODEL ?? process.env.OPENAI_ADMIN_MODEL ?? 'gpt-5.6-terra';
 
 type LeadStatusValue = 'new' | 'contacted' | 'replied' | 'called' | 'qualified' | 'quoted' | 'follow-up-scheduled' | 'won' | 'lost' | 'spam';
 

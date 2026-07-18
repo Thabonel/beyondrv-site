@@ -4,7 +4,7 @@ import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
 
 const openAiKey = process.env.OPENAI_API_KEY;
 const client = openAiKey ? new OpenAI({ apiKey: openAiKey }) : null;
-const REWRITE_MODEL = process.env.OPENAI_ADMIN_MODEL ?? 'gpt-5-mini';
+const REWRITE_MODEL = process.env.OPENAI_ADMIN_MODEL ?? 'gpt-5.6-terra';
 
 const REWRITE_PROMPT = `You are an editor for a chatbot knowledge file. The user pastes rough notes or answers to business questions. Your job is to rewrite them into clean, factual dot points suitable for a chatbot knowledge base.
 

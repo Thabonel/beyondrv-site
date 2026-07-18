@@ -4,7 +4,7 @@ import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
 import catalogue from './product-catalogue.json';
 
 const client = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
-const MODEL = process.env.OPENAI_MARKETING_INSIGHTS_MODEL ?? process.env.OPENAI_ADMIN_MODEL ?? 'gpt-5-mini';
+const MODEL = process.env.OPENAI_MARKETING_INSIGHTS_MODEL ?? process.env.OPENAI_ADMIN_MODEL ?? 'gpt-5.6-terra';
 const VALID_PRIORITIES = new Set(['high', 'medium', 'low']);
 const VALID_CATEGORIES = new Set(['quick-fix', 'owner-action', 'marketing', 'technical']);
 

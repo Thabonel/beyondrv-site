@@ -6,7 +6,7 @@ import catalogue from './product-catalogue.json';
 
 const openAiKey = process.env.OPENAI_API_KEY;
 const client = openAiKey ? new OpenAI({ apiKey: openAiKey }) : null;
-const CLASSIFY_MODEL = process.env.OPENAI_ADMIN_CLASSIFY_MODEL ?? process.env.OPENAI_ADMIN_MODEL ?? 'gpt-5-mini';
+const CLASSIFY_MODEL = process.env.OPENAI_ADMIN_CLASSIFY_MODEL ?? process.env.OPENAI_ADMIN_MODEL ?? 'gpt-5.6-terra';
 const ENQUIRY_STORE = 'customer-enquiries';
 const LEAD_STATUS_STORE = 'customer-lead-status';
 const VALID_PRIORITIES = new Set(['hot', 'warm', 'info-only', 'spam-low-quality']);

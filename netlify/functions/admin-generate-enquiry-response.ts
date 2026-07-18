@@ -16,7 +16,7 @@ import chatbotKnowledge from './chatbot-knowledge.json';
 
 const openAiKey = process.env.OPENAI_API_KEY;
 const client = openAiKey ? new OpenAI({ apiKey: openAiKey }) : null;
-const RESPONSE_MODEL = process.env.OPENAI_ADMIN_RESPONSE_MODEL ?? process.env.OPENAI_ADMIN_MODEL ?? 'gpt-5-mini';
+const RESPONSE_MODEL = process.env.OPENAI_ADMIN_RESPONSE_MODEL ?? process.env.OPENAI_ADMIN_MODEL ?? 'gpt-5.6-terra';
 const ENQUIRY_STORE = 'customer-enquiries';
 const LEAD_STATUS_STORE = 'customer-lead-status';
 const AI_HOURLY_LIMIT = Number(process.env.OPENAI_ADMIN_HOURLY_LIMIT ?? 20);
