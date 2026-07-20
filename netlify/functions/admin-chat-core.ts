@@ -3,6 +3,44 @@ export type AdminChatMessage = {
   content: string;
 };
 
+export type ExactTextReplacement = {
+  old_text: string;
+  new_text: string;
+};
+
+export function applyExactTextReplacements(currentContent: string, replacements: ExactTextReplacement[]) {
+  if (!Array.isArray(replacements) || replacements.length === 0) {
+    return { content: currentContent, errors: ['At least one exact text replacement is required.'] };
+  }
+  if (replacements.length > 20) {
+    return { content: currentContent, errors: ['A single patch may contain at most 20 replacements.'] };
+  }
+
+  let content = currentContent;
+  const errors: string[] = [];
+  replacements.forEach((replacement, index) => {
+    const oldText = typeof replacement?.old_text === 'string' ? replacement.old_text : '';
+    const newText = typeof replacement?.new_text === 'string' ? replacement.new_text : '';
+    if (!oldText) {
+      errors.push(`Replacement ${index + 1} is missing old_text.`);
+      return;
+    }
+    if (oldText === newText) {
+      errors.push(`Replacement ${index + 1} does not change anything.`);
+      return;
+    }
+
+    const occurrenceCount = content.split(oldText).length - 1;
+    if (occurrenceCount !== 1) {
+      errors.push(`Replacement ${index + 1} expected one exact match but found ${occurrenceCount}.`);
+      return;
+    }
+    content = content.replace(oldText, newText);
+  });
+
+  return errors.length > 0 ? { content: currentContent, errors } : { content, errors: [] };
+}
+
 export type JudgeDecision = 'allow' | 'block' | 'revise' | 'escalate';
 
 export type JudgeVerdict = {
