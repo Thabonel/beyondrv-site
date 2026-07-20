@@ -4,6 +4,7 @@ import { randomUUID } from 'crypto';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore } from './blob-store';
 import {
+  applyExactTextReplacements,
   buildChangeEvidence,
   buildOwnerIntent,
   findProductMatches,
@@ -219,6 +220,9 @@ ONSALE: true | false (boolean)
 
 RULES:
 - Always read the file first before proposing changes
+- For an existing file, use propose_patch with small exact old/new snippets instead of returning the complete file
+- Never use propose_change for an existing page, component, layout, stylesheet, or config file
+- Use propose_change only when creating a new file or when a complete small data file genuinely needs replacement
 - Never guess paths, slugs, links, IDs, filenames, or product data
 - Use find_products before any change that needs a product slug, page path, hero image, or gallery image
 - Treat find_products results as authoritative because they are refreshed from the current deployed Git branch
@@ -230,7 +234,7 @@ RULES:
 - If more than one enquiry matches a requested lead update, do not update anything; list the likely matches and ask which one
 - Lead status writes happen immediately and do not go to Pending Changes
 - If the owner asks about SEO, Google, sitemap, robots, AI search, or weak search pages, use get_seo_health
-- Confirm what you will change before calling propose_change
+- Confirm what you will change before calling propose_patch or propose_change
 - For chatbot knowledge, update src/data/chatbot-knowledge.md with short factual notes; do not add secrets, API keys, or private customer data
 - For homepage Recent Builds, update src/data/homepage/recent-builds.json instead of editing homepage markup
 - When replacing a Recent Build with an existing product, resolve the product first, preserve isVisible and sortOrder unless explicitly changed, and use exact product metadata rather than constructing values from its title
@@ -341,7 +345,7 @@ const tools = [
   {
     type: 'function',
     name: 'propose_change',
-    description: 'Queue a file change for the owner to review and deploy. Does NOT commit anything. A safety judge will review before queuing.',
+    description: 'Queue a complete file replacement for owner review. Use only for new files or small data files; use propose_patch for existing pages and large files.',
     parameters: {
       type: 'object' as const,
       properties: {
@@ -351,6 +355,34 @@ const tools = [
       },
       additionalProperties: false,
       required: ['path', 'content', 'description'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'propose_patch',
+    description: 'Queue exact text replacements in an existing file. The server applies each replacement to the file content already returned by read_file, then validates the complete result before queuing.',
+    parameters: {
+      type: 'object' as const,
+      properties: {
+        path: { type: 'string', description: 'Existing file path previously read with read_file' },
+        replacements: {
+          type: 'array',
+          minItems: 1,
+          maxItems: 20,
+          items: {
+            type: 'object',
+            properties: {
+              old_text: { type: 'string', description: 'Small exact text currently present once in the file' },
+              new_text: { type: 'string', description: 'Replacement text' },
+            },
+            additionalProperties: false,
+            required: ['old_text', 'new_text'],
+          },
+        },
+        description: { type: 'string', description: 'Short human-readable summary of all replacements' },
+      },
+      additionalProperties: false,
+      required: ['path', 'replacements', 'description'],
     },
   },
   {
@@ -400,6 +432,10 @@ const tools = [
 
 function clean(value: unknown, max = 1000) {
   return typeof value === 'string' ? value.trim().slice(0, max) : '';
+}
+
+function boundedText(value: unknown, max = 20000) {
+  return typeof value === 'string' ? value.slice(0, max) : '';
 }
 
 function normalise(value = '') {
@@ -722,14 +758,33 @@ CURRENT DATE:
           lookup.products.forEach(product => resolvedProducts.set(product.slug, product));
           result = lookup.output;
 
-        } else if (!result && call.name === 'propose_change') {
+        } else if (!result && (call.name === 'propose_change' || call.name === 'propose_patch')) {
           const path = clean(input.path, 500);
-          const content = clean(input.content, 200000);
+          let content = call.name === 'propose_change' ? clean(input.content, 200000) : '';
           const description = clean(input.description, 500);
 
           if (!Object.prototype.hasOwnProperty.call(readCache, path)) {
             result = `READ REQUIRED: Read ${path} with read_file before proposing a change. Product lookup does not replace reading the target file.`;
-          } else if (!path || !content || !description) {
+          } else if (!path || !description) {
+            result = 'Error: path and a specific description are required.';
+          } else if (call.name === 'propose_patch') {
+            const currentContent = readCache[path];
+            if (currentContent === null) {
+              result = `Error: file not found at ${path}`;
+            } else {
+              const rawReplacements = Array.isArray(input.replacements) ? input.replacements : [];
+              const replacements = rawReplacements.map(replacement => ({
+                old_text: boundedText((replacement as Record<string, unknown>)?.old_text),
+                new_text: boundedText((replacement as Record<string, unknown>)?.new_text),
+              }));
+              const patchResult = applyExactTextReplacements(currentContent, replacements);
+              if (patchResult.errors.length > 0) {
+                result = `PATCH ERROR:\n- ${patchResult.errors.join('\n- ')}\nRead the current file again and use small exact snippets.`;
+              } else {
+                content = patchResult.content;
+              }
+            }
+          } else if (!content) {
             result = 'Error: path, complete content, and a specific description are required.';
           }
 
