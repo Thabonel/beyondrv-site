@@ -29,17 +29,18 @@
     "sortOrder": 2
   },
   {
-    "id": "advent-2300-mutdapilly",
-    "title": "Advent 2300 Build",
-    "image": "/images/optimized/products/advent-2300-hardtop-slide-on/01-beyond-rv-2300-advent-series-19-1024x678.webp",
-    "alt": "Advent 2300 slide-on camper build at Beyond RV in Mutdapilly",
+    "id": "advent-2450-hardtop-slide-on",
+    "title": "Advent 2450 Hardtop Ute Slide-On Camper",
+    "image": "/media/products/advent-2450-hardtop-slide-on/1784267060833-85158ce8-fce4-4bbe-a326-1c8fea69c943-img_0609.webp",
+    "alt": "Advent 2450 Hardtop Ute Slide-On Camper build at Beyond RV Mutdapilly",
     "tags": [
       "Finished in Mutdapilly, Queensland",
-      "Solar, lithium & 240V fitout",
+      "Built for a Ford Super Duty",
       "Queensland warranty & ongoing support"
     ],
-    "link": "/advent-2300-hardtop-slide-on/",
+    "link": "/advent-2450-hardtop-slide-on/",
     "isVisible": true,
-    "sortOrder": 3
+    "sortOrder": 3,
+    "productSlug": "advent-2450-hardtop-slide-on"
   }
 ]
