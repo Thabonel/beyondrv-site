@@ -190,6 +190,24 @@ export default function ContractChangeManager({ contract, onRevisionCreated }: {
     finally { setBusy(false); }
   }
 
+  function printFinalAddendum() {
+    if (!draft.id || !draft.documentSnapshot?.sha256) {
+      setMessage('Prepare the final addendum before printing or saving it as a PDF.');
+      return;
+    }
+    const printWindow = window.open(`/.netlify/functions/admin-addendum-preview?id=${encodeURIComponent(String(draft.id))}`, '_blank');
+    if (!printWindow) {
+      setMessage('The browser blocked the print window. Allow pop-ups for this site and try again.');
+      return;
+    }
+    printWindow.opener = null;
+    printWindow.addEventListener('load', () => {
+      printWindow.focus();
+      printWindow.print();
+    }, { once: true });
+    setMessage('Print dialog opened. Choose a printer or Save as PDF for email.');
+  }
+
   const revisionAllowed = !['signed', 'cancelled', 'superseded', 'sent'].includes(contract.status) && !contract.signature?.documentId && !contract.documentSnapshot?.sha256;
   const addendumLocked = Boolean(draft.documentSnapshot?.sha256) || ['sent', 'signed'].includes(String(draft.status));
 
@@ -237,7 +255,8 @@ export default function ContractChangeManager({ contract, onRevisionCreated }: {
         <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
           {!draft.documentSnapshot?.sha256 && draft.status === 'approved' && <button type="button" onClick={() => void acceptanceAction('prepare')} disabled={busy} style={buttonStyle}>Prepare Final Addendum</button>}
           {draft.documentSnapshot?.sha256 && <a href={`/.netlify/functions/admin-addendum-preview?id=${encodeURIComponent(String(draft.id))}`} target="_blank" rel="noreferrer" style={{...buttonStyle,textDecoration:'none'}}>View Final Addendum</a>}
-          {draft.documentSnapshot?.sha256 && <a href={`/.netlify/functions/admin-addendum-preview?id=${encodeURIComponent(String(draft.id))}&download=1`} style={{...buttonStyle,textDecoration:'none'}}>Download for Email</a>}
+          {draft.documentSnapshot?.sha256 && <button type="button" onClick={printFinalAddendum} style={{...buttonStyle,background:'#1d4ed8',borderColor:'#2563eb'}}>Print / Save PDF</button>}
+          {draft.documentSnapshot?.sha256 && <a href={`/.netlify/functions/admin-addendum-preview?id=${encodeURIComponent(String(draft.id))}&download=1`} style={{...buttonStyle,textDecoration:'none'}}>Download HTML</a>}
           {draft.documentSnapshot?.sha256 && composeUrl && termsApproved && <a href={composeUrl} target="_blank" rel="noreferrer" style={{...buttonStyle,textDecoration:'none'}}>Open Gmail Draft</a>}
           {draft.documentSnapshot?.sha256 && draft.status === 'approved' && <button type="button" onClick={() => void acceptanceAction('mark_sent')} disabled={busy || !termsApproved} style={{...buttonStyle,background:termsApproved?'#E8540A':'#333',borderColor:termsApproved?'#E8540A':'#444'}}>Mark Addendum Sent</button>}
         </div>

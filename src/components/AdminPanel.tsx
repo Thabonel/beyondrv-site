@@ -6788,7 +6788,8 @@ export default function AdminPanel() {
                 <li>Use Validate &amp; Preview. Correct every error and review the entire document, amounts, buyer email, specifications, and Terms version.</li>
                 <li>Save the draft, mark it Ready for Review, then Approve Contract only after the commercial details are correct.</li>
                 <li>Prepare Final Copy creates a locked document and SHA-256 fingerprint. It cannot be edited afterwards; create a replacement revision if it is wrong.</li>
-                <li>Download the final agreement. Attach both that file and the matching approved Terms document to the company Gmail draft, check the recipient, and send it.</li>
+                <li>Choose Print / Save PDF. In the browser print dialog, select a physical printer or Save as PDF. For email, save the PDF with the contract number in its filename.</li>
+                <li>Attach the saved PDF and the matching approved Terms document to the company Gmail draft, check the recipient and attachments, and send it.</li>
                 <li>Return to Contracts and click Mark as Sent only after the Gmail message has actually been sent.</li>
                 <li>An orange legal-approval warning means the Terms version is not enabled for customer use. Do not send or record acceptance until the final approved version is configured.</li>
               </ol>
@@ -6810,7 +6811,8 @@ export default function AdminPanel() {
                 <li>Before the original contract is accepted, use Create Revision. Record why it changed and review the replacement as a new version.</li>
                 <li>After the original contract is accepted, use New Addendum for changes agreed by phone, email, in person, or owner entry.</li>
                 <li>For every addendum, state the old and new scope, price change, revised total, payment impact, and delivery impact. Confirm each line before approval.</li>
-                <li>Validate, preview, review, approve, prepare, download, email, and mark the addendum sent in that order.</li>
+                <li>Validate, preview, review, approve, and prepare the addendum. Choose Print / Save PDF, then either print it or save and attach the PDF to the Gmail draft.</li>
+                <li>Mark the addendum sent only after the email has actually been sent.</li>
                 <li>An addendum is accepted only by a returned signed copy/photo or explicit acceptance email. Deposit payment alone does not accept an addendum.</li>
                 <li>A phone conversation does not change the contract by itself. The resulting addendum must be accepted.</li>
                 <li>Accepted addenda are locked. A later change requires the next sequential addendum.</li>
