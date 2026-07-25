@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
+  applyExactTextReplacements,
   buildChangeEvidence,
   buildOwnerIntent,
   findProductMatches,
@@ -12,6 +13,33 @@ import {
   validateRecentBuildReplacement,
   validateRecentBuildProductReferences,
 } from '../netlify/functions/admin-chat-core.ts';
+
+test('exact patches update a large homepage without resending the complete file', () => {
+  const homepage = readFileSync('src/pages/index.astro', 'utf8');
+  const result = applyExactTextReplacements(homepage, [
+    {
+      old_text: "slideOn: '/images/site/homepage-slide-on-campers.webp'",
+      new_text: "slideOn: '/media/products/advent-2450-hardtop-slide-on/current-blue-hero.webp'",
+    },
+    {
+      old_text: 'Advent 2150 · 2300 · 2450 · 7ft electric pop-top',
+      new_text: 'Finished in Mutdapilly, Queensland · Built for a Ford Super Duty',
+    },
+  ]);
+
+  assert.deepEqual(result.errors, []);
+  assert.equal(result.content.length > 20_000, true);
+  assert.match(result.content, /current-blue-hero\.webp/);
+  assert.match(result.content, /Built for a Ford Super Duty/);
+  assert.doesNotMatch(result.content, /homepage-slide-on-campers\.webp/);
+});
+
+test('exact patches reject missing or ambiguous text without changing the file', () => {
+  const current = 'same value\nsame value\n';
+  const result = applyExactTextReplacements(current, [{ old_text: 'same value', new_text: 'new value' }]);
+  assert.equal(result.content, current);
+  assert.match(result.errors.join('\n'), /found 2/);
+});
 
 test('generated product catalogue array is available to Admin AI lookup', () => {
   const rawCatalogue = JSON.parse(readFileSync('netlify/functions/product-catalogue.json', 'utf8')) as unknown;

@@ -11,7 +11,7 @@ import {
   timelineKey,
 } from './owner-copilot-core';
 
-const VALID_APPROVAL_STATES = new Set(['draft', 'edited', 'approved', 'rejected', 'copied', 'sent_manually']);
+const VALID_APPROVAL_STATES = new Set(['draft', 'edited', 'approved', 'rejected', 'deferred', 'informational', 'copied', 'sent_manually']);
 
 function clean(value: unknown, max = 4000) {
   return typeof value === 'string' ? value.trim().slice(0, max) : '';
@@ -126,7 +126,7 @@ export const handler: Handler = async (event) => {
     approvalState,
     output: output || existing.output,
     reviewedBy: 'owner',
-    reviewedAt: ['approved', 'rejected', 'copied', 'sent_manually'].includes(approvalState) ? updatedAt : existing.reviewedAt || '',
+    reviewedAt: ['approved', 'rejected', 'informational', 'copied', 'sent_manually'].includes(approvalState) ? updatedAt : existing.reviewedAt || '',
     updatedAt,
   };
 
