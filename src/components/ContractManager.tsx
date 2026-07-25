@@ -272,6 +272,24 @@ export default function ContractManager({ products, customers, leads }: { produc
     finally { setLoading(false); }
   }
 
+  function printFinalCopy() {
+    if (!draft.id || !draft.documentSnapshot?.sha256) {
+      setStatus('Prepare the final copy before printing or saving it as a PDF.');
+      return;
+    }
+    const printWindow = window.open(`/.netlify/functions/admin-contract-preview?id=${encodeURIComponent(draft.id)}`, '_blank');
+    if (!printWindow) {
+      setStatus('The browser blocked the print window. Allow pop-ups for this site and try again.');
+      return;
+    }
+    printWindow.opener = null;
+    printWindow.addEventListener('load', () => {
+      printWindow.focus();
+      printWindow.print();
+    }, { once: true });
+    setStatus('Print dialog opened. Choose a printer or Save as PDF for email.');
+  }
+
   function openContract(contract: ContractRecord) {
     setDraft(JSON.parse(JSON.stringify(contract)) as ContractRecord); setPersisted(true); setValidation(null); setPreviewHtml(''); setShowEditor(true); setStatus('');
     setAcceptanceForm({
@@ -336,7 +354,8 @@ export default function ContractManager({ products, customers, leads }: { produc
         <div style={{display:'flex',gap:'0.45rem',flexWrap:'wrap'}}>
           {!draft.documentSnapshot?.sha256 && <button type="button" onClick={()=>void acceptanceAction('prepare')} disabled={loading||draft.status!=='approved'} style={secondaryButton}>Prepare Final Copy</button>}
           {draft.documentSnapshot?.sha256 && <a href={`/.netlify/functions/admin-contract-preview?id=${encodeURIComponent(draft.id)}`} target="_blank" rel="noreferrer" style={{...secondaryButton,textDecoration:'none'}}>View Final Copy</a>}
-          {draft.documentSnapshot?.sha256 && <a href={`/.netlify/functions/admin-contract-preview?id=${encodeURIComponent(draft.id)}&download=1`} style={{...secondaryButton,textDecoration:'none'}}>Download for Email</a>}
+          {draft.documentSnapshot?.sha256 && <button type="button" onClick={printFinalCopy} style={{...secondaryButton,background:'#1d4ed8',borderColor:'#2563eb'}}>Print / Save PDF</button>}
+          {draft.documentSnapshot?.sha256 && <a href={`/.netlify/functions/admin-contract-preview?id=${encodeURIComponent(draft.id)}&download=1`} style={{...secondaryButton,textDecoration:'none'}}>Download HTML</a>}
           {draft.documentSnapshot?.sha256 && composeUrl && termsApproved && <a href={composeUrl} target="_blank" rel="noreferrer" style={{...secondaryButton,textDecoration:'none'}}>Open Gmail Draft</a>}
           {draft.documentSnapshot?.sha256 && draft.status==='approved' && <button type="button" onClick={()=>void acceptanceAction('mark_sent')} disabled={loading||!termsApproved} style={{...secondaryButton,background:termsApproved?'#E8540A':'#333',borderColor:termsApproved?'#E8540A':'#444'}}>Mark as Sent</button>}
         </div>
