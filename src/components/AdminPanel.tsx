@@ -6712,7 +6712,10 @@ export default function AdminPanel() {
       >
         <div style={{ width: 'min(860px, 100%)', maxHeight: '88vh', overflowY: 'auto', background: '#111', color: '#fff', border: '1px solid #333', borderRadius: '8px', boxShadow: '0 24px 80px rgba(0,0,0,0.45)' }}>
           <div style={{ position: 'sticky', top: 0, background: '#111', borderBottom: '1px solid #333', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
-            <h2 style={{ margin: 0, fontSize: '1.15rem' }}>Admin Help</h2>
+            <div>
+              <h2 style={{ margin: 0, fontSize: '1.15rem' }}>Admin Help</h2>
+              <div style={{ color: '#777', fontSize: '0.7rem', marginTop: '0.15rem' }}>Updated 25 July 2026</div>
+            </div>
             <button
               onClick={() => setShowHelp(false)}
               style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.4rem 0.65rem', cursor: 'pointer' }}
@@ -6724,8 +6727,22 @@ export default function AdminPanel() {
             <section>
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>How the admin works</h3>
               <p style={{ margin: 0, color: '#ddd' }}>
-                The admin has two jobs: show the owner what needs attention, and prepare safe site changes for review. Dashboard, Enquiries, and Media save operational data directly. Product, homepage, content, and chatbot changes are queued in Pending Changes so they can be previewed before deployment.
+                The admin manages customer work, contracts, orders, business records, and website changes. Operational records such as enquiries, customers, contracts, acceptance evidence, orders, and audit events save directly. Website, product, homepage, payment-setting, and chatbot-knowledge changes go to Pending so they can be previewed before deployment.
               </p>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Choose the right tab</h3>
+              <ul style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li><strong>Dashboard:</strong> priorities, follow-ups, stock, enquiries, analytics, and launch warnings.</li>
+                <li><strong>Products, Shop, Media, Homepage, Knowledge, and Settings:</strong> prepare website changes for Pending review.</li>
+                <li><strong>Enquiries, Customers, and Leads:</strong> customer contact, status, follow-up, and normalized records.</li>
+                <li><strong>Contracts:</strong> agreements, revisions, customer acceptance, and post-acceptance addenda.</li>
+                <li><strong>Orders:</strong> payment, production, shipping, fitout, handover, and next actions.</li>
+                <li><strong>Google and Matches:</strong> read-only Gmail/Drive sync and owner-controlled record matching.</li>
+                <li><strong>AI Drafts:</strong> review AI-prepared actions, including proposed contract changes. AI drafts do nothing until the owner approves them.</li>
+                <li><strong>Audit and Reports:</strong> review recorded actions and generate weekly owner summaries.</li>
+                <li><strong>Pending:</strong> preview and deploy queued website-file changes.</li>
+              </ul>
             </section>
             <section>
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Use chat for questions and safe actions</h3>
@@ -6761,6 +6778,42 @@ export default function AdminPanel() {
                 <li>Use Archive for test, old, duplicate, or low-value enquiries that should leave active queues without being deleted.</li>
                 <li>Use the Archived filter to find archived enquiries. Click Restore if the enquiry needs to return to active follow-up.</li>
                 <li>Marking a lead Won does not automatically remove a product from the website. Use Products or Admin Chat to make stock changes deliberately.</li>
+              </ol>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Create and send a contract</h3>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Open Contracts, choose New Contract, then enter or select the buyer, product, price, specifications, exclusions, and delivery notes.</li>
+                <li>The standard payment schedule is calculated as 30% on signing or valid acceptance, 20% when the camper arrives in Australia, and 50% on taking delivery.</li>
+                <li>Use Validate &amp; Preview. Correct every error and review the entire document, amounts, buyer email, specifications, and Terms version.</li>
+                <li>Save the draft, mark it Ready for Review, then Approve Contract only after the commercial details are correct.</li>
+                <li>Prepare Final Copy creates a locked document and SHA-256 fingerprint. It cannot be edited afterwards; create a replacement revision if it is wrong.</li>
+                <li>Download the final agreement. Attach both that file and the matching approved Terms document to the company Gmail draft, check the recipient, and send it.</li>
+                <li>Return to Contracts and click Mark as Sent only after the Gmail message has actually been sent.</li>
+                <li>An orange legal-approval warning means the Terms version is not enabled for customer use. Do not send or record acceptance until the final approved version is configured.</li>
+              </ol>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Record customer acceptance</h3>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>For an original contract, record a returned signed copy/photo, an explicit acceptance email, or the qualifying 30% deposit paid after the complete agreement was supplied.</li>
+                <li>Record the accepting customer, email, date/time, method, and a durable Gmail message, signed-file, receipt, or bank-reference location.</li>
+                <li>For deposit acceptance, also record the exact amount and payment reference. Investigate any mismatch before continuing.</li>
+                <li>Do not infer acceptance from an unexplained, partial, third-party, or mismatched payment.</li>
+                <li>Record Acceptance locks the accepted agreement and enables the addendum workflow.</li>
+                <li>No paid electronic-signature provider is used. The system does not send customer email automatically.</li>
+              </ol>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Use revisions and addenda correctly</h3>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Before the original contract is accepted, use Create Revision. Record why it changed and review the replacement as a new version.</li>
+                <li>After the original contract is accepted, use New Addendum for changes agreed by phone, email, in person, or owner entry.</li>
+                <li>For every addendum, state the old and new scope, price change, revised total, payment impact, and delivery impact. Confirm each line before approval.</li>
+                <li>Validate, preview, review, approve, prepare, download, email, and mark the addendum sent in that order.</li>
+                <li>An addendum is accepted only by a returned signed copy/photo or explicit acceptance email. Deposit payment alone does not accept an addendum.</li>
+                <li>A phone conversation does not change the contract by itself. The resulting addendum must be accepted.</li>
+                <li>Accepted addenda are locked. A later change requires the next sequential addendum.</li>
               </ol>
             </section>
             <section>
@@ -6821,6 +6874,37 @@ export default function AdminPanel() {
               </ol>
             </section>
             <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Manage orders, shop items, and payment settings</h3>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Use Shop for accessories and services. Confirm fulfilment, pickup or shipping method, dimensions, weight, price, and stock before queueing an edit.</li>
+                <li>Use Orders to track customer, product, amount paid, deposit state, production stage, arrival, fitout, shipping, handover, notes, and the next action date.</li>
+                <li>Create a shipping label only when the saved address and shipping data are complete and correct.</li>
+                <li>Use Settings for the public vehicle-deposit checkout percentage and buyer notice. These settings do not change the separate 30/20/50 contract schedule.</li>
+                <li>Settings changes go to Pending and must be previewed and deployed.</li>
+              </ol>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Review Gmail contract changes safely</h3>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Use Google to connect read-only Gmail/Drive access, set the approved Gmail search, ignored senders, and approved Drive folders, then run Sync Gmail or Sync Drive.</li>
+                <li>Use Matches to approve, pin, or reject suggested customer/lead links. Do not approve an ambiguous match without checking the sender and contract number.</li>
+                <li>For a relevant Gmail thread, choose Review for Contract Change. The first pass uses the low-cost model and stores an owner-reviewable AI Draft.</li>
+                <li>Open AI Drafts to compare the original message with the extracted request. If a stronger model is recommended, the owner must approve that model change before it runs.</li>
+                <li>Edit any incorrect interpretation, confirm the affected items, then prepare a contract revision or addendum.</li>
+                <li>The AI cannot set prices, confirm delivery effects, approve documents, send email, or record acceptance. The owner must complete those actions in Contracts.</li>
+                <li>Use Deferred when more information is needed, Informational when no contract action is required, or Rejected when the draft is wrong or irrelevant.</li>
+              </ol>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Customers, leads, audit, and reports</h3>
+              <ul style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Customers shows normalized contact records; Leads shows product interest and links back to the source enquiry where available.</li>
+                <li>Keep Enquiries as the working place for contact status, follow-up dates, and notes. Customer and Lead records support matching and contract history.</li>
+                <li>Audit records important owner and system actions. Use it to check what was approved, prepared, sent, or accepted.</li>
+                <li>Reports generates a saved weekly summary with recommended owner actions. Treat it as an operating summary, not accounting or legal advice.</li>
+              </ul>
+            </section>
+            <section>
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Teach the chatbot</h3>
               <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
                 <li>Use the Chatbot Knowledge box for facts that apply across the business, not just one product.</li>
@@ -6842,7 +6926,7 @@ export default function AdminPanel() {
             <section>
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Best practice</h3>
               <p style={{ margin: 0, color: '#ddd' }}>
-                Start each session by checking Dashboard and Enquiries. Keep product/content edits small, use exact product names and prices, and preview every queued file before deployment. Treat the dashboard value as an estimate, not accounting data, and keep customer notes factual and brief.
+                Start each session by checking Dashboard, Enquiries, outstanding contract acceptance, and due order actions. Keep product/content edits small, use exact product names and prices, and preview every queued file before deployment. Review every customer recipient and attachment before sending. Keep contract evidence durable, customer notes factual and brief, and never store passwords, full payment-card details, or access tokens.
               </p>
             </section>
           </div>
