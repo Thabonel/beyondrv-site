@@ -1,5 +1,6 @@
 import React, { Component, type ReactNode, useState, useRef, useEffect } from 'react';
 import AdminDashboard from './AdminDashboard';
+import ContractManager from './ContractManager';
 import initialRecentBuilds from '../data/homepage/recent-builds.json';
 import initialTestimonials from '../data/homepage/testimonials.json';
 import initialPaymentSettings from '../data/payment-settings.json';
@@ -44,7 +45,7 @@ interface PendingChange {
 }
 
 type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
-type PanelTab = 'dashboard' | 'products' | 'shop' | 'orders' | 'settings' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'drafts' | 'audit' | 'knowledge' | 'google' | 'matches' | 'reports' | 'pending';
+type PanelTab = 'dashboard' | 'products' | 'shop' | 'orders' | 'contracts' | 'settings' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'drafts' | 'audit' | 'knowledge' | 'google' | 'matches' | 'reports' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 type CommerceAvailability = 'available_in_australia' | 'coming_next_container' | 'made_to_order' | 'ask_availability' | 'unavailable';
@@ -442,6 +443,46 @@ interface CopilotAiActionRecord {
   relatedCustomerId?: string;
   approvalState?: string;
   output?: string;
+  relatedContractId?: string;
+  contractNumber?: string;
+  processingStatus?: string;
+  sourceThreadId?: string;
+  sourceMessageId?: string;
+  sourceSubject?: string;
+  sourceBody?: string;
+  model?: string;
+  reasoningEffort?: string;
+  routingDecision?: string;
+  routingPrompt?: {
+    required?: boolean;
+    currentModel?: string;
+    currentCostTier?: string;
+    recommendedModel?: string;
+    recommendedCostTier?: string;
+    reason?: string;
+    alternatives?: string[];
+  } | null;
+  triage?: { classification?: string; confidence?: number; material?: boolean; reason?: string };
+  extraction?: {
+    classification: string;
+    confidence: number;
+    customerEmail: string;
+    mentionedContractNumber: string;
+    mentionedProduct: string;
+    requestedChanges: Array<{
+      action: 'add' | 'remove' | 'replace' | 'clarify';
+      item: string;
+      previousValue: string;
+      requestedValue: string;
+      sourceExcerpt: string;
+      needsPriceConfirmation: boolean;
+      needsDeliveryConfirmation: boolean;
+    }>;
+    unresolvedQuestions: string[];
+    ownerSummary: string;
+  } | null;
+  convertedTargetType?: string;
+  convertedTargetId?: string;
   warnings?: string[];
   missingFacts?: string[];
   outputWarnings?: string[];
@@ -610,6 +651,7 @@ interface CopilotMatchSuggestion {
 
 interface GmailThreadRecord {
   id: string;
+  messageId?: string;
   subject?: string;
   fromEmail?: string;
   toEmail?: string;
@@ -620,6 +662,9 @@ interface GmailThreadRecord {
   matchDecision?: string;
   linkedTargetType?: string;
   linkedTargetId?: string;
+  processingStatus?: string;
+  contractMatch?: { contractId?: string; contractNumber?: string; confidence?: number; method?: string; ambiguous?: boolean };
+  contractTriage?: { classification?: string; material?: boolean; reason?: string };
 }
 
 interface DriveFileRecord {
@@ -1635,6 +1680,8 @@ export default function AdminPanel() {
   const [responseGenerating, setResponseGenerating] = useState<string | null>(null);
   const [responseStatuses, setResponseStatuses] = useState<Record<string, string>>({});
   const [aiActionSaving, setAiActionSaving] = useState<string | null>(null);
+  const [contractIntakeSaving, setContractIntakeSaving] = useState<string | null>(null);
+  const [contractIntakeStatus, setContractIntakeStatus] = useState<Record<string, string>>({});
   const [recordSyncSaving, setRecordSyncSaving] = useState<string | null>(null);
   const [classificationSaving, setClassificationSaving] = useState<string | null>(null);
   const [classificationStatuses, setClassificationStatuses] = useState<Record<string, string>>({});
@@ -1765,7 +1812,7 @@ export default function AdminPanel() {
   }, [activeTab]);
 
   useEffect(() => {
-    if (activeTab === 'customers' || activeTab === 'leads' || activeTab === 'drafts' || activeTab === 'audit') {
+    if (activeTab === 'customers' || activeTab === 'leads' || activeTab === 'drafts' || activeTab === 'audit' || activeTab === 'contracts') {
       void loadCopilotRecords();
     }
   }, [activeTab]);
@@ -2677,6 +2724,100 @@ export default function AdminPanel() {
     } catch (err) {
       setResponseStatuses(prev => ({ ...prev, [enquiry.id]: err instanceof Error ? err.message : 'Could not update draft state.' }));
       return false;
+    } finally {
+      setAiActionSaving(null);
+    }
+  }
+
+  async function runGmailContractTriage(thread: GmailThreadRecord) {
+    if (!thread.messageId) {
+      setContractIntakeStatus(prev => ({ ...prev, [thread.id]: 'Sync Gmail again to store the full message first.' }));
+      return;
+    }
+    setContractIntakeSaving(thread.id);
+    setContractIntakeStatus(prev => ({ ...prev, [thread.id]: 'Running low-cost first-pass contract triage...' }));
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-gmail-contract-intake', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ threadId: thread.id, messageId: thread.messageId, action: 'triage' }),
+      });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await readAdminJson<{ action?: CopilotAiActionRecord; duplicate?: boolean; error?: string }>(res, 'Could not review Gmail message.');
+      if (!res.ok || !data.action) throw new Error(data.error ?? 'Could not review Gmail message.');
+      await Promise.all([loadCopilotOps(), loadMatchRecords()]);
+      setContractIntakeStatus(prev => ({ ...prev, [thread.id]: data.action?.routingPrompt ? 'Material change detected. Review the model recommendation in AI Drafts.' : 'Triage stored for owner review in AI Drafts.' }));
+    } catch (err) {
+      setContractIntakeStatus(prev => ({ ...prev, [thread.id]: err instanceof Error ? err.message : 'Could not review Gmail message.' }));
+    } finally {
+      setContractIntakeSaving(null);
+    }
+  }
+
+  async function runContractActionModel(action: CopilotAiActionRecord, nextAction: 'extract' | 'escalate') {
+    if (!action.sourceThreadId || !action.sourceMessageId) return;
+    setAiActionSaving(action.id);
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-gmail-contract-intake', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          threadId: action.sourceThreadId,
+          messageId: action.sourceMessageId,
+          action: nextAction,
+          ownerApprovedModelChange: true,
+          reason: action.routingPrompt?.reason || '',
+        }),
+      });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await readAdminJson<{ action?: CopilotAiActionRecord; error?: string }>(res, 'Contract extraction failed.');
+      if (!res.ok || !data.action) throw new Error(data.error ?? 'Contract extraction failed.');
+      setCopilotAiActions(current => current.map(item => item.id === action.id ? data.action as CopilotAiActionRecord : item));
+      setCopilotOpsStatus(data.action.routingPrompt ? 'Extraction needs a more careful model or manual resolution.' : 'Structured extraction is ready for owner review.');
+    } catch (err) {
+      setCopilotOpsStatus(err instanceof Error ? err.message : 'Contract extraction failed.');
+    } finally {
+      setAiActionSaving(null);
+    }
+  }
+
+  function updateContractExtraction(actionId: string, update: (extraction: NonNullable<CopilotAiActionRecord['extraction']>) => NonNullable<CopilotAiActionRecord['extraction']>) {
+    setCopilotAiActions(current => current.map(action => action.id === actionId && action.extraction
+      ? { ...action, extraction: update(action.extraction), approvalState: 'edited' }
+      : action));
+  }
+
+  async function convertContractAction(action: CopilotAiActionRecord) {
+    if (!action.extraction) return;
+    setAiActionSaving(action.id);
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-contract-change-actions', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: action.id, extraction: action.extraction, ownerApprovedInterpretation: true }),
+      });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await readAdminJson<{ action?: CopilotAiActionRecord; targetType?: string; error?: string }>(res, 'Could not prepare contract change.');
+      if (!res.ok || !data.action) throw new Error(data.error ?? 'Could not prepare contract change.');
+      setCopilotAiActions(current => current.map(item => item.id === action.id ? data.action as CopilotAiActionRecord : item));
+      setCopilotOpsStatus(`${data.targetType === 'contract_addendum' ? 'Addendum draft' : 'Contract revision'} prepared. Open Contracts to confirm pricing, delivery, and document wording.`);
+    } catch (err) {
+      setCopilotOpsStatus(err instanceof Error ? err.message : 'Could not prepare contract change.');
+    } finally {
+      setAiActionSaving(null);
+    }
+  }
+
+  async function updateGenericAiAction(action: CopilotAiActionRecord, approvalState: 'rejected' | 'deferred' | 'informational') {
+    setAiActionSaving(action.id);
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-owner-copilot-ai-actions', {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: action.id, approvalState, output: action.output || '' }),
+      });
+      if (redirectToLoginIfUnauthorized(res)) return;
+      const data = await readAdminJson<{ action?: CopilotAiActionRecord; error?: string }>(res, 'Could not update draft.');
+      if (!res.ok || !data.action) throw new Error(data.error ?? 'Could not update draft.');
+      setCopilotAiActions(current => current.map(item => item.id === action.id ? data.action as CopilotAiActionRecord : item));
+    } catch (err) {
+      setCopilotOpsStatus(err instanceof Error ? err.message : 'Could not update draft.');
     } finally {
       setAiActionSaving(null);
     }
@@ -3937,7 +4078,7 @@ export default function AdminPanel() {
   };
   const pendingGmailSuggestions = gmailThreads.reduce((count, thread) => count + (!thread.matchDecision ? (thread.suggestions?.length || 0) : 0), 0);
   const pendingDriveSuggestions = driveFiles.reduce((count, file) => count + (!file.matchDecision ? (file.suggestions?.length || 0) : 0), 0);
-  const panelTabs: PanelTab[] = ['dashboard', 'products', 'shop', 'orders', 'settings', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'matches', 'reports', 'pending'];
+  const panelTabs: PanelTab[] = ['dashboard', 'products', 'shop', 'orders', 'contracts', 'settings', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'matches', 'reports', 'pending'];
 
   function tabLabel(tab: PanelTab) {
     if (tab === 'pending') return `Pending (${pending.length})`;
@@ -4052,6 +4193,12 @@ export default function AdminPanel() {
         {activeTab === 'dashboard' && (
           <AdminSectionBoundary>
             <AdminDashboard pendingCount={pending.length} />
+          </AdminSectionBoundary>
+        )}
+
+        {activeTab === 'contracts' && (
+          <AdminSectionBoundary>
+            <ContractManager products={products} customers={copilotCustomers} leads={copilotLeads} />
           </AdminSectionBoundary>
         )}
 
@@ -5852,6 +5999,34 @@ export default function AdminPanel() {
                       <span style={{ color: '#93c5fd', border: '1px solid #1d4ed8', borderRadius: '999px', padding: '0.1rem 0.45rem', fontSize: '0.66rem', fontWeight: 800, textTransform: 'uppercase' }}>{action.approvalState || 'draft'}</span>
                     </div>
                     <div style={{ color: '#aaa', fontSize: '0.76rem', lineHeight: 1.45 }}>{action.output?.slice(0, 600) || 'No draft output saved.'}</div>
+                    {action.actionType === 'contract_change_intake' && <>
+                      <div style={{ color: '#93c5fd', fontSize: '0.72rem' }}>Contract: {action.contractNumber || 'match required'} · Classification: {(action.extraction?.classification || action.triage?.classification || 'pending').replace(/_/g, ' ')} · Model: {action.model || 'not recorded'} ({action.reasoningEffort || 'default'} reasoning)</div>
+                      {action.sourceSubject && <details style={{ background: '#171717', border: '1px solid #333', borderRadius: '6px', padding: '0.5rem' }}><summary style={{ color: '#fff', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 800 }}>Original Gmail message: {action.sourceSubject}</summary><pre style={{ color: '#aaa', fontFamily: 'inherit', fontSize: '0.72rem', whiteSpace: 'pre-wrap', maxHeight: '260px', overflowY: 'auto' }}>{action.sourceBody || 'Full message text not stored. Sync Gmail again.'}</pre></details>}
+                      {action.routingPrompt && <div style={{ background: '#201a12', border: '1px solid #92400e', borderRadius: '7px', padding: '0.65rem', display: 'grid', gap: '0.35rem' }}>
+                        <strong style={{ color: '#fdba74', fontSize: '0.78rem' }}>{action.processingStatus === 'awaiting_escalation_approval' ? 'Run a more careful contract review?' : 'Use the contract-work model?'}</strong>
+                        <div style={{ color: '#ddd', fontSize: '0.72rem', lineHeight: 1.45 }}>{action.routingPrompt.reason}</div>
+                        <div style={{ color: '#aaa', fontSize: '0.7rem' }}>Current: {action.routingPrompt.currentModel} ({action.routingPrompt.currentCostTier}) · Recommended: {action.routingPrompt.recommendedModel} ({action.routingPrompt.recommendedCostTier})</div>
+                        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                          <button type="button" onClick={() => runContractActionModel(action, action.processingStatus === 'awaiting_escalation_approval' ? 'escalate' : 'extract')} disabled={aiActionSaving === action.id} style={{ background: '#E8540A', border: 'none', color: '#fff', borderRadius: '6px', padding: '0.42rem 0.58rem', cursor: 'pointer', fontWeight: 800, fontSize: '0.7rem' }}>Approve {action.routingPrompt.recommendedModel}</button>
+                          <button type="button" onClick={() => updateGenericAiAction(action, 'deferred')} disabled={aiActionSaving === action.id} style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.42rem 0.58rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.7rem' }}>Defer</button>
+                        </div>
+                      </div>}
+                      {action.extraction && <div style={{ border: '1px solid #333', borderRadius: '7px', padding: '0.65rem', display: 'grid', gap: '0.5rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(180px,1fr) 100px', gap: '0.45rem' }}>
+                          <select value={action.extraction.classification} onChange={e => updateContractExtraction(action.id, extraction => ({ ...extraction, classification: e.target.value }))} style={{ background: '#171717', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.45rem', fontSize: '0.72rem' }}><option value="pre_signature_change">Pre-signature change</option><option value="post_signature_addendum">Post-signature addendum</option><option value="cancellation_or_removal">Cancellation/removal</option><option value="clarification">Clarification</option><option value="price_or_delivery_question">Price/delivery question</option><option value="no_change">No change</option><option value="ambiguous">Ambiguous</option></select>
+                          <div style={{ color: action.extraction.confidence >= 0.72 ? '#86efac' : '#fb923c', fontSize: '0.72rem', alignSelf: 'center' }}>{Math.round(action.extraction.confidence * 100)}% confidence</div>
+                        </div>
+                        <textarea value={action.extraction.ownerSummary} onChange={e => updateContractExtraction(action.id, extraction => ({ ...extraction, ownerSummary: e.target.value }))} rows={2} aria-label="Owner summary" style={{ background: '#171717', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.72rem', resize: 'vertical' }}/>
+                        {action.extraction.requestedChanges.map((change, index) => <div key={`${action.id}-change-${index}`} style={{ background: '#171717', border: '1px solid #333', borderRadius: '6px', padding: '0.5rem', display: 'grid', gap: '0.4rem' }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr', gap: '0.4rem' }}><select value={change.action} onChange={e => updateContractExtraction(action.id, extraction => ({ ...extraction, requestedChanges: extraction.requestedChanges.map((item, itemIndex) => itemIndex === index ? { ...item, action: e.target.value as typeof item.action } : item) }))} style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.4rem', fontSize: '0.7rem' }}><option value="add">Add</option><option value="remove">Remove</option><option value="replace">Replace</option><option value="clarify">Clarify</option></select><input value={change.item} onChange={e => updateContractExtraction(action.id, extraction => ({ ...extraction, requestedChanges: extraction.requestedChanges.map((item, itemIndex) => itemIndex === index ? { ...item, item: e.target.value } : item) }))} placeholder="Affected item" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.4rem', fontSize: '0.7rem' }}/></div>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}><input value={change.previousValue} onChange={e => updateContractExtraction(action.id, extraction => ({ ...extraction, requestedChanges: extraction.requestedChanges.map((item, itemIndex) => itemIndex === index ? { ...item, previousValue: e.target.value } : item) }))} placeholder="Previous value (if known)" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.4rem', fontSize: '0.7rem' }}/><input value={change.requestedValue} onChange={e => updateContractExtraction(action.id, extraction => ({ ...extraction, requestedChanges: extraction.requestedChanges.map((item, itemIndex) => itemIndex === index ? { ...item, requestedValue: e.target.value } : item) }))} placeholder="Requested value" style={{ background: '#111', border: '1px solid #444', color: '#fff', borderRadius: '5px', padding: '0.4rem', fontSize: '0.7rem' }}/></div>
+                          <div style={{ color: '#777', fontSize: '0.68rem' }}>Evidence: {change.sourceExcerpt || 'No verified excerpt — check the original email.'} · Price and delivery still require owner confirmation.</div>
+                        </div>)}
+                        {action.extraction.unresolvedQuestions.length > 0 && <div style={{ color: '#fb923c', fontSize: '0.7rem' }}>Resolve before final document: {action.extraction.unresolvedQuestions.join(' ')}</div>}
+                        {!action.convertedTargetId ? <button type="button" onClick={() => convertContractAction(action)} disabled={aiActionSaving === action.id || action.extraction.requestedChanges.length === 0 || !['pre_signature_change','post_signature_addendum','cancellation_or_removal'].includes(action.extraction.classification)} style={{ background: '#166534', border: 'none', color: '#fff', borderRadius: '6px', padding: '0.45rem 0.6rem', cursor: 'pointer', fontWeight: 800, fontSize: '0.72rem' }}>Owner Approves Interpretation — Prepare {action.extraction.classification === 'post_signature_addendum' ? 'Addendum' : 'Contract Change'}</button> : <div style={{ color: '#86efac', fontSize: '0.72rem' }}>Prepared {action.convertedTargetType?.replace(/_/g, ' ')}: {action.convertedTargetId}</div>}
+                      </div>}
+                      <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}><button type="button" onClick={() => updateGenericAiAction(action, 'informational')} disabled={aiActionSaving === action.id} style={{ background: '#1e3a5f', border: '1px solid #2563eb', color: '#dbeafe', borderRadius: '6px', padding: '0.36rem 0.5rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.68rem' }}>Mark Informational</button><button type="button" onClick={() => updateGenericAiAction(action, 'rejected')} disabled={aiActionSaving === action.id} style={{ background: '#331515', border: '1px solid #7f1d1d', color: '#fecaca', borderRadius: '6px', padding: '0.36rem 0.5rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.68rem' }}>Reject</button></div>
+                    </>}
                     {Boolean(action.outputWarnings?.length) && <div style={{ color: '#f87171', fontSize: '0.74rem' }}>Validation: {action.outputWarnings?.join(' ')}</div>}
                     {Boolean(action.missingFacts?.length) && <div style={{ color: '#fb923c', fontSize: '0.74rem' }}>Check: {action.missingFacts?.join(' ')}</div>}
                     <div style={{ color: '#666', fontSize: '0.68rem' }}>Lead: {action.relatedLeadId || 'none'} · Created: {action.createdAt ? new Date(action.createdAt).toLocaleString() : 'Not recorded'}</div>
@@ -6120,6 +6295,13 @@ export default function AdminPanel() {
                       <div style={{ color: '#fff', fontWeight: 800 }}>{thread.subject || thread.id}</div>
                       <div style={{ color: '#aaa', fontSize: '0.74rem', lineHeight: 1.45 }}>{thread.fromEmail || 'Unknown sender'} · {thread.productInterest || 'No product'} · {thread.receivedAt ? new Date(thread.receivedAt).toLocaleString() : 'No date'}</div>
                       {thread.snippet && <div style={{ color: '#888', fontSize: '0.74rem', lineHeight: 1.45 }}>{thread.snippet}</div>}
+                      {thread.contractMatch?.contractNumber && <div style={{ color: '#93c5fd', fontSize: '0.72rem' }}>Contract match: {thread.contractMatch.contractNumber} · {Math.round((thread.contractMatch.confidence || 0) * 100)}% · {thread.contractMatch.method?.replace(/_/g, ' ')}</div>}
+                      {thread.contractTriage?.reason && <div style={{ color: thread.contractTriage.material ? '#fb923c' : '#777', fontSize: '0.72rem' }}>{thread.contractTriage.reason}</div>}
+                      <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <button type="button" onClick={() => runGmailContractTriage(thread)} disabled={contractIntakeSaving === thread.id || !thread.messageId} style={{ background: thread.messageId ? '#1d4ed8' : '#333', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.36rem 0.52rem', cursor: thread.messageId ? 'pointer' : 'not-allowed', fontWeight: 800, fontSize: '0.68rem' }}>{thread.processingStatus ? 'Review Again in AI Drafts' : 'Review for Contract Change'}</button>
+                        {thread.processingStatus && <span style={{ color: '#86efac', fontSize: '0.7rem' }}>{thread.processingStatus.replace(/_/g, ' ')}</span>}
+                      </div>
+                      {contractIntakeStatus[thread.id] && <div style={{ color: isAdminWarningStatus(contractIntakeStatus[thread.id]) ? '#fb923c' : '#aaa', fontSize: '0.7rem' }}>{contractIntakeStatus[thread.id]}</div>}
                       {thread.matchDecision ? (
                         <div style={{ color: '#86efac', fontSize: '0.74rem' }}>Decision: {thread.matchDecision} {thread.linkedTargetId ? `· ${thread.linkedTargetType}:${thread.linkedTargetId}` : ''}</div>
                       ) : (thread.suggestions?.length || 0) === 0 ? (
