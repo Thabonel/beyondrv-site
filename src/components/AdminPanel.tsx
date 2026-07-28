@@ -12,6 +12,40 @@ interface Message {
   content: string;
 }
 
+interface BrowserSpeechRecognitionResult {
+  isFinal: boolean;
+  length: number;
+  [index: number]: { transcript: string };
+}
+
+interface BrowserSpeechRecognitionEvent {
+  resultIndex: number;
+  results: {
+    length: number;
+    [index: number]: BrowserSpeechRecognitionResult;
+  };
+}
+
+interface BrowserSpeechRecognition {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onstart: (() => void) | null;
+  onresult: ((event: BrowserSpeechRecognitionEvent) => void) | null;
+  onerror: ((event: { error: string }) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+}
+
+type BrowserSpeechRecognitionConstructor = new () => BrowserSpeechRecognition;
+
+type VoiceCapableWindow = Window & {
+  SpeechRecognition?: BrowserSpeechRecognitionConstructor;
+  webkitSpeechRecognition?: BrowserSpeechRecognitionConstructor;
+};
+
 class AdminSectionBoundary extends Component<{ children: ReactNode }, { error: string }> {
   state = { error: '' };
 
@@ -1604,6 +1638,11 @@ export default function AdminPanel() {
     { role: 'assistant', content: "Hi! I'm the Beyond RV admin assistant. I can help with site changes, lead follow-ups, and SEO health checks." }
   ]);
   const [input, setInput] = useState('');
+  const [speechRecognitionSupported, setSpeechRecognitionSupported] = useState<boolean | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [voiceStatus, setVoiceStatus] = useState('');
+  const [readAloudSupported, setReadAloudSupported] = useState<boolean | null>(null);
+  const [readAloudEnabled, setReadAloudEnabled] = useState(false);
   const [activeTab, setActiveTab] = useState<PanelTab>('dashboard');
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [knowledgeInput, setKnowledgeInput] = useState('');
@@ -1716,6 +1755,11 @@ export default function AdminPanel() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
+  const speechRecognitionRef = useRef<BrowserSpeechRecognition | null>(null);
+  const voiceDraftPrefixRef = useRef('');
+  const voiceHadResultRef = useRef(false);
+  const voiceHadErrorRef = useRef(false);
+  const readAloudEnabledRef = useRef(false);
   const mediaFileRef = useRef<HTMLInputElement>(null);
   const editProductFileRef = useRef<HTMLInputElement>(null);
   const newProductFileRef = useRef<HTMLInputElement>(null);
@@ -1728,6 +1772,29 @@ export default function AdminPanel() {
   }, [messages]);
 
   useEffect(() => {
+    const voiceWindow = window as VoiceCapableWindow;
+    const hasSpeechRecognition = Boolean(voiceWindow.SpeechRecognition || voiceWindow.webkitSpeechRecognition);
+    const hasReadAloud = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+    setSpeechRecognitionSupported(hasSpeechRecognition);
+    setReadAloudSupported(hasReadAloud);
+    setVoiceStatus(hasSpeechRecognition
+      ? 'Tap Speak to dictate. Your transcript stays editable and is never sent automatically.'
+      : 'Voice input is not supported by this browser. You can keep typing and send messages normally.');
+
+    return () => {
+      speechRecognitionRef.current?.abort();
+      if (hasReadAloud) window.speechSynthesis.cancel();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (showChatDrawer) return;
+    speechRecognitionRef.current?.abort();
+    speechRecognitionRef.current = null;
+    setIsListening(false);
+  }, [showChatDrawer]);
+
+  useEffect(() => {
     const textarea = chatInputRef.current;
     if (!textarea) return;
     const maxHeight = Math.min(window.innerHeight * 0.5, 360);
@@ -1735,6 +1802,111 @@ export default function AdminPanel() {
     textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
     textarea.style.overflowY = textarea.scrollHeight > maxHeight ? 'auto' : 'hidden';
   }, [input, showChatDrawer]);
+
+  function stopVoiceInput() {
+    try {
+      speechRecognitionRef.current?.stop();
+    } catch {
+      // Recognition may already have stopped between the tap and this handler.
+    }
+  }
+
+  function startVoiceInput() {
+    if (isListening) {
+      stopVoiceInput();
+      return;
+    }
+
+    const voiceWindow = window as VoiceCapableWindow;
+    const Recognition = voiceWindow.SpeechRecognition || voiceWindow.webkitSpeechRecognition;
+    if (!Recognition) {
+      setSpeechRecognitionSupported(false);
+      setVoiceStatus('Voice input is not supported by this browser. You can keep typing and send messages normally.');
+      return;
+    }
+
+    const recognition = new Recognition();
+    speechRecognitionRef.current = recognition;
+    voiceDraftPrefixRef.current = input.trimEnd();
+    voiceHadResultRef.current = false;
+    voiceHadErrorRef.current = false;
+    recognition.lang = 'en-AU';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+      setIsListening(true);
+      setVoiceStatus('Listening… Tap Stop when you have finished. Nothing will be sent automatically.');
+    };
+
+    recognition.onresult = event => {
+      const transcriptParts: string[] = [];
+      let hasFinalResult = false;
+      for (let index = 0; index < event.results.length; index += 1) {
+        const result = event.results[index];
+        const transcript = result?.[0]?.transcript?.trim();
+        if (transcript) transcriptParts.push(transcript);
+        if (result?.isFinal) hasFinalResult = true;
+      }
+
+      const transcript = transcriptParts.join(' ').trim();
+      if (!transcript) return;
+      voiceHadResultRef.current = true;
+      const prefix = voiceDraftPrefixRef.current;
+      setInput(`${prefix}${prefix ? ' ' : ''}${transcript}`);
+      setVoiceStatus(hasFinalResult
+        ? 'Transcript added. Review or edit it, then press Send when ready.'
+        : 'Transcribing… Review the text before you press Send.');
+    };
+
+    recognition.onerror = event => {
+      voiceHadErrorRef.current = true;
+      setIsListening(false);
+      const errorMessage: Record<string, string> = {
+        'not-allowed': 'Microphone permission was denied. Allow microphone access in your browser settings, or keep typing.',
+        'service-not-allowed': 'Microphone access is blocked in this browser. Allow access in browser settings, or keep typing.',
+        'audio-capture': 'No working microphone was found. Check your microphone, or keep typing.',
+        'no-speech': 'No clear speech was recognised. Tap Speak to try again, or keep typing.',
+        network: 'Voice transcription could not connect. Check your connection, try again, or keep typing.',
+        aborted: 'Voice input stopped. Review any transcript already added, or try again.',
+      };
+      setVoiceStatus(errorMessage[event.error] ?? 'Voice transcription failed. Tap Speak to try again, or keep typing.');
+    };
+
+    recognition.onend = () => {
+      speechRecognitionRef.current = null;
+      setIsListening(false);
+      if (!voiceHadResultRef.current && !voiceHadErrorRef.current) {
+        setVoiceStatus('No clear speech was recognised. Tap Speak to try again, or keep typing.');
+      } else if (voiceHadResultRef.current && !voiceHadErrorRef.current) {
+        setVoiceStatus('Transcript added. Review or edit it, then press Send when ready.');
+      }
+    };
+
+    try {
+      recognition.start();
+    } catch {
+      speechRecognitionRef.current = null;
+      setIsListening(false);
+      setVoiceStatus('Voice input could not start. Check microphone access, try again, or keep typing.');
+    }
+  }
+
+  function toggleReadAloud() {
+    if (!readAloudSupported) return;
+    const enabled = !readAloudEnabledRef.current;
+    readAloudEnabledRef.current = enabled;
+    setReadAloudEnabled(enabled);
+    if (!enabled) window.speechSynthesis.cancel();
+  }
+
+  function readAssistantReply(text: string) {
+    if (!readAloudEnabledRef.current || !readAloudSupported || !text.trim()) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-AU';
+    window.speechSynthesis.speak(utterance);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -1923,7 +2095,9 @@ export default function AdminPanel() {
         return null;
       }
 
-      setMessages(prev => [...prev, { role: 'assistant', content: data.text ?? 'Request completed.' }]);
+      const assistantReply = data.text ?? 'Request completed.';
+      setMessages(prev => [...prev, { role: 'assistant', content: assistantReply }]);
+      readAssistantReply(assistantReply);
 
       const responsePendingChanges = data.pendingChanges ?? [];
       if (responsePendingChanges.length) {
@@ -1938,7 +2112,7 @@ export default function AdminPanel() {
         });
       }
       return {
-        text: data.text ?? 'Request completed.',
+        text: assistantReply,
         pendingChanges: responsePendingChanges,
       };
     } catch {
@@ -6558,7 +6732,25 @@ export default function AdminPanel() {
                   title="Upload image"
                   aria-label="Upload image"
                 >+</button>
-                <span style={{ flex: 1, color: '#777', fontSize: '0.68rem' }}>Enter to send / Shift+Enter for a new line</span>
+                <button
+                  type="button"
+                  data-testid="admin-chat-voice-button"
+                  onClick={startVoiceInput}
+                  disabled={speechRecognitionSupported !== true || loading}
+                  aria-pressed={isListening}
+                  aria-label={isListening ? 'Stop voice input' : 'Start voice input'}
+                  title={speechRecognitionSupported === false ? 'Voice input is not supported in this browser' : isListening ? 'Stop listening' : 'Tap to speak'}
+                  style={{ minHeight: '36px', flexShrink: 0, background: isListening ? '#b91c1c' : '#242424', border: `1px solid ${isListening ? '#ef4444' : '#444'}`, color: '#fff', borderRadius: '999px', padding: '0 0.7rem', cursor: speechRecognitionSupported !== true || loading ? 'not-allowed' : 'pointer', opacity: speechRecognitionSupported !== true || loading ? 0.5 : 1, fontWeight: 700, fontSize: '0.72rem' }}
+                >{isListening ? '■ Stop' : '🎙 Speak'}</button>
+                <button
+                  type="button"
+                  onClick={toggleReadAloud}
+                  disabled={readAloudSupported !== true}
+                  aria-pressed={readAloudEnabled}
+                  title={readAloudSupported === false ? 'Read aloud is not supported in this browser' : 'Read assistant replies aloud'}
+                  style={{ minHeight: '36px', flexShrink: 0, background: readAloudEnabled ? '#374151' : '#242424', border: '1px solid #444', color: '#ddd', borderRadius: '999px', padding: '0 0.65rem', cursor: readAloudSupported === true ? 'pointer' : 'not-allowed', opacity: readAloudSupported === false ? 0.5 : 1, fontWeight: 600, fontSize: '0.68rem' }}
+                >Read {readAloudEnabled ? 'on' : 'off'}</button>
+                <span style={{ flex: 1, color: '#777', fontSize: '0.68rem' }}>Enter sends</span>
                 <button
                   onClick={() => sendMessage(input)}
                   disabled={loading || !input.trim()}
@@ -6566,6 +6758,12 @@ export default function AdminPanel() {
                 >Send</button>
               </div>
             </div>
+            <div
+              data-testid="admin-chat-voice-status"
+              role="status"
+              aria-live="polite"
+              style={{ minHeight: '1.2rem', color: speechRecognitionSupported === false ? '#fbbf24' : '#999', fontSize: '0.7rem', lineHeight: 1.4, padding: '0.35rem 0.25rem 0' }}
+            >{voiceStatus}</div>
           </div>
         </div>
       </div>
