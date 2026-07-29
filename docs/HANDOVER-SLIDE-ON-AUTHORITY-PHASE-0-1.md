@@ -127,8 +127,8 @@ All final local checks passed on 29 July 2026:
 |---|---|
 | `npm run check` | Passed: 0 errors; 61 informational hints from existing code |
 | `npm test` | Passed: 118/118 |
-| `npm run build` | Passed: 40 pages built; sitemap generated |
-| Authority crawl audit | Passed: 40 pages; zero findings |
+| `npm run build` | Passed: 39 pages built; sitemap generated |
+| Authority crawl audit | Passed: 39 pages; zero findings |
 | Stale claim search | Passed for the removed Queensland-built/finished and old experience/warranty wording in public sources |
 | `git diff --check` | Passed |
 

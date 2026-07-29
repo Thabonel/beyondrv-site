@@ -1,6 +1,6 @@
 ID,Phase,Workstream,Deliverable,Dependency,Responsible,Status,Completed_or_due,Evidence_or_next_action
 P0-01,0,Governance,"Registers and baseline files",None,Website team,Complete,2026-07-29,"docs/authority/"
-P0-02,0,Technical baseline,"Repeatable local production crawl",P0-01,Website team,Complete,2026-07-29,"40 pages audited; zero findings in docs/authority/baselines/2026-07-29-local-crawl.json"
+P0-02,0,Technical baseline,"Repeatable local production crawl",P0-01,Website team,Complete,2026-07-29,"39 pages audited after product archive; zero findings in docs/authority/baselines/2026-07-29-local-crawl.json"
 P0-03,0,Search baseline,"Google and Bing performance/indexing exports",P0-01,Account holder,Blocked,Unscheduled,"Grant read access or export requested reports"
 P0-04,0,Evidence,"Claim evidence pack",P0-01,Owners,Complete,2026-07-29,"Identity experience compliance warranty and imported-shell completion scope confirmed"
 P1-01,1,Entity identity,"Canonical organisation entity",P0-04,Website team,Complete,2026-07-29,"Owner-confirmed public brand plus approved contract seller identity"

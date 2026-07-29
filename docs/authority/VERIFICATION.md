@@ -6,8 +6,8 @@
 |---|---|
 | `npm run check` | Passed: 0 errors, 0 warnings, 61 existing hints. |
 | `npm test` | Passed: 118/118 tests. |
-| `npm run build` | Passed: 40 pages generated; sitemap index generated. |
-| `npm run audit:authority -- --out docs/authority/baselines/2026-07-29-local-crawl.json` | Passed: 40 pages, zero findings, including the strengthened misleading-origin wording regression check. |
+| `npm run build` | Passed: 39 pages generated after the archived product was removed from public routes; sitemap index generated. |
+| `npm run audit:authority -- --out docs/authority/baselines/2026-07-29-local-crawl.json` | Passed: 39 pages, zero findings, including the strengthened misleading-origin wording regression check. |
 | Built sitemap inspection | Passed: deployment timestamps removed; controlled dates appear only for recorded materially changed paths. |
 | Built JSON-LD inspection | Passed: no `#business`, internal availability codes, unsupported shipping/returns fields or fixed `priceValidUntil`. |
 | IndexNow dry run | Passed: same-origin URLs normalised; exact payload printed; no request sent. |
