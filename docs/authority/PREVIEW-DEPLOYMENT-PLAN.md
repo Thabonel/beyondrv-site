@@ -41,9 +41,9 @@ npm run audit:authority -- --out docs/authority/baselines/2026-07-29-preview-can
 git diff --check
 ```
 
-Expected local result: 40 built pages, 108 passing tests, zero Astro errors, and zero authority-audit findings.
+Expected local result: 40 built pages, 118 passing tests, zero Astro errors, and zero authority-audit findings.
 
-Review the isolated diff and staged file list before committing. The owner’s product-origin answer may be applied before preview if available; otherwise retain the conservative wording already present.
+Review the isolated diff and staged file list before committing. The owner confirmed that caravan and camper shells are imported, then completed at the Beyond RV workshop in Mutdapilly; retain that exact distinction throughout the preview.
 
 ## Preview deployment
 
