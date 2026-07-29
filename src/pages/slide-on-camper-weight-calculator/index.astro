@@ -4,7 +4,7 @@ import { displayImageUrl } from '../../lib/media';
 
 const pageUrl = 'https://beyondrv.com.au/slide-on-camper-weight-calculator/';
 const heroImage = '/images/site/homepage-slide-on-campers.webp';
-const disclaimer = 'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. ByondRV must confirm final suitability before purchase.';
+const disclaimer = 'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. Beyond RV must confirm final suitability before purchase.';
 
 const faqs = [
   {
@@ -34,7 +34,7 @@ const schema = [
     '@type': 'WebPage',
     name: 'Slide-On Camper Weight Calculator',
     url: pageUrl,
-    description: 'Manual Australian payload and GVM calculator for checking whether a ute may suit a ByondRV slide-on camper.'
+    description: 'Manual Australian payload and GVM calculator for checking whether a ute may suit a Beyond RV slide-on camper.'
   },
   {
     '@context': 'https://schema.org',
@@ -59,14 +59,14 @@ const schema = [
     '@type': 'Product',
     name: product.name,
     url: product.url,
-    brand: { '@type': 'Brand', name: 'ByondRV' },
+    brand: { '@type': 'Brand', name: 'Beyond RV' },
     category: 'Slide-on camper'
   }))
 ];
 ---
 <BaseLayout
-  title="Slide-On Camper Weight Calculator | ByondRV"
-  description="Estimate whether your ute has enough payload, GVM margin and tray size for a ByondRV slide-on camper. Manual Australian calculator for non-technical buyers."
+  title="Slide-On Camper Weight Calculator | Beyond RV"
+  description="Estimate whether your ute has enough payload, GVM margin and tray size for a Beyond RV slide-on camper. Manual Australian calculator for non-technical buyers."
   image={heroImage}
   activePath="/vehicle-suitability-checker/"
   structuredData={schema}
@@ -82,7 +82,7 @@ const schema = [
       </div>
       <h1 class="hero-title">Can Your Ute Carry a Slide-On?</h1>
       <p class="hero-sub">
-        Enter your own vehicle figures to estimate payload, loaded vehicle weight, GVM margin and which ByondRV slide-on range may be worth discussing.
+        Enter your own vehicle figures to estimate payload, loaded vehicle weight, GVM margin and which Beyond RV slide-on range may be worth discussing.
       </p>
     </div>
   </section>
@@ -178,11 +178,11 @@ const schema = [
         <div class="result-metric"><span>Data quality</span><strong id="dataQuality">Needs review</strong></div>
       </div>
       <div class="result-recommendation">
-        <strong>ByondRV product recommendation</strong>
-        <p id="recommendation">Confirm with ByondRV</p>
+        <strong>Beyond RV product recommendation</strong>
+        <p id="recommendation">Confirm with Beyond RV</p>
       </div>
       <ul class="result-notes" id="warningNotes"></ul>
-      <a class="btn-primary" id="sendResult" href="/inquiry-form/?intent=vehicle-suitability">Send this result to ByondRV</a>
+      <a class="btn-primary" id="sendResult" href="/inquiry-form/?intent=vehicle-suitability">Send this result to Beyond RV</a>
     </aside>
   </section>
 
@@ -199,7 +199,7 @@ const schema = [
         <h3>Worked example</h3>
         <p>A ute with 3350kg GVM and a 2400kg current weighbridge weight has 950kg before it reaches GVM. If passengers, accessories and loaded camper weight add 1130kg, the vehicle is estimated at 3530kg loaded. That is 180kg over GVM, so the result is red.</p>
       </div>
-      <h2>ByondRV slide-on product data table</h2>
+      <h2>Beyond RV slide-on product data table</h2>
       <div class="authority-table-wrap">
         <table class="authority-table">
           <thead>
@@ -213,7 +213,7 @@ const schema = [
             {products.map(product => (
               <tr>
                 <td><a href={new URL(product.url).pathname}>{product.name}</a></td>
-                <td>Confirm with ByondRV</td>
+                <td>Confirm with Beyond RV</td>
                 <td>{product.dryWeight}, tray size, GVM margin, axle limits and weighbridge result.</td>
               </tr>
             ))}

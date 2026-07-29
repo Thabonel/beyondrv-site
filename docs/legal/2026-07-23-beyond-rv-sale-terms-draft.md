@@ -250,7 +250,7 @@ In this Agreement:
 
 ## 17. Beyond RV voluntary warranty against defects
 
-17.1 In addition to the Buyer’s rights under the ACL, the Seller warrants the Beyond RV-manufactured or Beyond RV-assembled structural components and fitout identified in the Sale Agreement against defects in materials and workmanship for **60 months from the date of delivery**, subject to this clause. The solicitor and owner must confirm this period and its product coverage before this draft is approved.
+17.1 In addition to the Buyer’s rights under the ACL, the Seller warrants the Beyond RV-manufactured or Beyond RV-assembled structural components and fitout identified in the Sale Agreement against defects in materials and workmanship for **60 months from the date of delivery**, subject to this clause. The owner confirmed the five-year construction warranty on 29 July 2026; the solicitor must still review this clause before the draft is approved.
 
 17.2 The voluntary warranty applies to the original Buyer. Any transfer policy must be stated in the Sale Agreement or warranty schedule. A restriction on transfer does not limit rights that a later owner may have under the ACL or another law.
 

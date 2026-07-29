@@ -1,45 +1,21 @@
+import { ORGANIZATION_ID } from '../data/siteIdentity.js';
+
 export const DEFAULT_VIDEO_UPLOAD_DATE = '2026-06-01T00:00:00+10:00';
 const BRAND = {
   "@type": "Brand",
   name: "Beyond RV",
 };
-const MANUFACTURER = {
-  "@type": "Organization",
-  name: "Beyond RV",
-  url: "https://beyondrv.com.au/",
-};
-const MERCHANT_RETURN_POLICY = {
-  "@type": "MerchantReturnPolicy",
-  applicableCountry: "AU",
-  returnPolicyCategory: "https://schema.org/MerchantReturnNotPermitted",
-};
-const MERCHANT_SHIPPING_DETAILS = {
-  "@type": "OfferShippingDetails",
-  shippingDestination: {
-    "@type": "DefinedRegion",
-    addressCountry: "AU",
-  },
-  shippingRate: {
-    "@type": "MonetaryAmount",
-    value: "0",
-    currency: "AUD",
-  },
-  deliveryTime: {
-    "@type": "ShippingDeliveryTime",
-    handlingTime: {
-      "@type": "QuantitativeValue",
-      minValue: 0,
-      maxValue: 0,
-      unitCode: "DAY",
-    },
-    transitTime: {
-      "@type": "QuantitativeValue",
-      minValue: 0,
-      maxValue: 0,
-      unitCode: "DAY",
-    },
-  },
-  shippingLabel: "Workshop pickup or delivery arranged directly with Beyond RV.",
+const AVAILABILITY = {
+  available: 'https://schema.org/InStock',
+  available_in_australia: 'https://schema.org/InStock',
+  in_stock: 'https://schema.org/InStock',
+  sold: 'https://schema.org/SoldOut',
+  sold_out: 'https://schema.org/SoldOut',
+  unavailable: 'https://schema.org/OutOfStock',
+  out_of_stock: 'https://schema.org/OutOfStock',
+  preorder: 'https://schema.org/PreOrder',
+  pre_order: 'https://schema.org/PreOrder',
+  made_to_order: 'https://schema.org/PreOrder',
 };
 
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
@@ -86,13 +62,7 @@ export function buildProductSku(slug) {
 }
 
 export function buildMerchantOffer({ price, status, url, availability }) {
-  const offer = buildProductOffer({ price, status, url, availability });
-  if (!offer) return undefined;
-  return {
-    ...offer,
-    hasMerchantReturnPolicy: MERCHANT_RETURN_POLICY,
-    shippingDetails: MERCHANT_SHIPPING_DETAILS,
-  };
+  return buildProductOffer({ price, status, url, availability });
 }
 
 export function buildMerchantProduct({
@@ -115,7 +85,6 @@ export function buildMerchantProduct({
     url,
     sku: buildProductSku(slug),
     brand: BRAND,
-    manufacturer: MANUFACTURER,
     image,
     category,
     itemCondition: "https://schema.org/NewCondition",
@@ -149,13 +118,16 @@ export function buildProductOffer({ price, status, url, availability }) {
     "url": url,
     "priceCurrency": "AUD",
     "price": priceNum,
-    "priceValidUntil": "2026-12-31",
     "itemCondition": "https://schema.org/NewCondition",
-    "availability": availability ?? (isComingSoon ? "https://schema.org/PreOrder" : "https://schema.org/InStock"),
+    "availability": normalizeAvailability(availability, isComingSoon),
     "seller": {
-      "@type": "Organization",
-      "name": "Beyond RV",
-      "url": "https://beyondrv.com.au/"
+      "@id": ORGANIZATION_ID
     }
   };
+}
+
+export function normalizeAvailability(value, isComingSoon = false) {
+  if (typeof value === 'string' && value.startsWith('https://schema.org/')) return value;
+  const key = String(value ?? '').trim().toLowerCase().replace(/[\s-]+/g, '_');
+  return AVAILABILITY[key] ?? (isComingSoon ? 'https://schema.org/PreOrder' : 'https://schema.org/InStock');
 }

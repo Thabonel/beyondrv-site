@@ -5,6 +5,7 @@ import ProductCard from '../../components/ProductCard.astro';
 import ProductComparisonTable from '../../components/ProductComparisonTable.astro';
 import { displayImageUrl } from '../../lib/media';
 import { buildMerchantProduct } from '../../lib/structuredData.js';
+import { isPublicProduct } from '../../lib/productVisibility';
 
 const productOrder = [
   'sunpatch-12c-couples-caravan',
@@ -12,7 +13,7 @@ const productOrder = [
   'sunpatch-19xc-hardtop-couples-offroad-van',
   'sunpatch-21xf-hardtop-family-offroad-van',
 ];
-const allProducts = await getCollection('products');
+const allProducts = (await getCollection('products')).filter(isPublicProduct);
 type ProductEntry = typeof allProducts[number];
 const isProduct = (product: ProductEntry | undefined): product is ProductEntry => Boolean(product);
 const products = productOrder
@@ -66,7 +67,7 @@ const ctaImage = '/images/optimized/products/sunpatch-15xc-couples-offroad-van/0
 ---
 <BaseLayout
   title="Off-Road Caravans | Beyond RV Queensland"
-  description="Beyond RV builds composite off-road caravans for couples and families. The Sunpatch range — built in Queensland for serious Australian travel."
+  description="Beyond RV completes composite off-road caravans for couples and families. The Sunpatch range is prepared for serious Australian travel."
   image={heroImage}
   activePath="/our-caravans/"
   structuredData={[schema, faqSchema]}
@@ -82,8 +83,8 @@ const ctaImage = '/images/optimized/products/sunpatch-15xc-couples-offroad-van/0
       </div>
       <h1 class="hero-title">Our Caravans</h1>
       <p class="hero-sub">
-        Queensland-built off-road caravans for couples and families who refuse to stay on the beaten track.
-        Full composite construction. Independent suspension. Built to go where you want to go.
+        Off-road caravans for couples and families who refuse to stay on the beaten track.
+        Full composite construction. Independent suspension. Completed in Queensland.
       </p>
     </div>
   </section>

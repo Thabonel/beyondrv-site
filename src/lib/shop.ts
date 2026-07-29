@@ -29,9 +29,9 @@ export function fulfilmentInfo(fulfilmentType: FulfilmentType): FulfilmentInfo {
     case 'ship':
       return { message: 'Delivery: Shipping available', checkoutEligible: true };
     case 'pickup':
-      return { message: 'Delivery: Pickup from ByondRV Service Centre', checkoutEligible: true };
+      return { message: 'Delivery: Pickup from Beyond RV Service Centre', checkoutEligible: true };
     case 'install':
-      return { message: 'This item requires installation by the ByondRV team. Please enquire.', checkoutEligible: false };
+      return { message: 'This item requires installation by the Beyond RV team. Please enquire.', checkoutEligible: false };
     case 'quote_required':
       return { message: 'Freight or supply needs to be quoted. Please enquire.', checkoutEligible: false };
   }
@@ -70,18 +70,18 @@ export function normalizeSaleLabel(value?: string) {
 export function sourceTypeLabel(sourceType?: string) {
   switch (sourceType) {
     case 'china_container':
-      return 'Source: China container';
+      return 'Base unit source: Imported';
     case 'local_supplier':
-      return 'Source: Local supplier';
+      return 'Base unit source: Australian supplier';
     case 'workshop_stock':
-      return 'Source: Workshop stock';
+      return 'Current location: Mutdapilly workshop';
     case 'custom_made_to_order':
-      return 'Source: Custom made to order';
+      return 'Production: Made to order';
     case 'other':
     case undefined:
-      return 'Source: Byond RV';
+      return 'Source details: Confirm with Beyond RV';
     default:
-      return `Source: ${sourceType.replace(/_/g, ' ')}`;
+      return 'Source details: Confirm with Beyond RV';
   }
 }
 

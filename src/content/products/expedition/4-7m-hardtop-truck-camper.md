@@ -116,7 +116,7 @@ specGroups:
       - label: "Vehicle connection"
         value: "7 pin trailer plug"
       - label: "Warranty"
-        value: "5 years manufacturer warranty"
+        value: "5-year Beyond RV construction warranty; individual appliances retain manufacturer warranties"
 features:
   - Couples truck camper layout
   - 2.2m truck camper width or 2.4m Unimog configuration

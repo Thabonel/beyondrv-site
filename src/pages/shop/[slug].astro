@@ -5,10 +5,12 @@ import { displayImageUrl, imageSrcSet, thumbImageUrl } from '../../lib/media';
 import { formatShopPrice, shopProductPrice, availabilityLabel, canPurchaseOnline, isOnlinePayableFulfilment, fulfilmentInfo, sourceTypeLabel } from '../../lib/shop';
 import { ORDER_MAX } from '../../lib/cart';
 import { buildMerchantProduct } from '../../lib/structuredData.js';
+import { isPublicProduct } from '../../lib/productVisibility';
 
 export async function getStaticPaths() {
   const allProducts = await getCollection('products');
   return allProducts
+    .filter(isPublicProduct)
     .filter((product) => product.data.store === true)
     .map((product) => ({
       params: { slug: product.data.store === true ? product.data.slug : '' },

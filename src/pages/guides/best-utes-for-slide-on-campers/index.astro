@@ -2,7 +2,7 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 
 const pageUrl = 'https://beyondrv.com.au/guides/best-utes-for-slide-on-campers/';
-const disclaimer = 'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. ByondRV must confirm final suitability before purchase.';
+const disclaimer = 'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. Beyond RV must confirm final suitability before purchase.';
 
 const faqs = [
   {
@@ -14,7 +14,7 @@ const faqs = [
     a: 'A space cab or single cab often gives more tray length and payload flexibility, but suitability still depends on the exact vehicle, accessories, axle limits and camper weight.'
   },
   {
-    q: 'What information should I send ByondRV?',
+    q: 'What information should I send Beyond RV?',
     a: 'Send the vehicle make, model, year, cab style, GVM, axle limits, current weighbridge weight, tray dimensions, accessories and the camper model you are considering.'
   }
 ];
@@ -32,7 +32,9 @@ const schema = [
     '@type': 'WebPage',
     name: 'Best Utes for Slide-On Campers',
     url: pageUrl,
-    description: 'Guide to what makes a ute suitable for a slide-on camper in Australia, including payload, GVM, tray size, axle limits and accessories.'
+    description: 'Guide to what makes a ute suitable for a slide-on camper in Australia, including payload, GVM, tray size, axle limits and accessories.',
+    dateModified: '2026-07-29',
+    publisher: { '@id': 'https://beyondrv.com.au/#organization' }
   },
   {
     '@context': 'https://schema.org',
@@ -57,15 +59,15 @@ const schema = [
     '@type': 'Product',
     name: product.name,
     url: product.url,
-    brand: { '@type': 'Brand', name: 'ByondRV' },
+    brand: { '@type': 'Brand', name: 'Beyond RV' },
     category: 'Slide-on camper'
   }))
 ];
 ---
 <BaseLayout
-  title="Best Utes for Slide-On Campers | ByondRV Guide"
+  title="Best Utes for Slide-On Campers | Beyond RV Guide"
   description="What makes a ute suitable for a slide-on camper in Australia: payload, GVM, tray size, axle limits, accessories, suspension and real weighbridge data."
-  activePath="/vehicle-suitability-checker/"
+  activePath="/guides/"
   structuredData={schema}
 >
   <section class="page-hero page-hero--short">
@@ -129,7 +131,7 @@ const schema = [
         </table>
       </div>
 
-      <h2>ByondRV slide-on camper starting points</h2>
+      <h2>Beyond RV slide-on camper starting points</h2>
       <div class="authority-table-wrap">
         <table class="authority-table">
           <thead>
@@ -156,8 +158,9 @@ const schema = [
       </div>
 
       <p>
-        To check your own numbers, use the <a href="/slide-on-camper-weight-calculator/">slide-on camper weight calculator</a>, then send the result to ByondRV with your tray dimensions and vehicle details.
+        To check your own numbers, use the <a href="/slide-on-camper-weight-calculator/">slide-on camper weight calculator</a>, then send the result to Beyond RV with your tray dimensions and vehicle details.
       </p>
+      <p><a href="/guides/">Return to all slide-on camper guides</a>.</p>
       <p class="calculator-disclaimer">{disclaimer}</p>
     </article>
   </section>

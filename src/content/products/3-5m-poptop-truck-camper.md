@@ -129,7 +129,7 @@ specGroups:
       - label: Vehicle connection
         value: 7 pin trailer plug
       - label: Warranty
-        value: 5 years manufacturer warranty
+        value: 5-year Beyond RV construction warranty; individual appliances retain manufacturer warranties
 features:
   - Electric pop-top configuration
   - Custom truck camper body

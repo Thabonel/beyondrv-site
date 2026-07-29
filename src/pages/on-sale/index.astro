@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProductCard from '../../components/ProductCard.astro';
+import { isPublicProduct } from '../../lib/productVisibility';
 
 const productOrder = [
   'sunpatch-15xc-couples-offroad-van',
@@ -13,7 +14,7 @@ const productOrder = [
   '3-5m-diy-camper-box-with-cabover-and-underfloor-storage',
   'mercedes-sprinter-motorhome',
 ];
-const allProducts = await getCollection('products');
+const allProducts = (await getCollection('products')).filter(isPublicProduct);
 type ProductEntry = typeof allProducts[number];
 const isProduct = (product: ProductEntry | undefined): product is ProductEntry => Boolean(product);
 const products = productOrder

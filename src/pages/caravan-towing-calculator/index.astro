@@ -4,7 +4,7 @@ import { displayImageUrl } from '../../lib/media';
 
 const pageUrl = 'https://beyondrv.com.au/caravan-towing-calculator/';
 const heroImage = '/images/optimized/products/sunpatch-12c-couples-caravan/01-sunpatch-12c-couples-caravan-hero.webp';
-const disclaimer = 'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. ByondRV must confirm final suitability before purchase.';
+const disclaimer = 'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. Beyond RV must confirm final suitability before purchase.';
 
 const faqs = [
   {
@@ -23,9 +23,9 @@ const faqs = [
 
 const products = [
   { name: 'Sunpatch 12C Couples Off-Road Van', url: 'https://beyondrv.com.au/sunpatch-12c-couples-caravan/', atm: '2420kg', ball: '160kg', fit: 'Compact couples van for buyers wanting a lighter towing setup.' },
-  { name: 'Sunpatch 15-XC Couples Off-Road Van', url: 'https://beyondrv.com.au/sunpatch-15xc-couples-offroad-van/', atm: '2500kg', ball: 'Confirm with ByondRV', fit: 'Couples off-road van with more space while staying in a mid-weight towing discussion.' },
-  { name: 'Sunpatch 19-XC Hardtop Couples Off-Road Van', url: 'https://beyondrv.com.au/sunpatch-19xc-hardtop-couples-offroad-van/', atm: 'Confirm with ByondRV', ball: 'Confirm with ByondRV', fit: 'Larger couples hardtop caravan requiring careful tow vehicle matching.' },
-  { name: 'Sunpatch 21-XF Hardtop Family Off-Road Van', url: 'https://beyondrv.com.au/sunpatch-21xf-hardtop-family-offroad-van/', atm: 'Confirm with ByondRV', ball: 'Confirm with ByondRV', fit: 'Family layout requiring the strongest towing and payload checks.' }
+  { name: 'Sunpatch 15-XC Couples Off-Road Van', url: 'https://beyondrv.com.au/sunpatch-15xc-couples-offroad-van/', atm: '2500kg', ball: 'Confirm with Beyond RV', fit: 'Couples off-road van with more space while staying in a mid-weight towing discussion.' },
+  { name: 'Sunpatch 19-XC Hardtop Couples Off-Road Van', url: 'https://beyondrv.com.au/sunpatch-19xc-hardtop-couples-offroad-van/', atm: 'Confirm with Beyond RV', ball: 'Confirm with Beyond RV', fit: 'Larger couples hardtop caravan requiring careful tow vehicle matching.' },
+  { name: 'Sunpatch 21-XF Hardtop Family Off-Road Van', url: 'https://beyondrv.com.au/sunpatch-21xf-hardtop-family-offroad-van/', atm: 'Confirm with Beyond RV', ball: 'Confirm with Beyond RV', fit: 'Family layout requiring the strongest towing and payload checks.' }
 ];
 
 const schema = [
@@ -59,14 +59,14 @@ const schema = [
     '@type': 'Product',
     name: product.name,
     url: product.url,
-    brand: { '@type': 'Brand', name: 'ByondRV' },
+    brand: { '@type': 'Brand', name: 'Beyond RV' },
     category: 'Off-road caravan'
   }))
 ];
 ---
 <BaseLayout
-  title="Caravan Towing Calculator | ByondRV"
-  description="Estimate whether your tow vehicle may be a candidate for a ByondRV caravan using GVM, GCM, braked towing capacity, tow ball download, ATM, GTM and payload."
+  title="Caravan Towing Calculator | Beyond RV"
+  description="Estimate whether your tow vehicle may be a candidate for a Beyond RV caravan using GVM, GCM, braked towing capacity, tow ball download, ATM, GTM and payload."
   image={heroImage}
   activePath="/vehicle-suitability-checker/"
   structuredData={schema}
@@ -82,7 +82,7 @@ const schema = [
       </div>
       <h1 class="hero-title">Can Your Vehicle Tow It?</h1>
       <p class="hero-sub">
-        Estimate GVM, GCM, tow capacity, tow ball download and caravan payload before choosing a ByondRV off-road caravan.
+        Estimate GVM, GCM, tow capacity, tow ball download and caravan payload before choosing a Beyond RV off-road caravan.
       </p>
     </div>
   </section>
@@ -165,11 +165,11 @@ const schema = [
         <div class="result-metric"><span>Data quality</span><strong id="dataQuality">Needs review</strong></div>
       </div>
       <div class="result-recommendation">
-        <strong>ByondRV product recommendation</strong>
-        <p id="recommendation">Confirm with ByondRV</p>
+        <strong>Beyond RV product recommendation</strong>
+        <p id="recommendation">Confirm with Beyond RV</p>
       </div>
       <ul class="result-notes" id="warningNotes"></ul>
-      <a class="btn-primary" id="sendResult" href="/inquiry-form/?intent=vehicle-suitability">Send this result to ByondRV</a>
+      <a class="btn-primary" id="sendResult" href="/inquiry-form/?intent=vehicle-suitability">Send this result to Beyond RV</a>
     </aside>
   </section>
 
@@ -183,7 +183,7 @@ const schema = [
         <h3>Worked example</h3>
         <p>A vehicle weighing 2700kg before passengers and luggage may look strong with 3500kg towing capacity. Add 180kg of passengers, 120kg of accessories, 120kg of luggage and 240kg tow ball download and the loaded vehicle becomes 3360kg. If GVM is 3280kg, the result is red even if the caravan ATM is under the braked towing rating.</p>
       </div>
-      <h2>ByondRV caravan product data table</h2>
+      <h2>Beyond RV caravan product data table</h2>
       <div class="authority-table-wrap">
         <table class="authority-table">
           <thead>
@@ -198,7 +198,7 @@ const schema = [
               <tr>
                 <td><a href={new URL(product.url).pathname}>{product.name}</a></td>
                 <td>ATM: {product.atm}<br />Ball: {product.ball}</td>
-                <td>Confirm with ByondRV</td>
+                <td>Confirm with Beyond RV</td>
               </tr>
             ))}
           </tbody>

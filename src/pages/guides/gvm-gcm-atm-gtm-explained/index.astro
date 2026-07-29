@@ -4,7 +4,7 @@ import { displayImageUrl } from '../../../lib/media';
 
 const pageUrl = 'https://beyondrv.com.au/guides/gvm-gcm-atm-gtm-explained/';
 const heroImage = '/images/site/vehicle-suitability-hero.jpg';
-const disclaimer = 'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. ByondRV must confirm final suitability before purchase.';
+const disclaimer = 'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. Beyond RV must confirm final suitability before purchase.';
 
 const faqs = [
   {
@@ -27,7 +27,9 @@ const schema = [
     '@type': 'WebPage',
     name: 'GVM, GCM, ATM and GTM Explained',
     url: pageUrl,
-    description: 'Plain-English guide to Australian vehicle and caravan weight terms for slide-on camper and caravan buyers.'
+    description: 'Plain-English guide to Australian vehicle and caravan weight terms for slide-on camper and caravan buyers.',
+    dateModified: '2026-07-29',
+    publisher: { '@id': 'https://beyondrv.com.au/#organization' }
   },
   {
     '@context': 'https://schema.org',
@@ -50,10 +52,10 @@ const schema = [
 ];
 ---
 <BaseLayout
-  title="GVM, GCM, ATM and GTM Explained | ByondRV Guide"
+  title="GVM, GCM, ATM and GTM Explained | Beyond RV Guide"
   description="Plain-English Australian guide to GVM, GCM, ATM, GTM, payload, tare, tow ball download and weighbridge weights for camper and caravan buyers."
   image={heroImage}
-  activePath="/vehicle-suitability-checker/"
+  activePath="/guides/"
   structuredData={schema}
 >
   <section class="page-hero page-hero--short">
@@ -145,8 +147,9 @@ const schema = [
 
       <h2>Use the calculators</h2>
       <p>
-        If you are comparing a <a href="/our-slide-on-campers/">ByondRV slide-on camper</a>, start with the <a href="/slide-on-camper-weight-calculator/">slide-on camper weight calculator</a>. If you are comparing a <a href="/our-caravans/">ByondRV caravan</a>, use the <a href="/caravan-towing-calculator/">caravan towing calculator</a>.
+        If you are comparing a <a href="/our-slide-on-campers/">Beyond RV slide-on camper</a>, start with the <a href="/slide-on-camper-weight-calculator/">slide-on camper weight calculator</a>. If you are comparing a <a href="/our-caravans/">Beyond RV caravan</a>, use the <a href="/caravan-towing-calculator/">caravan towing calculator</a>.
       </p>
+      <p><a href="/guides/">Return to all slide-on camper guides</a>.</p>
       <p class="calculator-disclaimer">{disclaimer}</p>
     </article>
   </section>

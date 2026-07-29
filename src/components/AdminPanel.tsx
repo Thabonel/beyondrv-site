@@ -810,7 +810,7 @@ const EMPTY_RECENT_BUILD: RecentBuild = {
   title: '',
   image: '',
   alt: '',
-  tags: ['Finished in Mutdapilly, Queensland'],
+  tags: ['Five-year construction warranty'],
   link: '',
   isVisible: true,
   sortOrder: 1,
@@ -1666,6 +1666,8 @@ export default function AdminPanel() {
   const [productEditStatus, setProductEditStatus] = useState('');
   const [editProductMediaStatus, setEditProductMediaStatus] = useState('');
   const [newProductStatus, setNewProductStatus] = useState('');
+  const [archivingProductSlug, setArchivingProductSlug] = useState<string | null>(null);
+  const [productArchiveStatus, setProductArchiveStatus] = useState('');
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersStatus, setOrdersStatus] = useState('');
@@ -3453,12 +3455,50 @@ export default function AdminPanel() {
     }
   }
 
-  function requestProductUpdate(product: ProductRecord, task: string) {
-    setActiveTab('pending');
-    sendMessage(
-      `${task}\n\nProduct: ${product.title}\nSlug: ${product.slug}\n` +
-      `Read src/content/products/${product.slug}.md first, then queue a complete-file change for review.`
+  async function archiveProduct(product: ProductRecord) {
+    const confirmed = window.confirm(
+      `Are you sure?\n\n${product.title} will be removed from the public site. The product record will be kept as an archive.`,
     );
+    if (!confirmed) return;
+
+    setArchivingProductSlug(product.slug);
+    setProductArchiveStatus(`Archiving ${product.title}...`);
+
+    try {
+      const archiveRes = await adminFetch('/.netlify/functions/admin-product-archive', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: product.slug }),
+      });
+      if (redirectToLoginIfUnauthorized(archiveRes)) return;
+      const archiveData = await readAdminJson<{ pendingChange?: PendingChange; error?: string }>(archiveRes, 'Could not prepare the product archive.');
+      if (!archiveRes.ok || !archiveData.pendingChange) {
+        throw new Error(archiveData.error ?? 'Could not prepare the product archive.');
+      }
+
+      const deployRes = await adminFetch('/.netlify/functions/admin-deploy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ changes: [archiveData.pendingChange] }),
+      });
+      if (redirectToLoginIfUnauthorized(deployRes)) return;
+      const deployData = await readAdminJson<{ results?: { path: string; ok: boolean; error?: string }[]; error?: string }>(deployRes, 'Could not deploy the product archive.');
+      const failed = deployData.results?.find(result => !result.ok);
+      if (!deployRes.ok || failed || !deployData.results?.length) {
+        throw new Error(failed?.error ?? deployData.error ?? 'Could not deploy the product archive.');
+      }
+
+      setProducts(current => current.filter(item => item.slug !== product.slug));
+      setProductArchiveStatus(`${product.title} was archived. The site is rebuilding and will remove it in about 30 seconds.`);
+      setMessages(current => [...current, {
+        role: 'assistant',
+        content: `${product.title} was archived and removed from active products. The public site is rebuilding now.`,
+      }]);
+    } catch (error) {
+      setProductArchiveStatus(error instanceof Error ? error.message : 'Could not archive the product.');
+    } finally {
+      setArchivingProductSlug(null);
+    }
   }
 
   function startStructuredEdit(product: ProductRecord) {
@@ -4146,7 +4186,7 @@ export default function AdminPanel() {
           product.galleryCount ?? 0 ? `${product.galleryCount} photos` : '',
           activeOrderCounts[product.slug] ? `${activeOrderCounts[product.slug]} active order${activeOrderCounts[product.slug] === 1 ? '' : 's'}` : '',
         ];
-    const actionColumns = isShop ? '1fr' : product.onSale || product.status === 'on-sale' ? '1fr 1fr 1fr' : '1fr 1fr';
+    const actionColumns = isShop ? '1fr 1fr' : '1fr 1fr 1fr';
 
     return (
       <div key={product.slug} style={{ background: isQueuedDraft ? '#20140c' : '#1a1a1a', border: isQueuedDraft ? '1px solid #7c3a10' : '1px solid #303030', borderRadius: '6px', overflow: 'hidden', flexShrink: 0, display: 'grid', gridTemplateColumns: '150px minmax(0, 1fr)' }}>
@@ -4194,12 +4234,14 @@ export default function AdminPanel() {
                 Order
               </button>
             )}
-            {!isShop && (product.onSale || product.status === 'on-sale') && (
+            {!isQueuedDraft && (
               <button
-                onClick={() => requestProductUpdate(product, `This one-off sale product has sold. Remove it from active product listings and make sure the old URL redirects to ${product.category === 'caravan' ? '/our-caravans/' : product.category === 'expedition' ? '/expedition/' : '/our-slide-on-campers/'}. Do not remove standard product-line models unless they are one-off sale stock.`)}
-                style={{ background: '#2a1410', color: '#fb923c', border: '1px solid #63301f', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
+                type="button"
+                onClick={() => void archiveProduct(product)}
+                disabled={archivingProductSlug !== null}
+                style={{ background: '#2a1410', color: '#fb923c', border: '1px solid #63301f', borderRadius: '5px', padding: '0.42rem', cursor: archivingProductSlug ? 'wait' : 'pointer', fontSize: '0.74rem', fontWeight: 700, opacity: archivingProductSlug && archivingProductSlug !== product.slug ? 0.55 : 1 }}
               >
-                Sold
+                {archivingProductSlug === product.slug ? 'Archiving...' : 'Archive'}
               </button>
             )}
           </div>
@@ -4435,6 +4477,11 @@ export default function AdminPanel() {
               {newProductStatus && !editProduct && !showNewProductForm && (
                 <div style={{ marginTop: '0.55rem', background: '#2a1410', border: '1px solid #7c2d12', color: '#fed7aa', borderRadius: '6px', padding: '0.5rem 0.65rem', fontSize: '0.76rem', lineHeight: 1.4 }}>
                   {newProductStatus}
+                </div>
+              )}
+              {productArchiveStatus && !editProduct && !showNewProductForm && (
+                <div style={{ marginTop: '0.55rem', background: productArchiveStatus.includes('was archived') ? '#052e16' : '#2a1410', border: productArchiveStatus.includes('was archived') ? '1px solid #14532d' : '1px solid #7c2d12', color: productArchiveStatus.includes('was archived') ? '#86efac' : '#fed7aa', borderRadius: '6px', padding: '0.5rem 0.65rem', fontSize: '0.76rem', lineHeight: 1.4 }}>
+                  {productArchiveStatus}
                 </div>
               )}
             </div>
@@ -6912,7 +6959,7 @@ export default function AdminPanel() {
           <div style={{ position: 'sticky', top: 0, background: '#111', borderBottom: '1px solid #333', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
             <div>
               <h2 style={{ margin: 0, fontSize: '1.15rem' }}>Admin Help</h2>
-              <div style={{ color: '#777', fontSize: '0.7rem', marginTop: '0.15rem' }}>Updated 25 July 2026</div>
+              <div style={{ color: '#777', fontSize: '0.7rem', marginTop: '0.15rem' }}>Updated 29 July 2026</div>
             </div>
             <button
               onClick={() => setShowHelp(false)}
@@ -6925,7 +6972,7 @@ export default function AdminPanel() {
             <section>
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>How the admin works</h3>
               <p style={{ margin: 0, color: '#ddd' }}>
-                The admin manages customer work, contracts, orders, business records, and website changes. Operational records such as enquiries, customers, contracts, acceptance evidence, orders, and audit events save directly. Website, product, homepage, payment-setting, and chatbot-knowledge changes go to Pending so they can be previewed before deployment.
+                The admin manages customer work, contracts, orders, business records, and website changes. Operational records such as enquiries, customers, contracts, acceptance evidence, orders, and audit events save directly. Most website changes go to Pending for review. A product archive deploys immediately after the owner confirms the warning popup.
               </p>
             </section>
             <section>
@@ -6947,7 +6994,7 @@ export default function AdminPanel() {
               <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
                 <li>Admin Chat can search recent enquiries, update lead status or follow-up dates, check SEO health, and queue site/content changes for review.</li>
                 <li>Use the structured tabs for visual workflows such as product photos, gallery ordering, homepage cards, media uploads, orders, and final Pending deployment review.</li>
-                <li>Use Admin Chat for wording changes, redirects, removing a sold one-off listing, asking what needs attention, checking weak SEO pages, or updating a clear lead follow-up.</li>
+                <li>Use Admin Chat for wording changes, archiving a named product, redirects, asking what needs attention, checking weak SEO pages, or updating a clear lead follow-up.</li>
                 <li>Do not use Admin Chat for normal product photo changes. Remove, reorder, add, or set hero photos in Products, then click Queue Edit.</li>
                 <li>Lead status changes from chat save immediately. Site file changes from chat still go to Pending and must be previewed before deployment.</li>
               </ol>
@@ -7029,6 +7076,8 @@ export default function AdminPanel() {
                 <li>Click Queue Edit. The edit is sent directly to Pending without using Admin Chat.</li>
                 <li>Open Pending, use Preview to inspect the generated file, and remove anything that looks wrong.</li>
                 <li>Click Deploy. The live site usually updates after the Netlify rebuild completes.</li>
+                <li>To remove a product from the public site, click Archive on its product card. Confirm the popup only after checking the product name. The source record is retained, and the site rebuild begins immediately.</li>
+                <li>You can also ask Admin Chat to archive a named product. Chat queues the archive in Pending so you can review it and click Deploy.</li>
               </ol>
             </section>
             <section>

@@ -5,8 +5,10 @@ import ProductCard from '../../components/ProductCard.astro';
 import ProductComparisonTable from '../../components/ProductComparisonTable.astro';
 import { displayImageUrl, imageSrcSet } from '../../lib/media';
 import { buildMerchantProduct } from '../../lib/structuredData.js';
+import { isPublicProduct } from '../../lib/productVisibility';
 
 const products = (await getCollection('products'))
+  .filter(isPublicProduct)
   .filter(p => p.data.category === 'expedition');
 type ProductEntry = typeof products[number];
 const isProduct = (product: ProductEntry | undefined): product is ProductEntry => Boolean(product);
@@ -70,7 +72,7 @@ const calloutImage = '/images/optimized/products/expedition/4-7m-hardtop-truck-c
 ---
 <BaseLayout
   title="Expedition Vehicles | Unimog & Isuzu Campers | Beyond RV Queensland"
-  description="Beyond RV builds expedition campers, 4x4 truck campers, Unimog bodies, and Isuzu NPS builds for serious Australian touring. Custom-built in Queensland."
+  description="Explore Beyond RV expedition campers, 4x4 truck campers, Unimog bodies and Isuzu NPS builds for serious Australian touring."
   image={heroImage}
   activePath="/expedition/"
   structuredData={[schema, faqSchema]}
@@ -87,7 +89,7 @@ const calloutImage = '/images/optimized/products/expedition/4-7m-hardtop-truck-c
       <h1 class="hero-title">Expedition<br><span class="accent">Range</span></h1>
       <p class="hero-sub">
         Built for people who go beyond. 4x4 truck campers, Unimog bodies and Isuzu NPS builds with full composite expedition bodies.
-        Custom-built in Queensland for serious overlanders.
+        Configured for serious Australian overlanders.
       </p>
     </div>
   </section>

@@ -45,7 +45,7 @@ This file is loaded into the admin AI assistant only. It is never exposed to cus
 
 - **Shop products**: managed via the Products tab (set `store: true` in frontmatter, plus price, images, category, stock fields).
 - **Product availability**: `available_in_australia`, `coming_next_container`, `made_to_order`, `ask_availability`, `unavailable`.
-- **Fulfilment types**: `ship` (online-payable, delivery), `pickup` (online-payable, collect from service centre), `install` (requires ByondRV team — enquiry only), `quote_required` (freight/special-order — enquiry only).
+- **Fulfilment types**: `ship` (online-payable, delivery), `pickup` (online-payable, collect from service centre), `install` (requires Beyond RV team — enquiry only), `quote_required` (freight/special-order — enquiry only).
 - Only `ship` and `pickup` products with `purchasableOnline: true` and `availability !== 'unavailable'` can be bought through online checkout.
 - Ship products must declare packed dimensions and weight (`packedLengthCm`, `packedWidthCm`, `packedHeightCm`, `packedWeightKg`, `shippingDataStatus`).
 - `shippingDataStatus` must be `estimated` vs `confirmed`. Australia Post live rates must not be charged on estimated weight.

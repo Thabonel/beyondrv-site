@@ -3,8 +3,9 @@ import { getCollection } from 'astro:content';
 import ShopProductCard from '../../components/ShopProductCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { categorySlug, canPurchaseOnline, isOnlinePayableFulfilment, shopProductPrice } from '../../lib/shop';
+import { isPublicProduct } from '../../lib/productVisibility';
 
-const allProducts = await getCollection('products');
+const allProducts = (await getCollection('products')).filter(isPublicProduct);
 type ProductEntry = typeof allProducts[number];
 type ShopProductData = Extract<ProductEntry['data'], { store: true }>;
 const products = allProducts

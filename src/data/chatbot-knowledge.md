@@ -4,10 +4,10 @@ Use this file for business knowledge that should guide the public website chatbo
 
 ## Business basics
 
-- Beyond RV builds and sells slide-on campers, caravans, and expedition vehicles from Mutdapilly, Queensland.
-- Beyond RV is an Australian family-run manufacturer with more than a decade of hands-on camper building experience.
-- Beyond RV's mission is to build slide-on campers, truck campers, and expedition vehicles engineered for where Australian roads end. Every build is finished by hand in their Mutdapilly workshop, delivering expedition-grade quality at a price that reflects smart manufacturing, not corners cut.
-- Beyond RV began in Mulgrave, Sydney, with a first slide-on ute camper built from the family home garage, then grew into a Queensland-based manufacturer.
+- Beyond RV is based in Mutdapilly, Queensland, and offers slide-on campers, caravans, expedition vehicles and related customer support.
+- Beyond RV is an Australian family-run RV business with 15 years of hands-on experience.
+- Beyond RV focuses on caravans, campers and expedition vehicles for Australian touring. Do not infer where a shell was manufactured or which work was performed at Mutdapilly unless the product record says so.
+- Beyond RV began in Mulgrave, Sydney, with a first slide-on ute camper project at the family home, then moved its operations to Queensland.
 - Contact phone: 0430 863 819.
 - Contact email: beyondcaravans@gmail.com.
 - Address: 77 Coleyville Rd, Mutdapilly QLD 4307.
@@ -16,11 +16,11 @@ Use this file for business knowledge that should guide the public website chatbo
 ## Brand and positioning
 
 - Beyond RV positions itself around durable, reliable, quality and luxury campers suited to each customer.
-- Customers should be told they can speak directly with people who build campers, not just sales staff.
-- What makes Beyond RV different: customers deal with builders who understand payload, chassis, power systems, water, cabinetry, and compliance. Custom builds with no catalogue limits, from utes to Unimogs. One of the few Australian manufacturers building bespoke camper units for Unimogs. Full electrical fitout by their QLD team to Australian standards. Queensland-based handover and ongoing support, not an outsourced call centre. Full structural and fitout warranty they stand behind. Imported where it makes sense, finished, fitted, certified, and warrantied in Queensland.
+- Customers can speak directly with a team familiar with camper fitment, payload, chassis, power, water, cabinetry and compliance.
+- What makes Beyond RV different: vehicle-led product and custom-project discussions from utes to Unimogs; Queensland-based handover and ongoing support; applicable ADR requirements plus Queensland gas and 240V electrical certification for every caravan, camper and motorhome Beyond RV completes; and a five-year construction warranty, with individual appliances retaining their manufacturer warranties.
 - Beyond RV values honesty, transparency, care, fairness, craftsmanship, innovation, and practical adventure use.
 - Beyond RV says its products are designed for rugged Australian terrain and long adventure life.
-- Do not claim Beyond RV is the only manufacturer in Queensland unless the owner confirms that claim should remain current.
+- Do not claim where shells are manufactured or finished, or describe Beyond RV as the only manufacturer in Queensland, unless the owner confirms the precise product scope.
 
 ## Ideal customer
 
@@ -29,7 +29,7 @@ Use this file for business knowledge that should guide the public website chatbo
 - Ute owners (HiLux, Ranger, D-Max, Triton, and any dual-cab with the right payload) looking for slide-on campers.
 - Truck owners (Iveco Daily, Mercedes Sprinter 4x4, Isuzu NPR/NPS) wanting medium-duty expedition builds.
 - Unimog owners who need fully custom expedition bodies for the most remote travel.
-- People who value Australian craftsmanship, local support, custom builds, and dealing directly with the builder rather than a dealership.
+- People who value practical product knowledge, local support, custom projects and direct contact with the Beyond RV team.
 
 ## Product range guidance
 
@@ -41,8 +41,7 @@ Use this file for business knowledge that should guide the public website chatbo
 
 ## Custom projects
 
-- Beyond RV offers bespoke custom projects where the customer can set specifications and have a caravan, slide-on camper, truck camper, or motorhome built to suit their needs.
-- Beyond RV started by specialising in custom camper builds before selling pre-made caravans.
+- Beyond RV can discuss bespoke custom projects for caravans, slide-on campers, truck campers and motorhomes, subject to feasibility, weight, compliance and pricing checks.
 - For custom projects, the chatbot should invite the customer to call 0430 863 819 or use Talk to a human with vehicle details, travel style, sleeping requirements, must-have features, and budget range.
 - Do not promise that every requested feature is possible; say the team can confirm feasibility, weight, compliance, and pricing.
 
@@ -54,7 +53,7 @@ Use this file for business knowledge that should guide the public website chatbo
 
 ## Warranty and after-sales
 
-- Beyond RV’s manufacturer warranty has historically been described as 60 months for Beyond RV manufacture or assembly defects, subject to limitations and exclusions.
+- Beyond RV provides a five-year construction warranty. Individual appliances retain their respective manufacturers’ warranties.
 - The customer must complete and return the warranty acknowledgement promptly after delivery to validate warranty coverage.
 - Warranty is for the original purchaser and is not transferable if the caravan is sold during the warranty period.
 - Appliances and equipment not manufactured by Beyond RV, such as fridges, air conditioning, stoves, microwaves, radios, TVs, antennas, awnings, brakes, and suspension, are handled under the relevant manufacturer or supplier warranty.
@@ -62,6 +61,10 @@ Use this file for business knowledge that should guide the public website chatbo
 - Warranty repairs need prior authorisation. Customers should contact Beyond RV first; unauthorised repairs may be denied.
 - If the unit is within a 400km radius and safe to move, the customer may be required to take it to the factory for repair assessment.
 - Australian Consumer Law rights still apply. If asked about exact warranty coverage, recommend contacting Beyond RV for current terms.
+
+## Compliance confirmation
+
+- Every caravan, camper and motorhome Beyond RV completes is built according to the applicable Australian Design Rule requirements and receives Queensland gas and 240V electrical certification.
 
 ## Construction and engineering
 

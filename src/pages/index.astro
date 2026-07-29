@@ -5,8 +5,10 @@ import ProductCard from '../components/ProductCard.astro';
 import { displayImageUrl, imageSrcSet } from '../lib/media';
 import recentBuildsData from '../data/homepage/recent-builds.json';
 import testimonialsData from '../data/homepage/testimonials.json';
+import { ORGANIZATION_ID, SITE_IDENTITY, SITE_URL } from '../data/siteIdentity.js';
+import { isPublicProduct } from '../lib/productVisibility';
 
-const allProducts = await getCollection('products');
+const allProducts = (await getCollection('products')).filter(isPublicProduct);
 type ProductEntry = typeof allProducts[number];
 const isProduct = (product: ProductEntry | undefined): product is ProductEntry => Boolean(product);
 const featuredOrder = [
@@ -18,8 +20,13 @@ const featuredOrder = [
 const featuredProducts = featuredOrder
   .map(slug => allProducts.find(p => p.slug === slug))
   .filter(isProduct);
+const activeProductSlugs = new Set<string>(allProducts.map(product => product.slug));
 const visibleRecentBuilds = recentBuildsData
   .filter(build => build.isVisible)
+  .filter((build) => {
+    const linkedSlug = build.productSlug ?? build.link.replace(/^\/+|\/+$/g, '');
+    return !linkedSlug || activeProductSlugs.has(linkedSlug);
+  })
   .sort((a, b) => a.sortOrder - b.sortOrder);
 const visibleTestimonials = testimonialsData
   .filter(testimonial => testimonial.isVisible)
@@ -33,40 +40,13 @@ const rangeImages = {
   expeditionHighlight: '/images/site/expedition-hero.webp',
 };
 
-const orgSchema = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "@id": "https://beyondrv.com.au/#organization",
-  "name": "Beyond RV",
-  "alternateName": "Beyond Caravans",
-  "url": "https://beyondrv.com.au/",
-  "logo": "https://beyondrv.com.au/images/site/admin-logo.png",
-  "telephone": "+61430863819",
-  "email": "beyondcaravans@gmail.com",
-  "sameAs": [
-    "https://www.youtube.com/@beyondrvcampers4129",
-    "https://www.facebook.com/BeyondCaravans",
-    "https://www.instagram.com/beyondrvaus/"
-  ],
-  "areaServed": ["Australia", "Queensland", "Brisbane"],
-  "description": "Beyond RV builds slide-on campers, truck campers, off-road caravans, and expedition vehicle bodies from Mutdapilly, Queensland.",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "77 Coleyville Rd",
-    "addressLocality": "Mutdapilly",
-    "addressRegion": "QLD",
-    "postalCode": "4307",
-    "addressCountry": "AU"
-  }
-};
-
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "@id": "https://beyondrv.com.au/#website",
-  "name": "Beyond RV",
-  "url": "https://beyondrv.com.au/",
-  "publisher": { "@id": "https://beyondrv.com.au/#organization" },
+  "@id": `${SITE_URL}/#website`,
+  "name": SITE_IDENTITY.name,
+  "url": SITE_IDENTITY.url,
+  "publisher": { "@id": ORGANIZATION_ID },
   "potentialAction": {
     "@type": "SearchAction",
     "target": {
@@ -84,8 +64,8 @@ const heroSizes = '100vw';
 ---
 <BaseLayout
   title="Beyond RV — Queensland Slide-On Campers, Caravans & Expedition Vehicles"
-  description="Beyond RV builds slide-on campers, hardtop caravans, and expedition vehicles in Mutdapilly, Queensland. For HiLux, Ranger, Unimog, and serious trucks. ADR compliant."
-  structuredData={[orgSchema, websiteSchema]}
+  description="Beyond RV completes slide-on campers, hardtop caravans, and expedition vehicles in Mutdapilly, Queensland. For HiLux, Ranger, Unimog, and serious trucks."
+  structuredData={websiteSchema}
   preloadImage={{ src: heroImage, srcset: heroSrcSet, sizes: heroSizes }}
 >
   <!-- HERO -->
@@ -115,8 +95,8 @@ const heroSizes = '100vw';
         <span class="accent">Roads End</span>
       </h1>
       <p class="hero-sub">
-        Slide-on campers engineered in Queensland for Unimogs, Ivecos, Isuzu trucks and serious utes.
-        Weeks of Australian craftsmanship. Zero compromises.
+        Slide-on campers completed in Queensland for Unimogs, Ivecos, Isuzu trucks and serious utes.
+        Practical systems, careful fit-out, and clear handover.
       </p>
       <div class="hero-actions">
         <a href="/our-slide-on-campers/" class="btn-primary">Explore the Range</a>
@@ -126,12 +106,12 @@ const heroSizes = '100vw';
 
     <div class="hero-stats">
       <div class="hero-stat">
-          <div class="hero-stat-num">10<span>+</span></div>
-          <div class="hero-stat-label">Years Manufacturing Experience</div>
+          <div class="hero-stat-num">15</div>
+          <div class="hero-stat-label">Years RV Experience</div>
       </div>
       <div class="hero-stat">
-        <div class="hero-stat-num">100<span>%</span></div>
-        <div class="hero-stat-label">Queensland Finished</div>
+        <div class="hero-stat-num">QLD</div>
+        <div class="hero-stat-label">Gas &amp; 240V Certified</div>
       </div>
       <div class="hero-stat">
         <div class="hero-stat-num">4<span>x</span></div>
@@ -160,7 +140,7 @@ const heroSizes = '100vw';
       <span class="ticker-item ticker-dot">✦</span>
       <span class="ticker-item">Custom Ute Campers</span>
       <span class="ticker-item ticker-dot">✦</span>
-      <span class="ticker-item">Queensland Finished</span>
+      <span class="ticker-item">QLD Gas &amp; 240V Certified</span>
       <span class="ticker-item ticker-dot">✦</span>
       <span class="ticker-item">Expedition Ready</span>
       <span class="ticker-item ticker-dot">✦</span>
@@ -177,7 +157,7 @@ const heroSizes = '100vw';
       <span class="ticker-item ticker-dot">✦</span>
       <span class="ticker-item">Custom Ute Campers</span>
       <span class="ticker-item ticker-dot">✦</span>
-      <span class="ticker-item">Queensland Finished</span>
+      <span class="ticker-item">QLD Gas &amp; 240V Certified</span>
       <span class="ticker-item ticker-dot">✦</span>
       <span class="ticker-item">Expedition Ready</span>
       <span class="ticker-item ticker-dot">✦</span>
@@ -267,10 +247,39 @@ const heroSizes = '100vw';
         <div class="model-card-content">
           <span class="model-tag">Custom</span>
           <div class="model-name">Custom Builds</div>
-          <div class="model-spec">Any truck · Any spec · Built to order in Queensland</div>
+          <div class="model-spec">Vehicle-led planning · Custom specifications · Fitment checked</div>
           <a href="/custom/" class="model-link">Start a Custom Build →</a>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- GUIDES AND TOOLS -->
+  <section class="container authority-section">
+    <div class="section-eyebrow reveal">
+      <div class="section-eyebrow-line"></div>
+      <span class="section-eyebrow-text">Research Before You Choose</span>
+    </div>
+    <h2 class="section-title reveal reveal-delay-1">Guides &amp; Weight Tools</h2>
+    <div class="authority-grid" style="margin-top: 3rem">
+      <a class="authority-card" href="/guides/best-utes-for-slide-on-campers/">
+        <span class="authority-card-kicker">Vehicle fit</span>
+        <h3>Best Utes for Slide-On Campers</h3>
+        <p>Understand payload, tray size, accessories, axle limits and why the exact vehicle variant matters.</p>
+      </a>
+      <a class="authority-card" href="/guides/gvm-gcm-atm-gtm-explained/">
+        <span class="authority-card-kicker">Weight terms</span>
+        <h3>GVM, GCM, ATM &amp; GTM</h3>
+        <p>Learn the main Australian vehicle and trailer weight terms through plain-English examples.</p>
+      </a>
+      <a class="authority-card" href="/vehicle-suitability-checker/">
+        <span class="authority-card-kicker">Calculators</span>
+        <h3>Check Your Vehicle</h3>
+        <p>Use your own vehicle and camper figures to screen payload, fit and towing limits before enquiry.</p>
+      </a>
+    </div>
+    <div style="margin-top: 2rem">
+      <a href="/guides/" class="btn-primary">View All Guides</a>
     </div>
   </section>
 
@@ -340,7 +349,7 @@ const heroSizes = '100vw';
           <div class="story-num-label">ADR Compliant</div>
         </div>
         <div class="story-num">
-          <div class="story-num-val">10+</div>
+          <div class="story-num-val">15</div>
           <div class="story-num-label">Years Manufacturing Experience</div>
         </div>
         <div class="story-num">
@@ -361,8 +370,8 @@ const heroSizes = '100vw';
         </div>
         <h2 class="section-title reveal reveal-delay-1">For the ones<br>who <span style="color: var(--orange)">go furthest.</span></h2>
         <p style="font-size: 0.95rem; color: var(--muted); line-height: 1.8; margin-top: 1.5rem; max-width: 420px" class="reveal reveal-delay-2">
-          Beyond RV builds on Unimog and Isuzu NPS platforms for overlanders who genuinely leave all roads behind.
-          Full composite bodies. Custom-built to order in Queensland.
+          Explore Unimog and Isuzu NPS options for overlanders who genuinely leave all roads behind.
+          Composite expedition bodies configured around the vehicle and intended travel.
         </p>
         <div style="margin-top: 2.5rem" class="reveal reveal-delay-3">
           <a href="/expedition/" class="btn-primary">Explore Expedition Range</a>
@@ -568,7 +577,7 @@ const heroSizes = '100vw';
             <span class="faq-icon">+</span>
           </button>
           <div class="faq-answer">
-            <p>Yes. All Beyond RV builds are finished and certified in Queensland to meet Australian Design Rules (ADR) and relevant road safety standards. We handle compliance documentation as part of every build.</p>
+            <p>Every caravan, camper and motorhome Beyond RV completes is built to the applicable Australian Design Rule requirements and receives Queensland gas and 240V electrical certification.</p>
           </div>
         </div>
         <div class="faq-item">
@@ -612,8 +621,8 @@ const heroSizes = '100vw';
         <span class="italic">Beyond?</span>
       </h2>
       <p class="cta-sub reveal reveal-delay-1">
-        Tell us your truck and your dream. We'll build the rest.
-        Queensland-finished. Expedition-ready. Yours.
+        Tell us your truck and your dream. We'll work through the vehicle, layout and fitment with you.
+        Planned for Australian travel. Expedition-ready. Yours.
       </p>
       <div class="cta-actions reveal reveal-delay-2">
         <a href="/inquiry-form/" class="btn-primary">Tell Us About Your Vehicle</a>
