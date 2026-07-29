@@ -34,3 +34,28 @@ export function archiveProductMarkdown(content: string, archivedAt: string) {
     alreadyArchived: false,
   };
 }
+
+export function restoreProductMarkdown(content: string) {
+  const match = content.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+  if (!match) throw new Error('Product file is missing YAML frontmatter.');
+
+  const data = parse(match[1]) as Record<string, unknown>;
+  const title = typeof data.title === 'string'
+    ? data.title
+    : typeof data.name === 'string'
+      ? data.name
+      : 'Product';
+
+  if (data.archived !== true) {
+    return { content, title, alreadyActive: true };
+  }
+
+  delete data.archived;
+  delete data.archivedAt;
+
+  return {
+    content: `---\n${stringify(data, { lineWidth: 0 }).trimEnd()}\n---\n\n${(match[2] ?? '').trimStart()}`,
+    title,
+    alreadyActive: false,
+  };
+}

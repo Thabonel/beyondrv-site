@@ -5,6 +5,7 @@ import {
   archiveProductMarkdown,
   isSafeProductSlug,
   productPathCandidates,
+  restoreProductMarkdown,
 } from '../netlify/functions/product-archive-core.ts';
 import { isPublicProduct } from '../src/lib/productVisibility.ts';
 
@@ -48,6 +49,40 @@ Kept.
   assert.equal(result.alreadyArchived, true);
   assert.equal(result.content, current);
   assert.equal(result.title, 'Archived Shop Item');
+});
+
+test('restore removes archive metadata and preserves the product content', () => {
+  const current = `---
+title: Archived Camper
+price: $42,000
+archived: true
+archivedAt: 2026-07-29T04:30:00.000Z
+---
+
+The complete product record remains intact.
+`;
+  const result = restoreProductMarkdown(current);
+  const data = frontmatter(result.content);
+
+  assert.equal(result.title, 'Archived Camper');
+  assert.equal(result.alreadyActive, false);
+  assert.equal(data.archived, undefined);
+  assert.equal(data.archivedAt, undefined);
+  assert.match(result.content, /The complete product record remains intact\./);
+});
+
+test('restore is idempotent for an active product', () => {
+  const current = `---
+title: Active Camper
+price: $42,000
+---
+
+Still active.
+`;
+  const result = restoreProductMarkdown(current);
+
+  assert.equal(result.alreadyActive, true);
+  assert.equal(result.content, current);
 });
 
 test('product archive paths accept nested products and reject unsafe slugs', () => {

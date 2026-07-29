@@ -79,7 +79,7 @@ interface PendingChange {
 }
 
 type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
-type PanelTab = 'dashboard' | 'products' | 'shop' | 'orders' | 'contracts' | 'settings' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'drafts' | 'audit' | 'knowledge' | 'google' | 'matches' | 'reports' | 'pending';
+type PanelTab = 'dashboard' | 'products' | 'archived-products' | 'shop' | 'orders' | 'contracts' | 'settings' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'drafts' | 'audit' | 'knowledge' | 'google' | 'matches' | 'reports' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 type CommerceAvailability = 'available_in_australia' | 'coming_next_container' | 'made_to_order' | 'ask_availability' | 'unavailable';
@@ -192,6 +192,8 @@ interface ProductRecord {
   supplierNotes?: string;
   youtubeVideo?: YoutubeVideoMeta;
   suitabilityData?: SuitabilityData;
+  archived?: boolean;
+  archivedAt?: string;
 }
 
 interface QueuedShopDraft extends ProductRecord {
@@ -1576,8 +1578,9 @@ function redirectToLoginIfUnauthorized(res: Response) {
   return false;
 }
 
-async function fetchAdminProducts() {
-  const res = await adminFetch('/.netlify/functions/admin-products', { cache: 'no-store' });
+async function fetchAdminProducts(archived = false) {
+  const query = archived ? '?archived=true' : '';
+  const res = await adminFetch(`/.netlify/functions/admin-products${query}`, { cache: 'no-store' });
   if (redirectToLoginIfUnauthorized(res)) return null;
   if (!res.ok) throw new Error('Could not load products');
   const data = await res.json() as { products: ProductRecord[] };
@@ -1655,9 +1658,12 @@ export default function AdminPanel() {
   const [showHelp, setShowHelp] = useState(false);
   const [showChatDrawer, setShowChatDrawer] = useState(false);
   const [products, setProducts] = useState<ProductRecord[]>([]);
+  const [archivedProducts, setArchivedProducts] = useState<ProductRecord[]>([]);
   const [productFilter, setProductFilter] = useState('');
+  const [archivedProductFilter, setArchivedProductFilter] = useState('');
   const [shopFilter, setShopFilter] = useState('');
   const [productsLoading, setProductsLoading] = useState(true);
+  const [archivedProductsLoading, setArchivedProductsLoading] = useState(true);
   const [queuedShopDrafts, setQueuedShopDrafts] = useState<QueuedShopDraft[]>([]);
   const [newProduct, setNewProduct] = useState<NewProductForm>(EMPTY_PRODUCT_FORM);
   const [showNewProductForm, setShowNewProductForm] = useState(false);
@@ -1667,6 +1673,7 @@ export default function AdminPanel() {
   const [editProductMediaStatus, setEditProductMediaStatus] = useState('');
   const [newProductStatus, setNewProductStatus] = useState('');
   const [archivingProductSlug, setArchivingProductSlug] = useState<string | null>(null);
+  const [restoringProductSlug, setRestoringProductSlug] = useState<string | null>(null);
   const [productArchiveStatus, setProductArchiveStatus] = useState('');
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
@@ -1914,14 +1921,21 @@ export default function AdminPanel() {
     let cancelled = false;
     async function loadProducts() {
       try {
-        const freshProducts = await fetchAdminProducts();
+        const [freshProducts, freshArchivedProducts] = await Promise.all([
+          fetchAdminProducts(),
+          fetchAdminProducts(true),
+        ]);
         if (!cancelled && freshProducts) setProducts(freshProducts);
+        if (!cancelled && freshArchivedProducts) setArchivedProducts(freshArchivedProducts);
       } catch {
         if (!cancelled) {
           setMessages(prev => [...prev, { role: 'assistant', content: 'I could not load the product manager list. The chat can still make changes if you type the product name.' }]);
         }
       } finally {
-        if (!cancelled) setProductsLoading(false);
+        if (!cancelled) {
+          setProductsLoading(false);
+          setArchivedProductsLoading(false);
+        }
       }
     }
 
@@ -3497,6 +3511,10 @@ export default function AdminPanel() {
       }
 
       setProducts(current => current.filter(item => item.slug !== product.slug));
+      setArchivedProducts(current => [
+        { ...product, archived: true, archivedAt: new Date().toISOString() },
+        ...current.filter(item => item.slug !== product.slug),
+      ]);
       setProductArchiveStatus(`${product.title} was archived. The site is rebuilding and will remove it in about 30 seconds.`);
       setMessages(current => [...current, {
         role: 'assistant',
@@ -3506,6 +3524,54 @@ export default function AdminPanel() {
       setProductArchiveStatus(error instanceof Error ? error.message : 'Could not archive the product.');
     } finally {
       setArchivingProductSlug(null);
+    }
+  }
+
+  async function restoreProduct(product: ProductRecord) {
+    const confirmed = window.confirm(
+      `Restore ${product.title} to the live site?\n\nIts previous price, availability, photos, and product details will become public again.`,
+    );
+    if (!confirmed) return;
+
+    setRestoringProductSlug(product.slug);
+    setProductArchiveStatus(`Restoring ${product.title}...`);
+
+    try {
+      const restoreRes = await adminFetch('/.netlify/functions/admin-product-restore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: product.slug }),
+      });
+      if (redirectToLoginIfUnauthorized(restoreRes)) return;
+      const restoreData = await readAdminJson<{ pendingChange?: PendingChange; error?: string }>(restoreRes, 'Could not prepare the product restore.');
+      if (!restoreRes.ok || !restoreData.pendingChange) {
+        throw new Error(restoreData.error ?? 'Could not prepare the product restore.');
+      }
+
+      const deployRes = await adminFetch('/.netlify/functions/admin-deploy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ changes: [restoreData.pendingChange] }),
+      });
+      if (redirectToLoginIfUnauthorized(deployRes)) return;
+      const deployData = await readAdminJson<{ results?: { path: string; ok: boolean; error?: string }[]; error?: string }>(deployRes, 'Could not deploy the product restore.');
+      const failed = deployData.results?.find(result => !result.ok);
+      if (!deployRes.ok || failed || !deployData.results?.length) {
+        throw new Error(failed?.error ?? deployData.error ?? 'Could not deploy the product restore.');
+      }
+
+      const restoredProduct = { ...product, archived: false, archivedAt: '' };
+      setArchivedProducts(current => current.filter(item => item.slug !== product.slug));
+      setProducts(current => [restoredProduct, ...current.filter(item => item.slug !== product.slug)]);
+      setProductArchiveStatus(`${product.title} was restored. The site is rebuilding and will return it in about 30 seconds.`);
+      setMessages(current => [...current, {
+        role: 'assistant',
+        content: `${product.title} was restored to active products. The public site is rebuilding now.`,
+      }]);
+    } catch (error) {
+      setProductArchiveStatus(error instanceof Error ? error.message : 'Could not restore the product.');
+    } finally {
+      setRestoringProductSlug(null);
     }
   }
 
@@ -4150,6 +4216,14 @@ export default function AdminPanel() {
       .toLowerCase()
       .includes(q);
   });
+  const filteredArchivedProducts = archivedProducts.filter((product) => {
+    const q = archivedProductFilter.trim().toLowerCase();
+    if (!q) return true;
+    return [product.title, product.name, product.slug, product.category, product.status, product.availability, product.productType, product.archivedAt]
+      .join(' ')
+      .toLowerCase()
+      .includes(q);
+  });
   const visibleQueuedShopDrafts = queuedShopDrafts.filter(draft => {
     if (products.some(product => product.slug === draft.slug)) return false;
     if (!draft.pendingPath) return true;
@@ -4315,7 +4389,7 @@ export default function AdminPanel() {
   };
   const pendingGmailSuggestions = gmailThreads.reduce((count, thread) => count + (!thread.matchDecision ? (thread.suggestions?.length || 0) : 0), 0);
   const pendingDriveSuggestions = driveFiles.reduce((count, file) => count + (!file.matchDecision ? (file.suggestions?.length || 0) : 0), 0);
-  const panelTabs: PanelTab[] = ['dashboard', 'products', 'shop', 'orders', 'contracts', 'settings', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'matches', 'reports', 'pending'];
+  const panelTabs: PanelTab[] = ['dashboard', 'products', 'archived-products', 'shop', 'orders', 'contracts', 'settings', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'matches', 'reports', 'pending'];
 
   function tabLabel(tab: PanelTab) {
     if (tab === 'pending') return `Pending (${pending.length})`;
@@ -4439,6 +4513,72 @@ export default function AdminPanel() {
           </AdminSectionBoundary>
         )}
 
+        {activeTab === 'archived-products' && (
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '1rem', borderBottom: '1px solid #333' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', marginBottom: '0.45rem' }}>
+                <div>
+                  <div style={{ color: '#fff', fontWeight: 700 }}>Archived Products</div>
+                  <div style={{ color: '#888', fontSize: '0.74rem', marginTop: '0.18rem' }}>
+                    Retained privately and hidden from the public site
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => selectTab('products')}
+                  style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '6px', padding: '0.46rem 0.7rem', cursor: 'pointer', fontWeight: 700 }}
+                >
+                  Back to Products
+                </button>
+              </div>
+              <input
+                value={archivedProductFilter}
+                onChange={event => setArchivedProductFilter(event.target.value)}
+                placeholder="Search archived products..."
+                style={{ width: '100%', boxSizing: 'border-box', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem 0.65rem', fontSize: '0.82rem', outline: 'none' }}
+              />
+              {productArchiveStatus && (
+                <div style={{ marginTop: '0.55rem', background: productArchiveStatus.includes('was restored') || productArchiveStatus.includes('was archived') ? '#052e16' : '#2a1410', border: productArchiveStatus.includes('was restored') || productArchiveStatus.includes('was archived') ? '1px solid #14532d' : '1px solid #7c2d12', color: productArchiveStatus.includes('was restored') || productArchiveStatus.includes('was archived') ? '#86efac' : '#fed7aa', borderRadius: '6px', padding: '0.5rem 0.65rem', fontSize: '0.76rem', lineHeight: 1.4 }}>
+                  {productArchiveStatus}
+                </div>
+              )}
+            </div>
+            <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.75rem', display: 'grid', gap: '0.65rem', alignContent: 'start' }}>
+              {archivedProductsLoading && <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>Loading archived products...</p>}
+              {!archivedProductsLoading && filteredArchivedProducts.map(product => (
+                <div key={product.slug} style={{ background: '#171717', border: '1px solid #3f3f46', borderRadius: '6px', overflow: 'hidden', display: 'grid', gridTemplateColumns: '150px minmax(0, 1fr)' }}>
+                  <AdminProductThumb src={product.heroImage} title={product.title} />
+                  <div style={{ padding: '0.65rem 0.7rem', minWidth: 0, display: 'grid', gap: '0.4rem', alignContent: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
+                      <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem', lineHeight: 1.25 }}>{product.title}</div>
+                      <span style={{ color: '#bbb', border: '1px solid #555', borderRadius: '999px', padding: '0.14rem 0.45rem', fontSize: '0.66rem', fontWeight: 800, whiteSpace: 'nowrap' }}>Archived</span>
+                    </div>
+                    <div style={{ color: '#aaa', fontSize: '0.74rem' }}>
+                      {[product.store ? 'Shop item' : 'Vehicle', product.category, product.price, product.status].filter(Boolean).join(' · ')}
+                    </div>
+                    <div style={{ color: '#777', fontSize: '0.7rem' }}>
+                      Archived {product.archivedAt ? new Date(product.archivedAt).toLocaleString('en-AU') : 'date unavailable'}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => void restoreProduct(product)}
+                      disabled={restoringProductSlug !== null}
+                      style={{ background: '#12331f', color: '#bbf7d0', border: '1px solid #256d3d', borderRadius: '5px', padding: '0.45rem', cursor: restoringProductSlug ? 'wait' : 'pointer', fontSize: '0.74rem', fontWeight: 800, opacity: restoringProductSlug && restoringProductSlug !== product.slug ? 0.55 : 1 }}
+                    >
+                      {restoringProductSlug === product.slug ? 'Restoring...' : 'Restore to site'}
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {!archivedProductsLoading && filteredArchivedProducts.length === 0 && (
+                <p style={{ color: '#777', fontSize: '0.85rem', textAlign: 'center' }}>
+                  {archivedProducts.length === 0 ? 'No archived products' : 'No matching archived products'}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
         {(activeTab === 'products' || activeTab === 'shop') && (
           <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '1rem', borderBottom: '1px solid #333' }}>
@@ -4472,19 +4612,30 @@ export default function AdminPanel() {
                   </button>
                 )}
                 {!editProduct && !showNewProductForm && (
-                  <button onClick={() => {
-                    const mode = activeTab === 'shop' ? 'shop' : 'business';
-                    setNewProductMode(mode);
-                    setNewProduct({
-                      ...EMPTY_PRODUCT_FORM,
-                      mode,
-                      ...(mode === 'shop' ? { category: '', fulfilmentType: 'pickup' as ShopFulfilmentType, pickupLocation: DEFAULT_PICKUP_LOCATION } : {}),
-                    });
-                    setNewProductStatus('');
-                    setShowNewProductForm(true);
-                  }} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.46rem 0.7rem', cursor: 'pointer', fontWeight: 700 }}>
-                    {activeTab === 'shop' ? 'Add Shop Item' : 'Add Product'}
-                  </button>
+                  <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                    {activeTab === 'products' && (
+                      <button
+                        type="button"
+                        onClick={() => selectTab('archived-products')}
+                        style={{ background: '#222', color: '#ddd', border: '1px solid #555', borderRadius: '6px', padding: '0.46rem 0.7rem', cursor: 'pointer', fontWeight: 700 }}
+                      >
+                        Archived ({archivedProducts.length})
+                      </button>
+                    )}
+                    <button onClick={() => {
+                      const mode = activeTab === 'shop' ? 'shop' : 'business';
+                      setNewProductMode(mode);
+                      setNewProduct({
+                        ...EMPTY_PRODUCT_FORM,
+                        mode,
+                        ...(mode === 'shop' ? { category: '', fulfilmentType: 'pickup' as ShopFulfilmentType, pickupLocation: DEFAULT_PICKUP_LOCATION } : {}),
+                      });
+                      setNewProductStatus('');
+                      setShowNewProductForm(true);
+                    }} style={{ background: '#E8540A', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.46rem 0.7rem', cursor: 'pointer', fontWeight: 700 }}>
+                      {activeTab === 'shop' ? 'Add Shop Item' : 'Add Product'}
+                    </button>
+                  </div>
                 )}
               </div>
               {!editProduct && !showNewProductForm && (
@@ -4501,7 +4652,7 @@ export default function AdminPanel() {
                 </div>
               )}
               {productArchiveStatus && !editProduct && !showNewProductForm && (
-                <div style={{ marginTop: '0.55rem', background: productArchiveStatus.includes('was archived') ? '#052e16' : '#2a1410', border: productArchiveStatus.includes('was archived') ? '1px solid #14532d' : '1px solid #7c2d12', color: productArchiveStatus.includes('was archived') ? '#86efac' : '#fed7aa', borderRadius: '6px', padding: '0.5rem 0.65rem', fontSize: '0.76rem', lineHeight: 1.4 }}>
+                <div style={{ marginTop: '0.55rem', background: productArchiveStatus.includes('was archived') || productArchiveStatus.includes('was restored') ? '#052e16' : '#2a1410', border: productArchiveStatus.includes('was archived') || productArchiveStatus.includes('was restored') ? '1px solid #14532d' : '1px solid #7c2d12', color: productArchiveStatus.includes('was archived') || productArchiveStatus.includes('was restored') ? '#86efac' : '#fed7aa', borderRadius: '6px', padding: '0.5rem 0.65rem', fontSize: '0.76rem', lineHeight: 1.4 }}>
                   {productArchiveStatus}
                 </div>
               )}
@@ -7099,6 +7250,8 @@ export default function AdminPanel() {
                 <li>Click Deploy. The live site usually updates after the Netlify rebuild completes.</li>
                 <li>To remove a product from the public site, click Archive on its product card. Confirm the popup only after checking the product name. The source record is retained, and the site rebuild begins immediately.</li>
                 <li>You can also ask Admin Chat to archive a named product. Chat queues the archive in Pending so you can review it and click Deploy.</li>
+                <li>Open Archived Products to search retained items. Restore to site republishes the product with its previous price, availability, photos, and details after confirmation.</li>
+                <li>You can ask Admin Chat to restore or unarchive a named product. Chat finds it in the private archive and queues the restore in Pending for review.</li>
               </ol>
             </section>
             <section>
@@ -7139,6 +7292,7 @@ export default function AdminPanel() {
               <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
                 <li>For normal product-line models, use Order to create an order record. Do not remove the product page just because one unit sold.</li>
                 <li>For one-off on-sale, demo, or used stock, use Sold only when the listing should be removed from active sale pages.</li>
+                <li>Use Archived Products if a removed listing needs to return to the live site later.</li>
                 <li>Use Orders to track deposit, factory production, shipping, Mutdapilly fitout, handover, and the next owner action.</li>
                 <li>Review any pending product or redirect changes before deploying.</li>
               </ol>
