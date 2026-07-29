@@ -12,6 +12,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "audit:authority": "node SCRIPTS/audit-authority.mjs",
+    "audit:performance": "node SCRIPTS/audit-performance.mjs",
+    "audit:cls": "node SCRIPTS/audit-cls.mjs",
     "authority:indexnow": "node SCRIPTS/submit-indexnow.mjs",
     "images:optimize": "node SCRIPTS/optimize-product-images.mjs --write"
   },
@@ -19,6 +21,9 @@
     "@astrojs/check": "^0.9.9",
     "@astrojs/react": "^5.0.7",
     "@astrojs/sitemap": "^2.0.2",
+    "@fontsource-variable/outfit": "^5.3.0",
+    "@fontsource-variable/playfair-display": "^5.3.0",
+    "@fontsource/bebas-neue": "^5.3.0",
     "@netlify/blobs": "^10.7.8",
     "astro": "^4.16.19",
     "openai": "^6.39.0",

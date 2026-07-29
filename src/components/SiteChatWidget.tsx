@@ -4,6 +4,7 @@ interface Props {
   pageTitle?: string;
   productSlug?: string;
   productName?: string;
+  initiallyOpen?: boolean;
 }
 
 interface Message {
@@ -28,12 +29,12 @@ function renderMessageContent(content: string) {
   });
 }
 
-export default function SiteChatWidget({ pageTitle, productSlug, productName }: Props) {
+export default function SiteChatWidget({ pageTitle, productSlug, productName, initiallyOpen = false }: Props) {
   const initialGreeting = productName
     ? `Got questions about the ${productName}? Ask away.`
     : "Hi! I'm the Beyond RV assistant. Ask me anything about our campers and caravans.";
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(initiallyOpen);
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: initialGreeting },
   ]);
@@ -45,6 +46,14 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
   const panelRef = useRef<HTMLDivElement>(null);
 
   const isCapped = messages.length >= SESSION_CAP;
+
+  useEffect(() => {
+    if (!initiallyOpen) return;
+    (window as any).posthog?.capture('chat_opened', {
+      page: pageTitle,
+      product_slug: productSlug,
+    });
+  }, [initiallyOpen, pageTitle, productSlug]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -257,7 +266,7 @@ export default function SiteChatWidget({ pageTitle, productSlug, productName }: 
             <button className="chat-human-btn" onClick={handleHandoff}>
               Talk to a human →
             </button>
-            <button className="chat-close-btn" onClick={() => setIsOpen(false)}>
+            <button className="chat-close-btn" onClick={() => setIsOpen(false)} aria-label="Close chat">
               ✕
             </button>
           </div>

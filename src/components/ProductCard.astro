@@ -1,5 +1,5 @@
 ---
-import { displayImageUrl, imageSrcSet } from '../lib/media';
+import { croppedImageSrcSet, croppedImageUrl } from '../lib/media';
 import { availabilityLabel, normalizeSaleLabel, sourceTypeLabel } from '../lib/shop';
 
 interface Props {
@@ -23,8 +23,8 @@ const badgeText = normalizeSaleLabel(saleLabel ?? priceBadge ?? '');
 const statusBadge = availabilityBadge || (status === 'coming-soon' ? 'Coming Soon' : '');
 const sourceLabel = sourceTypeLabel(sourceType);
 const categoryLabel = category === 'slide-on' ? 'Slide-On' : category === 'caravan' ? 'Caravan' : 'Expedition';
-const cardImage = displayImageUrl(heroImage, 800);
-const cardSrcSet = imageSrcSet(heroImage, [480, 800]);
+const cardImage = croppedImageUrl(heroImage, 800);
+const cardSrcSet = croppedImageSrcSet(heroImage, [400, 640, 800]);
 ---
 <article class="product-card reveal">
   <a href={href} class="product-card-inner">
@@ -32,7 +32,7 @@ const cardSrcSet = imageSrcSet(heroImage, [480, 800]);
       <img
         src={cardImage}
         srcset={cardSrcSet}
-        sizes="(max-width: 760px) 100vw, (max-width: 1100px) 50vw, 380px"
+        sizes="(max-width: 760px) calc(100vw - 3rem), (max-width: 1100px) 50vw, 380px"
         alt={title}
         loading="lazy"
         decoding="async"
