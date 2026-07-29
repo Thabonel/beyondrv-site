@@ -6,7 +6,7 @@ price: $72,000
 priceBadge: IMMEDIATE DELIVERY
 status: available
 onlinePurchaseEnabled: true
-onSale: true
+onSale: false
 featured: true
 heroImage: /images/optimized/products/advent-2150-hardtop-slide-on/01-advent-2150-hardtop-slide-on-hero.webp
 gallery:
