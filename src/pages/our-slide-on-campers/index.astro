@@ -5,6 +5,7 @@ import ProductCard from '../../components/ProductCard.astro';
 import ProductComparisonTable from '../../components/ProductComparisonTable.astro';
 import { displayImageUrl } from '../../lib/media';
 import { buildMerchantProduct } from '../../lib/structuredData.js';
+import { isPublicProduct } from '../../lib/productVisibility';
 
 const productOrder = [
   'advent-2150-hardtop-slide-on',
@@ -12,7 +13,7 @@ const productOrder = [
   'advent-2450-hardtop-slide-on',
   '7ft-electric-poptop-slide-on',
 ];
-const allProducts = await getCollection('products');
+const allProducts = (await getCollection('products')).filter(isPublicProduct);
 type ProductEntry = typeof allProducts[number];
 const isProduct = (product: ProductEntry | undefined): product is ProductEntry => Boolean(product);
 const products = productOrder
@@ -65,7 +66,7 @@ const heroImage = '/images/site/homepage-slide-on-campers.webp';
 ---
 <BaseLayout
   title="Slide-On Campers for Utes | Beyond RV Queensland"
-  description="Beyond RV ute slide-on campers — hardtop and pop-top campers for suitable ute tray platforms. The Advent range and 7ft electric pop-top. Built in Queensland."
+  description="Beyond RV ute slide-on campers — hardtop and pop-top campers for suitable ute tray platforms. Completed to applicable ADR requirements with QLD gas and 240V certification."
   image={heroImage}
   activePath="/our-slide-on-campers/"
   structuredData={[schema, faqSchema]}
@@ -82,7 +83,7 @@ const heroImage = '/images/site/homepage-slide-on-campers.webp';
       <h1 class="hero-title">Slide-On Campers</h1>
       <p class="hero-sub">
         For suitable ute tray platforms. Hardtop and pop-top models across multiple size classes.
-        Full composite. Queensland finished.
+        Full composite. Completed to applicable ADR requirements with QLD gas and 240V certification.
       </p>
     </div>
   </section>
@@ -130,6 +131,13 @@ const heroImage = '/images/site/homepage-slide-on-campers.webp';
       <p>
         For truck campers, Unimog bodies, Isuzu NPS builds, or larger expedition bodies, compare the
         <a href="/expedition/">Expedition range</a>.
+      </p>
+      <h3>Check fit and weight before choosing</h3>
+      <p>
+        Start with our <a href="/guides/best-utes-for-slide-on-campers/">ute selection guide</a>,
+        learn the key terms in <a href="/guides/gvm-gcm-atm-gtm-explained/">GVM, GCM, ATM and GTM explained</a>,
+        then enter your own figures in the <a href="/slide-on-camper-weight-calculator/">slide-on camper weight calculator</a>.
+        The calculator is a screening tool; final fit and legal loading depend on the exact vehicle and verified weights.
       </p>
     </div>
   </section>

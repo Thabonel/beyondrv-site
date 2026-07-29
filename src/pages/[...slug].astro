@@ -1,10 +1,12 @@
 ---
 import { getCollection } from 'astro:content';
 import ProductLayout from '../layouts/ProductLayout.astro';
+import { isPublicProduct } from '../lib/productVisibility';
 
 export async function getStaticPaths() {
   const products = await getCollection('products');
   return products
+    .filter(isPublicProduct)
     .filter(p => p.data.store !== true)
     .filter(p => !p.slug.startsWith('expedition/'))
     .map(p => ({

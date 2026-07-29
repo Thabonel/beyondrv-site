@@ -63,7 +63,7 @@ specGroups:
       - label: "Storage"
         value: "Rear tunnel boot storage"
       - label: "Warranty"
-        value: "5 years manufacturer warranty"
+        value: "5-year Beyond RV construction warranty; individual appliances retain manufacturer warranties"
   - group: "Internal Features"
     items:
       - label: "Finish"

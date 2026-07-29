@@ -1,5 +1,5 @@
 export const ESTIMATE_DISCLAIMER =
-  'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. ByondRV must confirm final suitability before purchase.';
+  'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. Beyond RV must confirm final suitability before purchase.';
 
 export const CARAVAN_FINAL_WARNING =
   "Final suitability still requires confirmation against your exact vehicle compliance plate, owner's manual, towbar rating, axle limits, tyre ratings and certified weighbridge results.";
@@ -12,7 +12,7 @@ const NEUTRAL_RESULT = {
   statusLabel: 'Enter your numbers to calculate a result.',
   title: 'Enter your numbers',
   summary: 'Enter your numbers to calculate a result.',
-  recommendation: 'Confirm with ByondRV',
+  recommendation: 'Confirm with Beyond RV',
   dataQuality: 'Needs review: one or more important fields missing',
   notes: []
 };
@@ -157,8 +157,8 @@ export function calculateCaravanSuitability(input = {}, options = {}) {
     statusLabel,
     title,
     summary: `Estimated loaded vehicle weight is ${kg(estimatedLoadedVehicleWeight)} and combined loaded weight is ${kg(combinedLoadedWeight)}.`,
-    recommendation: 'Confirm with ByondRV',
-    dataQuality: 'Complete estimate; Product data incomplete: ByondRV must confirm product weights; Weighbridge required: actual loaded weights needed',
+    recommendation: 'Confirm with Beyond RV',
+    dataQuality: 'Complete estimate; Product data incomplete: Beyond RV must confirm product weights; Weighbridge required: actual loaded weights needed',
     notes,
     values: {
       estimatedLoadedVehicleWeight,
@@ -260,8 +260,8 @@ export function calculateSlideOnSuitability(input = {}, options = {}) {
     statusLabel,
     title,
     summary: `Estimated loaded vehicle weight is ${kg(estimatedLoadedVehicleWeight)} against a ${kg(vehicleGvm)} GVM.`,
-    recommendation: 'Confirm with ByondRV',
-    dataQuality: 'Complete estimate; Product data incomplete: ByondRV must confirm product weights; Weighbridge required: actual loaded weights needed',
+    recommendation: 'Confirm with Beyond RV',
+    dataQuality: 'Complete estimate; Product data incomplete: Beyond RV must confirm product weights; Weighbridge required: actual loaded weights needed',
     notes,
     values: {
       availablePayloadBeforeCamper,

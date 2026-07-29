@@ -7,6 +7,7 @@ import { parseMoneyValue } from '../lib/payment';
 import { availabilityLabel, formatShopPrice, normalizeSaleLabel, sourceTypeLabel, availabilitySchema } from '../lib/shop';
 import { getProductCheckoutOptions } from '../lib/checkout';
 import { buildMerchantProduct, normalizeVideoUploadDate } from '../lib/structuredData.js';
+import { ORGANIZATION_ID } from '../data/siteIdentity.js';
 import paymentSettings from '../data/payment-settings.json';
 
 type ProductData = CollectionEntry<'products'>['data'];
@@ -182,12 +183,7 @@ const videoSchema = youtubeVideo
       "embedUrl": youtubeEmbedUrl,
       "contentUrl": youtubeWatchUrl,
       "publisher": {
-        "@type": "Organization",
-        "name": "Beyond RV",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://beyondrv.com.au/images/site/admin-logo.png"
-        }
+        "@id": ORGANIZATION_ID
       }
     }
   : undefined;

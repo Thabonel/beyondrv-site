@@ -21,6 +21,7 @@ import {
 } from './admin-chat-core';
 import catalogue from './product-catalogue.json';
 import adminKnowledge from './admin-chat-knowledge.json';
+import { archiveProductMarkdown } from './product-archive-core';
 
 const openAiKey = process.env.OPENAI_API_KEY;
 const client = openAiKey ? new OpenAI({ apiKey: openAiKey }) : null;
@@ -240,8 +241,9 @@ RULES:
 - When replacing a Recent Build with an existing product, resolve the product first, preserve isVisible and sortOrder unless explicitly changed, and use exact product metadata rather than constructing values from its title
 - For testimonials, update src/data/homepage/testimonials.json; never invent customer quotes, customer names, or ratings
 - Preserve valid JSON, existing IDs, sortOrder, and isVisible fields unless the owner explicitly asks to change them
-- Standard product-line models stay listed when a unit sells; use the Orders admin tab to track customer orders and stock movement
-- Remove a sold product from active listings only for one-off on-sale, demo, or used stock items, and add/confirm a redirect when removing a page
+- Do not archive a product merely because a lead is marked won or one unit sells. Archive only when the owner explicitly asks to remove that product from the public site.
+- For an archive request, use find_products first and then archive_product. Do not simulate an archive with propose_patch or delete the product file.
+- Archiving preserves the source record, removes the product from public pages/catalogues after deployment, and must be reviewed in Pending Changes before the owner clicks Deploy.
 - For product videos, store YouTube data in a youtubeVideo frontmatter object. Store only the clean video ID in youtubeVideo.id, not the full URL. Preserve or remove the whole youtubeVideo block exactly as instructed by the owner.
 - Existing product image paths can be reused in other site data; the chat cannot upload a brand-new binary image file
 - Be concise and friendly
@@ -340,6 +342,19 @@ const tools = [
       },
       additionalProperties: false,
       required: ['query'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'archive_product',
+    description: 'Queue a confirmed product archive for owner review. The source record is preserved, while the product is removed from public routes, listings, checkout, and AI catalogues after deployment. Use find_products first.',
+    parameters: {
+      type: 'object' as const,
+      properties: {
+        slug: { type: 'string', description: 'Exact product slug returned by find_products' },
+      },
+      additionalProperties: false,
+      required: ['slug'],
     },
   },
   {
@@ -757,6 +772,41 @@ CURRENT DATE:
           const lookup = await findProductsTool(input.query, input.limit);
           lookup.products.forEach(product => resolvedProducts.set(product.slug, product));
           result = lookup.output;
+
+        } else if (!result && call.name === 'archive_product') {
+          const slug = clean(input.slug, 240);
+          const product = resolvedProducts.get(slug);
+          if (!product) {
+            result = `PRODUCT LOOKUP REQUIRED: Use find_products and pass one exact returned slug before archiving ${slug || 'a product'}.`;
+          } else {
+            const currentContent = await githubFetch(product.sourcePath);
+            readCache[product.sourcePath] = currentContent;
+            if (!currentContent) {
+              result = `Error: product file not found at ${product.sourcePath}`;
+            } else {
+              try {
+                const archived = archiveProductMarkdown(currentContent, new Date().toISOString());
+                if (archived.alreadyArchived) {
+                  result = `${archived.title} is already archived.`;
+                } else {
+                  const pendingChange: PendingChange = {
+                    path: product.sourcePath,
+                    content: archived.content,
+                    description: `Archive ${archived.title} and remove it from the public site`,
+                    proposal_id: randomUUID(),
+                    judgeDecision: 'allow',
+                    risk_flags: ['deterministic_product_archive'],
+                  };
+                  const existingIndex = pendingChanges.findIndex(change => change.path === pendingChange.path);
+                  if (existingIndex >= 0) pendingChanges[existingIndex] = pendingChange;
+                  else pendingChanges.push(pendingChange);
+                  result = `Archive queued for ${archived.title}. The source record will be preserved. The owner must review it in Pending Changes and click Deploy.`;
+                }
+              } catch (error) {
+                result = `Error: could not archive ${product.title}. ${error instanceof Error ? error.message : String(error)}`;
+              }
+            }
+          }
 
         } else if (!result && (call.name === 'propose_change' || call.name === 'propose_patch')) {
           const path = clean(input.path, 500);

@@ -79,6 +79,7 @@ const mdFiles = collectMdFiles(PRODUCTS_DIR);
 const catalogue = mdFiles.flatMap((filePath) => {
   const fileContent = readFileSync(filePath, 'utf-8');
   const { data, content } = matter(fileContent);
+  if (data.archived === true) return [];
 
   const slug = slugFromPath(filePath);
   const gallery = imageListFromData(data);
@@ -148,7 +149,7 @@ const SHOP_OUTPUT_FILE = join(ROOT, 'netlify/functions/shop-catalogue.json');
 const shopCatalogue = mdFiles.flatMap((filePath) => {
   const { data } = matter(readFileSync(filePath, 'utf-8'));
   if (data.store !== true) return [];
-  if (data.draft === true || data.published === false || data.hidden === true) return [];
+  if (data.archived === true || data.draft === true || data.published === false || data.hidden === true) return [];
   if (!data.slug || !data.name) return [];
   const gallery = imageListFromData(data);
   const entry = {
@@ -232,7 +233,7 @@ function productLine(p) {
 
 const llmsTxt = `# Beyond RV
 
-Beyond RV builds slide-on campers, truck campers, off-road caravans, and expedition vehicle bodies from Mutdapilly, Queensland, Australia. The business serves Australian buyers who need off-road touring, remote travel, and custom vehicle-based camping solutions.
+Beyond RV is an Australian RV business based in Mutdapilly, Queensland, with 15 years of experience. Its public website covers slide-on campers, truck campers, off-road caravans, expedition vehicles, vehicle-suitability guidance and related products.
 
 Website: ${SITE_URL}/
 Location: 77 Coleyville Rd, Mutdapilly QLD 4307, Australia
@@ -245,12 +246,26 @@ Email: beyondcaravans@gmail.com
 - Slide-on campers: ${SITE_URL}/our-slide-on-campers/
 - Off-road caravans: ${SITE_URL}/our-caravans/
 - Expedition vehicles: ${SITE_URL}/expedition/
+- Slide-on camper guides: ${SITE_URL}/guides/
+- Vehicle suitability checker: ${SITE_URL}/vehicle-suitability-checker/
+- Slide-on camper weight calculator: ${SITE_URL}/slide-on-camper-weight-calculator/
 - Custom builds: ${SITE_URL}/custom/
 - On-sale stock: ${SITE_URL}/on-sale/
 - Enquiry form: ${SITE_URL}/inquiry-form/
 - About: ${SITE_URL}/about-us/
 - Warranty: ${SITE_URL}/warranty/
 - Privacy policy: ${SITE_URL}/privacy-policy/
+
+## Published guides
+
+- Best Utes for Slide-On Campers: ${SITE_URL}/guides/best-utes-for-slide-on-campers/
+- GVM, GCM, ATM and GTM Explained: ${SITE_URL}/guides/gvm-gcm-atm-gtm-explained/
+
+## Confirmed business facts
+
+- Beyond RV has 15 years of RV experience.
+- Every caravan, camper and motorhome Beyond RV completes is built according to applicable Australian Design Rule requirements and receives Queensland gas and 240V electrical certification.
+- Beyond RV provides a five-year construction warranty. Individual appliances retain their respective manufacturers' warranties.
 
 ## Product categories
 
@@ -281,7 +296,7 @@ This file summarises public, stable Beyond RV website content for AI assistants 
 
 ## Business identity
 
-Beyond RV is a Queensland-based builder of slide-on campers, truck campers, off-road caravans, motorhome conversions, and expedition camper bodies. The workshop is located at 77 Coleyville Rd, Mutdapilly QLD 4307, about an hour south-west of Brisbane. Customers should book viewings by appointment.
+Beyond RV is an Australian RV business with 15 years of experience, based at 77 Coleyville Rd, Mutdapilly QLD 4307. Its public website covers slide-on campers, truck campers, off-road caravans, motorhomes, expedition vehicles, vehicle-suitability guidance and related products. Customers should book viewings by appointment.
 
 Contact:
 - Phone: +61 430 863 819
@@ -301,12 +316,28 @@ Primary services:
 - Slide-on campers: ${SITE_URL}/our-slide-on-campers/
 - Off-road caravans: ${SITE_URL}/our-caravans/
 - Expedition vehicles: ${SITE_URL}/expedition/
+- Slide-on camper guides: ${SITE_URL}/guides/
+- Vehicle suitability checker: ${SITE_URL}/vehicle-suitability-checker/
+- Slide-on camper weight calculator: ${SITE_URL}/slide-on-camper-weight-calculator/
 - Custom builds: ${SITE_URL}/custom/
 - On-sale stock: ${SITE_URL}/on-sale/
 - Enquiry form: ${SITE_URL}/inquiry-form/
 - About Beyond RV: ${SITE_URL}/about-us/
 - Warranty: ${SITE_URL}/warranty/
 - Privacy policy: ${SITE_URL}/privacy-policy/
+
+## Published guides and tools
+
+- Best Utes for Slide-On Campers: ${SITE_URL}/guides/best-utes-for-slide-on-campers/
+- GVM, GCM, ATM and GTM Explained: ${SITE_URL}/guides/gvm-gcm-atm-gtm-explained/
+- Vehicle Suitability Checker: ${SITE_URL}/vehicle-suitability-checker/
+- Slide-On Camper Weight Calculator: ${SITE_URL}/slide-on-camper-weight-calculator/
+
+## Confirmed business facts
+
+- Beyond RV has 15 years of RV experience.
+- Every caravan, camper and motorhome Beyond RV completes is built according to applicable Australian Design Rule requirements and receives Queensland gas and 240V electrical certification.
+- Beyond RV provides a five-year construction warranty. Individual appliances retain their respective manufacturers' warranties.
 
 ## Public product catalogue
 

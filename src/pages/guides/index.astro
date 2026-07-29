@@ -1,0 +1,126 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { ORGANIZATION_ID, SITE_URL } from '../../data/siteIdentity.js';
+
+const pageUrl = `${SITE_URL}/guides/`;
+const publishedGuides = [
+  {
+    title: 'Best Utes for Slide-On Campers',
+    href: '/guides/best-utes-for-slide-on-campers/',
+    topic: 'Choosing and fitment',
+    description: 'How payload, tray size, axle limits, accessories and real vehicle weight affect ute suitability.',
+  },
+  {
+    title: 'GVM, GCM, ATM and GTM Explained',
+    href: '/guides/gvm-gcm-atm-gtm-explained/',
+    topic: 'Weights and compliance',
+    description: 'Plain-English definitions, worked examples and links to Australian government sources.',
+  },
+];
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    '@id': `${pageUrl}#collection`,
+    name: 'Slide-On Camper Guides',
+    description: 'Beyond RV guides and tools for choosing, fitting and checking the weight of a slide-on camper in Australia.',
+    url: pageUrl,
+    dateModified: '2026-07-29',
+    publisher: { '@id': ORGANIZATION_ID },
+    hasPart: publishedGuides.map((guide) => ({
+      '@type': 'WebPage',
+      name: guide.title,
+      url: new URL(guide.href, SITE_URL).toString(),
+    })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Published Beyond RV slide-on camper guides',
+    itemListElement: publishedGuides.map((guide, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: guide.title,
+      url: new URL(guide.href, SITE_URL).toString(),
+    })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+      { '@type': 'ListItem', position: 2, name: 'Guides', item: pageUrl },
+    ],
+  },
+];
+---
+<BaseLayout
+  title="Slide-On Camper Guides & Weight Tools | Beyond RV"
+  description="Australian slide-on camper guides and practical tools covering ute suitability, payload, tray fit, GVM, axle limits and loaded vehicle weight."
+  activePath="/guides/"
+  structuredData={schema}
+>
+  <section class="page-hero page-hero--short">
+    <div class="hero-overlay" style="background: rgba(10,10,10,0.52)"></div>
+    <div class="page-hero-content">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Beyond RV Knowledge Centre</span>
+      </div>
+      <h1 class="hero-title">Slide-On Camper Guides</h1>
+      <p class="hero-sub">Use evidence, verified vehicle data and real weights to narrow the options before final fitment is confirmed.</p>
+    </div>
+  </section>
+
+  <section class="container authority-section">
+    <div class="authority-copy">
+      <h2>Start with the published guides</h2>
+      <p>These resources explain the decisions that most often determine whether a slide-on setup will work. They are general guidance, not vehicle approval or engineering certification.</p>
+    </div>
+    <div class="authority-grid" style="margin-top: 2rem">
+      {publishedGuides.map((guide) => (
+        <a class="authority-card" href={guide.href}>
+          <span class="authority-card-kicker">{guide.topic}</span>
+          <h3>{guide.title}</h3>
+          <p>{guide.description}</p>
+        </a>
+      ))}
+      <a class="authority-card" href="/vehicle-suitability-checker/">
+        <span class="authority-card-kicker">Interactive tools</span>
+        <h3>Vehicle Suitability Checker</h3>
+        <p>Choose the slide-on or caravan calculator and enter the figures for your own vehicle.</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="authority-section authority-section--dark">
+    <div class="container authority-copy">
+      <h2>Guide topics</h2>
+      <p>Our guide library is organised around five practical subjects:</p>
+      <ul>
+        <li><strong>Choosing:</strong> camper types, layouts and the questions to answer before comparing models.</li>
+        <li><strong>Vehicle fitment:</strong> tray dimensions, cab style, overhang, centre of gravity and mounting considerations.</li>
+        <li><strong>Weights and compliance:</strong> payload, GVM, axle limits, tyres, accessories and weighbridge data.</li>
+        <li><strong>Design and construction:</strong> materials, systems and specifications where supporting evidence is available.</li>
+        <li><strong>Ownership and travel:</strong> loading, setup, care and trip preparation.</li>
+      </ul>
+      <p>New articles will be added only when the underlying facts can be supported and the relevant technical review has been completed.</p>
+    </div>
+  </section>
+
+  <section class="container authority-section">
+    <div class="authority-copy">
+      <h2>Evidence and review standard</h2>
+      <p>Measurements, limits and product specifications should identify their source and date. General educational content should link to the relevant government, manufacturer or standards source where one is publicly available. Vehicle suitability must use the exact vehicle variant, current compliance information and real loaded weights; estimates are clearly labelled and do not replace professional advice or certification.</p>
+      <p>Found something that needs correction? <a href="/inquiry-form/">Send Beyond RV the page and the supporting source</a> so it can be checked and updated.</p>
+    </div>
+  </section>
+
+  <section class="authority-section authority-section--dark">
+    <div class="container authority-copy">
+      <h2>Continue your research</h2>
+      <p>Compare the <a href="/our-slide-on-campers/">slide-on camper range</a>, run the <a href="/slide-on-camper-weight-calculator/">slide-on weight calculator</a>, or use the <a href="/vehicle-suitability-checker/">vehicle suitability checker</a> to choose the right starting point.</p>
+    </div>
+  </section>
+</BaseLayout>

@@ -11,6 +11,8 @@
     "test:e2e:update": "playwright test --update-snapshots",
     "preview": "astro preview",
     "check": "astro check",
+    "audit:authority": "node SCRIPTS/audit-authority.mjs",
+    "authority:indexnow": "node SCRIPTS/submit-indexnow.mjs",
     "images:optimize": "node SCRIPTS/optimize-product-images.mjs --write"
   },
   "dependencies": {

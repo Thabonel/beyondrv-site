@@ -4,8 +4,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { displayImageUrl } from '../lib/media';
 import { fulfilmentInfo } from '../lib/shop';
 import type { CatalogueEntry } from '../lib/cart';
+import { isPublicProduct } from '../lib/productVisibility';
 
-const allProducts = await getCollection('products');
+const allProducts = (await getCollection('products')).filter(isPublicProduct);
 
 const catalogueEntries = allProducts.flatMap((product): [string, CatalogueEntry][] => {
   if (product.data.store !== true || product.data.productType !== 'stock') return [];

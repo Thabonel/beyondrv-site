@@ -1,0 +1,1132 @@
+{
+  "generatedAt": "2026-07-29T03:29:39.072Z",
+  "source": "/Users/thabonel/Code/Byond_RV/dist",
+  "pageCount": 40,
+  "failureCount": 0,
+  "failures": {
+    "missingTitle": [],
+    "missingDescription": [],
+    "missingCanonical": [],
+    "invalidH1Count": [],
+    "missingImageAlt": [],
+    "duplicateSchemaIds": [],
+    "invalidAvailability": [],
+    "legacyBrandMentions": [],
+    "unverifiedOriginClaims": [],
+    "jsonLdParseErrors": [],
+    "brokenInternalLinks": []
+  },
+  "pages": [
+    {
+      "route": "/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/",
+      "title": "3.5m DIY Camper Box with Cabover and Underfloor Storage | Beyond RV",
+      "description": "Beyond RV 3.5m DIY hardtop camper box with cabover and underfloor storage, sold as-is from $38,999.",
+      "canonical": "https://beyondrv.com.au/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/",
+      "h1s": [
+        "3.5m DIY Camper Box with Cabover and Underfloor Storage"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "ListItem",
+        "LocalBusiness",
+        "Offer",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "State"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/3-5m-poptop-truck-camper/",
+      "title": "Custom 3.5m Electric Pop-Top Truck Camper | Beyond RV",
+      "description": "Custom 3.5m electric pop-top truck camper available from Beyond RV from $49,999.",
+      "canonical": "https://beyondrv.com.au/3-5m-poptop-truck-camper/",
+      "h1s": [
+        "Custom 3.5m Electric Pop-Top Truck Camper"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "ListItem",
+        "LocalBusiness",
+        "Offer",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "State"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/404.html",
+      "title": "Page Not Found | Beyond RV",
+      "description": "This page has wandered off the map. Let",
+      "canonical": "https://beyondrv.com.au/404/",
+      "h1s": [
+        "Looks like you've gone bush."
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Country",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "State"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/7ft-electric-poptop-slide-on/",
+      "title": "7ft Electric Pop-Top Slide-On Camper | Beyond RV",
+      "description": "Beyond RV 7ft electric pop-top slide-on camper for single cab ute platforms.",
+      "canonical": "https://beyondrv.com.au/7ft-electric-poptop-slide-on/",
+      "h1s": [
+        "7ft Electric Pop-Top Slide-On Camper"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "ListItem",
+        "LocalBusiness",
+        "Offer",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "State",
+        "VideoObject"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/about-us/",
+      "title": "About Beyond RV | 15 Years of RV Experience",
+      "description": "Meet Beyond RV, an Australian RV business based in Mutdapilly, Queensland, with 15 years of experience across caravans, campers and motorhomes.",
+      "canonical": "https://beyondrv.com.au/about-us/",
+      "h1s": [
+        "15 Years of RV Experience."
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AboutPage",
+        "AutomotiveBusiness",
+        "Country",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "State"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/admin/analytics/",
+      "title": "Beyond RV Analytics",
+      "description": "Private Beyond RV analytics dashboard for reviewing website enquiries and traffic.",
+      "canonical": "https://beyondrv.com.au/admin/analytics/",
+      "h1s": [
+        "Beyond RV Analytics"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/admin/",
+      "title": "Beyond RV Admin",
+      "description": "Private Beyond RV administration area for managing site content and product information.",
+      "canonical": "https://beyondrv.com.au/admin/",
+      "h1s": [
+        "Beyond RV Admin"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/advent-2150-hardtop-slide-on/",
+      "title": "Advent 2150 Hardtop Ute Slide-On Camper | Beyond RV",
+      "description": "The Advent 2150 hardtop ute slide-on camper is built for 4x4 space cab utes and selected dual cab ute owners.",
+      "canonical": "https://beyondrv.com.au/advent-2150-hardtop-slide-on/",
+      "h1s": [
+        "Advent 2150 Hardtop Ute Slide-On Camper"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "ListItem",
+        "LocalBusiness",
+        "Offer",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "State"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/advent-2300-hardtop-slide-on/",
+      "title": "Advent 2300 Hardtop Ute Slide-On Camper | Beyond RV",
+      "description": "The Advent 2300 hardtop ute slide-on camper gives buyers a longer 2300mm base in the Beyond RV Advent range.",
+      "canonical": "https://beyondrv.com.au/advent-2300-hardtop-slide-on/",
+      "h1s": [
+        "Advent 2300 Hardtop Ute Slide-On Camper"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "ListItem",
+        "LocalBusiness",
+        "Offer",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "State",
+        "VideoObject"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/advent-2450-hardtop-slide-on/",
+      "title": "Advent 2450 Hardtop Ute Slide-On Camper | Beyond RV",
+      "description": "The Advent 2450 is a larger hardtop ute slide-on camper designed specifically for single cab ute platforms.",
+      "canonical": "https://beyondrv.com.au/advent-2450-hardtop-slide-on/",
+      "h1s": [
+        "Advent 2450 Hardtop Ute Slide-On Camper"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "ListItem",
+        "LocalBusiness",
+        "Offer",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "State",
+        "VideoObject"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/caravan-towing-calculator/",
+      "title": "Caravan Towing Calculator | Beyond RV",
+      "description": "Estimate whether your tow vehicle may be a candidate for a Beyond RV caravan using GVM, GCM, braked towing capacity, tow ball download, ATM, GTM and payload.",
+      "canonical": "https://beyondrv.com.au/caravan-towing-calculator/",
+      "h1s": [
+        "Can Your Vehicle Tow It?"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "Answer",
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "FAQPage",
+        "ListItem",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "Question",
+        "State",
+        "WebPage"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/cart/",
+      "title": "Your Cart | Beyond RV Shop",
+      "description": "Review the parts and accessories in your Beyond RV shopping cart.",
+      "canonical": "https://beyondrv.com.au/cart/",
+      "h1s": [
+        "Your Cart"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Country",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "State"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/checkout/success/",
+      "title": "Payment Received | Beyond RV Shop",
+      "description": "Your Beyond RV order has been received.",
+      "canonical": "https://beyondrv.com.au/checkout/success/",
+      "h1s": [
+        "Payment received"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Country",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "State"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/custom/",
+      "title": "Custom Camper Projects | Beyond RV",
+      "description": "Plan a custom slide-on, truck camper or expedition vehicle project with Beyond RV around your vehicle, payload, layout and intended travel.",
+      "canonical": "https://beyondrv.com.au/custom/",
+      "h1s": [
+        "Your Truck. Your Build."
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "Answer",
+        "AutomotiveBusiness",
+        "Country",
+        "FAQPage",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Question",
+        "State",
+        "WebPage"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/expedition/3-5m-electric-poptop-cabover-family-camper/",
+      "title": "3.5m Electric Pop-Top Cabover Family Camper | Beyond RV",
+      "description": "Beyond RV 3.5m electric pop-top cabover family truck camper with electric drop-down bed for dual cab Isuzu NPS platforms.",
+      "canonical": "https://beyondrv.com.au/expedition/3-5m-electric-poptop-cabover-family-camper/",
+      "h1s": [
+        "3.5m Electric Pop-Top Cabover Family Camper w/ Electric Drop Down Bed"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "ListItem",
+        "LocalBusiness",
+        "Offer",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "State",
+        "VideoObject"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/expedition/4-7m-hardtop-truck-camper/",
+      "title": "4.7m Hardtop Truck Camper | Beyond RV",
+      "description": "Beyond RV 4.7m hardtop couples truck camper for single cab truck and Unimog platforms, priced from $98,000.",
+      "canonical": "https://beyondrv.com.au/expedition/4-7m-hardtop-truck-camper/",
+      "h1s": [
+        "4.7m Hardtop Truck Camper"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "ListItem",
+        "LocalBusiness",
+        "Offer",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "State",
+        "VideoObject"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/expedition/blue-unimog-overlander-camper/",
+      "title": "Blue Unimog Overlander Camper | Beyond RV Expedition Vehicles",
+      "description": "Beyond RV blue Unimog overlander camper with 4.7m expedition camper body and truck camper interior fitout.",
+      "canonical": "https://beyondrv.com.au/expedition/blue-unimog-overlander-camper/",
+      "h1s": [
+        "Blue Unimog Overlander Camper"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "ListItem",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "State"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/expedition/",
+      "title": "Expedition Vehicles | Unimog & Isuzu Campers | Beyond RV Queensland",
+      "description": "Explore Beyond RV expedition campers, 4x4 truck campers, Unimog bodies and Isuzu NPS builds for serious Australian touring.",
+      "canonical": "https://beyondrv.com.au/expedition/",
+      "h1s": [
+        "Expedition Range"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "Answer",
+        "AutomotiveBusiness",
+        "Brand",
+        "CollectionPage",
+        "Country",
+        "FAQPage",
+        "LocalBusiness",
+        "Offer",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "Question",
+        "State"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/expedition/unimog-overlander-camper/",
+      "title": "Unimog Overlander Camper | Beyond RV Expedition Vehicles Queensland",
+      "description": "Beyond RV",
+      "canonical": "https://beyondrv.com.au/expedition/unimog-overlander-camper/",
+      "h1s": [
+        "Unimog Overlander Camper"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "ListItem",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "State"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/expedition/unimog-poptop-camper/",
+      "title": "Empty DIY Unimog Camper Box | Beyond RV",
+      "description": "Beyond RV empty DIY Unimog camper box, available as a flatpack kit or fully assembled box with wiring roughed in.",
+      "canonical": "https://beyondrv.com.au/expedition/unimog-poptop-camper/",
+      "h1s": [
+        "Empty DIY Unimog Camper Box"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "ListItem",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "State",
+        "VideoObject"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/guides/best-utes-for-slide-on-campers/",
+      "title": "Best Utes for Slide-On Campers | Beyond RV Guide",
+      "description": "What makes a ute suitable for a slide-on camper in Australia: payload, GVM, tray size, axle limits, accessories, suspension and real weighbridge data.",
+      "canonical": "https://beyondrv.com.au/guides/best-utes-for-slide-on-campers/",
+      "h1s": [
+        "Best Utes for Slide-On Campers"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "Answer",
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "FAQPage",
+        "ListItem",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "Question",
+        "State",
+        "WebPage"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/guides/gvm-gcm-atm-gtm-explained/",
+      "title": "GVM, GCM, ATM and GTM Explained | Beyond RV Guide",
+      "description": "Plain-English Australian guide to GVM, GCM, ATM, GTM, payload, tare, tow ball download and weighbridge weights for camper and caravan buyers.",
+      "canonical": "https://beyondrv.com.au/guides/gvm-gcm-atm-gtm-explained/",
+      "h1s": [
+        "GVM, GCM, ATM and GTM Explained"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "Answer",
+        "AutomotiveBusiness",
+        "BreadcrumbList",
+        "Country",
+        "FAQPage",
+        "ListItem",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Question",
+        "State",
+        "WebPage"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/guides/",
+      "title": "Slide-On Camper Guides & Weight Tools | Beyond RV",
+      "description": "Australian slide-on camper guides and practical tools covering ute suitability, payload, tray fit, GVM, axle limits and loaded vehicle weight.",
+      "canonical": "https://beyondrv.com.au/guides/",
+      "h1s": [
+        "Slide-On Camper Guides"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "BreadcrumbList",
+        "CollectionPage",
+        "Country",
+        "ItemList",
+        "ListItem",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "State",
+        "WebPage"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/",
+      "title": "Beyond RV — Queensland Slide-On Campers, Caravans & Expedition Vehicles",
+      "description": "Beyond RV completes slide-on campers, hardtop caravans, and expedition vehicles in Mutdapilly, Queensland. For HiLux, Ranger, Unimog, and serious trucks.",
+      "canonical": "https://beyondrv.com.au/",
+      "h1s": [
+        "Built For Where Roads End"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Country",
+        "EntryPoint",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "SearchAction",
+        "State",
+        "WebSite"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/inquiry-form/",
+      "title": "Enquire | Beyond RV — We'll Call You Back",
+      "description": "Get in touch with Beyond RV. Tell us what you",
+      "canonical": "https://beyondrv.com.au/inquiry-form/",
+      "h1s": [
+        "Enquire Now"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "ContactPage",
+        "Country",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "State"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/inquiry-form/success/",
+      "title": "Enquiry Sent | Beyond RV",
+      "description": "Thanks for getting in touch with Beyond RV. We",
+      "canonical": "https://beyondrv.com.au/inquiry-form/success/",
+      "h1s": [
+        "You're on the map."
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Country",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "State"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/mercedes-sprinter-motorhome/",
+      "title": "Mercedes Sprinter AWD LWB Cab Chassis Motorhome | Beyond RV",
+      "description": "In-stock Mercedes Sprinter AWD LWB cab chassis motorhome available from Beyond RV for $225,000 negotiable.",
+      "canonical": "https://beyondrv.com.au/mercedes-sprinter-motorhome/",
+      "h1s": [
+        "Mercedes Sprinter AWD LWB Cab Chassis Motorhome"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "ListItem",
+        "LocalBusiness",
+        "Offer",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "State",
+        "VideoObject"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/on-sale/",
+      "title": "On Sale | Current Stock | Beyond RV Queensland",
+      "description": "Beyond RV current in-stock campers and caravans available for immediate delivery. Check what",
+      "canonical": "https://beyondrv.com.au/on-sale/",
+      "h1s": [
+        "On Sale Now"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Country",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "State"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/our-caravans/",
+      "title": "Off-Road Caravans | Beyond RV Queensland",
+      "description": "Beyond RV completes composite off-road caravans for couples and families. The Sunpatch range is prepared for serious Australian travel.",
+      "canonical": "https://beyondrv.com.au/our-caravans/",
+      "h1s": [
+        "Our Caravans"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "Answer",
+        "AutomotiveBusiness",
+        "Brand",
+        "CollectionPage",
+        "Country",
+        "FAQPage",
+        "LocalBusiness",
+        "Offer",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "Question",
+        "State"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/our-slide-on-campers/",
+      "title": "Slide-On Campers for Utes | Beyond RV Queensland",
+      "description": "Beyond RV ute slide-on campers — hardtop and pop-top campers for suitable ute tray platforms. Completed to applicable ADR requirements with QLD gas and 240V certification.",
+      "canonical": "https://beyondrv.com.au/our-slide-on-campers/",
+      "h1s": [
+        "Slide-On Campers"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "Answer",
+        "AutomotiveBusiness",
+        "Brand",
+        "CollectionPage",
+        "Country",
+        "FAQPage",
+        "LocalBusiness",
+        "Offer",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "Question",
+        "State"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/privacy-policy/",
+      "title": "Privacy Policy | Beyond RV",
+      "description": "Beyond RV privacy policy — how we collect, use, and protect your personal information in accordance with the Australian Privacy Principles.",
+      "canonical": "https://beyondrv.com.au/privacy-policy/",
+      "h1s": [
+        "Privacy Policy"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Country",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "State",
+        "WebPage"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/shop/",
+      "title": "RV Parts & Accessories | Beyond RV Shop",
+      "description": "Browse Beyond RV parts, accessories, power upgrades, and connectivity products for campers and expedition vehicles.",
+      "canonical": "https://beyondrv.com.au/shop/",
+      "h1s": [
+        "Parts & Accessories"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "CollectionPage",
+        "Country",
+        "ItemList",
+        "ListItem",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "State"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/shop/twin-air-compressor-shield/",
+      "title": "Twin Air Compressor Shield | Beyond RV Shop",
+      "description": "Boxed twin air compressor shield in 3mm marine-grade aluminium. In stock and ready for immediate delivery Australia-wide.",
+      "canonical": "https://beyondrv.com.au/shop/twin-air-compressor-shield/",
+      "h1s": [
+        "Twin Air Compressor Shield"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "ListItem",
+        "LocalBusiness",
+        "Offer",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "State"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/slide-on-camper-weight-calculator/",
+      "title": "Slide-On Camper Weight Calculator | Beyond RV",
+      "description": "Estimate whether your ute has enough payload, GVM margin and tray size for a Beyond RV slide-on camper. Manual Australian calculator for non-technical buyers.",
+      "canonical": "https://beyondrv.com.au/slide-on-camper-weight-calculator/",
+      "h1s": [
+        "Can Your Ute Carry a Slide-On?"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "Answer",
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "FAQPage",
+        "ListItem",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "Question",
+        "State",
+        "WebPage"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/sunpatch-12c-couples-caravan/",
+      "title": "Sunpatch 12C Couples Off-Road Van | Beyond RV",
+      "description": "The Sunpatch 12C is a compact hardtop couples off-road van available from Beyond RV.",
+      "canonical": "https://beyondrv.com.au/sunpatch-12c-couples-caravan/",
+      "h1s": [
+        "Sunpatch 12C Couples Off-Road Van"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "ListItem",
+        "LocalBusiness",
+        "Offer",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "State"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/sunpatch-15xc-couples-offroad-van/",
+      "title": "Sunpatch 15-XC Couples Off-Road Van | Beyond RV",
+      "description": "The Sunpatch 15-XC couples off-road van is available from Beyond RV with 240L fresh water and a 200Ah lithium battery.",
+      "canonical": "https://beyondrv.com.au/sunpatch-15xc-couples-offroad-van/",
+      "h1s": [
+        "Sunpatch 15-XC Couples Off-Road Van"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "ListItem",
+        "LocalBusiness",
+        "Offer",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "State",
+        "VideoObject"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/sunpatch-19xc-hardtop-couples-offroad-van/",
+      "title": "Sunpatch 19-XC Hardtop Couples Off-Road Van | Beyond RV",
+      "description": "The Sunpatch 19-XC hardtop couples off-road van is available for sale from Beyond RV, with final images and details coming soon.",
+      "canonical": "https://beyondrv.com.au/sunpatch-19xc-hardtop-couples-offroad-van/",
+      "h1s": [
+        "Sunpatch 19-XC Hardtop Couples Off-Road Van"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "ListItem",
+        "LocalBusiness",
+        "Offer",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "State"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/sunpatch-21xf-hardtop-family-offroad-van/",
+      "title": "Sunpatch 21-XF Hardtop Family Off-Road Van | Beyond RV",
+      "description": "The Sunpatch 21-XF hardtop family off-road van sleeps five and is available from Beyond RV with one in stock.",
+      "canonical": "https://beyondrv.com.au/sunpatch-21xf-hardtop-family-offroad-van/",
+      "h1s": [
+        "Sunpatch 21-XF Hardtop Family Off-Road Van"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Brand",
+        "BreadcrumbList",
+        "Country",
+        "ListItem",
+        "LocalBusiness",
+        "Offer",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Product",
+        "State",
+        "VideoObject"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/vehicle-suitability-checker/",
+      "title": "Vehicle Suitability Checker | Beyond RV Australia",
+      "description": "Check whether your ute may suit a Beyond RV slide-on camper or whether your vehicle may tow a Beyond RV caravan. Manual Australian GVM, GCM, payload and towing calculator.",
+      "canonical": "https://beyondrv.com.au/vehicle-suitability-checker/",
+      "h1s": [
+        "Can Your Vehicle Carry or Tow It?"
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "Answer",
+        "AutomotiveBusiness",
+        "BreadcrumbList",
+        "Country",
+        "FAQPage",
+        "ListItem",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "Question",
+        "State",
+        "WebPage"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    },
+    {
+      "route": "/warranty/",
+      "title": "Five-Year Construction Warranty | Beyond RV",
+      "description": "Beyond RV provides a five-year construction warranty. Individual appliances retain their respective manufacturers",
+      "canonical": "https://beyondrv.com.au/warranty/",
+      "h1s": [
+        "We Stand Behind Every Build."
+      ],
+      "missingAlt": 0,
+      "schemaTypes": [
+        "AutomotiveBusiness",
+        "Country",
+        "LocalBusiness",
+        "OpeningHoursSpecification",
+        "Organization",
+        "PostalAddress",
+        "State",
+        "WebPage"
+      ],
+      "duplicateSchemaIds": [],
+      "invalidAvailability": [],
+      "legacyBrandMentions": 0,
+      "unverifiedOriginClaims": [],
+      "jsonLdParseErrors": []
+    }
+  ]
+}

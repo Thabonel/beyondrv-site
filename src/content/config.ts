@@ -26,6 +26,8 @@ function availabilityFromStatus(status: 'available' | 'on-sale' | 'coming-soon')
 
 const vehicleProduct = z.object({
   store:         z.literal(false).optional(),
+  archived:      z.boolean().default(false),
+  archivedAt:    z.string().optional(),
   title:         z.string(),
   compareAtPrice: z.string().optional(),
   saleLabel:     z.string().optional(),
@@ -75,6 +77,8 @@ const vehicleProduct = z.object({
 
 const shopBase = {
   store:       z.literal(true),
+  archived:    z.boolean().default(false),
+  archivedAt:  z.string().optional(),
   name:        z.string().min(1),
   title:       z.string().optional(),
   slug:        z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
