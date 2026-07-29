@@ -4,8 +4,9 @@
   --dark:    #111111;
   --panel:   #161616;
   --border:  #2a2a2a;
-  --orange:  #E8540A;
+  --orange:  #CB4600;
   --orange2: #FF6B1A;
+  --orange-button-hover: #A93A00;
   --tan:     #C4A87A;
   --cream:   #F0EBE3;
   --muted: #999999;
@@ -124,7 +125,7 @@ nav.scrolled {
   text-align: center;
   white-space: nowrap;
 }
-.nav-cta:hover { background: var(--orange2); transform: translateY(-1px); }
+.nav-cta:hover { background: var(--orange-button-hover); transform: translateY(-1px); }
 
 .nav-hamburger {
   display: none;
@@ -267,7 +268,7 @@ nav.scrolled {
   transition: all 0.25s;
   clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
 }
-.btn-primary:hover { background: var(--orange2); transform: translateY(-2px); }
+.btn-primary:hover { background: var(--orange-button-hover); transform: translateY(-2px); }
 .btn-ghost {
   border: 1px solid rgba(240,235,227,0.3); color: var(--cream);
   padding: 1rem 2.2rem; text-decoration: none; display: inline-block;

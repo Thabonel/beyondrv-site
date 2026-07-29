@@ -181,8 +181,8 @@ const heroSizes = '100vw';
       <div class="model-card featured reveal">
         <img
           src={displayImageUrl(rangeImages.expedition, 1200)}
-          srcset={imageSrcSet(rangeImages.expedition, [640, 960, 1200, 1380])}
-          sizes="(max-width: 900px) 100vw, 66vw"
+          srcset={imageSrcSet(rangeImages.expedition, [480, 640, 840, 960, 1200, 1380])}
+          sizes="(max-width: 900px) calc(100vw - 3rem), 92vw"
           alt="Beyond RV Expedition Vehicles — Isuzu NPS builds"
           loading="lazy"
           decoding="async"
@@ -200,8 +200,8 @@ const heroSizes = '100vw';
       <div class="model-card featured reveal">
         <img
           src={displayImageUrl(rangeImages.slideOn, 1200)}
-          srcset={imageSrcSet(rangeImages.slideOn, [640, 960, 1200, 1380])}
-          sizes="(max-width: 900px) 100vw, 66vw"
+          srcset={imageSrcSet(rangeImages.slideOn, [480, 640, 840, 960, 1200, 1380])}
+          sizes="(max-width: 900px) calc(100vw - 3rem), 92vw"
           alt="Beyond RV Slide-On Campers — Advent range"
           loading="lazy"
           decoding="async"
@@ -219,8 +219,8 @@ const heroSizes = '100vw';
       <div class="model-card reveal reveal-delay-1">
         <img
           src={displayImageUrl(rangeImages.caravan, 800)}
-          srcset={imageSrcSet(rangeImages.caravan, [480, 800, 1200])}
-          sizes="(max-width: 900px) 100vw, 33vw"
+          srcset={imageSrcSet(rangeImages.caravan, [480, 640, 840, 960, 1200])}
+          sizes="(max-width: 900px) calc(100vw - 3rem), 46vw"
           alt="Beyond RV Sunpatch caravans"
           loading="lazy"
           decoding="async"
@@ -237,8 +237,8 @@ const heroSizes = '100vw';
       <div class="model-card reveal reveal-delay-2">
         <img
           src={displayImageUrl(rangeImages.custom, 1200)}
-          srcset={imageSrcSet(rangeImages.custom, [640, 960, 1200, 1380])}
-          sizes="(max-width: 900px) 100vw, 33vw"
+          srcset={imageSrcSet(rangeImages.custom, [480, 640, 840, 960, 1200, 1380])}
+          sizes="(max-width: 900px) calc(100vw - 3rem), 46vw"
           alt="Beyond RV interior fit-out"
           loading="lazy"
           decoding="async"
@@ -613,7 +613,7 @@ const heroSizes = '100vw';
 
   <!-- CTA BAND -->
   <section class="cta-section">
-    <div class="cta-bg" style="background-image: url('/images/site/mog2.jpg')"></div>
+    <div class="cta-bg" style="background-image: url('/images/site/mog2-1280.webp')"></div>
     <div class="cta-overlay"></div>
     <div class="cta-content">
       <h2 class="cta-title reveal">

@@ -3,6 +3,10 @@
 Prepared: 29 July 2026
 Current source branch: `staging`
 
+## Deployment outcome
+
+Deploy Preview #9 was approved and merged in GitHub. Production deploy `6a69a7d41e3ffa00084fbb06` published main commit `fd37b40c83aceb4b6d3ed67cfc909143d64e8e79` successfully on 29 July 2026. The production authority gate passed except for four legacy redirects whose destination product had since been archived; the follow-up change redirects those URLs to the live Expedition category instead.
+
 ## Safety boundary
 
 Do not deploy from the current working tree. It contains unrelated documentation deletions, contract/SignWell work and generated Playwright report changes.
@@ -70,6 +74,6 @@ Check the preview deployment for:
 
 ## Production gate
 
-Production remains blocked until the isolated preview is approved. After production deployment, repeat the redirect, sitemap, canonical, structured-data and crawl checks against `https://beyondrv.com.au`.
+The approved isolated preview was deployed to production. Redirect, sitemap, canonical, structured-data and public wording checks were repeated against `https://beyondrv.com.au`; results are recorded in `baselines/2026-07-29-production-verification.md`.
 
-Search Console, Bing and IndexNow actions remain separate external steps requiring the relevant access and explicit authorisation. IndexNow must remain a dry run until its matching public key file is deployed.
+Search Console and Bing actions remain separate external steps requiring account access. The owner authorised the post-production follow-through; IndexNow can be submitted only after the matching public key file in the follow-up deployment is live.

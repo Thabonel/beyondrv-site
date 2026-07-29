@@ -58,17 +58,17 @@
 
 [[redirects]]
   from   = "/3-5m-truck-camper"
-  to     = "/3-5m-poptop-truck-camper/"
+  to     = "/expedition/"
   status = 301
 
 [[redirects]]
   from   = "/3-5m-truck-camper/"
-  to     = "/3-5m-poptop-truck-camper/"
+  to     = "/expedition/"
   status = 301
 
 [[redirects]]
   from   = "/15ft-truck-camper-combined-shower-toilet/"
-  to     = "/3-5m-poptop-truck-camper/"
+  to     = "/expedition/"
   status = 301
 
 [[redirects]]
@@ -93,7 +93,7 @@
 
 [[redirects]]
   from   = "/4-6m-poptop-truck-camper-one-off/"
-  to     = "/3-5m-poptop-truck-camper/"
+  to     = "/expedition/"
   status = 301
 
 [[redirects]]

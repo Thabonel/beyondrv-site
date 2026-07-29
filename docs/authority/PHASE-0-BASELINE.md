@@ -38,7 +38,7 @@ npm run audit:authority -- --out docs/authority/baselines/2026-07-29-local-crawl
 
 The generated JSON is the machine-readable page inventory and failure report. It includes URL, title, description, canonical, H1s, image-alt omissions, schema types, duplicate schema IDs, invalid availability values, legacy brand mentions and broken internal links.
 
-Final result: 40 generated public pages audited, zero findings in every check category.
+Final result: 39 generated public pages audited, zero findings in every check category. The sitemap contains 33 indexable canonical URLs because admin, checkout, cart, success and error routes are intentionally excluded.
 
 ## Search baseline still required
 
