@@ -3455,6 +3455,14 @@ export default function AdminPanel() {
     }
   }
 
+  function requestProductUpdate(product: ProductRecord, task: string) {
+    setActiveTab('pending');
+    sendMessage(
+      `${task}\n\nProduct: ${product.title}\nSlug: ${product.slug}\n` +
+      `Read src/content/products/${product.slug}.md first, then queue a complete-file change for review.`
+    );
+  }
+
   async function archiveProduct(product: ProductRecord) {
     const confirmed = window.confirm(
       `Are you sure?\n\n${product.title} will be removed from the public site. The product record will be kept as an archive.`,
@@ -4186,7 +4194,11 @@ export default function AdminPanel() {
           product.galleryCount ?? 0 ? `${product.galleryCount} photos` : '',
           activeOrderCounts[product.slug] ? `${activeOrderCounts[product.slug]} active order${activeOrderCounts[product.slug] === 1 ? '' : 's'}` : '',
         ];
-    const actionColumns = isShop ? '1fr 1fr' : '1fr 1fr 1fr';
+    const actionColumns = isShop
+      ? '1fr 1fr'
+      : product.onSale || product.status === 'on-sale'
+        ? '1fr 1fr 1fr 1fr'
+        : '1fr 1fr 1fr';
 
     return (
       <div key={product.slug} style={{ background: isQueuedDraft ? '#20140c' : '#1a1a1a', border: isQueuedDraft ? '1px solid #7c3a10' : '1px solid #303030', borderRadius: '6px', overflow: 'hidden', flexShrink: 0, display: 'grid', gridTemplateColumns: '150px minmax(0, 1fr)' }}>
@@ -4232,6 +4244,15 @@ export default function AdminPanel() {
                 style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
               >
                 Order
+              </button>
+            )}
+            {!isShop && (product.onSale || product.status === 'on-sale') && (
+              <button
+                type="button"
+                onClick={() => requestProductUpdate(product, `This one-off sale product has sold. Remove it from active product listings and make sure the old URL redirects to ${product.category === 'caravan' ? '/our-caravans/' : product.category === 'expedition' ? '/expedition/' : '/our-slide-on-campers/'}. Do not remove standard product-line models unless they are one-off sale stock.`)}
+                style={{ background: '#2a1410', color: '#fb923c', border: '1px solid #63301f', borderRadius: '5px', padding: '0.42rem', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 700 }}
+              >
+                Sold
               </button>
             )}
             {!isQueuedDraft && (
