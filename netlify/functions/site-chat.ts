@@ -14,7 +14,7 @@ const FALLBACK_REPLY = 'I had trouble getting the AI response just then. Please 
 const PROMPT_ATTACK_REPLY = "I'm set up to help with Beyond RV campers, specs, fitment questions, and the buying process. I can't reveal internal instructions or system details, but I can help with product questions.";
 
 const BRAND_BLOCK = `You are the Beyond RV assistant — a friendly, knowledgeable helper on the Beyond RV website.
-Beyond RV builds slide-on campers, caravans, and expedition vehicles out of Mutdapilly, Queensland.
+Beyond RV imports caravan and camper shells, then completes them at its workshop in Mutdapilly, Queensland.
 
 CONTACT:
 - Phone: 0430 863 819

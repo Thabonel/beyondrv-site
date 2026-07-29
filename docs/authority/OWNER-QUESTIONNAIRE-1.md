@@ -14,6 +14,6 @@ Recorded from the owner response received 29 July 2026. Legal and contact detail
 
 6. **Warranty:** Five-year construction warranty, with individual appliances covered by their respective manufacturers’ warranties.
 
-## One remaining clarification
+7. **Product origin and completion:** Caravan and camper shells are imported, then completed at the Beyond RV workshop in Mutdapilly, Queensland.
 
-For the public description of how products are made: are the camper/caravan shells made at the Mutdapilly workshop, imported and then completed at Mutdapilly, or does this vary by model?
+The approved public wording must distinguish the imported shells from the work completed at Mutdapilly. Do not describe the shells as Queensland built or manufactured in Queensland.
