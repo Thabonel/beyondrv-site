@@ -4,7 +4,8 @@
   --dark:    #111111;
   --panel:   #161616;
   --border:  #2a2a2a;
-  --orange:  #CB4600;
+  --orange:  #E8540A;
+  --orange-button: #CB4600;
   --orange2: #FF6B1A;
   --orange-button-hover: #A93A00;
   --tan:     #C4A87A;
@@ -114,7 +115,7 @@ nav.scrolled {
 .nav-links a.active { color: var(--white); }
 
 .nav-cta {
-  background: var(--orange); color: var(--white);
+  background: var(--orange-button); color: var(--white);
   padding: 0.6rem 1.5rem; border: none;
   font-family: var(--font-body); font-size: 0.78rem; font-weight: 600;
   letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;
@@ -262,7 +263,7 @@ nav.scrolled {
 
 /* ─── BUTTONS ─── */
 .btn-primary {
-  background: var(--orange); color: var(--white);
+  background: var(--orange-button); color: var(--white);
   padding: 1rem 2.2rem; text-decoration: none; display: inline-block;
   font-weight: 600; font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase;
   transition: all 0.25s;
@@ -280,7 +281,7 @@ nav.scrolled {
 /* ─── BADGES ─── */
 .badge {
   display: inline-block;
-  background: var(--orange); color: var(--white);
+  background: var(--orange-button); color: var(--white);
   font-size: 0.62rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
   padding: 0.3rem 0.8rem;
   clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
@@ -314,7 +315,7 @@ nav.scrolled {
 
 /* ─── TICKER ─── */
 .ticker {
-  background: var(--orange);
+  background: var(--orange-button);
   padding: 0.75rem 0;
   overflow: hidden; white-space: nowrap;
 }
@@ -409,7 +410,7 @@ nav.scrolled {
 }
 .model-tag {
   display: inline-block;
-  background: var(--orange); color: var(--white);
+  background: var(--orange-button); color: var(--white);
   font-size: 0.62rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
   padding: 0.25rem 0.75rem; margin-bottom: 0.75rem;
   clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
@@ -643,8 +644,8 @@ nav.scrolled {
   color: var(--dark);
 }
 .product-ctas button.btn-ghost[data-stripe-checkout]:hover {
-  background: var(--orange);
-  border-color: var(--orange);
+  background: var(--orange-button);
+  border-color: var(--orange-button);
   color: var(--white);
 }
 
@@ -2033,7 +2034,7 @@ footer {
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: var(--orange);
+  background: var(--orange-button);
   color: white;
   border: none;
   cursor: pointer;
@@ -2129,7 +2130,7 @@ footer {
   word-break: break-word;
 }
 .chat-bubble-user {
-  background: var(--orange);
+  background: var(--orange-button);
   color: #fff;
   align-self: flex-end;
   border-bottom-right-radius: 3px;
@@ -2167,7 +2168,7 @@ footer {
 .chat-input-bar input:focus { border-color: var(--orange); }
 .chat-input-bar input::placeholder { color: rgba(255,255,255,0.35); }
 .chat-input-bar button {
-  background: var(--orange);
+  background: var(--orange-button);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -2392,7 +2393,7 @@ footer {
   top: 1rem;
   left: 1rem;
   padding: 0.38rem 0.7rem;
-  background: var(--orange);
+  background: var(--orange-button);
   color: var(--white);
   font-size: 0.65rem;
   font-weight: 600;
@@ -2479,7 +2480,7 @@ footer {
 .shop-detail-price-stack { display: grid; gap: 0.2rem; margin-top: 2rem; }
 .shop-detail-price { margin-top: 0; color: var(--orange); font-family: var(--font-heading); font-size: 2.8rem; line-height: 1; }
 .shop-detail-compare-at { color: var(--muted); font-size: 0.82rem; text-decoration: line-through; }
-.shop-detail-sale-label { display: inline-flex; align-items: center; justify-content: center; width: fit-content; padding: 0.34rem 0.72rem; background: var(--orange); color: var(--white); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
+.shop-detail-sale-label { display: inline-flex; align-items: center; justify-content: center; width: fit-content; padding: 0.34rem 0.72rem; background: var(--orange-button); color: var(--white); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
 .shop-detail-stock { margin-top: 0.6rem; text-align: left; }
 .shop-fulfilment-note { margin-top: 0.6rem; color: var(--muted); font-size: 0.85rem; line-height: 1.5; }
 .shop-detail-meta { margin-top: 0.45rem; color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
@@ -2537,7 +2538,7 @@ footer {
   height: 1.25rem;
   padding: 0 0.35rem;
   border-radius: 999px;
-  background: var(--orange);
+  background: var(--orange-button);
   color: var(--white);
   font-size: 0.7rem;
   line-height: 1;
@@ -2547,7 +2548,7 @@ footer {
 .shop-cart-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem; margin: 1.75rem 0 0.5rem; }
 .shop-add-to-cart { border: none; cursor: pointer; font-family: inherit; }
 .shop-add-to-cart[disabled] { opacity: 0.5; cursor: not-allowed; }
-.shop-add-to-cart[disabled]:hover { background: var(--orange); transform: none; }
+.shop-add-to-cart[disabled]:hover { background: var(--orange-button); transform: none; }
 .shop-add-feedback { color: #72c98f; font-size: 0.78rem; }
 .shop-add-feedback[hidden] { display: none; }
 .shop-detail-info .shop-enquiry-link { margin-top: 1rem; }
@@ -2580,7 +2581,7 @@ footer {
   background: var(--panel); color: var(--white);
   border: none; cursor: pointer; font-size: 1.1rem; line-height: 1;
 }
-.cart-qty-btn:hover:not([disabled]) { background: var(--orange); }
+.cart-qty-btn:hover:not([disabled]) { background: var(--orange-button); }
 .cart-qty-btn[disabled] { opacity: 0.4; cursor: not-allowed; }
 .cart-qty-value { min-width: 2.5rem; text-align: center; color: var(--cream); font-variant-numeric: tabular-nums; }
 .cart-row-total { color: var(--white); font-family: var(--font-heading); font-size: 1.4rem; white-space: nowrap; }
