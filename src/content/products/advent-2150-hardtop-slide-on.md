@@ -4,9 +4,9 @@ category: "slide-on"
 tagline: "The Advent 2150 is the go-anywhere companion for 4x4 space cab utes and select dual cab ute owners."
 price: "$72,000"
 priceBadge: "IMMEDIATE DELIVERY"
-status: "on-sale"
+status: "available"
 onlinePurchaseEnabled: true
-onSale: true
+onSale: false
 featured: true
 heroImage: "/images/optimized/products/advent-2150-hardtop-slide-on/01-advent-2150-hardtop-slide-on-hero.webp"
 gallery:

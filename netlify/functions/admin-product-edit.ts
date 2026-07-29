@@ -2,6 +2,7 @@ import type { Handler } from '@netlify/functions';
 import { randomUUID } from 'crypto';
 import { parse, stringify } from 'yaml';
 import { replaceProductHero } from '../../src/lib/productImages';
+import { vehicleSaleStateForStatus } from '../../src/lib/productSaleState';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
@@ -255,9 +256,10 @@ export const handler: Handler = async (event) => {
     data.price = payload.price!.trim();
   }
   if (!isStoreProduct) {
-    data.status = payload.status;
+    Object.assign(data, vehicleSaleStateForStatus(payload.status!));
+  } else {
+    data.onSale = Boolean(payload.onSale);
   }
-  data.onSale = Boolean(payload.onSale);
   data.featured = Boolean(payload.featured);
   data.tagline = payload.tagline!.trim();
   const replacement = replaceProductHero(

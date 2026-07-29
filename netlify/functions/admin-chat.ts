@@ -221,6 +221,7 @@ STATUS VALUES for products: available | on-sale | coming-soon
 ONSALE: true | false (boolean)
 
 RULES:
+- For vehicle products, keep status and onSale consistent: on sale means status: on-sale and onSale: true; removing a vehicle from the sale page means status: available and onSale: false. Never propose changing only one of these fields.
 - Always read the file first before proposing changes
 - For an existing file, use propose_patch with small exact old/new snippets instead of returning the complete file
 - Never use propose_change for an existing page, component, layout, stylesheet, or config file

@@ -6,6 +6,7 @@ import initialTestimonials from '../data/homepage/testimonials.json';
 import initialPaymentSettings from '../data/payment-settings.json';
 import { adminFetch, clearAdminToken } from '../lib/adminApi';
 import { replaceProductHero } from '../lib/productImages';
+import { vehicleSaleStateForStatus, vehicleSaleStateForToggle } from '../lib/productSaleState';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -4715,7 +4716,14 @@ export default function AdminPanel() {
                 <div className="admin-form-grid admin-form-grid--three" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.4rem' }}>
                   <input value={editProduct.price} onChange={e => setEditProduct(p => p && ({ ...p, price: e.target.value }))} placeholder="$72,000" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
                   <input value={editProduct.compareAtPrice} onChange={e => setEditProduct(p => p && ({ ...p, compareAtPrice: e.target.value }))} placeholder="Original price / was price" style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
-                  <select value={editProduct.status} onChange={e => setEditProduct(p => p && ({ ...p, status: e.target.value as ProductStatus }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
+                  <select value={editProduct.status} onChange={e => {
+                    const status = e.target.value as ProductStatus;
+                    setEditProduct(product => product && ({
+                      ...product,
+                      status,
+                      ...(!product.store ? vehicleSaleStateForStatus(status) : {}),
+                    }));
+                  }} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }}>
                     <option value="available">Available</option>
                     <option value="on-sale">On sale</option>
                     <option value="coming-soon">Coming soon</option>
@@ -4845,7 +4853,14 @@ export default function AdminPanel() {
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.4rem', color: '#ddd', fontSize: '0.78rem' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <input type="checkbox" checked={editProduct.onSale} onChange={e => setEditProduct(p => p && ({ ...p, onSale: e.target.checked }))} />
+                    <input type="checkbox" checked={editProduct.onSale} onChange={e => {
+                      const onSale = e.target.checked;
+                      setEditProduct(product => product && ({
+                        ...product,
+                        onSale,
+                        ...(!product.store ? vehicleSaleStateForToggle(product.status, onSale) : {}),
+                      }));
+                    }} />
                     On sale
                   </label>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
