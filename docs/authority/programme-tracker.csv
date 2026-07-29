@@ -11,5 +11,5 @@ P1-05,1,Internal links,"Homepage/category links to guide cluster",P1-04,Website 
 P1-06,1,Legacy recovery,"Blog hub redirect and URL inventory",P1-04,Website team,Part complete,2026-07-29,"Production /blog/ redirect verified; public search and Internet Archive inventory found no article paths; obtain authenticated historical URL exports"
 P1-07,1,Sitemap,"Material-change lastmod policy",P0-02,Website team,Complete,2026-07-29,"Built sitemap includes controlled dates only on recorded paths"
 P1-08A,1,AI discovery,"Guides and tools in llms references",P1-04,Website team,Complete,2026-07-29,"public/llms.txt and public/llms-full.txt; robots reviewed"
-P1-08,1,Discovery,"IndexNow utility",P1-04,Website team,Deployment prepared,2026-07-29,"Public verification key file added; submit after the matching production deployment is live"
-P1-09,1,Webmaster tools,"Sitemap submission and recrawl",P1-04,Account holder,Part complete,2026-07-29,"Main fd37b40 deployed and production gate passed; Search Console and Bing submissions still require account access"
+P1-08,1,Discovery,"IndexNow utility",P1-04,Website team,Complete,2026-07-29,"Public key verified on production; IndexNow accepted all 33 canonical sitemap URLs with HTTP 202"
+P1-09,1,Webmaster tools,"Sitemap submission and recrawl",P1-04,Account holder,Part complete,2026-07-29,"Main 6aba4eb deployed and production gate passed; IndexNow complete; Search Console and Bing submissions still require account access"

@@ -5,7 +5,7 @@ Current source branch: `staging`
 
 ## Deployment outcome
 
-Deploy Preview #9 was approved and merged in GitHub. Production deploy `6a69a7d41e3ffa00084fbb06` published main commit `fd37b40c83aceb4b6d3ed67cfc909143d64e8e79` successfully on 29 July 2026. The production authority gate passed except for four legacy redirects whose destination product had since been archived; the follow-up change redirects those URLs to the live Expedition category instead.
+Deploy Preview #9 was approved and merged in GitHub. Production deploy `6a69a7d41e3ffa00084fbb06` published main commit `fd37b40c83aceb4b6d3ed67cfc909143d64e8e79` successfully on 29 July 2026. The production authority gate found four legacy redirects whose destination product had since been archived. Deploy Preview #10 corrected them and incorporated the owner-supplied Lighthouse findings; production deploy `6a69ab548464d000082cc0a8` published follow-up main commit `6aba4eb0e4328a1a69dda0ce5894a70d4ac3e2c0`. The final production gate passed.
 
 ## Safety boundary
 
@@ -76,4 +76,4 @@ Check the preview deployment for:
 
 The approved isolated preview was deployed to production. Redirect, sitemap, canonical, structured-data and public wording checks were repeated against `https://beyondrv.com.au`; results are recorded in `baselines/2026-07-29-production-verification.md`.
 
-Search Console and Bing actions remain separate external steps requiring account access. The owner authorised the post-production follow-through; IndexNow can be submitted only after the matching public key file in the follow-up deployment is live.
+Search Console and Bing actions remain separate external steps requiring account access. The IndexNow key was verified on production and all 33 canonical sitemap URLs were accepted with HTTP `202`.
