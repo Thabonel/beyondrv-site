@@ -102,7 +102,7 @@ for (const file of htmlFiles) {
   const legacyBrandMentions = (html.match(/\bByond ?RV\b/g) ?? []).length;
   const unverifiedOriginClaims = (
     html.match(
-      /\b(?:(?:custom[- ]built|built|manufactured|made|finished)(?:\s+to\s+order)?\s+in\s+Queensland|Queensland[-\s]+(?:built|made|manufactured|finished)|100%\s+Queensland\s+finished)\b/gi,
+      /\b(?:(?:custom[- ]built|built|manufactured|made|finished)(?:\s+to\s+order)?\s+in\s+Queensland|Queensland[-\s]+(?:built|made|manufactured|finished)|100%\s+Queensland\s+finished|(?:we|Beyond RV)\s+(?:build|manufacture)s?\s+(?:every\s+)?(?:caravans?|campers?|slide-ons?|shells?)|one\s+of\s+the\s+few\s+manufacturers)\b/gi,
     ) ?? []
   ).map(decode);
 

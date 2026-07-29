@@ -3,7 +3,7 @@
 **Handover date:** 29 July 2026
 **Repository:** `/Users/thabonel/Code/Byond_RV`
 **Current branch:** `staging`
-**Status:** Phases 0 and 1 are locally implemented as far as possible without external accounts, production deployment or one remaining owner clarification.
+**Status:** Phases 0 and 1 are locally implemented as far as possible without external accounts or final production verification. All requested owner clarifications are recorded.
 
 ## Start here
 
@@ -30,6 +30,7 @@ The owners confirmed the following on 29 July 2026:
 2. Beyond RV has **15 years of RV experience**.
 3. Every caravan, camper and motorhome Beyond RV completes is built to the applicable **Australian Design Rule requirements** and receives **Queensland gas and 240V electrical certification**.
 4. Beyond RV provides a **five-year construction warranty**. Individual appliances retain their **manufacturer warranties**.
+5. Caravan and camper shells are **imported, then completed at the Beyond RV workshop in Mutdapilly, Queensland**.
 
 The legal seller identity was extracted from the approved contract-generator record:
 
@@ -38,13 +39,9 @@ The legal seller identity was extracted from the approved contract-generator rec
 
 These facts have been applied to the website, AI knowledge files, schema identity and authority evidence records.
 
-## One owner answer still required
+## Product-origin wording resolved
 
-The earlier question about what Beyond RV does for each product range was unclear. Ask only this:
-
-> For the caravan and camper shells, which is correct: (a) made at Mutdapilly, (b) imported and then completed at Mutdapilly, or (c) it differs by model? If it differs, list each model/range and choose (a) or (b).
-
-Until answered, do not publish claims such as “Queensland built”, “manufactured in Queensland” or “100% Queensland finished”. The unconfirmed claims have been removed or narrowed in the main public pages.
+The owner confirmed on 29 July 2026 that caravan and camper shells are imported, then completed at the Beyond RV workshop in Mutdapilly, Queensland. Public wording must preserve that distinction and must not describe the shells as “Queensland built”, “manufactured in Queensland” or “100% Queensland finished”.
 
 ## Work completed
 
@@ -129,9 +126,9 @@ All final local checks passed on 29 July 2026:
 | Check | Result |
 |---|---|
 | `npm run check` | Passed: 0 errors; 61 informational hints from existing code |
-| `npm test` | Passed: 108/108 |
-| `npm run build` | Passed: 40 pages built; sitemap generated |
-| Authority crawl audit | Passed: 40 pages; zero findings |
+| `npm test` | Passed: 118/118 |
+| `npm run build` | Passed: 39 pages built; sitemap generated |
+| Authority crawl audit | Passed: 39 pages; zero findings |
 | Stale claim search | Passed for the removed Queensland-built/finished and old experience/warranty wording in public sources |
 | `git diff --check` | Passed |
 
@@ -144,10 +141,9 @@ Do not represent these as completed:
 1. Google Search Console access/export and production indexing submissions.
 2. Bing Webmaster Tools access/export and production sitemap inspection.
 3. Recovery of old article URLs from historical search/CMS/backlink data.
-4. The remaining owner clarification about shell origin and manufacturing scope.
-5. Production redirect, sitemap and schema verification after deployment.
-6. Live IndexNow submission after a public key file is deployed.
-7. Google Business Profile and other external citation reconciliation.
+4. Production redirect, sitemap and schema verification after deployment.
+5. Live IndexNow submission after a public key file is deployed.
+6. Google Business Profile and other external citation reconciliation.
 
 The authoritative details and smallest next action for each are in `docs/authority/BLOCKERS.md`.
 
@@ -161,7 +157,7 @@ A safe continuation is:
 
 1. Review `git status --short` and the Phase 0–1 backlog file map.
 2. Review the authority-related diff only.
-3. Obtain the one remaining owner answer and update claim C-005/C-009.
+3. Review the resolved C-005/C-009 imported-shell wording across public and AI-facing copy.
 4. Decide whether to isolate this work on a `codex/` branch or make a carefully scoped commit on the intended branch.
 5. Push to a preview/staging deployment first.
 6. Run live redirect, sitemap, canonical and schema checks.
@@ -186,4 +182,4 @@ npm run authority:indexnow -- /guides/ /our-slide-on-campers/
 
 ## Recommended next task prompt
 
-> Read `docs/HANDOVER-SLIDE-ON-AUTHORITY-PHASE-0-1.md`, then read the linked backlog, blocker and verification records. Preserve all unrelated working-tree changes. Apply the owner's product-origin answer if available, review only the authority-related diff, and prepare a safely scoped preview deployment plan. Do not push, merge, deploy or submit URLs without explicit approval.
+> Read `docs/HANDOVER-SLIDE-ON-AUTHORITY-PHASE-0-1.md`, then read the linked backlog, blocker and verification records. Preserve all unrelated working-tree changes. Review only the authority-related diff and prepare a safely scoped preview deployment plan. Do not push, merge, deploy or submit URLs without explicit approval.

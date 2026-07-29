@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-07-29T03:29:39.072Z",
-  "source": "/Users/thabonel/Code/Byond_RV/dist",
-  "pageCount": 40,
+  "generatedAt": "2026-07-29T07:03:00.961Z",
+  "source": "/private/tmp/byondrv-staging-preview.vLvZJs/dist",
+  "pageCount": 39,
   "failureCount": 0,
   "failures": {
     "missingTitle": [],
@@ -24,35 +24,6 @@
       "canonical": "https://beyondrv.com.au/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/",
       "h1s": [
         "3.5m DIY Camper Box with Cabover and Underfloor Storage"
-      ],
-      "missingAlt": 0,
-      "schemaTypes": [
-        "AutomotiveBusiness",
-        "Brand",
-        "BreadcrumbList",
-        "Country",
-        "ListItem",
-        "LocalBusiness",
-        "Offer",
-        "OpeningHoursSpecification",
-        "Organization",
-        "PostalAddress",
-        "Product",
-        "State"
-      ],
-      "duplicateSchemaIds": [],
-      "invalidAvailability": [],
-      "legacyBrandMentions": 0,
-      "unverifiedOriginClaims": [],
-      "jsonLdParseErrors": []
-    },
-    {
-      "route": "/3-5m-poptop-truck-camper/",
-      "title": "Custom 3.5m Electric Pop-Top Truck Camper | Beyond RV",
-      "description": "Custom 3.5m electric pop-top truck camper available from Beyond RV from $49,999.",
-      "canonical": "https://beyondrv.com.au/3-5m-poptop-truck-camper/",
-      "h1s": [
-        "Custom 3.5m Electric Pop-Top Truck Camper"
       ],
       "missingAlt": 0,
       "schemaTypes": [

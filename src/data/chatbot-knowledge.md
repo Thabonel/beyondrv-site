@@ -6,7 +6,8 @@ Use this file for business knowledge that should guide the public website chatbo
 
 - Beyond RV is based in Mutdapilly, Queensland, and offers slide-on campers, caravans, expedition vehicles and related customer support.
 - Beyond RV is an Australian family-run RV business with 15 years of hands-on experience.
-- Beyond RV focuses on caravans, campers and expedition vehicles for Australian touring. Do not infer where a shell was manufactured or which work was performed at Mutdapilly unless the product record says so.
+- Beyond RV's caravan and camper shells are imported, then completed at its workshop in Mutdapilly, Queensland.
+- The exact fitout scope varies by product and project. Do not claim specific work was completed at Mutdapilly unless the product record or approved public copy states it.
 - Beyond RV began in Mulgrave, Sydney, with a first slide-on ute camper project at the family home, then moved its operations to Queensland.
 - Contact phone: 0430 863 819.
 - Contact email: beyondcaravans@gmail.com.
@@ -20,7 +21,7 @@ Use this file for business knowledge that should guide the public website chatbo
 - What makes Beyond RV different: vehicle-led product and custom-project discussions from utes to Unimogs; Queensland-based handover and ongoing support; applicable ADR requirements plus Queensland gas and 240V electrical certification for every caravan, camper and motorhome Beyond RV completes; and a five-year construction warranty, with individual appliances retaining their manufacturer warranties.
 - Beyond RV values honesty, transparency, care, fairness, craftsmanship, innovation, and practical adventure use.
 - Beyond RV says its products are designed for rugged Australian terrain and long adventure life.
-- Do not claim where shells are manufactured or finished, or describe Beyond RV as the only manufacturer in Queensland, unless the owner confirms the precise product scope.
+- Do not describe Beyond RV's caravan or camper shells as Queensland built or manufactured in Queensland. Do not describe Beyond RV as the only manufacturer in Queensland.
 
 ## Ideal customer
 
@@ -68,6 +69,7 @@ Use this file for business knowledge that should guide the public website chatbo
 
 ## Construction and engineering
 
+- Caravan and camper shells are imported, then completed at the Beyond RV workshop in Mutdapilly, Queensland.
 - Beyond RV uses full composite construction across all models. Walls are 29mm fibreglass sandwich panels with a built-in PVC frame. Floors are 17mm infused one-piece composite (truck campers) or 25mm honeycomb composite (caravans). Roofs are 55mm fibreglass alloy, fully insulated (truck campers). All shells are 100% timber-free, with no wood or plywood in the structure.
 - Subframes and bases are fully welded aluminium. Caravans use a 6 inch hot dipped galvanised chassis and drawbar.
 - Caravan suspension is independent coil with dual shock absorbers. Caravans use a D035 off-road hitch and 10 inch electric brakes with Brake Safe. Slide-on campers and truck campers have no suspension of their own and rely on the host vehicle.
@@ -77,7 +79,7 @@ Use this file for business knowledge that should guide the public website chatbo
 - Compared to timber-framed caravans: Beyond RV is 100% timber-free, so there is no rot risk, lower weight, and no thermal bridging from timber framing.
 - Off-road testing details are not published on the site. If asked, recommend contacting the team.
 - Maintenance requirements are covered in handover documentation. If asked, recommend contacting the team.
-- If a customer asks about construction details not published on the site (panel core material, bonding method, R-values, dust sealing, sourcing of shells), say the information is not publicly listed and suggest contacting the team directly.
+- If a customer asks about construction details not published on the site (panel core material, bonding method, R-values, dust sealing, overseas supplier or country of origin), say the information is not publicly listed and suggest contacting the team directly.
 
 ## Chatbot tone and rules
 
