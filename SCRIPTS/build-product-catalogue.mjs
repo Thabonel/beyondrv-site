@@ -14,6 +14,7 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const ROOT = join(__dirname, '..');
 const PRODUCTS_DIR = join(ROOT, 'src/content/products');
 const OUTPUT_FILE = join(ROOT, 'netlify/functions/product-catalogue.json');
+const ARCHIVED_OUTPUT_FILE = join(ROOT, 'netlify/functions/product-archive-catalogue.json');
 const KNOWLEDGE_FILE = join(ROOT, 'src/data/chatbot-knowledge.md');
 const KNOWLEDGE_OUTPUT_FILE = join(ROOT, 'netlify/functions/chatbot-knowledge.json');
 const ADMIN_KNOWLEDGE_FILE = join(ROOT, 'src/data/admin-chat-knowledge.md');
@@ -76,10 +77,9 @@ if (!existsSync(PRODUCTS_DIR)) {
 
 const mdFiles = collectMdFiles(PRODUCTS_DIR);
 
-const catalogue = mdFiles.flatMap((filePath) => {
+const productRecords = mdFiles.map((filePath) => {
   const fileContent = readFileSync(filePath, 'utf-8');
   const { data, content } = matter(fileContent);
-  if (data.archived === true) return [];
 
   const slug = slugFromPath(filePath);
   const gallery = imageListFromData(data);
@@ -91,7 +91,7 @@ const catalogue = mdFiles.flatMap((filePath) => {
   // Keep only the first 4 keySpecs to save tokens
   const keySpecs = Array.isArray(data.keySpecs) ? data.keySpecs.slice(0, 4) : [];
 
-  return [{
+  return {
     store:        data.store === true,
     slug,
     title:        data.title ?? data.name ?? '',
@@ -132,14 +132,23 @@ const catalogue = mdFiles.flatMap((filePath) => {
     suitabilityData: data.suitabilityData && typeof data.suitabilityData === 'object' ? data.suitabilityData : undefined,
     keySpecs,
     description,
-  }];
+    archived:     data.archived === true,
+    archivedAt:   data.archivedAt ?? '',
+  };
 });
+
+const archivedCatalogue = productRecords.filter(product => product.archived);
+const catalogue = productRecords
+  .filter(product => !product.archived)
+  .map(({ archived: _archived, archivedAt: _archivedAt, ...product }) => product);
 
 // Sort for deterministic output (slug alphabetical)
 catalogue.sort((a, b) => a.slug.localeCompare(b.slug));
+archivedCatalogue.sort((a, b) => a.slug.localeCompare(b.slug));
 
 mkdirSync(dirname(OUTPUT_FILE), { recursive: true });
 writeFileSync(OUTPUT_FILE, JSON.stringify(catalogue, null, 2) + '\n', 'utf-8');
+writeFileSync(ARCHIVED_OUTPUT_FILE, JSON.stringify(archivedCatalogue, null, 2) + '\n', 'utf-8');
 
 // ─── Shop product manifest (trusted checkout source, store: true only) ──────────
 // Emits ONLY an explicit public allow-list of fields (never private/internal data),
@@ -213,6 +222,7 @@ writeFileSync(
 console.log(`✓ Admin chat knowledge written: ${ADMIN_KNOWLEDGE_OUTPUT_FILE}`);
 
 console.log(`✓ Product catalogue written: ${OUTPUT_FILE}`);
+console.log(`✓ Archived product catalogue written: ${ARCHIVED_OUTPUT_FILE} (${archivedCatalogue.length} products)`);
 console.log(`✓ Chatbot knowledge written: ${KNOWLEDGE_OUTPUT_FILE}`);
 console.log(`  ${catalogue.length} products indexed:`);
 for (const p of catalogue) {

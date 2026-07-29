@@ -20,8 +20,9 @@ import {
   type ResolvedProduct,
 } from './admin-chat-core';
 import catalogue from './product-catalogue.json';
+import archivedCatalogue from './product-archive-catalogue.json';
 import adminKnowledge from './admin-chat-knowledge.json';
-import { archiveProductMarkdown } from './product-archive-core';
+import { archiveProductMarkdown, restoreProductMarkdown } from './product-archive-core';
 
 const openAiKey = process.env.OPENAI_API_KEY;
 const client = openAiKey ? new OpenAI({ apiKey: openAiKey }) : null;
@@ -244,6 +245,8 @@ RULES:
 - Do not archive a product merely because a lead is marked won or one unit sells. Archive only when the owner explicitly asks to remove that product from the public site.
 - For an archive request, use find_products first and then archive_product. Do not simulate an archive with propose_patch or delete the product file.
 - Archiving preserves the source record, removes the product from public pages/catalogues after deployment, and must be reviewed in Pending Changes before the owner clicks Deploy.
+- For a restore or unarchive request, use find_archived_products first and then restore_product. Do not restore an active product or guess an archived slug.
+- Restoring removes the archive metadata and returns the previous product details to the public site after the owner reviews and deploys the pending change.
 - For product videos, store YouTube data in a youtubeVideo frontmatter object. Store only the clean video ID in youtubeVideo.id, not the full URL. Preserve or remove the whole youtubeVideo block exactly as instructed by the owner.
 - Existing product image paths can be reused in other site data; the chat cannot upload a brand-new binary image file
 - Be concise and friendly
@@ -287,6 +290,37 @@ async function findProductsTool(queryValue: unknown, limitValue: unknown) {
   }
 
   const products = productCatalogueEntries(catalogue);
+  const matches = findProductMatches(products, query, limit);
+  const resolved = await Promise.all(matches.map(async product => {
+    const sourcePath = `src/content/products/${product.slug}.md`;
+    const currentContent = await githubFetch(sourcePath);
+    return resolveProductMetadata(product, currentContent);
+  }));
+
+  return {
+    products: resolved,
+    output: JSON.stringify({
+      branch: GITHUB_BRANCH,
+      count: resolved.length,
+      matches: resolved.map(product => ({
+        ...product,
+        galleryCount: product.gallery.length,
+      })),
+    }),
+  };
+}
+
+async function findArchivedProductsTool(queryValue: unknown, limitValue: unknown) {
+  const query = clean(queryValue, 240);
+  const limit = Math.max(1, Math.min(10, typeof limitValue === 'number' ? Math.round(limitValue) : 5));
+  if (!query) {
+    return {
+      output: JSON.stringify({ branch: GITHUB_BRANCH, count: 0, matches: [], error: 'An archived product query is required.' }),
+      products: [] as ResolvedProduct[],
+    };
+  }
+
+  const products = productCatalogueEntries(archivedCatalogue);
   const matches = findProductMatches(products, query, limit);
   const resolved = await Promise.all(matches.map(async product => {
     const sourcePath = `src/content/products/${product.slug}.md`;
@@ -352,6 +386,33 @@ const tools = [
       type: 'object' as const,
       properties: {
         slug: { type: 'string', description: 'Exact product slug returned by find_products' },
+      },
+      additionalProperties: false,
+      required: ['slug'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'find_archived_products',
+    description: 'Find products retained in the private archive and return exact current slugs and source paths. Required before restoring a product.',
+    parameters: {
+      type: 'object' as const,
+      properties: {
+        query: { type: 'string', description: 'Archived product name or identifying words' },
+        limit: { type: 'number', description: 'Maximum matches to return, default 5, max 10' },
+      },
+      additionalProperties: false,
+      required: ['query'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'restore_product',
+    description: 'Queue a confirmed archived product restore for owner review. This returns the retained product to public routes and catalogues after deployment. Use find_archived_products first.',
+    parameters: {
+      type: 'object' as const,
+      properties: {
+        slug: { type: 'string', description: 'Exact archived product slug returned by find_archived_products' },
       },
       additionalProperties: false,
       required: ['slug'],
@@ -710,6 +771,7 @@ CURRENT DATE:
   // Cache of file content the actor has read (for delta-based risk classification)
   const readCache: Record<string, string | null> = {};
   const resolvedProducts = new Map<string, ResolvedProduct>();
+  const resolvedArchivedProducts = new Map<string, ResolvedProduct>();
 
   let responseId: string | undefined;
   let currentInput: unknown = messages.map((message) => ({
@@ -773,6 +835,11 @@ CURRENT DATE:
           lookup.products.forEach(product => resolvedProducts.set(product.slug, product));
           result = lookup.output;
 
+        } else if (!result && call.name === 'find_archived_products') {
+          const lookup = await findArchivedProductsTool(input.query, input.limit);
+          lookup.products.forEach(product => resolvedArchivedProducts.set(product.slug, product));
+          result = lookup.output;
+
         } else if (!result && call.name === 'archive_product') {
           const slug = clean(input.slug, 240);
           const product = resolvedProducts.get(slug);
@@ -804,6 +871,41 @@ CURRENT DATE:
                 }
               } catch (error) {
                 result = `Error: could not archive ${product.title}. ${error instanceof Error ? error.message : String(error)}`;
+              }
+            }
+          }
+
+        } else if (!result && call.name === 'restore_product') {
+          const slug = clean(input.slug, 240);
+          const product = resolvedArchivedProducts.get(slug);
+          if (!product) {
+            result = `ARCHIVED PRODUCT LOOKUP REQUIRED: Use find_archived_products and pass one exact returned slug before restoring ${slug || 'a product'}.`;
+          } else {
+            const currentContent = await githubFetch(product.sourcePath);
+            readCache[product.sourcePath] = currentContent;
+            if (!currentContent) {
+              result = `Error: archived product file not found at ${product.sourcePath}`;
+            } else {
+              try {
+                const restored = restoreProductMarkdown(currentContent);
+                if (restored.alreadyActive) {
+                  result = `${restored.title} is already active.`;
+                } else {
+                  const pendingChange: PendingChange = {
+                    path: product.sourcePath,
+                    content: restored.content,
+                    description: `Restore ${restored.title} to the public site`,
+                    proposal_id: randomUUID(),
+                    judgeDecision: 'allow',
+                    risk_flags: ['deterministic_product_restore'],
+                  };
+                  const existingIndex = pendingChanges.findIndex(change => change.path === pendingChange.path);
+                  if (existingIndex >= 0) pendingChanges[existingIndex] = pendingChange;
+                  else pendingChanges.push(pendingChange);
+                  result = `Restore queued for ${restored.title}. The owner must review it in Pending Changes and click Deploy before it returns to the public site.`;
+                }
+              } catch (error) {
+                result = `Error: could not restore ${product.title}. ${error instanceof Error ? error.message : String(error)}`;
               }
             }
           }
