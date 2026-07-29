@@ -32,7 +32,7 @@ export default function CookieConsent() {
     }}>
       <span>
         We use cookies to understand how the site is used.{' '}
-        <a href="/privacy-policy/" style={{ color: '#E8540A', textDecoration: 'none' }}>
+        <a href="/privacy-policy/" style={{ color: '#F06A24', textDecoration: 'none' }}>
           Privacy policy
         </a>
       </span>
@@ -45,7 +45,7 @@ export default function CookieConsent() {
         </button>
         <button
           onClick={accept}
-          style={{ background: '#E8540A', border: 'none', color: '#fff', padding: '0.4rem 1rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}
+          style={{ background: '#CB4600', border: 'none', color: '#fff', padding: '0.4rem 1rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}
         >
           Accept
         </button>
