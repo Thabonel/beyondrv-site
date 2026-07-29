@@ -1,5 +1,8 @@
 ---
 import { buildOrganizationSchema } from '../data/siteIdentity.js';
+import bebasNeueFont from '@fontsource/bebas-neue/files/bebas-neue-latin-400-normal.woff2?url';
+import outfitFont from '@fontsource-variable/outfit/files/outfit-latin-wght-normal.woff2?url';
+import playfairItalicFont from '@fontsource-variable/playfair-display/files/playfair-display-latin-wght-italic.woff2?url';
 
 interface Props {
   title: string;
@@ -62,25 +65,9 @@ const organizationSchema = buildOrganizationSchema();
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={ogImage} />
 
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-  href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@1,400;1,600&display=swap"
-  rel="preload"
-  as="style"
-/>
-<link
-  href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@1,400;1,600&display=swap"
-  rel="stylesheet"
-  media="print"
-  onload="this.onload=null;this.media='all'"
-/>
-<noscript>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@1,400;1,600&display=swap"
-    rel="stylesheet"
-  />
-</noscript>
+<link rel="preload" href={bebasNeueFont} as="font" type="font/woff2" crossorigin="anonymous" />
+<link rel="preload" href={outfitFont} as="font" type="font/woff2" crossorigin="anonymous" />
+<link rel="preload" href={playfairItalicFont} as="font" type="font/woff2" crossorigin="anonymous" />
 
 {structuredData && (
   <script is:inline type="application/ld+json" set:html={JSON.stringify(

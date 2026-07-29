@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProductCard from '../components/ProductCard.astro';
-import { displayImageUrl, imageSrcSet } from '../lib/media';
+import { croppedImageSrcSet, croppedImageUrl, displayImageUrl, imageSrcSet } from '../lib/media';
 import recentBuildsData from '../data/homepage/recent-builds.json';
 import testimonialsData from '../data/homepage/testimonials.json';
 import { ORGANIZATION_ID, SITE_IDENTITY, SITE_URL } from '../data/siteIdentity.js';
@@ -180,8 +180,8 @@ const heroSizes = '100vw';
     <div class="range-grid">
       <div class="model-card featured reveal">
         <img
-          src={displayImageUrl(rangeImages.expedition, 1200)}
-          srcset={imageSrcSet(rangeImages.expedition, [480, 640, 840, 960, 1200, 1380])}
+          src={croppedImageUrl(rangeImages.expedition, 1200)}
+          srcset={croppedImageSrcSet(rangeImages.expedition, [480, 640, 840, 960, 1200, 1380])}
           sizes="(max-width: 900px) calc(100vw - 3rem), 92vw"
           alt="Beyond RV Expedition Vehicles — Isuzu NPS builds"
           loading="lazy"
@@ -199,8 +199,8 @@ const heroSizes = '100vw';
 
       <div class="model-card featured reveal">
         <img
-          src={displayImageUrl(rangeImages.slideOn, 1200)}
-          srcset={imageSrcSet(rangeImages.slideOn, [480, 640, 840, 960, 1200, 1380])}
+          src={croppedImageUrl(rangeImages.slideOn, 1200)}
+          srcset={croppedImageSrcSet(rangeImages.slideOn, [480, 640, 840, 960, 1200, 1380])}
           sizes="(max-width: 900px) calc(100vw - 3rem), 92vw"
           alt="Beyond RV Slide-On Campers — Advent range"
           loading="lazy"
@@ -218,8 +218,8 @@ const heroSizes = '100vw';
 
       <div class="model-card reveal reveal-delay-1">
         <img
-          src={displayImageUrl(rangeImages.caravan, 800)}
-          srcset={imageSrcSet(rangeImages.caravan, [480, 640, 840, 960, 1200])}
+          src={croppedImageUrl(rangeImages.caravan, 800)}
+          srcset={croppedImageSrcSet(rangeImages.caravan, [480, 640, 800, 840, 960, 1200])}
           sizes="(max-width: 900px) calc(100vw - 3rem), 46vw"
           alt="Beyond RV Sunpatch caravans"
           loading="lazy"
@@ -236,8 +236,8 @@ const heroSizes = '100vw';
 
       <div class="model-card reveal reveal-delay-2">
         <img
-          src={displayImageUrl(rangeImages.custom, 1200)}
-          srcset={imageSrcSet(rangeImages.custom, [480, 640, 840, 960, 1200, 1380])}
+          src={croppedImageUrl(rangeImages.custom, 1200)}
+          srcset={croppedImageSrcSet(rangeImages.custom, [480, 640, 840, 960, 1200, 1380])}
           sizes="(max-width: 900px) calc(100vw - 3rem), 46vw"
           alt="Beyond RV interior fit-out"
           loading="lazy"

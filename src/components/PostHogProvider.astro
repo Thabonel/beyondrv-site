@@ -1,0 +1,46 @@
+---
+const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY as string | undefined;
+---
+<span data-posthog-config data-key={posthogKey || ''} hidden></span>
+
+<script>
+  const config = document.querySelector<HTMLElement>('[data-posthog-config]');
+  const key = config?.dataset.key || '';
+  const host = 'https://us.i.posthog.com';
+  let posthogPromise: Promise<typeof import('posthog-js').default | null> | null = null;
+
+  function initialisePostHog() {
+    if (!key) return Promise.resolve(null);
+    if (posthogPromise) return posthogPromise;
+    posthogPromise = import('posthog-js').then(({ default: posthog }) => {
+      if (!(posthog as typeof posthog & { __loaded?: boolean }).__loaded) {
+        posthog.init(key, {
+          api_host: host,
+          autocapture: true,
+          capture_pageview: true,
+          persistence: 'localStorage',
+        });
+      }
+      return posthog;
+    });
+    return posthogPromise;
+  }
+
+  async function captureSuccessfulEnquiry() {
+    if (!window.location.pathname.includes('/inquiry-form/success')) return;
+    const posthog = await initialisePostHog();
+    if (!posthog) return;
+    let extra: Record<string, unknown> = {};
+    try { extra = { ...JSON.parse(localStorage.getItem('brv_referral') || '{}') }; } catch {}
+    try { extra = { ...extra, ...JSON.parse(localStorage.getItem('brv_utm') || '{}') }; } catch {}
+    posthog.capture('enquiry_submitted', extra);
+  }
+
+  if (localStorage.getItem('brv_cookie_consent') === 'accepted') {
+    void initialisePostHog().then(() => captureSuccessfulEnquiry());
+  }
+
+  window.addEventListener('brv-cookie-accepted', () => {
+    void initialisePostHog().then(() => captureSuccessfulEnquiry());
+  }, { once: true });
+</script>

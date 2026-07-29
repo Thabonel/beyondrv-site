@@ -1,0 +1,50 @@
+---
+interface Props {
+  pageTitle?: string;
+  productSlug?: string;
+  productName?: string;
+}
+const { pageTitle = '', productSlug = '', productName = '' } = Astro.props;
+---
+<div
+  class="chat-widget"
+  data-lazy-chat
+  data-page-title={pageTitle}
+  data-product-slug={productSlug}
+  data-product-name={productName}
+>
+  <button class="chat-widget-btn" type="button" aria-label="Open chat" data-lazy-chat-button>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" fill="currentColor"></path>
+    </svg>
+  </button>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-lazy-chat]').forEach((chatHost) => {
+    const launcher = chatHost.querySelector<HTMLButtonElement>('[data-lazy-chat-button]');
+    launcher?.addEventListener('click', async () => {
+      launcher.disabled = true;
+      launcher.setAttribute('aria-label', 'Loading chat');
+      try {
+        const [{ createElement }, { createRoot }, { default: SiteChatWidget }] = await Promise.all([
+          import('react'),
+          import('react-dom/client'),
+          import('./SiteChatWidget'),
+        ]);
+        const props = {
+          pageTitle: chatHost.dataset.pageTitle || undefined,
+          productSlug: chatHost.dataset.productSlug || undefined,
+          productName: chatHost.dataset.productName || undefined,
+          initiallyOpen: true,
+        };
+        chatHost.replaceChildren();
+        createRoot(chatHost).render(createElement(SiteChatWidget, props));
+      } catch (error) {
+        console.error('Unable to load chat.', error);
+        launcher.disabled = false;
+        launcher.setAttribute('aria-label', 'Open chat');
+      }
+    }, { once: true });
+  });
+</script>

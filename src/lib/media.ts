@@ -50,6 +50,26 @@ export function imageSrcSet(src: string, widths = [400, 480, 800, 1200]) {
   return candidates.map(({ width, url }) => `${url} ${width}w`).join(', ');
 }
 
+export function croppedImageUrl(src: string, width: number, aspectRatio = 16 / 10) {
+  if (!src.startsWith('/images/') && !src.startsWith('/wp-content/uploads/')) {
+    return displayImageUrl(src, width);
+  }
+  const height = Math.round(width / aspectRatio);
+  const params = new URLSearchParams({
+    url: src,
+    w: String(width),
+    h: String(height),
+    fit: 'cover',
+  });
+  return `/.netlify/images?${params.toString()}`;
+}
+
+export function croppedImageSrcSet(src: string, widths = [400, 480, 640, 840, 1200], aspectRatio = 16 / 10) {
+  return widths
+    .map((width) => `${croppedImageUrl(src, width, aspectRatio)} ${width}w`)
+    .join(', ');
+}
+
 export function thumbImageUrl(src: string) {
   if (isOptimizedProductImage(src)) return src.replace(/\.webp$/, '-thumb.webp');
   return displayImageUrl(src, 300);

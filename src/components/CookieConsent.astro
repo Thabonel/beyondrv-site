@@ -1,0 +1,28 @@
+<div class="cookie-consent" data-cookie-consent hidden>
+  <span>
+    We use cookies to understand how the site is used.
+    <a href="/privacy-policy/">Privacy policy</a>
+  </span>
+  <div class="cookie-consent-actions">
+    <button type="button" class="cookie-consent-decline" data-cookie-decline>Decline</button>
+    <button type="button" class="cookie-consent-accept" data-cookie-accept>Accept</button>
+  </div>
+</div>
+
+<script>
+  const consentBanner = document.querySelector<HTMLElement>('[data-cookie-consent]');
+  if (consentBanner && !localStorage.getItem('brv_cookie_consent')) {
+    consentBanner.hidden = false;
+  }
+
+  consentBanner?.querySelector('[data-cookie-accept]')?.addEventListener('click', () => {
+    localStorage.setItem('brv_cookie_consent', 'accepted');
+    consentBanner.hidden = true;
+    window.dispatchEvent(new Event('brv-cookie-accepted'));
+  });
+
+  consentBanner?.querySelector('[data-cookie-decline]')?.addEventListener('click', () => {
+    localStorage.setItem('brv_cookie_consent', 'declined');
+    consentBanner.hidden = true;
+  });
+</script>
