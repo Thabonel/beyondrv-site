@@ -1,141 +1,149 @@
 ---
-title: "Advent 2150 Hardtop Ute Slide-On Camper"
-category: "slide-on"
-tagline: "The Advent 2150 is the go-anywhere companion for 4x4 space cab utes and select dual cab ute owners."
-price: "$72,000"
-priceBadge: "IMMEDIATE DELIVERY"
-status: "on-sale"
+title: Advent 2150 Hardtop Ute Slide-On Camper
+category: slide-on
+tagline: The Advent 2150 is the go-anywhere companion for 4x4 space cab utes and select dual cab ute owners.
+price: $72,000
+priceBadge: IMMEDIATE DELIVERY
+status: available
 onlinePurchaseEnabled: true
 onSale: true
 featured: true
-heroImage: "/images/optimized/products/advent-2150-hardtop-slide-on/01-advent-2150-hardtop-slide-on-hero.webp"
+heroImage: /images/optimized/products/advent-2150-hardtop-slide-on/01-advent-2150-hardtop-slide-on-hero.webp
 gallery:
-  - "/images/optimized/products/advent-2150-hardtop-slide-on/02-20250801-114510.webp"
-  - "/images/optimized/products/advent-2150-hardtop-slide-on/03-20250801-114526.webp"
-  - "/images/optimized/products/advent-2150-hardtop-slide-on/04-20250801-114535.webp"
-  - "/images/optimized/products/advent-2150-hardtop-slide-on/05-dsc-0220.webp"
-  - "/images/optimized/products/advent-2150-hardtop-slide-on/06-dsc-0222.webp"
-  - "/images/optimized/products/advent-2150-hardtop-slide-on/07-dsc-0223.webp"
-  - "/images/optimized/products/advent-2150-hardtop-slide-on/08-dsc-0225.webp"
-  - "/images/optimized/products/advent-2150-hardtop-slide-on/09-dsc-0227.webp"
-  - "/images/optimized/products/advent-2150-hardtop-slide-on/10-dsc-0229.webp"
-  - "/images/optimized/products/advent-2150-hardtop-slide-on/11-dsc-0230.webp"
-  - "/images/optimized/products/advent-2150-hardtop-slide-on/12-dsc-0231.webp"
-  - "/images/optimized/products/advent-2150-hardtop-slide-on/13-dsc-0232.webp"
-  - "/images/optimized/products/advent-2150-hardtop-slide-on/14-dsc-0233.webp"
-  - "/images/optimized/products/advent-2150-hardtop-slide-on/15-dsc-0235.webp"
-  - "/images/optimized/products/advent-2150-hardtop-slide-on/16-dsc-0239.webp"
-  - "/images/optimized/products/advent-2150-hardtop-slide-on/17-dsc-0240.webp"
-  - "/images/optimized/products/advent-2150-hardtop-slide-on/18-dsc-0243.webp"
-  - "/images/optimized/products/advent-2150-hardtop-slide-on/19-dsc-0245.webp"
+  - /images/optimized/products/advent-2150-hardtop-slide-on/02-20250801-114510.webp
+  - /images/optimized/products/advent-2150-hardtop-slide-on/03-20250801-114526.webp
+  - /images/optimized/products/advent-2150-hardtop-slide-on/04-20250801-114535.webp
+  - /images/optimized/products/advent-2150-hardtop-slide-on/05-dsc-0220.webp
+  - /images/optimized/products/advent-2150-hardtop-slide-on/06-dsc-0222.webp
+  - /images/optimized/products/advent-2150-hardtop-slide-on/07-dsc-0223.webp
+  - /images/optimized/products/advent-2150-hardtop-slide-on/08-dsc-0225.webp
+  - /images/optimized/products/advent-2150-hardtop-slide-on/09-dsc-0227.webp
+  - /images/optimized/products/advent-2150-hardtop-slide-on/10-dsc-0229.webp
+  - /images/optimized/products/advent-2150-hardtop-slide-on/11-dsc-0230.webp
+  - /images/optimized/products/advent-2150-hardtop-slide-on/12-dsc-0231.webp
+  - /images/optimized/products/advent-2150-hardtop-slide-on/13-dsc-0232.webp
+  - /images/optimized/products/advent-2150-hardtop-slide-on/14-dsc-0233.webp
+  - /images/optimized/products/advent-2150-hardtop-slide-on/15-dsc-0235.webp
+  - /images/optimized/products/advent-2150-hardtop-slide-on/16-dsc-0239.webp
+  - /images/optimized/products/advent-2150-hardtop-slide-on/17-dsc-0240.webp
+  - /images/optimized/products/advent-2150-hardtop-slide-on/18-dsc-0243.webp
+  - /images/optimized/products/advent-2150-hardtop-slide-on/19-dsc-0245.webp
 keySpecs:
-  - label: "Base"
-    value: "2150mm x 2000mm"
-  - label: "Suits"
-    value: "Space cab / select dual cab utes"
-  - label: "Roof"
-    value: "Hardtop"
+  - label: Base
+    value: 2150mm x 2000mm
+  - label: Suits
+    value: Space cab / select dual cab utes
+  - label: Roof
+    value: Hardtop
 specGroups:
-  - group: "Dimensions"
+  - group: Dimensions
     items:
-      - label: "Base"
-        value: "2150mm base with north-south cabover sleeping area"
-      - label: "Roof"
-        value: "Hardtop"
-  - group: "Build and Construction"
+      - label: Base
+        value: 2150mm base with north-south cabover sleeping area
+      - label: Roof
+        value: Hardtop
+  - group: Build and Construction
     items:
-      - label: "Body"
-        value: "Full composite construction, no wood or plywood used"
-      - label: "Base"
-        value: "Fully welded aluminium base"
-      - label: "Jack legs"
-        value: "12V electric jack legs with remote control"
-      - label: "Walls"
-        value: "Fibreglass sandwich walls with built-in PVC frame"
-      - label: "Doors and windows"
-        value: "Quality RV flush mounted entry door and windows"
-      - label: "Vehicle connection"
-        value: "7 pin trailer plug and charging Anderson plugs"
-      - label: "Certification"
-        value: "Gas certificate and 240V electrical certificate"
-      - label: "Warranty"
-        value: "5-year Beyond RV construction warranty; individual appliances retain manufacturer warranties"
-  - group: "Internal Features"
+      - label: Body
+        value: Full composite construction, no wood or plywood used
+      - label: Base
+        value: Fully welded aluminium base
+      - label: Jack legs
+        value: 12V electric jack legs with remote control
+      - label: Walls
+        value: Fibreglass sandwich walls with built-in PVC frame
+      - label: Doors and windows
+        value: Quality RV flush mounted entry door and windows
+      - label: Vehicle connection
+        value: 7 pin trailer plug and charging Anderson plugs
+      - label: Certification
+        value: Gas certificate and 240V electrical certificate
+      - label: Warranty
+        value: 5-year Beyond RV construction warranty; individual appliances retain manufacturer warranties
+  - group: Internal Features
     items:
-      - label: "Finish"
-        value: "High quality modern finish and interior finish"
-      - label: "Bathroom"
-        value: "Shower toilet combo, 900L x 700W, with stainless steel shower tray"
-      - label: "Ventilation"
-        value: "Two-way exhaust fan with LED"
-      - label: "Cabinetry"
-        value: "Quality European cabinetry hardware"
-      - label: "Bed"
-        value: "High quality queen size foam mattress"
-      - label: "Dining"
-        value: "Internal dining area with table"
-      - label: "Upholstery"
-        value: "High quality fabric upholstery"
-      - label: "Kitchen"
-        value: "Full internal kitchenette with laminated hand-crafted benchtop"
-      - label: "Skylight"
-        value: "700 x 500 skylight with LED above bed"
-  - group: "External Features"
+      - label: Finish
+        value: High quality modern finish and interior finish
+      - label: Bathroom
+        value: Shower toilet combo, 900L x 700W, with stainless steel shower tray
+      - label: Ventilation
+        value: Two-way exhaust fan with LED
+      - label: Cabinetry
+        value: Quality European cabinetry hardware
+      - label: Bed
+        value: High quality queen size foam mattress
+      - label: Dining
+        value: Internal dining area with table
+      - label: Upholstery
+        value: High quality fabric upholstery
+      - label: Kitchen
+        value: Full internal kitchenette with laminated hand-crafted benchtop
+      - label: Skylight
+        value: 700 x 500 skylight with LED above bed
+  - group: External Features
     items:
-      - label: "Storage"
-        value: "External storage hatches with triple rubber seal"
-      - label: "Entry"
-        value: "Entry scissor steps and entry grab rail"
-      - label: "Mounting"
-        value: "Camper mounting system supplied and fitted to vehicle with fixing turnbuckles"
-      - label: "Awning"
-        value: "Electric awning"
-  - group: "Electrical"
+      - label: Storage
+        value: External storage hatches with triple rubber seal
+      - label: Entry
+        value: Entry scissor steps and entry grab rail
+      - label: Mounting
+        value: Camper mounting system supplied and fitted to vehicle with fixing turnbuckles
+      - label: Awning
+        value: Electric awning
+  - group: Electrical
     items:
-      - label: "Battery"
-        value: "200Ah lithium batteries, Supcelion brand"
-      - label: "Battery management"
-        value: "Smart battery management system"
-      - label: "Inverter"
-        value: "2000W pure sine wave inverter with remote switch"
-      - label: "Power changeover"
-        value: "Auto changeover between shore power and inverter"
-      - label: "Solar"
-        value: "2 x 180W roof-mounted solar panels"
-      - label: "Entertainment"
-        value: "Winegard TV aerial and 24 inch smart TV"
-      - label: "Fridge"
-        value: "110L 12V/240V Dometic compressor fridge"
-      - label: "Air conditioning"
-        value: "Truma Aventa reverse-cycle rooftop air conditioning"
-      - label: "Fans and outlets"
-        value: "2 x 12V marine fans, USB/cigarette sockets and 240V power points throughout"
-      - label: "Cooking and lighting"
-        value: "Induction cooktop and LED external lighting"
-  - group: "Plumbing and Gas"
+      - label: Battery
+        value: 200Ah lithium batteries, Supcelion brand
+      - label: Battery management
+        value: Smart battery management system
+      - label: Inverter
+        value: 2000W pure sine wave inverter with remote switch
+      - label: Power changeover
+        value: Auto changeover between shore power and inverter
+      - label: Solar
+        value: 2 x 180W roof-mounted solar panels
+      - label: Entertainment
+        value: Winegard TV aerial and 24 inch smart TV
+      - label: Fridge
+        value: 110L 12V/240V Dometic compressor fridge
+      - label: Air conditioning
+        value: Truma Aventa reverse-cycle rooftop air conditioning
+      - label: Fans and outlets
+        value: 2 x 12V marine fans, USB/cigarette sockets and 240V power points throughout
+      - label: Cooking and lighting
+        value: Induction cooktop and LED external lighting
+  - group: Plumbing and Gas
     items:
-      - label: "Fresh water"
-        value: "100L stainless steel fresh water tank"
-      - label: "External shower"
-        value: "External hot and cold shower"
-      - label: "Hot water"
-        value: "Truma Ultrarapid gas/electric HWS"
-      - label: "Water pump"
-        value: "12V RV water pump"
-      - label: "Gas storage"
-        value: "1 x 9kg gas bottle storage"
-      - label: "Toilet"
-        value: "Cassette toilet"
+      - label: Fresh water
+        value: 100L stainless steel fresh water tank
+      - label: External shower
+        value: External hot and cold shower
+      - label: Hot water
+        value: Truma Ultrarapid gas/electric HWS
+      - label: Water pump
+        value: 12V RV water pump
+      - label: Gas storage
+        value: 1 x 9kg gas bottle storage
+      - label: Toilet
+        value: Cassette toilet
 features:
-  - "Composite hardtop body"
-  - "Compact ute slide-on footprint"
-  - "Configured for space cab and selected dual cab utes"
+  - Composite hardtop body
+  - Compact ute slide-on footprint
+  - Configured for space cab and selected dual cab utes
 relatedSlugs:
-  - "advent-2300-hardtop-slide-on"
-  - "advent-2450-hardtop-slide-on"
-  - "7ft-electric-poptop-slide-on"
-seoTitle: "Advent 2150 Hardtop Ute Slide-On Camper | Beyond RV"
-seoDesc: "The Advent 2150 hardtop ute slide-on camper is built for 4x4 space cab utes and selected dual cab ute owners."
+  - advent-2300-hardtop-slide-on
+  - advent-2450-hardtop-slide-on
+  - 7ft-electric-poptop-slide-on
+seoTitle: Advent 2150 Hardtop Ute Slide-On Camper | Beyond RV
+seoDesc: The Advent 2150 hardtop ute slide-on camper is built for 4x4 space cab utes and selected dual cab ute owners.
+availability: available_in_australia
+purchasableOnline: true
+depositEnabled: true
+fullPaymentEnabled: true
+sourceType: other
+containerEligible: false
+suitabilityData:
+  status: draft
 ---
 
 The **Advent 2150** is built for owners who want a compact hardtop slide-on camper matched to a serious 4x4 ute. It keeps the slide-on range focused on ute platforms while giving buyers a ready-to-roll Beyond RV camper at the confirmed owner price.
