@@ -30,6 +30,22 @@ test('merchant product schema includes required merchant listing fields', () => 
   assert.equal(product.offers?.priceValidUntil, undefined);
 });
 
+test('merchant product schema is omitted when no genuine offer price exists', () => {
+  const product = buildMerchantProduct({
+    slug: 'expedition/example-build',
+    name: 'Example custom expedition build',
+    description: 'A made-to-order expedition build.',
+    url: 'https://beyondrv.com.au/expedition/example-build/',
+    image: 'https://beyondrv.com.au/images/example.webp',
+    price: 'POA',
+    status: 'available',
+    availability: 'made_to_order',
+    category: 'Expedition Vehicles',
+  });
+
+  assert.equal(product, undefined);
+});
+
 test('offer availability values are normalized to schema.org URLs', () => {
   assert.equal(normalizeAvailability('made-to-order'), 'https://schema.org/PreOrder');
   assert.equal(normalizeAvailability('sold_out'), 'https://schema.org/SoldOut');

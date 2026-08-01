@@ -54,14 +54,19 @@ const schema = [
       { '@type': 'ListItem', position: 3, name: 'Best Utes for Slide-On Campers', item: pageUrl }
     ]
   },
-  ...products.map(product => ({
+  {
     '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: product.name,
-    url: product.url,
-    brand: { '@type': 'Brand', name: 'Beyond RV' },
-    category: 'Slide-on camper'
-  }))
+    '@type': 'ItemList',
+    name: 'Beyond RV slide-on camper starting points',
+    numberOfItems: products.length,
+    itemListOrder: 'https://schema.org/ItemListOrderAscending',
+    itemListElement: products.map((product, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: product.name,
+      url: product.url
+    }))
+  }
 ];
 ---
 <BaseLayout

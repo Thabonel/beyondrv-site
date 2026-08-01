@@ -76,6 +76,9 @@ export function buildMerchantProduct({
   availability,
   category,
 }) {
+  const offer = buildMerchantOffer({ price, status, url, availability });
+  if (!offer) return undefined;
+
   const product = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -92,10 +95,8 @@ export function buildMerchantProduct({
       "@type": "Country",
       name: "Australia",
     },
+    offers: offer,
   };
-
-  const offer = buildMerchantOffer({ price, status, url, availability });
-  if (offer) product.offers = offer;
 
   return product;
 }

@@ -38,7 +38,7 @@ const schema = {
       availability: p.data.availability,
       category: 'Slide-On Campers',
     });
-  })
+  }).filter(Boolean)
 };
 const faqSchema = {
   "@context": "https://schema.org",

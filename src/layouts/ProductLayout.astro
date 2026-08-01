@@ -132,6 +132,20 @@ const productSchema = buildMerchantProduct({
   availability: availabilitySchema(availability),
   category: categoryMeta.name,
 });
+const primarySchema = productSchema ?? {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": `${productUrl}#webpage`,
+  "name": data.title,
+  "description": data.seoDesc ?? data.tagline,
+  "url": productUrl,
+  ...(productImages[0] && {
+    "primaryImageOfPage": {
+      "@type": "ImageObject",
+      "url": productImages[0]
+    }
+  })
+};
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",
@@ -188,7 +202,7 @@ const videoSchema = youtubeVideo
     }
   : undefined;
 
-const schemas = [productSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : []), ...(videoSchema ? [videoSchema] : [])];
+const schemas = [primarySchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : []), ...(videoSchema ? [videoSchema] : [])];
 ---
 <BaseLayout
   title={data.seoTitle ?? `${data.title} | Beyond RV`}
