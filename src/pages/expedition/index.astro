@@ -43,7 +43,7 @@ const schema = {
       availability: p.data.availability,
       category: 'Expedition Vehicles',
     });
-  })
+  }).filter(Boolean)
 };
 const faqSchema = {
   "@context": "https://schema.org",
