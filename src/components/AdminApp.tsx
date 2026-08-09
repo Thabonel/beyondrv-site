@@ -16,6 +16,11 @@ interface AdminSession {
   capabilities: string[];
 }
 
+function signInUrlForCurrentAdminPage() {
+  const returnTo = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  return `/.netlify/functions/admin-login?returnTo=${encodeURIComponent(returnTo)}`;
+}
+
 export default function AdminApp() {
   const [session, setSession] = useState<AdminSession | null>(null);
   const [loading, setLoading] = useState(true);
@@ -27,7 +32,7 @@ export default function AdminApp() {
       .then(async response => {
         if (response.status === 401) {
           clearAdminToken();
-          window.location.href = '/.netlify/functions/admin-login';
+          window.location.href = signInUrlForCurrentAdminPage();
           return null;
         }
         if (!response.ok && ['localhost', '127.0.0.1'].includes(window.location.hostname)) {
@@ -61,7 +66,7 @@ export default function AdminApp() {
       <div style={{ minHeight: 'calc(100vh - 60px)', display: 'grid', placeItems: 'center', padding: '1rem' }}>
         <div style={{ maxWidth: '420px', color: '#fca5a5', lineHeight: 1.5, textAlign: 'center' }}>
           {error || 'Your admin session could not be loaded.'}
-          <div><a href="/.netlify/functions/admin-login" style={{ color: '#fff' }}>Return to sign in</a></div>
+          <div><a href={signInUrlForCurrentAdminPage()} style={{ color: '#fff' }}>Return to sign in</a></div>
         </div>
       </div>
     );

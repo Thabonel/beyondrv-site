@@ -1,5 +1,6 @@
 import type { Handler, HandlerResponse } from '@netlify/functions';
 import { authenticateAdminCredentials, createAdminToken, getConfiguredAdminAccounts } from './admin-auth';
+import { safeAdminReturnTo } from './admin-login-core';
 import { isRateLimited } from './security-utils';
 
 const COOKIE_NAME = 'brv_admin_auth';
@@ -16,7 +17,17 @@ function textResponse(statusCode: number, body: string): HandlerResponse {
   return { statusCode, body };
 }
 
-function loginPageResponse(error = ''): HandlerResponse {
+function escapeHtmlAttribute(value: string): string {
+  return value.replace(/[&<>"']/g, character => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  })[character] ?? character);
+}
+
+function loginPageResponse(error = '', returnTo = '/admin/'): HandlerResponse {
   return {
     statusCode: 200,
     headers: {
@@ -24,7 +35,7 @@ function loginPageResponse(error = ''): HandlerResponse {
       'Cache-Control': 'no-store',
       'Set-Cookie': `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`,
     },
-    body: loginPage(error),
+    body: loginPage(error, returnTo),
   };
 }
 
@@ -40,7 +51,7 @@ function successResponse(location: string, cookie: string): HandlerResponse {
   };
 }
 
-function loginPage(error = '') {
+function loginPage(error = '', returnTo = '/admin/') {
   const individualAccountsConfigured = getConfiguredAdminAccounts().length > 0;
   return `<!doctype html>
 <html lang="en">
@@ -77,6 +88,7 @@ function loginPage(error = '') {
   </head>
   <body>
     <form method="POST" action="/.netlify/functions/admin-login">
+      <input type="hidden" name="returnTo" value="${escapeHtmlAttribute(returnTo)}" />
       <img src="/images/site/admin-logo.png" alt="Beyond RV" />
       <h1>Admin Login</h1>
       <label for="user">User</label>
@@ -99,7 +111,7 @@ export const handler: Handler = async (event) => {
   }
 
   if (event.httpMethod === 'GET') {
-    return loginPageResponse();
+    return loginPageResponse('', safeAdminReturnTo(event.queryStringParameters?.returnTo));
   }
 
   if (event.httpMethod !== 'POST') {
@@ -118,18 +130,19 @@ export const handler: Handler = async (event) => {
   }
 
   const params = new URLSearchParams(event.body ?? '');
+  const returnTo = safeAdminReturnTo(params.get('returnTo'));
   const user = params.get('user') ?? '';
   const password = params.get('password') ?? '';
   const actor = authenticateAdminCredentials(user, password);
 
   if (!actor) {
-    return loginPageResponse('Incorrect user or password.');
+    return loginPageResponse('Incorrect user or password.', returnTo);
   }
 
   const token = createAdminToken(actor);
   if (!token) return htmlResponse(500, loginPage('Admin session signing is not configured.'));
   return successResponse(
-    '/admin/',
+    returnTo,
     `${COOKIE_NAME}=${encodeURIComponent(token)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=28800`
   );
 };
