@@ -10,7 +10,9 @@
 
 **Implementation base:** `8227ed5` (`test: support Netlify deploy preview checks`)
 
-**Implementation state:** Saved in a local checkpoint commit on `staging`; use `git log -1` for its current commit ID
+**Checkpoint commit:** `7bdc139` (`feat: add GM sales workspace and enquiry agreements`)
+
+**Implementation state:** Committed locally; `staging` is one commit ahead of `origin/staging`
 
 **Deployment state:** Not pushed and not deployed
 
@@ -41,7 +43,7 @@ The local implementation now includes:
 
 The implementation has passed local type checking, unit testing, production builds, Netlify function/edge packaging, a full Chromium regression suite, and the new GM workflow across all five configured browser/device projects.
 
-The system is not ready for production promotion yet. It still needs staging configuration and acceptance testing, completion of older endpoint capability migration, one-touch follow-up outcomes, automatic next follow-ups, further agreement acceleration, workshop voice capture and the later deposit/build-release workflow.
+The system is not ready for production promotion yet. It still needs staging configuration and acceptance testing, one-touch follow-up outcomes, automatic next follow-ups, further agreement acceleration, workshop voice capture and the later deposit/build-release workflow.
 
 ---
 
@@ -113,8 +115,9 @@ At the completed checkpoint:
 
 - The checked-out branch is `staging`.
 - The implementation started from `origin/staging` at `8227ed5`.
-- All GM workspace work described here is saved in one local checkpoint commit on top of that base.
-- The checkpoint has not been pushed.
+- All GM workspace work described here is saved in local commit `7bdc139`.
+- `git rev-list --left-right --count origin/staging...staging` returned `0 1`: local `staging` is exactly one commit ahead and has not diverged behind the remote.
+- Commit `7bdc139` has not been pushed.
 - No Netlify Deploy Preview contains this complete local implementation.
 - Production remains on its previously deployed code.
 - Do not interpret the successful local `npx netlify build` as a deployment; it only validates Netlify packaging locally.
@@ -554,7 +557,7 @@ Result: passed.
 
 ### 11.1 Must address before a GM staging pilot
 
-1. Complete the audit of older admin Functions still using legacy `isAdminAuthorized` and enforce the correct capability on every commercial mutation.
+1. Verify the completed capability migration against a Deploy Preview: every `admin-*` Function now derives an actor and enforces a capability, while scheduled lead summaries retain their explicit scheduled-invocation path.
 2. Create a focused commit or commit series without including unrelated dirty files.
 3. Push a non-production branch and create a Netlify Deploy Preview.
 4. Configure individual preview accounts and the exact agreement approval version.
@@ -602,15 +605,11 @@ Result: passed.
 
 ## 12. Recommended continuation sequence
 
-### Step 1 — Finish capability migration
+### Step 1 — Capability migration (completed locally)
 
-1. Search all `netlify/functions/admin-*.ts` files for `isAdminAuthorized`.
-2. Classify each endpoint as read-only sales, sales mutation, agreement read/write/approve/send/acceptance, site operation, integration, deposit verification or build release.
-3. Replace legacy-only checks with `getAdminActor` plus the narrowest appropriate capability.
-4. Pass the actor into every audit-producing mutation.
-5. Add negative tests proving `site_admin` cannot make commercial commitments.
+All `admin-*` Functions have been classified and moved from the legacy boolean gate to `getAdminActor` plus a narrow capability check. Read and mutation paths use the relevant sales, agreement, configuration, build, site, integration or audit capability; action-sensitive configurator endpoints distinguish read, write and approval authority. Scheduled lead summaries retain their separate trusted schedule path. The focused auth suite proves a site administrator cannot acquire commercial, deposit-verification or build-release authority, and `npm run check` passes.
 
-Do this before adding more GM mutation controls.
+Validate these boundaries against a real Deploy Preview before adding more GM mutation controls.
 
 ### Step 2 — One-touch outcome logging
 
@@ -804,6 +803,39 @@ The full initiative is complete only when:
 
 ## 17. Immediate next action
 
-The safest next engineering action is to finish capability migration for remaining legacy admin endpoints before exposing more GM mutation controls. After that, implement one-touch call outcomes and automatic replacement follow-ups as idempotent server commands using the existing actor, activity and source-link foundations.
+The safest next engineering action is to implement one-touch call outcomes and automatic replacement follow-ups as idempotent server commands using the existing actor, activity and source-link foundations.
 
 Do not deploy the current working tree directly to production.
+
+---
+
+## 18. Resume instructions for a new Codex task
+
+The long implementation conversation can be retired. A new task should begin from the committed repository state and this document rather than attempting to reconstruct prior chat context.
+
+Recommended model for continued everyday implementation: **GPT-5.6 Terra with medium reasoning**. Use Sol/high reasoning only for genuinely difficult architecture, security or commercial-safety decisions.
+
+Use this opening instruction:
+
+> Work in `/Users/thabonel/Code/Byond_RV`. Read `docs/HANDOVER-GM-SALES-WORKSPACE-2026-08-09.md` and `docs/plans/2026-08-09-gm-sales-workspace-agreement-voice-capture-prd.md` completely. Confirm branch `staging` contains checkpoint commit `7bdc139`. Preserve the unrelated dirty files identified in the handover. Do not push, deploy or modify production without explicit approval. Review the uncommitted capability-migration changes, verify them with focused tests, then implement the one-touch outcome and automatic follow-up slice described in Section 12. Update the handover before the next checkpoint.
+
+Initial repository checks:
+
+```bash
+git branch --show-current
+git log -1 --oneline --decorate
+git rev-list --left-right --count origin/staging...staging
+git status --short
+```
+
+Expected results at this handover:
+
+- branch: `staging`;
+- HEAD: `7bdc139 feat: add GM sales workspace and enquiry agreements`;
+- remote comparison: `0 1`;
+- unrelated local state still present and deliberately excluded:
+  - modified `playwright-report/index.html`;
+  - untracked `docs/ByondRV-Configurator-PRD-and-Database-Design.md`;
+  - untracked `work/`.
+
+If the repository does not match these expectations, inspect the new commits and working-tree changes before editing anything. Do not reset, delete or overwrite unexpected work.

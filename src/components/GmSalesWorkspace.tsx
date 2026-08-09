@@ -110,6 +110,7 @@ export default function GmSalesWorkspace({ actor }: { actor: AdminSessionActor }
   const [selectedAgreementId, setSelectedAgreementId] = useState('');
   const [convertingEnquiryId, setConvertingEnquiryId] = useState('');
   const [conversionError, setConversionError] = useState('');
+  const [recordingOutcomeId, setRecordingOutcomeId] = useState('');
 
   async function loadWorkspace() {
     setLoading(true);
@@ -184,6 +185,33 @@ export default function GmSalesWorkspace({ actor }: { actor: AdminSessionActor }
     } finally {
       setConvertingEnquiryId('');
     }
+  }
+
+  async function recordOutcome(action: WorkspaceAction, outcome: 'no_answer' | 'follow_up' | 'not_proceeding' | 'visit_booked' | 'agreement_in_progress') {
+    if (recordingOutcomeId || action.type !== 'enquiry') return;
+    let followUpAt = '';
+    let lossReason = '';
+    if (outcome === 'follow_up' || outcome === 'visit_booked') {
+      followUpAt = window.prompt(outcome === 'visit_booked' ? 'Visit date (YYYY-MM-DD)' : 'Follow-up date (YYYY-MM-DD)')?.trim() || '';
+      if (!followUpAt) return;
+    }
+    if (outcome === 'not_proceeding') {
+      lossReason = window.prompt('Reason: price, timing, product fit, or other')?.trim() || '';
+      if (!lossReason) return;
+    }
+    setRecordingOutcomeId(action.id);
+    setConversionError('');
+    try {
+      const response = await adminFetch('/.netlify/functions/admin-sales-outcome', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enquiryId: action.recordId, outcome, followUpAt, lossReason, idempotencyKey: `${action.recordId}:${outcome}:${crypto.randomUUID()}` }),
+      });
+      const body = await adminJson<{ summary?: string }>(response, 'Could not record the sales outcome');
+      if (!response.ok) throw new Error(body.error || 'Could not record the sales outcome.');
+      await loadWorkspace();
+    } catch (reason) {
+      setConversionError(reason instanceof Error ? reason.message : 'Could not record the sales outcome.');
+    } finally { setRecordingOutcomeId(''); }
   }
 
   async function logout() {
@@ -265,7 +293,7 @@ export default function GmSalesWorkspace({ actor }: { actor: AdminSessionActor }
       <div className="gm-shell">
         <div className="gm-heading">
           <div><div className="gm-eyebrow">Sales workspace</div><h1>{areaLabels[area]}</h1></div>
-          <div className="gm-user"><span>{actor.displayName}</span><button type="button" className="gm-button" onClick={() => void logout()}>Sign out</button></div>
+          <div className="gm-user"><span>{actor.displayName}</span><button type="button" className="gm-button gm-button--primary" onClick={() => { setSelectedAgreementId(''); selectArea('agreements'); }}>Create agreement</button><button type="button" className="gm-button" onClick={() => void logout()}>Sign out</button></div>
         </div>
         <nav className="gm-tabs" aria-label="Sales workspace">
           {(Object.keys(areaLabels) as WorkspaceArea[]).map(item => <button key={item} className="gm-tab" aria-selected={area === item} onClick={() => selectArea(item)}>{areaLabels[item]}</button>)}
@@ -297,6 +325,12 @@ export default function GmSalesWorkspace({ actor }: { actor: AdminSessionActor }
                 <div className="gm-value">{action.estimatedValueCents ? money(action.estimatedValueCents) : 'Value to confirm'}</div>
                 <div className="gm-actions">
                   {action.phone && <a className="gm-call" href={`tel:${action.phone}`}>Call</a>}
+                  {action.type === 'enquiry' && <>
+                    <button type="button" className="gm-button" disabled={Boolean(recordingOutcomeId)} onClick={() => void recordOutcome(action, 'no_answer')}>{recordingOutcomeId === action.id ? 'Saving…' : 'No answer'}</button>
+                    <button type="button" className="gm-button" disabled={Boolean(recordingOutcomeId)} onClick={() => void recordOutcome(action, 'follow_up')}>Follow up</button>
+                    <button type="button" className="gm-button" disabled={Boolean(recordingOutcomeId)} onClick={() => void recordOutcome(action, 'visit_booked')}>Visit booked</button>
+                    <button type="button" className="gm-button" disabled={Boolean(recordingOutcomeId)} onClick={() => void recordOutcome(action, 'not_proceeding')}>Not proceeding</button>
+                  </>}
                   {action.canCreateAgreement
                     ? <button type="button" className="gm-button gm-button--primary" disabled={Boolean(convertingEnquiryId)} onClick={() => void createOrOpenAgreement(action.recordId)}>{convertingEnquiryId === action.recordId ? 'Creating…' : 'Create agreement'}</button>
                     : <button type="button" className="gm-button" onClick={() => openAction(action)}>{action.type === 'agreement' ? 'Open agreement' : action.type === 'build' ? 'Open build' : 'Customer'}</button>}
