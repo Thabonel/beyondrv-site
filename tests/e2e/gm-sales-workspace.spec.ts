@@ -85,6 +85,7 @@ test('GM lands on a focused mobile Today queue with usable touch targets', async
   await expect(page.getByText('People waiting')).toBeVisible();
   await expect(page.getByText('$212,000')).toBeVisible();
   await expect(page.getByText('Admin Tools')).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Connect company Gmail' })).toHaveAttribute('href', '/.netlify/functions/google-oauth-start');
 
   const actions = page.locator('[data-testid^="gm-action-"]');
   await expect(actions).toHaveCount(2);
