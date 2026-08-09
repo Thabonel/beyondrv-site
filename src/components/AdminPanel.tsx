@@ -1638,7 +1638,7 @@ function parseMediaTarget(value: string): { scope: MediaScope; slug: string } {
   };
 }
 
-export default function AdminPanel() {
+export default function AdminPanel({ onOpenGmWorkspace, onSignOut }: { onOpenGmWorkspace?: () => void; onSignOut?: () => void }) {
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: "Hi! I'm the Beyond RV admin assistant. I can help with site changes, lead follow-ups, and SEO health checks." }
   ]);
@@ -4409,7 +4409,15 @@ export default function AdminPanel() {
       <div style={{ minWidth: 0, minHeight: 0, height: '100%', display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333' }}>
         <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
           <div style={{ color: '#fff', fontWeight: 800 }}>Admin Tools</div>
-          <div style={{ display: 'flex', gap: '0.45rem' }}>
+          <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+            {onOpenGmWorkspace && (
+              <button
+                onClick={onOpenGmWorkspace}
+                style={{ background: '#fff', border: '1px solid #fff', color: '#111', borderRadius: '6px', padding: '0.42rem 0.65rem', cursor: 'pointer', fontWeight: 800 }}
+              >
+                Sales workspace
+              </button>
+            )}
             <button
               onClick={() => setShowChatDrawer(true)}
               style={{ background: '#E8540A', border: 'none', color: '#fff', borderRadius: '6px', padding: '0.42rem 0.65rem', cursor: 'pointer', fontWeight: 700 }}
@@ -4422,6 +4430,14 @@ export default function AdminPanel() {
             >
               Help
             </button>
+            {onSignOut && (
+              <button
+                onClick={onSignOut}
+                style={{ background: '#222', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.42rem 0.65rem', cursor: 'pointer', fontWeight: 700 }}
+              >
+                Sign out
+              </button>
+            )}
           </div>
         </div>
         <div className="admin-mobile-nav" style={{ display: 'block', padding: '0.75rem 1rem', borderBottom: '1px solid #333', background: '#111' }}>

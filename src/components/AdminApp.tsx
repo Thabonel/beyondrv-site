@@ -21,10 +21,22 @@ function signInUrlForCurrentAdminPage() {
   return `/.netlify/functions/admin-login?returnTo=${encodeURIComponent(returnTo)}`;
 }
 
+function openGmWorkspace() {
+  const url = new URL(window.location.href);
+  url.searchParams.set('view', 'gm');
+  window.location.href = url.toString();
+}
+
 export default function AdminApp() {
   const [session, setSession] = useState<AdminSession | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  async function signOut() {
+    await adminFetch('/.netlify/functions/admin-logout', { method: 'POST' });
+    clearAdminToken();
+    window.location.href = '/.netlify/functions/admin-login';
+  }
 
   useEffect(() => {
     let active = true;
@@ -80,5 +92,5 @@ export default function AdminApp() {
     return <Suspense fallback={<div style={{ minHeight: 'calc(100vh - 60px)', display: 'grid', placeItems: 'center', color: '#aaa' }}>Opening GM workspace…</div>}><GmSalesWorkspace actor={session.actor} ownerPreview onExitPreview={() => { const url = new URL(window.location.href); url.searchParams.delete('view'); window.location.href = url.toString(); }} /></Suspense>;
   }
 
-  return <Suspense fallback={<div style={{ minHeight: 'calc(100vh - 60px)', display: 'grid', placeItems: 'center', color: '#aaa' }}>Opening admin tools…</div>}><AdminPanel /></Suspense>;
+  return <Suspense fallback={<div style={{ minHeight: 'calc(100vh - 60px)', display: 'grid', placeItems: 'center', color: '#aaa' }}>Opening admin tools…</div>}><AdminPanel onOpenGmWorkspace={session.actor.role === 'owner' ? openGmWorkspace : undefined} onSignOut={() => void signOut()} /></Suspense>;
 }
