@@ -5,6 +5,17 @@ import type { AdminSessionActor } from './AdminApp';
 const ContractManager = lazy(() => import('./ContractManager'));
 
 type WorkspaceArea = 'today' | 'customers' | 'agreements' | 'builds';
+type SalesOutcome = 'no_answer' | 'follow_up' | 'not_proceeding' | 'visit_booked' | 'agreement_in_progress';
+
+interface OutcomeDraft {
+  actionId: string;
+  enquiryId: string;
+  outcome: SalesOutcome;
+  followUpAt: string;
+  lossReason: string;
+  note: string;
+  idempotencyKey: string;
+}
 
 interface WorkspaceAction {
   id: string;
@@ -79,6 +90,14 @@ const areaLabels: Record<WorkspaceArea, string> = {
   builds: 'Builds',
 };
 
+const outcomeLabels: Record<SalesOutcome, string> = {
+  no_answer: 'No answer',
+  follow_up: 'Follow up',
+  not_proceeding: 'Not proceeding',
+  visit_booked: 'Visit booked',
+  agreement_in_progress: 'Agreement in progress',
+};
+
 function money(cents: number) {
   return new Intl.NumberFormat('en-AU', {
     style: 'currency', currency: 'AUD', maximumFractionDigits: 0,
@@ -111,6 +130,9 @@ export default function GmSalesWorkspace({ actor }: { actor: AdminSessionActor }
   const [convertingEnquiryId, setConvertingEnquiryId] = useState('');
   const [conversionError, setConversionError] = useState('');
   const [recordingOutcomeId, setRecordingOutcomeId] = useState('');
+  const [outcomeDraft, setOutcomeDraft] = useState<OutcomeDraft | null>(null);
+  const [outcomeError, setOutcomeError] = useState('');
+  const [outcomeFeedback, setOutcomeFeedback] = useState('');
 
   async function loadWorkspace() {
     setLoading(true);
@@ -187,30 +209,55 @@ export default function GmSalesWorkspace({ actor }: { actor: AdminSessionActor }
     }
   }
 
-  async function recordOutcome(action: WorkspaceAction, outcome: 'no_answer' | 'follow_up' | 'not_proceeding' | 'visit_booked' | 'agreement_in_progress') {
+  function startOutcome(action: WorkspaceAction, outcome: SalesOutcome) {
     if (recordingOutcomeId || action.type !== 'enquiry') return;
-    let followUpAt = '';
-    let lossReason = '';
-    if (outcome === 'follow_up' || outcome === 'visit_booked') {
-      followUpAt = window.prompt(outcome === 'visit_booked' ? 'Visit date (YYYY-MM-DD)' : 'Follow-up date (YYYY-MM-DD)')?.trim() || '';
-      if (!followUpAt) return;
+    const draft: OutcomeDraft = {
+      actionId: action.id,
+      enquiryId: action.recordId,
+      outcome,
+      followUpAt: '',
+      lossReason: '',
+      note: '',
+      idempotencyKey: `${action.recordId}:${outcome}:${crypto.randomUUID()}`,
+    };
+    setOutcomeDraft(draft);
+    setOutcomeError('');
+    setOutcomeFeedback('');
+    if (outcome === 'no_answer') void submitOutcome(draft);
+  }
+
+  function updateOutcomeDraft(update: Partial<OutcomeDraft>) {
+    setOutcomeDraft(current => current ? { ...current, ...update } : current);
+  }
+
+  async function submitOutcome(draft = outcomeDraft) {
+    if (!draft || recordingOutcomeId) return;
+    if ((draft.outcome === 'follow_up' || draft.outcome === 'visit_booked') && !draft.followUpAt) {
+      setOutcomeError(`Choose the ${draft.outcome === 'visit_booked' ? 'visit' : 'follow-up'} date.`);
+      return;
     }
-    if (outcome === 'not_proceeding') {
-      lossReason = window.prompt('Reason: price, timing, product fit, or other')?.trim() || '';
-      if (!lossReason) return;
+    if (draft.outcome === 'not_proceeding' && !draft.lossReason) {
+      setOutcomeError('Choose a reason the customer is not proceeding.');
+      return;
     }
-    setRecordingOutcomeId(action.id);
-    setConversionError('');
+    if (draft.outcome === 'not_proceeding' && draft.lossReason === 'other' && !draft.note.trim()) {
+      setOutcomeError('Add a short reason when you choose Other.');
+      return;
+    }
+    setRecordingOutcomeId(draft.actionId);
+    setOutcomeError('');
     try {
       const response = await adminFetch('/.netlify/functions/admin-sales-outcome', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ enquiryId: action.recordId, outcome, followUpAt, lossReason, idempotencyKey: `${action.recordId}:${outcome}:${crypto.randomUUID()}` }),
+        body: JSON.stringify({ enquiryId: draft.enquiryId, outcome: draft.outcome, followUpAt: draft.followUpAt, lossReason: draft.lossReason, note: draft.note, idempotencyKey: draft.idempotencyKey }),
       });
       const body = await adminJson<{ summary?: string }>(response, 'Could not record the sales outcome');
       if (!response.ok) throw new Error(body.error || 'Could not record the sales outcome.');
+      setOutcomeFeedback(body.summary || 'Sales outcome recorded.');
+      setOutcomeDraft(null);
       await loadWorkspace();
     } catch (reason) {
-      setConversionError(reason instanceof Error ? reason.message : 'Could not record the sales outcome.');
+      setOutcomeError(reason instanceof Error ? reason.message : 'Could not record the sales outcome.');
     } finally { setRecordingOutcomeId(''); }
   }
 
@@ -270,6 +317,11 @@ export default function GmSalesWorkspace({ actor }: { actor: AdminSessionActor }
         .gm-card { border:1px solid #333; border-radius:14px; background:#131313; padding:15px; min-width:0; }
         .gm-card h3 { margin:0 0 5px; font-size:17px; }
         .gm-search { width:100%; min-height:50px; border:1px solid #444; border-radius:12px; background:#151515; color:#fff; padding:12px 14px; font:inherit; font-size:16px; margin-bottom:12px; }
+        .gm-outcome-form { grid-column:1 / -1; display:grid; gap:10px; margin-top:12px; padding:14px; border:1px solid #7c2d12; border-radius:12px; background:#1c130e; }
+        .gm-outcome-form label { display:grid; gap:6px; color:#f5d0a9; font-size:13px; font-weight:800; }
+        .gm-outcome-input { width:100%; min-height:48px; box-sizing:border-box; border:1px solid #7c2d12; border-radius:9px; background:#0e0e0e; color:#fff; padding:10px 12px; font:inherit; font-size:16px; }
+        .gm-outcome-form-actions { display:flex; gap:8px; flex-wrap:wrap; }
+        .gm-outcome-form-actions > * { flex:1; }
         .gm-empty { padding:32px 18px; border:1px dashed #3a3a3a; border-radius:14px; text-align:center; color:#aaa; }
         .gm-bottom-nav { display:none; }
         @media (max-width:700px) {
@@ -302,6 +354,7 @@ export default function GmSalesWorkspace({ actor }: { actor: AdminSessionActor }
         {loading && <div className="gm-empty">Loading the latest customers and sales work…</div>}
         {error && <div className="gm-empty"><div>{error}</div><button className="gm-button" type="button" onClick={() => void loadWorkspace()} style={{ marginTop: 12 }}>Try again</button></div>}
         {conversionError && <div role="alert" className="gm-empty" style={{ borderColor: '#9a3412', color: '#fdba74', marginBottom: 12 }}>{conversionError}</div>}
+        {outcomeFeedback && <div data-testid="gm-outcome-feedback" role="status" className="gm-empty" style={{ borderColor: '#166534', color: '#bbf7d0', marginBottom: 12 }}>{outcomeFeedback}</div>}
 
         {!loading && !error && workspace && area === 'today' && <>
           <section className="gm-summary" aria-label="Today summary">
@@ -326,15 +379,36 @@ export default function GmSalesWorkspace({ actor }: { actor: AdminSessionActor }
                 <div className="gm-actions">
                   {action.phone && <a className="gm-call" href={`tel:${action.phone}`}>Call</a>}
                   {action.type === 'enquiry' && <>
-                    <button type="button" className="gm-button" disabled={Boolean(recordingOutcomeId)} onClick={() => void recordOutcome(action, 'no_answer')}>{recordingOutcomeId === action.id ? 'Saving…' : 'No answer'}</button>
-                    <button type="button" className="gm-button" disabled={Boolean(recordingOutcomeId)} onClick={() => void recordOutcome(action, 'follow_up')}>Follow up</button>
-                    <button type="button" className="gm-button" disabled={Boolean(recordingOutcomeId)} onClick={() => void recordOutcome(action, 'visit_booked')}>Visit booked</button>
-                    <button type="button" className="gm-button" disabled={Boolean(recordingOutcomeId)} onClick={() => void recordOutcome(action, 'not_proceeding')}>Not proceeding</button>
+                    <button type="button" className="gm-button" disabled={Boolean(recordingOutcomeId)} onClick={() => startOutcome(action, 'no_answer')}>{recordingOutcomeId === action.id ? 'Saving…' : 'No answer'}</button>
+                    <button type="button" className="gm-button" disabled={Boolean(recordingOutcomeId)} onClick={() => startOutcome(action, 'follow_up')}>Follow up</button>
+                    <button type="button" className="gm-button" disabled={Boolean(recordingOutcomeId)} onClick={() => startOutcome(action, 'visit_booked')}>Visit booked</button>
+                    <button type="button" className="gm-button" disabled={Boolean(recordingOutcomeId)} onClick={() => startOutcome(action, 'not_proceeding')}>Not proceeding</button>
                   </>}
                   {action.canCreateAgreement
                     ? <button type="button" className="gm-button gm-button--primary" disabled={Boolean(convertingEnquiryId)} onClick={() => void createOrOpenAgreement(action.recordId)}>{convertingEnquiryId === action.recordId ? 'Creating…' : 'Create agreement'}</button>
                     : <button type="button" className="gm-button" onClick={() => openAction(action)}>{action.type === 'agreement' ? 'Open agreement' : action.type === 'build' ? 'Open build' : 'Customer'}</button>}
                 </div>
+                {outcomeDraft?.actionId === action.id && <form className="gm-outcome-form" data-testid={`gm-outcome-form-${action.recordId}`} onSubmit={event => { event.preventDefault(); void submitOutcome(); }}>
+                  <strong>{outcomeLabels[outcomeDraft.outcome]}</strong>
+                  {outcomeDraft.outcome === 'no_answer' && <div className="gm-muted">This will schedule a replacement follow-up in two days.</div>}
+                  {(outcomeDraft.outcome === 'follow_up' || outcomeDraft.outcome === 'visit_booked') && <label>{outcomeDraft.outcome === 'visit_booked' ? 'Visit date' : 'Follow-up date'}<input className="gm-outcome-input" type="date" value={outcomeDraft.followUpAt} onChange={event => updateOutcomeDraft({ followUpAt: event.target.value })} required /></label>}
+                  {outcomeDraft.outcome === 'not_proceeding' && <>
+                    <label>Reason<select className="gm-outcome-input" value={outcomeDraft.lossReason} onChange={event => updateOutcomeDraft({ lossReason: event.target.value, note: event.target.value === 'other' ? outcomeDraft.note : '' })} required>
+                      <option value="">Choose a reason</option>
+                      <option value="too-expensive">Too expensive</option>
+                      <option value="wrong-vehicle">Wrong vehicle</option>
+                      <option value="no-payload">No payload</option>
+                      <option value="bought-elsewhere">Bought elsewhere</option>
+                      <option value="just-researching">Just researching</option>
+                      <option value="no-response">No response</option>
+                      <option value="timing-not-right">Timing not right</option>
+                      <option value="other">Other</option>
+                    </select></label>
+                    {outcomeDraft.lossReason === 'other' && <label>Reason details<input className="gm-outcome-input" value={outcomeDraft.note} onChange={event => updateOutcomeDraft({ note: event.target.value })} maxLength={4000} required /></label>}
+                  </>}
+                  {outcomeError && <div role="alert" style={{ color: '#fdba74' }}>{outcomeError}</div>}
+                  <div className="gm-outcome-form-actions"><button type="button" className="gm-button" disabled={Boolean(recordingOutcomeId)} onClick={() => { setOutcomeDraft(null); setOutcomeError(''); }}>Cancel</button><button type="submit" className="gm-button gm-button--primary" disabled={Boolean(recordingOutcomeId)}>{recordingOutcomeId === action.id ? 'Saving…' : outcomeError ? `Retry ${outcomeLabels[outcomeDraft.outcome].toLowerCase()}` : `Save ${outcomeLabels[outcomeDraft.outcome].toLowerCase()}`}</button></div>
+                </form>}
               </div>
             </article>)}
           </div>

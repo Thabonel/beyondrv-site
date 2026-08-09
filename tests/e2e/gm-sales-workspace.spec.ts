@@ -135,3 +135,40 @@ test('GM converts a website enquiry once and lands in the editable draft with no
   await expect(page.getByPlaceholder('Legal name *')).toHaveValue('Alex Smith');
   expect(conversionRequests).toBe(1);
 });
+
+test('GM records outcomes with mobile controls and safely retries the same command', async ({ page }) => {
+  const requests: Array<Record<string, string>> = [];
+  let followUpAttempts = 0;
+  await page.route('**/.netlify/functions/admin-sales-outcome', async route => {
+    const body = route.request().postDataJSON() as Record<string, string>;
+    requests.push(body);
+    if (body.outcome === 'follow_up' && followUpAttempts++ === 0) {
+      await route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ error: 'Temporary connection problem.' }) });
+      return;
+    }
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, summary: body.outcome === 'not_proceeding' ? 'Not proceeding' : 'Spoke — follow up scheduled' }) });
+  });
+
+  await page.goto('/admin/');
+  const action = page.getByTestId('gm-action-enquiry:enquiry-1');
+
+  await action.getByRole('button', { name: 'Follow up' }).click();
+  await action.getByLabel('Follow-up date').fill('2026-08-18');
+  await action.getByRole('button', { name: 'Save follow up' }).click();
+  await expect(action.getByRole('alert')).toContainText('Temporary connection problem.');
+  await action.getByRole('button', { name: 'Retry follow up' }).click();
+  await expect(page.getByTestId('gm-outcome-feedback')).toContainText('Spoke — follow up scheduled');
+  expect(requests[0]).toMatchObject({ enquiryId: 'enquiry-1', outcome: 'follow_up', followUpAt: '2026-08-18' });
+  expect(requests[1].idempotencyKey).toBe(requests[0].idempotencyKey);
+
+  await action.getByRole('button', { name: 'Visit booked' }).click();
+  await expect(action.getByLabel('Visit date')).toBeVisible();
+  await action.getByRole('button', { name: 'Cancel' }).click();
+  await expect(action.getByTestId('gm-outcome-form-enquiry-1')).toHaveCount(0);
+
+  await action.getByRole('button', { name: 'Not proceeding' }).click();
+  await action.getByLabel('Reason').selectOption('other');
+  await action.getByLabel('Reason details').fill('Customer is moving interstate.');
+  await action.getByRole('button', { name: 'Save not proceeding' }).click();
+  expect(requests[2]).toMatchObject({ enquiryId: 'enquiry-1', outcome: 'not_proceeding', lossReason: 'other', note: 'Customer is moving interstate.' });
+});
