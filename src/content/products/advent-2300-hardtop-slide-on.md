@@ -39,6 +39,8 @@ gallery:
 keySpecs:
   - label: "Base"
     value: "2300mm x 2000mm"
+  - label: "Sleeps"
+    value: "2 in cabover + 1 in converted dinette"
   - label: "Roof"
     value: "Hardtop"
   - label: "Category"

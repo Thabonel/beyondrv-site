@@ -31,6 +31,8 @@ gallery:
 keySpecs:
   - label: Base
     value: 2150mm x 2000mm
+  - label: Sleeps
+    value: 2 in cabover + 1 in converted dinette
   - label: Suits
     value: Space cab / select dual cab utes
   - label: Roof

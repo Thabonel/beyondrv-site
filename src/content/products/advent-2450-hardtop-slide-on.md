@@ -44,6 +44,8 @@ gallery:
 keySpecs:
   - label: Base
     value: 2450mm x 2000mm
+  - label: Sleeps
+    value: 2 in cabover + 1 in converted dinette
   - label: Suits
     value: Single cab utes
   - label: Status

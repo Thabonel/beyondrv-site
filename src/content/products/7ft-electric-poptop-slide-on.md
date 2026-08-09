@@ -35,6 +35,8 @@ gallery:
 keySpecs:
   - label: "Base"
     value: "2120mm x 2020mm"
+  - label: "Sleeps"
+    value: "2 in cabover + 1 in converted dinette"
   - label: "Suits"
     value: "Single cab utes"
   - label: "Roof"
