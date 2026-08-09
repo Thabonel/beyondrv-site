@@ -73,6 +73,14 @@ test('contract totals include extras and subtract approved discounts', () => {
   assert.equal(calculateContractTotal(contract.lineItems), 40_000_00);
 });
 
+test('manual conversation context stays out of the rendered agreement and may be clarified before approval', () => {
+  const contract = normaliseContractInput({ ...validContractInput(), salesContext: { source: 'phone', enquiryMessage: 'Customer asked about a solar upgrade.' } });
+  const clarified = normaliseContractInput({ ...contract, salesContext: { ...contract.salesContext, source: 'visit', enquiryMessage: 'Customer asked to inspect samples.' } }, contract);
+  assert.equal(clarified.salesContext?.source, 'visit');
+  assert.equal(clarified.salesContext?.enquiryMessage, 'Customer asked to inspect samples.');
+  assert.doesNotMatch(renderContractHtml(clarified), /inspect samples/i);
+});
+
 test('money parser accepts Australian display values without floating point drift', () => {
   assert.equal(parseMoneyToCents('$39,999.95'), 3_999_995);
   assert.equal(parseMoneyToCents('not a price'), 0);

@@ -127,6 +127,7 @@ export default function GmSalesWorkspace({ actor }: { actor: AdminSessionActor }
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [selectedAgreementId, setSelectedAgreementId] = useState('');
+  const [newAgreementRequest, setNewAgreementRequest] = useState(0);
   const [convertingEnquiryId, setConvertingEnquiryId] = useState('');
   const [conversionError, setConversionError] = useState('');
   const [recordingOutcomeId, setRecordingOutcomeId] = useState('');
@@ -345,7 +346,7 @@ export default function GmSalesWorkspace({ actor }: { actor: AdminSessionActor }
       <div className="gm-shell">
         <div className="gm-heading">
           <div><div className="gm-eyebrow">Sales workspace</div><h1>{areaLabels[area]}</h1></div>
-          <div className="gm-user"><span>{actor.displayName}</span><button type="button" className="gm-button gm-button--primary" onClick={() => { setSelectedAgreementId(''); selectArea('agreements'); }}>New agreement</button><button type="button" className="gm-button" onClick={() => void logout()}>Sign out</button></div>
+          <div className="gm-user"><span>{actor.displayName}</span><button type="button" className="gm-button gm-button--primary" onClick={() => { setSelectedAgreementId(''); setNewAgreementRequest(current => current + 1); selectArea('agreements'); }}>New agreement</button><button type="button" className="gm-button" onClick={() => void logout()}>Sign out</button></div>
         </div>
         <nav className="gm-tabs" aria-label="Sales workspace">
           {(Object.keys(areaLabels) as WorkspaceArea[]).map(item => <button key={item} className="gm-tab" aria-selected={area === item} onClick={() => selectArea(item)}>{areaLabels[item]}</button>)}
@@ -434,7 +435,7 @@ export default function GmSalesWorkspace({ actor }: { actor: AdminSessionActor }
         </>}
 
         {!loading && !error && workspace && area === 'agreements' && <div style={{ border: '1px solid #303030', borderRadius: 14, overflow: 'hidden', background: '#111' }}>
-          <Suspense fallback={<div className="gm-empty">Opening agreements…</div>}><ContractManager key={selectedAgreementId || 'agreements'} initialContractId={selectedAgreementId} products={workspace.products} customers={contractCustomers} leads={contractLeads} /></Suspense>
+          <Suspense fallback={<div className="gm-empty">Opening agreements…</div>}><ContractManager key={selectedAgreementId || 'agreements'} initialContractId={selectedAgreementId} newAgreementRequest={newAgreementRequest} products={workspace.products} customers={contractCustomers} leads={contractLeads} /></Suspense>
         </div>}
 
         {!loading && !error && workspace && area === 'builds' && <div className="gm-card-grid">

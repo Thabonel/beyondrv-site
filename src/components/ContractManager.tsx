@@ -113,7 +113,7 @@ function displayStatus(status: string) {
   return status === 'signed' ? 'accepted' : status.replace(/_/g, ' ');
 }
 
-export default function ContractManager({ products, customers, leads, initialContractId = '' }: { products: ProductOption[]; customers: CustomerOption[]; leads: LeadOption[]; initialContractId?: string }) {
+export default function ContractManager({ products, customers, leads, initialContractId = '', newAgreementRequest = 0 }: { products: ProductOption[]; customers: CustomerOption[]; leads: LeadOption[]; initialContractId?: string; newAgreementRequest?: number }) {
   const [contracts, setContracts] = useState<ContractRecord[]>([]);
   const [draft, setDraft] = useState<ContractRecord>(() => cloneEmpty());
   const [validation, setValidation] = useState<ContractValidation | null>(null);
@@ -125,6 +125,7 @@ export default function ContractManager({ products, customers, leads, initialCon
   const [termsApproved, setTermsApproved] = useState(false);
   const [composeUrl, setComposeUrl] = useState('');
   const openedInitialContractId = useRef('');
+  const openedNewAgreementRequest = useRef(0);
   const [acceptanceForm, setAcceptanceForm] = useState({
     method: 'hand_signed_copy',
     acceptedAt: new Date().toISOString().slice(0, 16),
@@ -169,6 +170,11 @@ export default function ContractManager({ products, customers, leads, initialCon
 
   function updateProduct(change: Partial<ContractRecord['product']>) {
     setDraft(current => ({ ...current, product: { ...current.product, ...change }, status: current.status === 'approved' ? 'draft' : current.status }));
+    setPreviewHtml(''); setValidation(null);
+  }
+
+  function updateSalesContext(change: Partial<NonNullable<ContractRecord['salesContext']>>) {
+    setDraft(current => ({ ...current, salesContext: { ...current.salesContext!, ...change, capturedAt: current.salesContext?.capturedAt || new Date().toISOString() } }));
     setPreviewHtml(''); setValidation(null);
   }
 
@@ -324,8 +330,16 @@ export default function ContractManager({ products, customers, leads, initialCon
     openContract(contract);
   }, [contracts, initialContractId]);
 
+  useEffect(() => {
+    if (!newAgreementRequest || openedNewAgreementRequest.current === newAgreementRequest) return;
+    openedNewAgreementRequest.current = newAgreementRequest;
+    newContract();
+  }, [newAgreementRequest]);
+
   function newContract() {
-    setDraft(cloneEmpty()); setPersisted(false); setValidation(null); setPreviewHtml(''); setShowEditor(true); setStatus('');
+    const next = cloneEmpty();
+    next.salesContext = { ...next.salesContext!, source: 'manual', capturedAt: new Date().toISOString() };
+    setDraft(next); setPersisted(false); setValidation(null); setPreviewHtml(''); setShowEditor(true); setStatus('');
     setTermsApproved(false); setComposeUrl('');
   }
 
@@ -353,6 +367,8 @@ export default function ContractManager({ products, customers, leads, initialCon
         {draft.salesContext?.statedProductInterest && <div style={{ color: '#ddd', fontSize: '0.76rem' }}><strong>Customer selected:</strong> {draft.salesContext.statedProductInterest}</div>}
         {draft.salesContext?.enquiryMessage && <div style={{ color: '#ddd', fontSize: '0.76rem', whiteSpace: 'pre-wrap' }}><strong>Customer message:</strong><br />{draft.salesContext.enquiryMessage}</div>}
       </section>}
+
+      {draft.salesContext?.source !== 'website_enquiry' && <section data-testid="conversation-context" style={{ background: '#201a12', border: '1px solid #92400e', borderRadius: '8px', padding: '0.85rem', display: 'grid', gap: '0.55rem' }}><strong style={{ color: '#fdba74' }}>Conversation context — not yet contractual</strong><div style={{ color: '#ddd', fontSize: '0.76rem', lineHeight: 1.5 }}>Record what the customer asked for here. It will not add inclusions, prices, alterations, delivery commitments, or specifications to the agreement. Confirm those separately in the structured fields below.</div><label style={{color:'#f5d0a9',fontSize:'0.76rem'}}>Conversation source<select aria-label="Conversation source" value={draft.salesContext?.source || 'manual'} onChange={event => updateSalesContext({ source: event.target.value })} style={{...inputStyle,marginTop:'0.3rem'}}><option value="manual">Choose context</option><option value="phone">Phone conversation</option><option value="visit">Workshop or walk-in visit</option></select></label><textarea aria-label="Customer request or discussion" value={draft.salesContext?.enquiryMessage || ''} onChange={event => updateSalesContext({ enquiryMessage: event.target.value })} placeholder="Customer request or discussion (not contractual)" rows={3} style={{...inputStyle,resize:'vertical'}}/></section>}
 
       {Boolean(draft.proposedChanges?.length) && <section style={{ background: '#201a12', border: '1px solid #92400e', borderRadius: '8px', padding: '0.85rem', display: 'grid', gap: '0.5rem' }}><strong style={{ color: '#fdba74' }}>Customer email changes to apply</strong><div style={{ color: '#ddd', fontSize: '0.74rem' }}>{draft.revisionReason}</div>{draft.proposedChanges?.map((change,index)=><div key={`${change.item}-${index}`} style={{color:'#ddd',fontSize:'0.74rem',borderTop:'1px solid #5b3419',paddingTop:'0.4rem'}}><strong style={{textTransform:'capitalize'}}>{change.action}</strong> {change.item}: {change.previousValue || 'current value not stated'} → {change.requestedValue || 'requested value not stated'}{change.sourceExcerpt && <div style={{color:'#999',marginTop:'0.2rem'}}>Email evidence: “{change.sourceExcerpt}”</div>}</div>)}<div style={{color:'#fb923c',fontSize:'0.7rem'}}>Apply these changes to the structured contract fields, then validate the totals and full preview. The AI has not changed pricing or delivery terms.</div></section>}
 

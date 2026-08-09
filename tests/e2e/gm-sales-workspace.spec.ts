@@ -172,3 +172,13 @@ test('GM records outcomes with mobile controls and safely retries the same comma
   await action.getByRole('button', { name: 'Save not proceeding' }).click();
   expect(requests[2]).toMatchObject({ enquiryId: 'enquiry-1', outcome: 'not_proceeding', lossReason: 'other', note: 'Customer is moving interstate.' });
 });
+
+test('GM starts a phone or walk-in agreement with non-contractual conversation context', async ({ page }) => {
+  await page.route('**/.netlify/functions/admin-contracts', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ contracts: [] }) }));
+  await page.goto('/admin/');
+  await page.getByRole('button', { name: 'New agreement' }).click();
+  await expect(page.getByTestId('conversation-context')).toContainText('not yet contractual');
+  await page.getByLabel('Conversation source').selectOption('visit');
+  await page.getByLabel('Customer request or discussion').fill('Customer wants to inspect samples before deciding.');
+  await expect(page.getByText('Customer wants to inspect samples before deciding.')).toHaveCount(0);
+});

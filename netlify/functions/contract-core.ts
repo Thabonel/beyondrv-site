@@ -399,17 +399,15 @@ export function normaliseContractInput(
         };
       })
       : existing?.proposedChanges || [],
-    salesContext: existing?.salesContext ?? (() => {
+    salesContext: existing?.salesContext?.source === 'website_enquiry' ? existing.salesContext : (() => {
       const context = input.salesContext && typeof input.salesContext === 'object'
         ? input.salesContext as Record<string, unknown>
         : {};
       return {
-        source: text(context.source, 80),
-        sourceReference: text(context.sourceReference, 240),
-        enquiryMessage: text(context.enquiryMessage, 5000),
-        statedProductInterest: text(context.statedProductInterest, 500),
-        submittedAt: text(context.submittedAt, 80),
-        capturedAt: text(context.capturedAt, 80),
+        source: text(context.source, 80) || existing?.salesContext?.source || '',
+        sourceReference: text(context.sourceReference, 240) || existing?.salesContext?.sourceReference || '',
+        enquiryMessage: text(context.enquiryMessage, 5000), statedProductInterest: text(context.statedProductInterest, 500),
+        submittedAt: text(context.submittedAt, 80) || existing?.salesContext?.submittedAt || '', capturedAt: text(context.capturedAt, 80) || existing?.salesContext?.capturedAt || '',
       };
     })(),
     templateVersion: existing?.templateVersion || CONTRACT_TEMPLATE_VERSION,
