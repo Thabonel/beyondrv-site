@@ -71,5 +71,9 @@ export default function AdminApp() {
     return <Suspense fallback={<div style={{ minHeight: 'calc(100vh - 60px)', display: 'grid', placeItems: 'center', color: '#aaa' }}>Opening Today…</div>}><GmSalesWorkspace actor={session.actor} /></Suspense>;
   }
 
+  if (session.actor.role === 'owner' && new URLSearchParams(window.location.search).get('view') === 'gm') {
+    return <Suspense fallback={<div style={{ minHeight: 'calc(100vh - 60px)', display: 'grid', placeItems: 'center', color: '#aaa' }}>Opening GM workspace…</div>}><GmSalesWorkspace actor={session.actor} ownerPreview onExitPreview={() => { const url = new URL(window.location.href); url.searchParams.delete('view'); window.location.href = url.toString(); }} /></Suspense>;
+  }
+
   return <Suspense fallback={<div style={{ minHeight: 'calc(100vh - 60px)', display: 'grid', placeItems: 'center', color: '#aaa' }}>Opening admin tools…</div>}><AdminPanel /></Suspense>;
 }
