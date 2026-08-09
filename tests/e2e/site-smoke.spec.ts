@@ -1,4 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { prepareNetlifyPreview } from './netlify-preview';
+
+test.beforeEach(async ({ page }) => {
+  await prepareNetlifyPreview(page);
+});
 
 const pages = [
   { path: '/', title: /Beyond RV/ },

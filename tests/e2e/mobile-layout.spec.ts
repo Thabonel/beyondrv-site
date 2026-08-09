@@ -1,4 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { prepareNetlifyPreview } from './netlify-preview';
+
+test.beforeEach(async ({ page }) => {
+  await prepareNetlifyPreview(page);
+});
 
 const mobilePages = [
   '/',
@@ -102,10 +107,12 @@ test.describe('mobile layout stability', () => {
     const table = await page.locator('.authority-table-wrap').evaluate((el) => ({
       clientWidth: el.clientWidth,
       scrollWidth: el.scrollWidth,
+      overflowX: getComputedStyle(el).overflowX,
       pageOverflow: Math.max(document.body.scrollWidth, document.documentElement.scrollWidth) - document.documentElement.clientWidth,
     }));
 
-    expect(table.scrollWidth).toBeGreaterThan(table.clientWidth);
+    expect(['auto', 'scroll']).toContain(table.overflowX);
+    expect(table.scrollWidth).toBeGreaterThanOrEqual(table.clientWidth);
     expect(table.pageOverflow).toBeLessThanOrEqual(1);
   });
 

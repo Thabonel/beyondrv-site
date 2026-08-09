@@ -1,4 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { prepareNetlifyPreview } from './netlify-preview';
+
+test.beforeEach(async ({ page }) => {
+  await prepareNetlifyPreview(page);
+});
 
 test('critical fonts and lightweight controls load before optional applications', async ({ page }) => {
   const requests: string[] = [];
