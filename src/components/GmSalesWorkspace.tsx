@@ -346,7 +346,7 @@ export default function GmSalesWorkspace({ actor, ownerPreview = false, onExitPr
       <div className="gm-shell">
         <div className="gm-heading">
           <div><div className="gm-eyebrow">Sales workspace</div><h1>{areaLabels[area]}</h1></div>
-          <div className="gm-user"><span>{actor.displayName}</span>{ownerPreview && <button type="button" className="gm-button" onClick={onExitPreview}>Technical admin</button>}<button type="button" className="gm-button gm-button--primary" onClick={() => { setSelectedAgreementId(''); setNewAgreementRequest(current => current + 1); selectArea('agreements'); }}>New agreement</button><a className="gm-button" href="/.netlify/functions/google-oauth-start">Connect company Gmail</a><button type="button" className="gm-button" onClick={() => void logout()}>Sign out</button></div>
+          <div className="gm-user"><span>{actor.displayName}</span>{ownerPreview && <button type="button" className="gm-button" onClick={onExitPreview}>Technical admin</button>}<a className="gm-button gm-button--primary" href="/admin/quick-note/">Log customer call</a><button type="button" className="gm-button" onClick={() => { setSelectedAgreementId(''); setNewAgreementRequest(current => current + 1); selectArea('agreements'); }}>New agreement</button><a className="gm-button" href="/.netlify/functions/google-oauth-start">Connect company Gmail</a><button type="button" className="gm-button" onClick={() => void logout()}>Sign out</button></div>
         </div>
         <nav className="gm-tabs" aria-label="Sales workspace">
           {(Object.keys(areaLabels) as WorkspaceArea[]).map(item => <button key={item} className="gm-tab" aria-selected={area === item} onClick={() => selectArea(item)}>{areaLabels[item]}</button>)}

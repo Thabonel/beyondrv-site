@@ -132,9 +132,11 @@ export default async function adminGate(request: Request) {
     console.warn('admin-gate: auth check failed, redirecting to login', error);
   }
 
+  const requested = new URL(request.url);
   const url = new URL(request.url);
   url.pathname = '/.netlify/functions/admin-login';
   url.search = '';
+  url.searchParams.set('returnTo', `${requested.pathname}${requested.search}`);
   return Response.redirect(url, 302);
 }
 
