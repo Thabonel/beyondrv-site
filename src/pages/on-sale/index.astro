@@ -18,7 +18,7 @@ const allProducts = (await getCollection('products')).filter(isPublicProduct);
 type ProductEntry = typeof allProducts[number];
 const isProduct = (product: ProductEntry | undefined): product is ProductEntry => Boolean(product);
 const products = productOrder
-  .map(slug => allProducts.find(p => p.slug === slug && p.data.store !== true && p.data.onSale))
+  .map(slug => allProducts.find(p => p.id === slug && p.data.store !== true && p.data.onSale))
   .filter(isProduct);
 ---
 <BaseLayout
@@ -50,7 +50,7 @@ const products = productOrder
         {products.map(p => (
           <ProductCard
             title={p.data.title}
-            slug={p.slug}
+            slug={p.id}
             category={p.data.category}
             tagline={p.data.tagline}
             price={p.data.price}

@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { displayImageUrl, imageSrcSet, thumbImageUrl } from '../../lib/media';
 import { formatShopPrice, shopProductPrice, availabilityLabel, canPurchaseOnline, isOnlinePayableFulfilment, fulfilmentInfo, sourceTypeLabel } from '../../lib/shop';
@@ -48,7 +48,7 @@ const formatItemDimensions = (dimensions: { length?: number; width?: number; hei
 };
 const itemDimensionsText = stockData ? formatItemDimensions(stockData.dimensions) : '';
 const hasItemSpecs = Boolean(stockData?.weight || itemDimensionsText);
-const { Content } = await product.render();
+const { Content } = await render(product);
 const unitPrice = shopProductPrice(data.price);
 const productUrl = `https://beyondrv.com.au/shop/${data.slug}/`;
 const itemAdditionalProperty = stockData && hasItemSpecs

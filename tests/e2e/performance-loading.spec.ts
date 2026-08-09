@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test('critical fonts and lightweight controls load before optional applications', async ({ page }) => {
   const requests: string[] = [];
+  const chatApplicationRequested = () => requests.some(url => /\/_astro\/SiteChatWidget\.[^/]+\.js(?:\?|$)/.test(url));
   page.on('request', request => requests.push(request.url()));
   await page.addInitScript(() => localStorage.removeItem('brv_cookie_consent'));
 
@@ -9,7 +10,8 @@ test('critical fonts and lightweight controls load before optional applications'
   await expect(page.locator('[data-cookie-consent]')).toBeVisible();
 
   expect(requests.some(url => url.includes('fonts.googleapis.com') || url.includes('fonts.gstatic.com'))).toBe(false);
-  expect(requests.some(url => url.includes('us.i.posthog.com') || url.includes('SiteChatWidget'))).toBe(false);
+  expect(requests.some(url => url.includes('us.i.posthog.com'))).toBe(false);
+  expect(chatApplicationRequested()).toBe(false);
 
   const cardSources = await page.locator('.range-grid img').evaluateAll(images =>
     images.map(image => image.getAttribute('src') || '')
@@ -31,6 +33,6 @@ test('critical fonts and lightweight controls load before optional applications'
 
   await page.locator('[data-lazy-chat-button]').click();
   await expect(page.getByRole('dialog', { name: 'Beyond RV chat assistant' })).toBeVisible();
-  expect(requests.some(url => url.includes('SiteChatWidget'))).toBe(true);
+  expect(chatApplicationRequested()).toBe(true);
   await page.locator('.chat-close-btn').click();
 });

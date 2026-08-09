@@ -3,8 +3,15 @@ title: "Advent 2300 Hardtop Ute Slide-On Camper"
 category: "slide-on"
 tagline: "A hardtop ute slide-on camper with extra base length for longer tray setups."
 price: "$75,000"
+priceBadge: "BUILD TO ORDER"
 status: "available"
 onlinePurchaseEnabled: true
+purchasableOnline: true
+depositEnabled: true
+fullPaymentEnabled: true
+availability: "made_to_order"
+sourceType: "china_container"
+leadTimeText: "Made to order. Once the deposit is paid, production starts in China. The camper is then shipped to our Mutdapilly factory for local finishing, certification and handover preparation."
 onSale: false
 featured: false
 heroImage: "/images/optimized/products/advent-2300-hardtop-slide-on/01-advent-2300-hardtop-slide-on-hero.webp"
@@ -136,4 +143,4 @@ seoTitle: "Advent 2300 Hardtop Ute Slide-On Camper | Beyond RV"
 seoDesc: "The Advent 2300 hardtop ute slide-on camper gives buyers a longer 2300mm base in the Beyond RV Advent range."
 ---
 
-The **Advent 2300** sits in the middle of the Advent hardtop ute slide-on range, giving buyers a longer base while staying within the ute slide-on category.
+The **Advent 2300** is built to order and sits in the middle of the Advent hardtop ute slide-on range, giving buyers a longer base while staying within the ute slide-on category. Once the deposit is paid, production starts in China before the camper is shipped to our Mutdapilly factory for local finishing, certification and handover preparation.

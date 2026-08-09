@@ -3,7 +3,15 @@ title: "7ft Electric Pop-Top Slide-On Camper"
 category: "slide-on"
 tagline: "Electric pop-top slide-on camper for single cab utes."
 price: "$68,800"
+priceBadge: "BUILD TO ORDER"
 status: "available"
+onlinePurchaseEnabled: true
+purchasableOnline: true
+depositEnabled: true
+fullPaymentEnabled: true
+availability: "made_to_order"
+sourceType: "china_container"
+leadTimeText: "Made to order. Once the deposit is paid, production starts in China. The camper is then shipped to our Mutdapilly factory for local finishing, certification and handover preparation."
 onSale: false
 featured: false
 heroImage: "/images/optimized/products/7ft-electric-poptop-slide-on/01-7ft-electric-poptop-slide-on-hero.webp"
@@ -130,4 +138,4 @@ seoTitle: "7ft Electric Pop-Top Slide-On Camper | Beyond RV"
 seoDesc: "Beyond RV 7ft electric pop-top slide-on camper for single cab ute platforms."
 ---
 
-The **7ft Electric Pop-Top Slide-On** is built for single cab ute owners who want a lower travel profile with standing room once camped.
+The **7ft Electric Pop-Top Slide-On** is built to order for single cab ute owners who want a lower travel profile with standing room once camped. Once the deposit is paid, production starts in China before the camper is shipped to our Mutdapilly factory for local finishing, certification and handover preparation.

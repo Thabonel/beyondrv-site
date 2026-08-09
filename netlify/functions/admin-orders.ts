@@ -87,6 +87,9 @@ function normalizeOrder(body: Record<string, unknown>, existing: Record<string, 
     productTitle,
     productCategory: cleanWithFallback(body, existing, 'productCategory', 80),
     sourceEnquiryId: cleanWithFallback(body, existing, 'sourceEnquiryId', 240),
+    configurationId: cleanWithFallback(body, existing, 'configurationId', 240),
+    configurationNumber: cleanWithFallback(body, existing, 'configurationNumber', 240),
+    contractId: cleanWithFallback(body, existing, 'contractId', 240),
     orderType,
     status,
     depositPaid: cleanBooleanWithFallback(body, existing, 'depositPaid'),
@@ -121,6 +124,11 @@ function normalizeOrder(body: Record<string, unknown>, existing: Record<string, 
     expectedHandoverDate,
     nextActionDate,
     notes: cleanWithFallback(body, existing, 'notes', 4000),
+    statusHistory: Array.isArray(existing?.statusHistory)
+      ? status !== clean(existing?.status, 40)
+        ? [...existing.statusHistory as unknown[], { id: randomUUID(), status, occurredAt: now, note: clean(body.statusNote, 1000), recordedBy: 'admin' }].slice(-100)
+        : existing.statusHistory
+      : [{ id: randomUUID(), status, occurredAt: now, note: clean(body.statusNote, 1000), recordedBy: 'admin' }],
     createdAt: clean(existing?.createdAt, 80) || now,
     updatedAt: now,
     createdBy: clean(existing?.createdBy, 80) || 'admin',

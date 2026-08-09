@@ -5,9 +5,10 @@ interface Props {
   productName?: string;
 }
 const { pageTitle = '', productSlug = '', productName = '' } = Astro.props;
+const isInquiryPage = Astro.url.pathname.startsWith('/inquiry-form');
 ---
 <div
-  class="chat-widget"
+  class:list={['chat-widget', { 'chat-widget-inquiry': isInquiryPage }]}
   data-lazy-chat
   data-page-title={pageTitle}
   data-product-slug={productSlug}

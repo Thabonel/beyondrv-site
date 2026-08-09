@@ -174,7 +174,7 @@ const rows = [
           <th scope="col" class="comparison-field-col">Field</th>
           {products.map((entry) => (
             <th scope="col" class="comparison-product-col">
-              <a class="comparison-product-name" href={`/${entry.slug}/`}>{entry.data.title}</a>
+              <a class="comparison-product-name" href={`/${entry.id}/`}>{entry.data.title}</a>
               <span class="comparison-product-price">{entry.data.price}</span>
             </th>
           ))}
@@ -193,7 +193,7 @@ const rows = [
           <th scope="row" class="comparison-field-col">CTA</th>
           {products.map((entry) => (
             <td>
-              <a class="comparison-table-link" href={`/${entry.slug}/`}>View details →</a>
+              <a class="comparison-table-link" href={`/${entry.id}/`}>View details →</a>
             </td>
           ))}
         </tr>

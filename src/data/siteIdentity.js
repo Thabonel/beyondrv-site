@@ -1,5 +1,8 @@
 export const SITE_URL = 'https://beyondrv.com.au';
 export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
+export const MERCHANT_POLICY_URL = `${SITE_URL}/shipping-and-returns/`;
+export const MERCHANT_RETURN_POLICY_ID = `${MERCHANT_POLICY_URL}#return-policy`;
+export const MERCHANT_SHIPPING_SERVICE_ID = `${MERCHANT_POLICY_URL}#shipping-service`;
 
 export const SITE_IDENTITY = Object.freeze({
   name: 'Beyond RV',
@@ -47,6 +50,24 @@ export function buildOrganizationSchema() {
       { '@type': 'Country', name: 'Australia' },
       { '@type': 'State', name: 'Queensland' },
     ],
+    hasMerchantReturnPolicy: {
+      '@type': 'MerchantReturnPolicy',
+      '@id': MERCHANT_RETURN_POLICY_ID,
+      merchantReturnLink: `${MERCHANT_POLICY_URL}#returns`,
+    },
+    hasShippingService: {
+      '@type': 'ShippingService',
+      '@id': MERCHANT_SHIPPING_SERVICE_ID,
+      name: 'Australia delivery and collection by arrangement',
+      description: 'Shipping, delivery, freight, workshop collection, and handover arrangements depend on the product and destination and are confirmed by Beyond RV before fulfilment.',
+      shippingConditions: {
+        '@type': 'ShippingConditions',
+        shippingDestination: {
+          '@type': 'DefinedRegion',
+          addressCountry: 'AU',
+        },
+      },
+    },
     openingHoursSpecification: [{
       '@type': 'OpeningHoursSpecification',
       dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],

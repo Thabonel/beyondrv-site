@@ -24,11 +24,11 @@ interface Props {
 }
 const { product } = Astro.props as Props;
 const { data } = product;
-const encodedSlug = encodeURIComponent(product.slug);
+const encodedSlug = encodeURIComponent(product.id);
 const encodedName = encodeURIComponent(data.title);
 const enquiryUrl = `/inquiry-form/?product=${encodedSlug}&name=${encodedName}`;
 const siteUrl = Astro.site ?? new URL('https://beyondrv.com.au');
-const productUrl = new URL(`/${product.slug}/`, siteUrl).toString();
+const productUrl = new URL(`/${product.id}/`, siteUrl).toString();
 const heroDisplayImage = displayImageUrl(data.heroImage, 1400);
 const heroSrcSet = imageSrcSet(data.heroImage);
 const heroSizes = '(max-width: 900px) 100vw, 58vw';
@@ -122,7 +122,7 @@ const paymentNote = canDeposit && canFullPayment
       ? 'Secure checkout via Stripe. Full payment available.'
       : '';
 const productSchema = buildMerchantProduct({
-  slug: product.slug,
+  slug: product.id,
   name: data.title,
   description: data.seoDesc ?? data.tagline,
   url: productUrl,
@@ -212,9 +212,9 @@ const schemas = [primarySchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
   canonicalUrl={data.canonicalUrl}
   structuredData={schemas}
   preloadImage={{ src: heroDisplayImage, srcset: heroSrcSet, sizes: heroSizes }}
-  activePath={`/${product.slug}/`}
+  activePath={`/${product.id}/`}
   productTitle={data.title}
-  productSlug={product.slug}
+  productSlug={product.id}
 >
   <section class="product-hero-section">
     <div class="product-gallery">
@@ -296,7 +296,7 @@ const schemas = [primarySchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
       <div
         class="product-ctas"
         data-stripe-product
-        data-product-slug={product.slug}
+        data-product-slug={product.id}
         data-product-title={data.title}
         data-base-price={parsedPrice}
         data-deposit-percent={configuredDepositPercent}
@@ -516,7 +516,7 @@ const schemas = [primarySchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
     <OptionalExtras
       client:load
       basePrice={data.price}
-      productSlug={product.slug}
+      productSlug={product.id}
       productName={data.title}
     />
   )}

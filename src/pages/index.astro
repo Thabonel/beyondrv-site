@@ -18,9 +18,9 @@ const featuredOrder = [
   'sunpatch-12c-couples-caravan',
 ];
 const featuredProducts = featuredOrder
-  .map(slug => allProducts.find(p => p.slug === slug))
+  .map(slug => allProducts.find(p => p.id === slug))
   .filter(isProduct);
-const activeProductSlugs = new Set<string>(allProducts.map(product => product.slug));
+const activeProductSlugs = new Set<string>(allProducts.map(product => product.id));
 const visibleRecentBuilds = recentBuildsData
   .filter(build => build.isVisible)
   .filter((build) => {
@@ -295,7 +295,7 @@ const heroSizes = '100vw';
         {featuredProducts.map(p => (
           <ProductCard
             title={p.data.title}
-            slug={p.slug}
+            slug={p.id}
             category={p.data.category}
             tagline={p.data.tagline}
             price={p.data.price}

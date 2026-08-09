@@ -18,10 +18,16 @@ const dashboard = {
   generatedAt: '2026-06-15T00:00:00.000Z',
   range: '30',
   decisions: [],
+  lifecycle: [],
+  orders: {
+    total: 0, paid: 0, enquiryLinked: 0, shippingBlocked: 0,
+    byStatus: [], byShippingStatus: [], recent: [],
+  },
   inventory: {
     totalProducts: 1, available: 0, onSale: 1, comingSoon: 0, featured: 0, estimatedListedValue: 49990,
     byCategory: [{ category: 'slide-on', count: 1, value: 49990 }],
     byStatus: [{ status: 'on-sale', count: 1 }],
+    planning: [],
     weakListings: [{ slug: product.slug, title: product.title, issue: 'Fewer than three gallery images' }],
   },
   leads: { last7Days: 0, last30Days: 0, open: 0, dueToday: 0, overdue: 0, byStatus: [], priorityQueue: [], followUpQueue: [], recent: [] },

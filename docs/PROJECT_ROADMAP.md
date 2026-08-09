@@ -1,6 +1,6 @@
 # Beyond RV Project Roadmap
 
-Last updated: 2026-06-26
+Last updated: 2026-08-09
 
 This roadmap is the working queue for Codex.
 
@@ -23,6 +23,18 @@ Files likely to change: `src/content/config.ts`, `netlify/functions/admin-produc
 Dependencies: the order lifecycle, shipping status data, and lead/demand signals from enquiries.
 
 Acceptance criteria: owners can see demand history, internal stock estimates, reorder quantities, container ETA cues, and planning signals per product from admin.
+
+### 2. Admin-first visual camper configurator
+
+Current state: Phase 2 is implemented in code. In addition to the Phase 1 pricing and rules foundation, the protected admin now has an operational catalogue editor, versioned drawing uploads/links and approvals, a GLB viewer foundation, secure expiring customer review links, recorded customer decisions, contract/customer approval gates, and a production tracker linked to customer orders. Production status reflects China manufacture and Mutdapilly finishing. The active catalogue contains the four slide-ons plus the priced 3.5m family camper, 4.7m hardtop camper, DIY camper box and Mercedes Sprinter. Three POA Unimog products remain inactive until base prices are supplied. The build has not been deployed.
+
+Still needed: owner/factory validation of technical compatibility rules, internal costs and option weights; receipt and audit of the source CAD files; execution of the implemented GLB conversion pipeline and final node bindings; the three Unimog base prices; then owner acceptance testing and deployment. A broad public self-service configurator remains a later phase; the private customer approval page is implemented.
+
+Primary design: [`plans/2026-08-08-admin-first-visual-configurator-prd.md`](./plans/2026-08-08-admin-first-visual-configurator-prd.md).
+
+Acceptance criteria for the next gate: the owner approves a versioned internal catalogue, representative drawing → customer approval → snapshot → contract → deposit → production flows pass owner acceptance testing, and at least one supplied CAD asset passes the documented GLB conversion and binding workflow.
+
+Operations: [`CONFIGURATOR-PHASE-2-OPERATIONS.md`](./CONFIGURATOR-PHASE-2-OPERATIONS.md).
 
 ## Completed
 
@@ -59,7 +71,6 @@ Acceptance criteria: sitemap submission is confirmed in Google and Bing, represe
 
 Do not implement these unless the user explicitly asks for them.
 
-- 3D Configurator
 - Experimental features
 - Nice-to-have UX enhancements
 - AI Owner Copilot

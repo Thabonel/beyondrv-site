@@ -1,4 +1,6 @@
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
+import { glob } from 'astro/loaders';
+import { z } from 'astro/zod';
 
 const specRow = z.object({ label: z.string(), value: z.string() });
 const specGroup = z.object({ group: z.string(), items: z.array(specRow) });
@@ -18,6 +20,18 @@ const youtubeVideo = z.object({
   duration: z.string().optional(),
   startSeconds: z.number().int().nonnegative().optional(),
   transcriptSummary: z.string().optional(),
+});
+const suitabilityData = z.object({
+  status: z.enum(['draft', 'target', 'confirmed']).default('draft'),
+  dryWeightKg: z.string().optional(),
+  estimatedLoadedWeightKg: z.string().optional(),
+  requiredTrayLengthMm: z.string().optional(),
+  requiredTrayWidthMm: z.string().optional(),
+  centreOfGravityMm: z.string().optional(),
+  atmKg: z.string().optional(),
+  gtmKg: z.string().optional(),
+  towBallWeightKg: z.string().optional(),
+  notes: z.string().optional(),
 });
 
 function availabilityFromStatus(status: 'available' | 'on-sale' | 'coming-soon') {
@@ -56,6 +70,7 @@ const vehicleProduct = z.object({
   faq:           z.array(z.object({ q: z.string(), a: z.string() })).optional(),
   relatedSlugs:  z.array(z.string()).optional(),
   youtubeVideo:  youtubeVideo.optional(),
+  suitabilityData: suitabilityData.optional(),
   seoTitle:      z.string().optional(),
   seoDesc:       z.string().optional(),
   canonicalUrl:  z.string().optional(),
@@ -100,6 +115,17 @@ const shopBase = {
   leadTimeText: z.string().optional(),
   containerEtaText: z.string().optional(),
   containerEtaDate: z.string().optional(),
+  priceBadge:   z.string().optional(),
+  depositEnabled: z.boolean().optional(),
+  fullPaymentEnabled: z.boolean().optional(),
+  specs:        z.array(specRow).optional(),
+  specGroups:   z.array(specGroup).optional(),
+  features:     z.array(z.string()).optional(),
+  faq:          z.array(z.object({ q: z.string(), a: z.string() })).optional(),
+  relatedSlugs: z.array(z.string()).optional(),
+  youtubeVideo: youtubeVideo.optional(),
+  suitabilityData: suitabilityData.optional(),
+  canonicalUrl: z.string().optional(),
   seoTitle:    z.string().optional(),
   seoDesc:     z.string().optional(),
 };
@@ -139,7 +165,7 @@ const shopProduct = z.discriminatedUnion('productType', [stockProduct, servicePr
     const requiredShippingFields = ['packedWeightKg', 'packedLengthCm', 'packedWidthCm', 'packedHeightCm', 'shippingDataStatus'] as const;
     for (const field of requiredShippingFields) {
       if (product[field] === undefined) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: [field], message: `Ship products must declare ${field}.` });
+        ctx.addIssue({ code: 'custom', path: [field], message: `Ship products must declare ${field}.` });
       }
     }
   }
@@ -177,9 +203,21 @@ const shopProduct = z.discriminatedUnion('productType', [stockProduct, servicePr
   keySpecs: [],
 }));
 
+const product = z.unknown().transform((value, ctx) => {
+  const candidate = value && typeof value === 'object' && 'store' in value && value.store === true
+    ? shopProduct
+    : vehicleProduct;
+  const result = candidate.safeParse(value);
+  if (result.success) return result.data;
+  for (const issue of result.error.issues) {
+    ctx.addIssue({ code: 'custom', path: issue.path, message: issue.message });
+  }
+  return z.NEVER;
+});
+
 const products = defineCollection({
-  type: 'content',
-  schema: z.union([vehicleProduct, shopProduct]),
+  loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/content/products' }),
+  schema: product,
 });
 
 export const collections = { products };

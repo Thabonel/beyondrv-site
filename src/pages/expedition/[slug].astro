@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import ProductLayout from '../../layouts/ProductLayout.astro';
 import { isPublicProduct } from '../../lib/productVisibility';
 
@@ -7,9 +7,9 @@ export async function getStaticPaths() {
   const products = await getCollection('products');
   return products
     .filter(isPublicProduct)
-    .filter(p => p.slug.startsWith('expedition/'))
+    .filter(p => p.id.startsWith('expedition/'))
     .map(p => ({
-      params: { slug: p.slug.replace('expedition/', '') },
+      params: { slug: p.id.replace('expedition/', '') },
       props: { product: p },
     }));
 }
@@ -18,7 +18,7 @@ interface Props {
   product: Awaited<ReturnType<typeof getCollection<'products'>>>[number];
 }
 const { product } = Astro.props;
-const { Content } = await product.render();
+const { Content } = await render(product);
 ---
 <ProductLayout product={product}>
   <Content />

@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
 
+async function openEnquiries(page: import('@playwright/test').Page) {
+  await page.getByRole('button', { name: /Menu Dashboard/i }).click();
+  await page.getByRole('button', { name: /^Enquiries$/i }).click();
+}
+
 function enquiry(index: number) {
   return {
     id: `enquiry-${index}`,
@@ -32,7 +37,7 @@ test('enquiries and reminders share one scroll container', async ({ page }) => {
   }));
 
   await page.goto('/admin/');
-  await page.getByRole('button', { name: 'enquiries' }).click();
+  await openEnquiries(page);
 
   const scrollContainer = page.getByTestId('enquiries-scroll-container');
   const records = page.getByTestId('enquiries-records');
@@ -86,7 +91,7 @@ test('an enquiry can be archived and restored without deletion', async ({ page }
   });
 
   await page.goto('/admin/');
-  await page.getByRole('button', { name: 'enquiries' }).click();
+  await openEnquiries(page);
 
   await page.getByTestId('archive-enquiry-enquiry-1').click();
   await expect(page.getByTestId('enquiry-card-enquiry-1')).toHaveCount(0);

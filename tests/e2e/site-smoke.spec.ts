@@ -33,7 +33,14 @@ test.describe('public site cross-browser smoke', () => {
         const url = new URL(src);
         return url.hostname === '127.0.0.1' && url.pathname === '/.netlify/images';
       });
-      const unexpectedFailedImages = result.failedImages.filter((src) => !localNetlifyImageFailures.includes(src));
+      // Blob-backed media is served by Netlify's /media/* function in deploy previews and
+      // production. Astro preview has no function runtime, so those URLs cannot resolve here.
+      const localNetlifyBlobFailures = result.failedImages.filter((src) => {
+        const url = new URL(src);
+        return url.hostname === '127.0.0.1' && url.pathname.startsWith('/media/');
+      });
+      const expectedLocalRuntimeFailures = [...localNetlifyImageFailures, ...localNetlifyBlobFailures];
+      const unexpectedFailedImages = result.failedImages.filter((src) => !expectedLocalRuntimeFailures.includes(src));
 
       for (const src of localNetlifyImageFailures) {
         const transformedUrl = new URL(src);
@@ -60,8 +67,8 @@ test.describe('restored product galleries', () => {
   for (const product of productGalleries) {
     test(`${product.path} has restored gallery thumbnails`, async ({ page }) => {
       await page.goto(product.path);
-      await expect(page.locator('.thumb-btn')).toHaveCount(product.minThumbs);
-      await expect(page.locator('.specs-table').first()).toBeVisible();
+      expect(await page.locator('.thumb-btn').count()).toBeGreaterThanOrEqual(product.minThumbs);
+      await expect(page.locator('.spec-panel').first()).toBeVisible();
     });
   }
 });

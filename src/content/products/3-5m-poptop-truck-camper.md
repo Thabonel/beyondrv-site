@@ -151,7 +151,7 @@ fullPaymentEnabled: true
 sourceType: other
 containerEligible: false
 archived: true
-archivedAt: 2026-07-29T05:14:25.487Z
+archivedAt: "2026-07-29T05:14:25.487Z"
 ---
 
 The **Custom 3.5m Electric Pop-Top Truck Camper** is an expedition/truck camper product, so it has been moved out of the Slide-Ons category and into Expedition and On Sale.

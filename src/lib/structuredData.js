@@ -1,4 +1,8 @@
-import { ORGANIZATION_ID } from '../data/siteIdentity.js';
+import {
+  MERCHANT_RETURN_POLICY_ID,
+  MERCHANT_SHIPPING_SERVICE_ID,
+  ORGANIZATION_ID,
+} from '../data/siteIdentity.js';
 
 export const DEFAULT_VIDEO_UPLOAD_DATE = '2026-06-01T00:00:00+10:00';
 const BRAND = {
@@ -121,6 +125,15 @@ export function buildProductOffer({ price, status, url, availability }) {
     "price": priceNum,
     "itemCondition": "https://schema.org/NewCondition",
     "availability": normalizeAvailability(availability, isComingSoon),
+    "hasMerchantReturnPolicy": {
+      "@id": MERCHANT_RETURN_POLICY_ID
+    },
+    "shippingDetails": {
+      "@type": "OfferShippingDetails",
+      "hasShippingService": {
+        "@id": MERCHANT_SHIPPING_SERVICE_ID
+      }
+    },
     "seller": {
       "@id": ORGANIZATION_ID
     }

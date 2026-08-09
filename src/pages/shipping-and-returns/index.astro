@@ -1,0 +1,82 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { MERCHANT_POLICY_URL } from '../../data/siteIdentity.js';
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'Shipping and Returns | Beyond RV',
+  url: MERCHANT_POLICY_URL,
+  description: 'Beyond RV shipping, delivery, collection, returns, and refunds information.',
+};
+---
+<BaseLayout
+  title="Shipping & Returns | Beyond RV"
+  description="Beyond RV shipping, delivery, collection, returns, and refunds information for parts, campers, caravans, and expedition vehicles."
+  activePath="/shipping-and-returns/"
+  structuredData={schema}
+>
+  <section class="page-hero page-hero--short">
+    <div class="hero-overlay" style="background: rgba(10,10,10,0.425)"></div>
+    <div class="page-hero-content">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Customer information</span>
+      </div>
+      <h1 class="hero-title">Shipping &amp; Returns</h1>
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="page-content">
+      <p style="font-size: 0.82rem; color: var(--muted); border-left: 2px solid var(--orange); padding-left: 1rem; margin-bottom: 2rem">
+        Last updated: August 2026. This page explains Beyond RV's standard approach to delivery, collection,
+        returns, and refunds. Product-specific quotes, order confirmations, and signed sale agreements also
+        apply where relevant.
+      </p>
+
+      <h2 id="shipping">Shipping, Delivery &amp; Collection</h2>
+      <h3>Parts and accessories</h3>
+      <p>
+        Parts and accessories marked as available for shipping may be sent to addresses within Australia.
+        Freight cost and timing depend on the item, packed size and weight, delivery destination, carrier,
+        and current stock. Beyond RV will confirm the applicable arrangements before dispatch or order completion.
+      </p>
+      <p>
+        Any shipping estimate shown during an enquiry or checkout is indicative until Beyond RV confirms it.
+        Contact us before ordering if you need a delivery quote or require an item by a particular date.
+      </p>
+
+      <h3>Campers, caravans, and expedition vehicles</h3>
+      <p>
+        Collection and handover are generally arranged through our Mutdapilly workshop. Delivery or third-party
+        freight may be arranged separately where practical. The location, cost, timing, and handover requirements
+        will be set out in your quote, order confirmation, or sale agreement.
+      </p>
+
+      <h2 id="returns">Returns &amp; Refunds</h2>
+      <p>
+        Please contact Beyond RV before returning any product. Include your order or build details, the reason for
+        the requested return, and photographs where an item is damaged or faulty. Do not send a product back until
+        we have confirmed the appropriate return arrangements.
+      </p>
+      <p>
+        Returns and refunds are assessed under the terms that apply to the product and sale, including any quote,
+        order confirmation, or signed sale agreement. Beyond RV does not advertise a single change-of-mind return
+        window across all parts, custom builds, campers, caravans, and expedition vehicles.
+      </p>
+      <p>
+        Nothing on this page excludes, restricts, or modifies any rights or remedies that cannot lawfully be
+        excluded, including rights under the Australian Consumer Law. For faults and warranty claims, see our
+        <a href="/warranty/">Warranty &amp; Consumer Guarantees</a> information.
+      </p>
+
+      <h2>Contact Us</h2>
+      <p>
+        For a delivery quote or to discuss a return, call <a href="tel:+61430863819">0430 863 819</a> or email
+        <a href="mailto:beyondcaravans@gmail.com">beyondcaravans@gmail.com</a>. Our workshop is at
+        77 Coleyville Rd, Mutdapilly QLD 4307; visits and returns must be arranged in advance.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

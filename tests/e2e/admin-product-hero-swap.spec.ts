@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
 
 test('setting a gallery photo as hero preserves the previous hero in that gallery position', async ({ page }) => {
-  await page.route('**/.netlify/functions/admin-products', route => route.fulfill({
+  await page.route('**/.netlify/functions/admin-products*', route => route.fulfill({
     status: 200,
     contentType: 'application/json',
-    body: JSON.stringify({
+    body: JSON.stringify(route.request().url().includes('archived=true') ? { products: [] } : {
       products: [{
         slug: 'test-slide-on',
         title: 'Test Slide-On',

@@ -3,7 +3,7 @@ title: Advent 2150 Hardtop Ute Slide-On Camper
 category: slide-on
 tagline: The Advent 2150 is the go-anywhere companion for 4x4 space cab utes and select dual cab ute owners.
 price: $72,000
-priceBadge: IMMEDIATE DELIVERY
+priceBadge: BUILD TO ORDER
 status: available
 onlinePurchaseEnabled: true
 onSale: false
@@ -136,14 +136,15 @@ relatedSlugs:
   - 7ft-electric-poptop-slide-on
 seoTitle: Advent 2150 Hardtop Ute Slide-On Camper | Beyond RV
 seoDesc: The Advent 2150 hardtop ute slide-on camper is built for 4x4 space cab utes and selected dual cab ute owners.
-availability: available_in_australia
+availability: made_to_order
 purchasableOnline: true
 depositEnabled: true
 fullPaymentEnabled: true
-sourceType: other
-containerEligible: false
+sourceType: china_container
+leadTimeText: Made to order. Once the deposit is paid, production starts in China. The camper is then shipped to our Mutdapilly factory for local finishing, certification and handover preparation.
+containerEligible: true
 suitabilityData:
   status: draft
 ---
 
-The **Advent 2150** is built for owners who want a compact hardtop slide-on camper matched to a serious 4x4 ute. It keeps the slide-on range focused on ute platforms while giving buyers a ready-to-roll Beyond RV camper at the confirmed owner price.
+The **Advent 2150** is built to order for owners who want a compact hardtop slide-on camper matched to a serious 4x4 ute. Once the deposit is paid, production starts in China before the camper is shipped to our Mutdapilly factory for local finishing, certification and handover preparation.

@@ -1,6 +1,7 @@
 import React, { Component, type ReactNode, useState, useRef, useEffect } from 'react';
 import AdminDashboard from './AdminDashboard';
 import ContractManager from './ContractManager';
+import ConfiguratorWorkspace from './ConfiguratorWorkspace';
 import initialRecentBuilds from '../data/homepage/recent-builds.json';
 import initialTestimonials from '../data/homepage/testimonials.json';
 import initialPaymentSettings from '../data/payment-settings.json';
@@ -80,7 +81,7 @@ interface PendingChange {
 }
 
 type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
-type PanelTab = 'dashboard' | 'products' | 'archived-products' | 'shop' | 'orders' | 'contracts' | 'settings' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'drafts' | 'audit' | 'knowledge' | 'google' | 'matches' | 'reports' | 'pending';
+type PanelTab = 'dashboard' | 'products' | 'archived-products' | 'shop' | 'orders' | 'configurator' | 'contracts' | 'settings' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'drafts' | 'audit' | 'knowledge' | 'google' | 'matches' | 'reports' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 type CommerceAvailability = 'available_in_australia' | 'coming_next_container' | 'made_to_order' | 'ask_availability' | 'unavailable';
@@ -2001,7 +2002,7 @@ export default function AdminPanel() {
   }, [activeTab]);
 
   useEffect(() => {
-    if (activeTab === 'customers' || activeTab === 'leads' || activeTab === 'drafts' || activeTab === 'audit' || activeTab === 'contracts') {
+    if (activeTab === 'customers' || activeTab === 'leads' || activeTab === 'drafts' || activeTab === 'audit' || activeTab === 'contracts' || activeTab === 'configurator') {
       void loadCopilotRecords();
     }
   }, [activeTab]);
@@ -4390,7 +4391,7 @@ export default function AdminPanel() {
   };
   const pendingGmailSuggestions = gmailThreads.reduce((count, thread) => count + (!thread.matchDecision ? (thread.suggestions?.length || 0) : 0), 0);
   const pendingDriveSuggestions = driveFiles.reduce((count, file) => count + (!file.matchDecision ? (file.suggestions?.length || 0) : 0), 0);
-  const panelTabs: PanelTab[] = ['dashboard', 'products', 'archived-products', 'shop', 'orders', 'contracts', 'settings', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'matches', 'reports', 'pending'];
+  const panelTabs: PanelTab[] = ['dashboard', 'products', 'archived-products', 'shop', 'orders', 'configurator', 'contracts', 'settings', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'matches', 'reports', 'pending'];
 
   function tabLabel(tab: PanelTab) {
     if (tab === 'pending') return `Pending (${pending.length})`;
@@ -4511,6 +4512,12 @@ export default function AdminPanel() {
         {activeTab === 'contracts' && (
           <AdminSectionBoundary>
             <ContractManager products={products} customers={copilotCustomers} leads={copilotLeads} />
+          </AdminSectionBoundary>
+        )}
+
+        {activeTab === 'configurator' && (
+          <AdminSectionBoundary>
+            <ConfiguratorWorkspace products={products} customers={copilotCustomers} leads={copilotLeads} onOpenContracts={() => setActiveTab('contracts')} />
           </AdminSectionBoundary>
         )}
 

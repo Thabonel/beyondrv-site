@@ -17,7 +17,7 @@ const allProducts = (await getCollection('products')).filter(isPublicProduct);
 type ProductEntry = typeof allProducts[number];
 const isProduct = (product: ProductEntry | undefined): product is ProductEntry => Boolean(product);
 const products = productOrder
-  .map(slug => allProducts.find(p => p.slug === slug))
+  .map(slug => allProducts.find(p => p.id === slug))
   .filter(isProduct);
 
 const schema = {
@@ -26,9 +26,9 @@ const schema = {
   "name": "Beyond RV Off-Road Caravans",
   "url": "https://beyondrv.com.au/our-caravans/",
   "hasPart": products.map(p => {
-    const productUrl = `https://beyondrv.com.au/${p.slug}/`;
+    const productUrl = `https://beyondrv.com.au/${p.id}/`;
     return buildMerchantProduct({
-      slug: p.slug,
+      slug: p.id,
       name: p.data.title,
       description: p.data.seoDesc ?? p.data.tagline,
       url: productUrl,
@@ -94,7 +94,7 @@ const ctaImage = '/images/optimized/products/sunpatch-15xc-couples-offroad-van/0
       {products.map(p => (
           <ProductCard
             title={p.data.title}
-            slug={p.slug}
+            slug={p.id}
             category={p.data.category}
             tagline={p.data.tagline}
             price={p.data.price}

@@ -1,8 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildMerchantProduct, buildProductSku, buildProductOffer, normalizeAvailability } from '../src/lib/structuredData.js';
+import {
+  buildOrganizationSchema,
+  MERCHANT_RETURN_POLICY_ID,
+  MERCHANT_SHIPPING_SERVICE_ID,
+} from '../src/data/siteIdentity.js';
 
-test('merchant product schema includes required merchant listing fields', () => {
+test('merchant product schema includes merchant listing fields and policy references', () => {
   const product = buildMerchantProduct({
     slug: 'our-caravans/sunpatch-12c-couples-caravan',
     name: 'Sunpatch 12C Couples Off-Road Van',
@@ -25,9 +30,30 @@ test('merchant product schema includes required merchant listing fields', () => 
   assert.ok(String(product.sku).length <= 23);
   assert.equal(product.offers?.availability, 'https://schema.org/InStock');
   assert.equal(product.offers?.seller?.['@id'], 'https://beyondrv.com.au/#organization');
-  assert.equal(product.offers?.hasMerchantReturnPolicy, undefined);
-  assert.equal(product.offers?.shippingDetails, undefined);
+  assert.equal(product.offers?.hasMerchantReturnPolicy?.['@id'], MERCHANT_RETURN_POLICY_ID);
+  assert.equal(product.offers?.shippingDetails?.['@type'], 'OfferShippingDetails');
+  assert.equal(product.offers?.shippingDetails?.hasShippingService?.['@id'], MERCHANT_SHIPPING_SERVICE_ID);
+  assert.equal(product.offers?.shippingDetails?.shippingRate, undefined);
+  assert.equal(product.offers?.shippingDetails?.deliveryTime, undefined);
   assert.equal(product.offers?.priceValidUntil, undefined);
+});
+
+test('organization schema defines truthful global merchant policies', () => {
+  const organization = buildOrganizationSchema();
+  const returnPolicy = organization.hasMerchantReturnPolicy;
+  const shippingService = organization.hasShippingService;
+
+  assert.equal(returnPolicy?.['@type'], 'MerchantReturnPolicy');
+  assert.equal(returnPolicy?.['@id'], MERCHANT_RETURN_POLICY_ID);
+  assert.equal(returnPolicy?.merchantReturnLink, 'https://beyondrv.com.au/shipping-and-returns/#returns');
+  assert.equal(returnPolicy?.returnPolicyCategory, undefined);
+  assert.equal(returnPolicy?.merchantReturnDays, undefined);
+
+  assert.equal(shippingService?.['@type'], 'ShippingService');
+  assert.equal(shippingService?.['@id'], MERCHANT_SHIPPING_SERVICE_ID);
+  assert.equal(shippingService?.shippingConditions?.shippingDestination?.addressCountry, 'AU');
+  assert.equal(shippingService?.shippingConditions?.shippingRate, undefined);
+  assert.equal(shippingService?.shippingConditions?.transitTime, undefined);
 });
 
 test('merchant product schema is omitted when no genuine offer price exists', () => {

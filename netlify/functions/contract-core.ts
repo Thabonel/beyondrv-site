@@ -47,6 +47,13 @@ export interface ContractSpecificationSection {
   items: string[];
 }
 
+export interface ContractConfigurationReference {
+  configurationId: string;
+  configurationNumber: string;
+  revision: number;
+  snapshotDigest: string;
+}
+
 export interface ContractRecord {
   id: string;
   contractNumber: string;
@@ -76,6 +83,7 @@ export interface ContractRecord {
     dimensions: string;
     weights: string;
   };
+  configurationReference?: ContractConfigurationReference;
   lineItems: ContractLineItem[];
   specificationSections: ContractSpecificationSection[];
   exclusions: string[];
@@ -325,6 +333,9 @@ export function normaliseContractInput(input: Record<string, unknown>, existing?
   const now = new Date();
   const buyer = input.buyer && typeof input.buyer === 'object' ? input.buyer as Record<string, unknown> : {};
   const product = input.product && typeof input.product === 'object' ? input.product as Record<string, unknown> : {};
+  const configurationReference = input.configurationReference && typeof input.configurationReference === 'object'
+    ? input.configurationReference as Record<string, unknown>
+    : {};
   const approval = existing?.ownerApproval ?? { approvedAt: '', approvedBy: '' };
   const status = ['draft', 'ready_for_review', 'approved', 'sent', 'signed', 'cancelled', 'superseded'].includes(String(input.status))
     ? String(input.status) as ContractStatus
@@ -369,6 +380,12 @@ export function normaliseContractInput(input: Record<string, unknown>, existing?
       buildIdentifier: text(product.buildIdentifier, 180),
       dimensions: text(product.dimensions, 300),
       weights: text(product.weights, 500),
+    },
+    configurationReference: existing?.configurationReference ?? {
+      configurationId: text(configurationReference.configurationId, 240),
+      configurationNumber: text(configurationReference.configurationNumber, 120),
+      revision: Math.max(0, finiteInteger(configurationReference.revision)),
+      snapshotDigest: text(configurationReference.snapshotDigest, 128),
     },
     lineItems: cleanLineItems(input.lineItems),
     specificationSections: cleanSections(input.specificationSections),
@@ -483,7 +500,7 @@ export function renderContractHtml(contract: ContractRecord) {
 <h1>Sale Agreement</h1>
 <div class="meta"><div><strong>Contract:</strong> ${escapeHtml(contract.contractNumber)}<br><strong>Version:</strong> ${contract.version}<br><strong>Date:</strong> ${escapeHtml(contract.createdAt.slice(0,10))}</div><div><strong>Template:</strong> ${escapeHtml(contract.templateVersion)}<br><strong>Terms:</strong> ${escapeHtml(contract.termsVersion)}<br><strong>Status:</strong> ${escapeHtml(contract.status.replace(/_/g,' '))}${contract.validityDate ? `<br><strong>Valid until:</strong> ${escapeHtml(contract.validityDate)}` : ''}</div></div>
 <div class="parties"><div class="card"><strong>BUYER</strong><p>${escapeHtml(contract.buyer.name)}</p>${contract.buyer.organisation ? `<p>${escapeHtml(contract.buyer.organisation)}</p>` : ''}<p>${escapeHtml(contract.buyer.address)}</p><p>${escapeHtml(contract.buyer.phone)}</p><p>${escapeHtml(contract.buyer.email)}</p></div><div class="card"><strong>SELLER</strong><p>${escapeHtml(APPROVED_SELLER.legalName)}</p><p>${escapeHtml(APPROVED_SELLER.address)}</p><p>${escapeHtml(APPROVED_SELLER.phone)}</p><p>${escapeHtml(APPROVED_SELLER.email)}</p><p>ABN ${escapeHtml(APPROVED_SELLER.abn)}</p></div></div>
-<h2>Product</h2><p><strong>${escapeHtml(contract.product.name)}</strong>${contract.product.buildIdentifier ? ` · ${escapeHtml(contract.product.buildIdentifier)}` : ''}</p>${contract.product.dimensions ? `<p><strong>Dimensions:</strong> ${escapeHtml(contract.product.dimensions)}</p>` : ''}${contract.product.weights ? `<p><strong>Weights:</strong> ${escapeHtml(contract.product.weights)}</p>` : ''}
+<h2>Product</h2><p><strong>${escapeHtml(contract.product.name)}</strong>${contract.product.buildIdentifier ? ` · ${escapeHtml(contract.product.buildIdentifier)}` : ''}</p>${contract.configurationReference?.configurationNumber ? `<p><strong>Approved configuration:</strong> ${escapeHtml(contract.configurationReference.configurationNumber)} · Revision ${contract.configurationReference.revision}</p>` : ''}${contract.product.dimensions ? `<p><strong>Dimensions:</strong> ${escapeHtml(contract.product.dimensions)}</p>` : ''}${contract.product.weights ? `<p><strong>Weights:</strong> ${escapeHtml(contract.product.weights)}</p>` : ''}
 <h2>Price</h2><table><thead><tr><th>Description</th><th>Qty</th><th>Unit price</th><th>Total</th></tr></thead><tbody>${rows}<tr class="total"><td colspan="3">Total contract value (AUD)</td><td>${formatAud(validation.totalCents)}</td></tr></tbody></table>
 ${specs}
 ${contract.exclusions.length ? `<section><h2>Exclusions</h2><ul>${contract.exclusions.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}

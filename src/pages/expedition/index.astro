@@ -13,7 +13,7 @@ const products = (await getCollection('products'))
 type ProductEntry = typeof products[number];
 const isProduct = (product: ProductEntry | undefined): product is ProductEntry => Boolean(product);
 
-const unimogProducts = products.filter(p => p.slug.includes('unimog'));
+const unimogProducts = products.filter(p => p.id.includes('unimog'));
 const truckBuildOrder = [
   'expedition/3-5m-electric-poptop-cabover-family-camper',
   'expedition/4-7m-hardtop-truck-camper',
@@ -22,7 +22,7 @@ const truckBuildOrder = [
   'mercedes-sprinter-motorhome',
 ];
 const truckBuildProducts = truckBuildOrder
-  .map(slug => products.find(p => p.slug === slug))
+  .map(slug => products.find(p => p.id === slug))
   .filter(isProduct);
 
 const schema = {
@@ -31,9 +31,9 @@ const schema = {
   "name": "Beyond RV Expedition Vehicles",
   "url": "https://beyondrv.com.au/expedition/",
   "hasPart": products.map(p => {
-    const productUrl = `https://beyondrv.com.au/${p.slug}/`;
+    const productUrl = `https://beyondrv.com.au/${p.id}/`;
     return buildMerchantProduct({
-      slug: p.slug,
+      slug: p.id,
       name: p.data.title,
       description: p.data.seoDesc ?? p.data.tagline,
       url: productUrl,
@@ -128,7 +128,7 @@ const calloutImage = '/images/optimized/products/expedition/4-7m-hardtop-truck-c
         {unimogProducts.map(p => (
           <ProductCard
             title={p.data.title}
-            slug={p.slug}
+            slug={p.id}
             category={p.data.category}
             tagline={p.data.tagline}
             price={p.data.price}
@@ -154,7 +154,7 @@ const calloutImage = '/images/optimized/products/expedition/4-7m-hardtop-truck-c
         {truckBuildProducts.map(p => (
           <ProductCard
             title={p.data.title}
-            slug={p.slug}
+            slug={p.id}
             category={p.data.category}
             tagline={p.data.tagline}
             price={p.data.price}

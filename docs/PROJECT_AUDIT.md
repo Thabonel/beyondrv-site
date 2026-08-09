@@ -15,13 +15,18 @@ Note: the shop planning folder in this repo is [`docs/byondrv-shop-docs.`](./byo
 
 ## 2026-04-17-3d-configurator-prd.md
 
-Overall status: Not Started
+Overall status: Superseded by `2026-08-08-admin-first-visual-configurator-prd.md`; Phase 2 operational workflow implemented
 
 | Feature | Status | Evidence (files) | Notes |
 | --- | --- | --- | --- |
-| 3D slide-on configurator page and model | Not implemented | No matching `configurator` route or 3D function found in `src/pages` or `netlify/functions` | There is no customer-facing 3D configurator yet. |
-| Upgrade catalogue / live price and weight updates | Not implemented | No matching configurator data model in `src/data` or `src/content` | No `camper-config` asset exists. |
-| Deposit checkout branch for the configurator | Not implemented | No configurator checkout branch found | Current Stripe checkout is product/cart based, not configurator based. |
+| Protected owner configurator workspace | Phase 1 implemented | `src/components/ConfiguratorWorkspace.tsx`, `src/components/AdminPanel.tsx`, `netlify/functions/admin-configurations.ts` | The internal sales/specification workflow works without waiting for 3D assets. It has not been deployed. |
+| Versioned catalogue / live price, cost and weight evaluation | Retail prices owner-reviewed; factory data pending | `src/data/configurator/catalogue.json`, `src/lib/configurator/engine.ts`, `src/lib/configurator/catalogue.ts`, `docs/CONFIGURATOR-PRICE-AUDIT-2026-08-08.md` | Live website prices match the repository and configurator. Eight priced models are active; three POA Unimog models remain inactive pending base prices. Unknown costs and weights stay explicitly unknown; technical rules are not invented. |
+| Saved records, revisions and immutable approvals | Implemented | `netlify/functions/configuration-core.ts`, `netlify/functions/admin-configurations.ts` | Operational records use Netlify Blobs and approved snapshots are digest-protected. |
+| Customer summary and contract handoff | Implemented with safety gate | `netlify/functions/admin-configuration-summary.ts`, `netlify/functions/admin-configuration-contract.ts`, `netlify/functions/contract-core.ts` | Customer-safe output includes the made-to-order production process. Contract creation remains locked while the catalogue is `owner_review`. |
+| Drawing register and customer approval | Implemented | `src/components/ConfigurationWorkflowPanel.tsx`, `netlify/functions/admin-configuration-drawings.ts`, `netlify/functions/admin-configuration-review.ts`, `netlify/functions/configuration-review.ts` | Versioned private files/links, owner approval and expiring hashed customer-review tokens are implemented. |
+| 3D slide-on viewer and CAD-derived model | Viewer/pipeline implemented; source CAD pending | `src/components/ConfiguratorGlbViewer.tsx`, `SCRIPTS/prepare-configurator-glb.mjs`, `public/draco/` | The runtime supports GLB, Draco, orbit/zoom, option-node bindings, hotspots and base/configured comparison. Actual assets and final bindings await China CAD. |
+| Customer-facing configurator and configurator deposit checkout | Private review implemented; public self-service later | `src/pages/configuration-review.astro`, `src/components/CustomerConfigurationReview.tsx` | Customers can securely review and approve owner-prepared configurations. Public self-configuration and direct Stripe configurator checkout remain later work. |
+| Production release and tracking | Implemented with gates | `netlify/functions/admin-configuration-production.ts`, `src/components/ConfigurationWorkflowPanel.tsx`, `netlify/functions/admin-orders.ts` | Verified contract and deposit evidence are required before production release; the China-to-Mutdapilly status chain is recorded. |
 
 ## 2026-04-17-buy-now-design.md
 

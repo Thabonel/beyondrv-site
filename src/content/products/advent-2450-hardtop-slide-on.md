@@ -148,14 +148,15 @@ youtubeVideo:
   startSeconds: 23
 seoTitle: Advent 2450 Hardtop Ute Slide-On Camper | Beyond RV
 seoDesc: The Advent 2450 is a larger hardtop ute slide-on camper designed specifically for single cab ute platforms.
-availability: available_in_australia
+availability: made_to_order
 purchasableOnline: true
 depositEnabled: true
 fullPaymentEnabled: true
-sourceType: other
-containerEligible: false
+sourceType: china_container
+leadTimeText: Made to order. Once the deposit is paid, production starts in China. The camper is then shipped to our Mutdapilly factory for local finishing, certification and handover preparation.
+containerEligible: true
 suitabilityData:
   status: draft
 ---
 
-The **Advent 2450** remains part of the ute slide-on range as a build-to-order model. It is designed for single cab utes and is no longer presented as in-stock or on sale.
+The **Advent 2450** remains part of the ute slide-on range as a build-to-order model. It is designed for single cab utes. Once the deposit is paid, production starts in China before the camper is shipped to our Mutdapilly factory for local finishing, certification and handover preparation.
