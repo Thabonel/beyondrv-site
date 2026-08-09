@@ -16,6 +16,10 @@ interface AdminSession {
   capabilities: string[];
 }
 
+function canPreviewGmWorkspace(actor: AdminSessionActor) {
+  return actor.role === 'owner' || actor.role === 'legacy_admin';
+}
+
 function signInUrlForCurrentAdminPage() {
   const returnTo = `${window.location.pathname}${window.location.search}${window.location.hash}`;
   return `/.netlify/functions/admin-login?returnTo=${encodeURIComponent(returnTo)}`;
@@ -88,9 +92,9 @@ export default function AdminApp() {
     return <Suspense fallback={<div style={{ minHeight: 'calc(100vh - 60px)', display: 'grid', placeItems: 'center', color: '#aaa' }}>Opening Today…</div>}><GmSalesWorkspace actor={session.actor} /></Suspense>;
   }
 
-  if (session.actor.role === 'owner' && new URLSearchParams(window.location.search).get('view') === 'gm') {
+  if (canPreviewGmWorkspace(session.actor) && new URLSearchParams(window.location.search).get('view') === 'gm') {
     return <Suspense fallback={<div style={{ minHeight: 'calc(100vh - 60px)', display: 'grid', placeItems: 'center', color: '#aaa' }}>Opening GM workspace…</div>}><GmSalesWorkspace actor={session.actor} ownerPreview onExitPreview={() => { const url = new URL(window.location.href); url.searchParams.delete('view'); window.location.href = url.toString(); }} /></Suspense>;
   }
 
-  return <Suspense fallback={<div style={{ minHeight: 'calc(100vh - 60px)', display: 'grid', placeItems: 'center', color: '#aaa' }}>Opening admin tools…</div>}><AdminPanel onOpenGmWorkspace={session.actor.role === 'owner' ? openGmWorkspace : undefined} onSignOut={() => void signOut()} /></Suspense>;
+  return <Suspense fallback={<div style={{ minHeight: 'calc(100vh - 60px)', display: 'grid', placeItems: 'center', color: '#aaa' }}>Opening admin tools…</div>}><AdminPanel onOpenGmWorkspace={canPreviewGmWorkspace(session.actor) ? openGmWorkspace : undefined} onSignOut={() => void signOut()} /></Suspense>;
 }
