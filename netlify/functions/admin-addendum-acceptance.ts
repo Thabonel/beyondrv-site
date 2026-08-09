@@ -1,6 +1,6 @@
 import { createHash } from 'crypto';
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { connectBlobStore, getBlobStore } from './blob-store';
 import { CONTRACT_STORE, contractKey, type ContractRecord } from './contract-core';
 import {
@@ -32,7 +32,9 @@ function clean(value: unknown, max = 240) {
 
 export const handler: Handler = async event => {
   if (!['GET', 'POST'].includes(event.httpMethod)) return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, 'agreements:read')) return forbiddenResponse('agreements:read');
   connectBlobStore(event);
 
   let body: Record<string, unknown> = {};
@@ -62,6 +64,7 @@ export const handler: Handler = async event => {
 
   const action = clean(body.action, 40);
   if (action === 'prepare') {
+    if (!hasAdminCapability(actor, 'agreements:approve')) return forbiddenResponse('agreements:approve');
     if (addendum.documentSnapshot?.sha256 || ['prepared', 'sent', 'accepted'].includes(addendum.acceptance?.status || '')) {
       return json(409, { error: 'This addendum already has an immutable final copy. Create a replacement addendum if it must change.' });
     }
@@ -88,18 +91,19 @@ export const handler: Handler = async event => {
       mimeType: 'text/html; charset=utf-8',
       createdAt: now.toISOString(),
     };
-    addendum.acceptance = markPrepared(addendum.acceptance, now);
+    addendum.acceptance = markPrepared(addendum.acceptance, now, actor.id);
     addendum.updatedAt = now.toISOString();
     await addendumStore.setJSON(addendumKey(id), addendum);
     await appendOwnerAudit('addendum_final_copy_prepared', 'contract_addendum', id, {
       addendumNumber: addendum.addendumNumber,
       termsVersion: contract.termsVersion,
       sha256: addendum.documentSnapshot.sha256,
-    });
+    }, actor);
     return json(201, { ok: true, addendum, termsApproved });
   }
 
   if (action === 'mark_sent') {
+    if (!hasAdminCapability(actor, 'agreements:send')) return forbiddenResponse('agreements:send');
     if (!addendum.documentSnapshot?.sha256) return json(409, { error: 'Prepare the immutable final copy before recording it as sent.' });
     if (addendum.status !== 'approved' || addendum.acceptance?.status !== 'prepared') {
       return json(409, { error: 'Only a prepared, approved addendum can be recorded as sent.' });
@@ -110,7 +114,7 @@ export const handler: Handler = async event => {
     const sentToEmail = clean(body.sentToEmail, 240).toLowerCase() || contract.buyer.email;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sentToEmail)) return json(400, { error: 'Add a valid recipient email address.' });
     const now = new Date();
-    addendum.acceptance = markSent(addendum.acceptance, sentToEmail, now);
+    addendum.acceptance = markSent(addendum.acceptance, sentToEmail, now, actor.id);
     addendum.status = 'sent';
     addendum.updatedAt = now.toISOString();
     await addendumStore.setJSON(addendumKey(id), addendum);
@@ -118,11 +122,12 @@ export const handler: Handler = async event => {
       addendumNumber: addendum.addendumNumber,
       sentToEmail,
       snapshotSha256: addendum.documentSnapshot.sha256,
-    });
+    }, actor);
     return json(200, { ok: true, addendum });
   }
 
   if (action === 'record_acceptance') {
+    if (!hasAdminCapability(actor, 'agreements:record_acceptance')) return forbiddenResponse('agreements:record_acceptance');
     if (!addendum.documentSnapshot?.sha256) return json(409, { error: 'Prepare the immutable final copy before recording acceptance.' });
     if (addendum.status !== 'sent' || addendum.acceptance?.status !== 'sent') {
       return json(409, { error: 'Record that the complete addendum was sent before recording customer acceptance.' });
@@ -136,7 +141,7 @@ export const handler: Handler = async event => {
     });
     if (!validation.valid) return json(400, { error: 'Complete the acceptance evidence.', validation });
     const now = new Date();
-    addendum.acceptance = recordAcceptance(addendum.acceptance, validation.evidence, now);
+    addendum.acceptance = recordAcceptance(addendum.acceptance, validation.evidence, now, actor.id);
     addendum.status = 'signed';
     addendum.updatedAt = now.toISOString();
     await addendumStore.setJSON(addendumKey(id), addendum);
@@ -148,7 +153,7 @@ export const handler: Handler = async event => {
         acceptedByEmail: addendum.acceptance.acceptedByEmail,
         evidenceReference: addendum.acceptance.evidenceReference,
         snapshotSha256: addendum.documentSnapshot.sha256,
-      }),
+      }, actor),
       appendOwnerTimeline('contract_addendum_accepted', `${addendum.addendumNumber} accepted by ${addendum.acceptance.acceptedByName} via ${acceptanceMethodLabel(addendum.acceptance.method)}.`, {
         relatedLeadId: contract.leadId,
         relatedCustomerId: contract.customerId,

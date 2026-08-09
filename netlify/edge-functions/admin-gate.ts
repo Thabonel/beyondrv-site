@@ -1,5 +1,9 @@
 const COOKIE_NAME = 'brv_admin_auth';
-const TOKEN_VERSION = 'v1';
+const LEGACY_TOKEN_VERSION = 'v1';
+const ACTOR_TOKEN_VERSION = 'v2';
+const SESSION_MAX_AGE_MS = 8 * 60 * 60 * 1000;
+const ADMIN_ROLES = ['gm', 'owner', 'site_admin', 'legacy_admin'] as const;
+type AdminRole = typeof ADMIN_ROLES[number];
 
 function parseCookies(header = '') {
   const cookies: Record<string, string> = {};
@@ -37,30 +41,87 @@ async function sign(value: string, secret: string) {
   return base64Url(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(value)));
 }
 
-async function isValidToken(token: string, secret: string) {
-  const [version, issuedAt, signature] = token.split('.');
-  if (version !== TOKEN_VERSION || !issuedAt || !signature) return false;
-  const timestamp = Number(issuedAt);
+function parseSessionValidAfter(value: string | undefined) {
+  if (!value?.trim()) return 0;
+  const numeric = Number(value);
+  if (Number.isFinite(numeric) && numeric > 0) return numeric;
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function sessionIsNotRevoked(timestamp: number, role: AdminRole, environment: (key: string) => string | undefined) {
+  const roleEnvironmentKey = role === 'legacy_admin'
+    ? 'ADMIN_LEGACY_SESSION_VALID_AFTER'
+    : `ADMIN_${role.toUpperCase()}_SESSION_VALID_AFTER`;
+  const validAfter = Math.max(
+    parseSessionValidAfter(environment('ADMIN_SESSION_VALID_AFTER')),
+    parseSessionValidAfter(environment(roleEnvironmentKey))
+  );
+  return timestamp >= validAfter;
+}
+
+function timestampIsValid(timestamp: number) {
   if (!Number.isFinite(timestamp)) return false;
   if (timestamp > Date.now() + 5 * 60 * 1000) return false;
-  if (Date.now() - timestamp > 8 * 60 * 60 * 1000) return false;
-  return signature === await sign(`${version}.${issuedAt}`, secret);
+  return Date.now() - timestamp <= SESSION_MAX_AGE_MS;
+}
+
+function decodeActorPayload(encoded: string) {
+  try {
+    const standard = encoded.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = standard.padEnd(Math.ceil(standard.length / 4) * 4, '=');
+    const binary = atob(padded);
+    const bytes = Uint8Array.from(binary, character => character.charCodeAt(0));
+    const payload = JSON.parse(new TextDecoder().decode(bytes)) as { issuedAt?: unknown; role?: unknown };
+    const role = ADMIN_ROLES.includes(String(payload.role) as AdminRole) ? payload.role as AdminRole : null;
+    const issuedAt = Number(payload.issuedAt);
+    return role && Number.isFinite(issuedAt) ? { role, issuedAt } : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function isValidAdminGateToken(
+  token: string,
+  secret: string,
+  environment: (key: string) => string | undefined = () => undefined
+) {
+  if (!token || token.length > 4096 || !secret) return false;
+  const [version, value, signature, ...extra] = token.split('.');
+  if (!value || !signature || extra.length > 0) return false;
+  if (signature !== await sign(`${version}.${value}`, secret)) return false;
+
+  if (version === LEGACY_TOKEN_VERSION) {
+    const issuedAt = Number(value);
+    return timestampIsValid(issuedAt) && sessionIsNotRevoked(issuedAt, 'legacy_admin', environment);
+  }
+
+  if (version !== ACTOR_TOKEN_VERSION) return false;
+  const payload = decodeActorPayload(value);
+  return Boolean(
+    payload &&
+    timestampIsValid(payload.issuedAt) &&
+    sessionIsNotRevoked(payload.issuedAt, payload.role, environment)
+  );
 }
 
 export default async function adminGate(request: Request) {
   try {
-    const expected = globalThis.Netlify?.env?.get('ADMIN_PASSWORD') ?? '';
-    const secret = globalThis.Netlify?.env?.get('ADMIN_COOKIE_SECRET') || expected;
+    const environment = (key: string) => globalThis.Netlify?.env?.get(key);
     const cookies = parseCookies(request.headers.get('cookie') ?? '');
     const token = cookies[COOKIE_NAME] ?? '';
-    const secrets = Array.from(new Set([secret, expected].filter(Boolean))) as string[];
+    const secrets = Array.from(new Set([
+      environment('ADMIN_COOKIE_SECRET'),
+      environment('ADMIN_PASSWORD'),
+      environment('ADMIN_GM_PASSWORD'),
+      environment('ADMIN_OWNER_PASSWORD'),
+      environment('ADMIN_SITE_ADMIN_PASSWORD'),
+    ].filter(Boolean))) as string[];
     let isAllowed = false;
-    if (expected) {
-      for (const candidate of secrets) {
-        if (await isValidToken(token, candidate)) {
-          isAllowed = true;
-          break;
-        }
+    for (const candidate of secrets) {
+      if (await isValidAdminGateToken(token, candidate, environment)) {
+        isAllowed = true;
+        break;
       }
     }
 
@@ -78,5 +139,5 @@ export default async function adminGate(request: Request) {
 }
 
 export const config = {
-  path: ['/admin', '/admin/', '/admin/analytics', '/admin/analytics/'],
+  path: ['/admin', '/admin/', '/admin/*'],
 };

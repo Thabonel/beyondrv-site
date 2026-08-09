@@ -1,6 +1,7 @@
 export const CONTRACT_STORE = 'byondrv-contracts';
 export const CONTRACT_TEMPLATE_VERSION = '12c-master-v2-manual-acceptance';
-export const CONTRACT_TERMS_VERSION = '2026-07-23-v0.1-legal-review-draft';
+export const CONTRACT_TERMS_VERSION = '2026-08-09-v1-business-approved';
+export const CONTRACT_BUSINESS_APPROVAL_VERSION = '2026-08-09-v1';
 
 export const APPROVED_SELLER = {
   legalName: 'Passion Industries Pty Ltd',
@@ -31,6 +32,8 @@ export interface AgreementAcceptance {
   depositReference: string;
   recordedAt: string;
   recordedBy: string;
+  preparedByUserId: string;
+  sentByUserId: string;
 }
 
 export interface ContractLineItem {
@@ -62,9 +65,20 @@ export interface ContractRecord {
   supersededByContractId: string;
   revisionReason: string;
   sourceAiActionId: string;
+  sourceEnquiryId: string;
+  opportunityId: string;
   proposedChanges: Array<{ action: string; item: string; previousValue: string; requestedValue: string; sourceExcerpt: string }>;
+  salesContext?: {
+    source: string;
+    sourceReference: string;
+    enquiryMessage: string;
+    statedProductInterest: string;
+    submittedAt: string;
+    capturedAt: string;
+  };
   templateVersion: string;
   termsVersion: string;
+  businessApprovalVersion: string;
   status: ContractStatus;
   customerId: string;
   leadId: string;
@@ -93,6 +107,11 @@ export interface ContractRecord {
     approvedAt: string;
     approvedBy: string;
   };
+  businessApproval: {
+    approvedAt: string;
+    approvedByUserId: string;
+    approvalVersion: string;
+  };
   acceptance: AgreementAcceptance;
   /** @deprecated Retained only to read historical SignWell records. */
   signature: {
@@ -116,6 +135,9 @@ export interface ContractRecord {
   };
   createdAt: string;
   updatedAt: string;
+  createdByUserId: string;
+  updatedByUserId: string;
+  approvedByUserId: string;
 }
 
 export function emptyAgreementAcceptance(): AgreementAcceptance {
@@ -134,6 +156,8 @@ export function emptyAgreementAcceptance(): AgreementAcceptance {
     depositReference: '',
     recordedAt: '',
     recordedBy: '',
+    preparedByUserId: '',
+    sentByUserId: '',
   };
 }
 
@@ -160,6 +184,8 @@ function cleanAcceptance(value: unknown, fallback?: AgreementAcceptance): Agreem
     depositReference: text(record.depositReference, 300) || fallback?.depositReference || '',
     recordedAt: text(record.recordedAt, 80) || fallback?.recordedAt || '',
     recordedBy: text(record.recordedBy, 180) || fallback?.recordedBy || '',
+    preparedByUserId: text(record.preparedByUserId, 180) || fallback?.preparedByUserId || '',
+    sentByUserId: text(record.sentByUserId, 180) || fallback?.sentByUserId || '',
   };
 }
 
@@ -329,14 +355,24 @@ function cleanLineItems(value: unknown): ContractLineItem[] {
   }).filter(item => item.description).slice(0, 100);
 }
 
-export function normaliseContractInput(input: Record<string, unknown>, existing?: ContractRecord | null): ContractRecord {
+export function normaliseContractInput(
+  input: Record<string, unknown>,
+  existing?: ContractRecord | null,
+  options: { actorUserId?: string } = {},
+): ContractRecord {
   const now = new Date();
+  const actorUserId = text(options.actorUserId, 180) || text(input.updatedByUserId, 180) || existing?.updatedByUserId || 'legacy-admin';
   const buyer = input.buyer && typeof input.buyer === 'object' ? input.buyer as Record<string, unknown> : {};
   const product = input.product && typeof input.product === 'object' ? input.product as Record<string, unknown> : {};
   const configurationReference = input.configurationReference && typeof input.configurationReference === 'object'
     ? input.configurationReference as Record<string, unknown>
     : {};
   const approval = existing?.ownerApproval ?? { approvedAt: '', approvedBy: '' };
+  const businessApproval = existing?.businessApproval ?? {
+    approvedAt: approval.approvedAt,
+    approvedByUserId: approval.approvedBy,
+    approvalVersion: existing?.businessApprovalVersion || CONTRACT_BUSINESS_APPROVAL_VERSION,
+  };
   const status = ['draft', 'ready_for_review', 'approved', 'sent', 'signed', 'cancelled', 'superseded'].includes(String(input.status))
     ? String(input.status) as ContractStatus
     : existing?.status || 'draft';
@@ -349,6 +385,8 @@ export function normaliseContractInput(input: Record<string, unknown>, existing?
     supersededByContractId: existing?.supersededByContractId || text(input.supersededByContractId, 240),
     revisionReason: existing?.revisionReason || text(input.revisionReason, 1000),
     sourceAiActionId: existing?.sourceAiActionId || text(input.sourceAiActionId, 240),
+    sourceEnquiryId: existing?.sourceEnquiryId || text(input.sourceEnquiryId, 240),
+    opportunityId: existing?.opportunityId || text(input.opportunityId, 240),
     proposedChanges: Array.isArray(input.proposedChanges)
       ? input.proposedChanges.slice(0, 30).map(item => {
         const change = item && typeof item === 'object' ? item as Record<string, unknown> : {};
@@ -361,8 +399,22 @@ export function normaliseContractInput(input: Record<string, unknown>, existing?
         };
       })
       : existing?.proposedChanges || [],
+    salesContext: existing?.salesContext ?? (() => {
+      const context = input.salesContext && typeof input.salesContext === 'object'
+        ? input.salesContext as Record<string, unknown>
+        : {};
+      return {
+        source: text(context.source, 80),
+        sourceReference: text(context.sourceReference, 240),
+        enquiryMessage: text(context.enquiryMessage, 5000),
+        statedProductInterest: text(context.statedProductInterest, 500),
+        submittedAt: text(context.submittedAt, 80),
+        capturedAt: text(context.capturedAt, 80),
+      };
+    })(),
     templateVersion: existing?.templateVersion || CONTRACT_TEMPLATE_VERSION,
     termsVersion: existing?.termsVersion || text(input.termsVersion, 120) || CONTRACT_TERMS_VERSION,
+    businessApprovalVersion: existing?.businessApprovalVersion || text(input.businessApprovalVersion, 120) || CONTRACT_BUSINESS_APPROVAL_VERSION,
     status,
     customerId: text(input.customerId, 240),
     leadId: text(input.leadId, 240),
@@ -393,10 +445,15 @@ export function normaliseContractInput(input: Record<string, unknown>, existing?
     deliveryNotes: text(input.deliveryNotes, 3000),
     validityDate: text(input.validityDate, 40),
     ownerApproval: status === 'approved' && !approval.approvedAt
-      ? { approvedAt: now.toISOString(), approvedBy: 'owner' }
+      ? { approvedAt: now.toISOString(), approvedBy: actorUserId }
       : status === 'draft' || status === 'ready_for_review'
         ? { approvedAt: '', approvedBy: '' }
         : approval,
+    businessApproval: status === 'approved' && !businessApproval.approvedAt
+      ? { approvedAt: now.toISOString(), approvedByUserId: actorUserId, approvalVersion: CONTRACT_BUSINESS_APPROVAL_VERSION }
+      : status === 'draft' || status === 'ready_for_review'
+        ? { approvedAt: '', approvedByUserId: '', approvalVersion: CONTRACT_BUSINESS_APPROVAL_VERSION }
+        : businessApproval,
     acceptance: cleanAcceptance(input.acceptance, existing?.acceptance),
     signature: existing?.signature ?? {
       provider: '',
@@ -413,10 +470,15 @@ export function normaliseContractInput(input: Record<string, unknown>, existing?
     documentSnapshot: existing?.documentSnapshot ?? { store: '', key: '', sha256: '', mimeType: '', createdAt: '' },
     createdAt: existing?.createdAt || now.toISOString(),
     updatedAt: now.toISOString(),
+    createdByUserId: existing?.createdByUserId || text(input.createdByUserId, 180) || actorUserId,
+    updatedByUserId: actorUserId,
+    approvedByUserId: status === 'approved'
+      ? existing?.approvedByUserId || businessApproval.approvedByUserId || actorUserId
+      : '',
   };
 }
 
-export function createContractRevision(parent: ContractRecord, version: number, reason: string, now = new Date()): ContractRecord {
+export function createContractRevision(parent: ContractRecord, version: number, reason: string, now = new Date(), actorUserId = 'legacy-admin'): ContractRecord {
   const id = newContractId(now);
   return {
     ...JSON.parse(JSON.stringify(parent)) as ContractRecord,
@@ -427,11 +489,15 @@ export function createContractRevision(parent: ContractRecord, version: number, 
     revisionReason: text(reason, 1000),
     status: 'draft',
     ownerApproval: { approvedAt: '', approvedBy: '' },
+    businessApproval: { approvedAt: '', approvedByUserId: '', approvalVersion: CONTRACT_BUSINESS_APPROVAL_VERSION },
     acceptance: emptyAgreementAcceptance(),
     signature: { provider: '', documentId: '', status: '', testMode: true, editUrl: '', completedPdfUrl: '', createdAt: '', sentAt: '', completedAt: '', lastCheckedAt: '' },
     documentSnapshot: { store: '', key: '', sha256: '', mimeType: '', createdAt: '' },
     createdAt: now.toISOString(),
     updatedAt: now.toISOString(),
+    createdByUserId: actorUserId,
+    updatedByUserId: actorUserId,
+    approvedByUserId: '',
   };
 }
 
@@ -469,7 +535,7 @@ export function validateContract(contract: ContractRecord) {
   if (!contract.specificationSections.length) errors.push('Add at least one specification or inclusion section.');
   if (!contract.deliveryNotes) warnings.push('Delivery or handover notes have not been added.');
   if (!contract.buyer.address) warnings.push('Buyer address has not been added.');
-  if (/legal-review-draft/i.test(contract.termsVersion)) warnings.push('The incorporated Terms version is still marked as requiring legal review. Do not send it to a customer until approved.');
+  if (/legal-review-draft/i.test(contract.termsVersion)) warnings.push('This historical Terms version is marked as a draft and cannot be used for a new customer agreement.');
   return { valid: errors.length === 0, errors, warnings, totalCents, paymentStages: calculatePaymentStages(totalCents) };
 }
 

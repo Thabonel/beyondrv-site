@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 import { CONTRACT_STORE, contractKey, type ContractRecord } from './contract-core';
 import {
@@ -43,7 +43,11 @@ function requestedStatus(body: Record<string, unknown>, existing?: ContractAdden
 
 export const handler: Handler = async event => {
   if (!['GET', 'POST', 'PATCH'].includes(event.httpMethod)) return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, event.httpMethod === 'GET' ? 'agreements:read' : 'agreements:write')) {
+    return forbiddenResponse(event.httpMethod === 'GET' ? 'agreements:read' : 'agreements:write');
+  }
   const blobRuntimeSource = connectBlobStore(event);
 
   let contractStore: ReturnType<typeof getBlobStore>;
@@ -98,7 +102,8 @@ export const handler: Handler = async event => {
   const effectiveDeal = calculateEffectiveDeal(contract, addenda);
   const previousTotalCents = existing?.previousTotalCents ?? effectiveDeal.effectiveTotalCents;
   const input = { ...body, status: requestedStatus(body, existing) };
-  const addendum = normaliseAddendumInput(input, contract, previousTotalCents, sequence, existing);
+  if (body.action === 'approve' && !hasAdminCapability(actor, 'agreements:approve')) return forbiddenResponse('agreements:approve');
+  const addendum = normaliseAddendumInput(input, contract, previousTotalCents, sequence, existing, { actorUserId: actor.id });
   const validation = validateAddendum(addendum, contract);
   const html = renderAddendumHtml(addendum, contract);
 
@@ -117,7 +122,7 @@ export const handler: Handler = async event => {
       netChangeCents: addendum.netChangeCents,
       revisedTotalCents: addendum.revisedTotalCents,
       sourceType: addendum.sourceType,
-    }),
+    }, actor),
     appendOwnerTimeline(eventType, `${addendum.addendumNumber} ${existing ? 'updated' : 'created'} for contract ${contract.contractNumber}.`, {
       relatedLeadId: contract.leadId,
       relatedCustomerId: contract.customerId,

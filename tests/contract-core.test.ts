@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   APPROVED_SELLER,
+  CONTRACT_BUSINESS_APPROVAL_VERSION,
   CONTRACT_TERMS_VERSION,
   calculateContractTotal,
   calculatePaymentStages,
@@ -104,17 +105,36 @@ test('renderer includes the approved policy and escapes customer-provided HTML',
 });
 
 test('contract records default to the versioned manual acceptance workflow', () => {
-  const contract = normaliseContractInput(validContractInput());
+  const contract = normaliseContractInput(validContractInput(), null, { actorUserId: 'gm' });
   assert.equal(contract.templateVersion, '12c-master-v2-manual-acceptance');
   assert.equal(contract.termsVersion, CONTRACT_TERMS_VERSION);
+  assert.equal(contract.businessApprovalVersion, CONTRACT_BUSINESS_APPROVAL_VERSION);
+  assert.equal(contract.createdByUserId, 'gm');
+  assert.equal(contract.updatedByUserId, 'gm');
   assert.equal(contract.acceptance.status, 'not_prepared');
   assert.equal(contract.acceptance.method, '');
 });
 
+test('agreement approval records the authenticated business actor and preserves stable source links', () => {
+  const input = {
+    ...validContractInput(),
+    status: 'approved',
+    sourceEnquiryId: 'enquiry-123',
+    opportunityId: 'opportunity-456',
+  };
+  const contract = normaliseContractInput(input, null, { actorUserId: 'gm' });
+  assert.equal(contract.sourceEnquiryId, 'enquiry-123');
+  assert.equal(contract.opportunityId, 'opportunity-456');
+  assert.equal(contract.ownerApproval.approvedBy, 'gm');
+  assert.equal(contract.businessApproval.approvedByUserId, 'gm');
+  assert.equal(contract.approvedByUserId, 'gm');
+  assert.equal(contract.businessApproval.approvalVersion, CONTRACT_BUSINESS_APPROVAL_VERSION);
+});
+
 test('manual acceptance lifecycle preserves delivery and deposit evidence', () => {
   const contract = normaliseContractInput(validContractInput());
-  const prepared = markPrepared(contract.acceptance, new Date('2026-07-23T00:00:00Z'));
-  const sent = markSent(prepared, 'alex@example.com', new Date('2026-07-24T00:00:00Z'));
+  const prepared = markPrepared(contract.acceptance, new Date('2026-07-23T00:00:00Z'), 'gm');
+  const sent = markSent(prepared, 'alex@example.com', new Date('2026-07-24T00:00:00Z'), 'gm');
   const validation = validateAcceptanceEvidence({
     method: 'deposit_payment',
     acceptedByName: 'Alex Buyer',
@@ -125,11 +145,14 @@ test('manual acceptance lifecycle preserves delivery and deposit evidence', () =
     depositReference: 'BRV-123',
   }, { expectedEmail: 'alex@example.com', depositDueCents: 12_000_00, allowDeposit: true });
   assert.equal(validation.valid, true);
-  const accepted = recordAcceptance(sent, validation.evidence, new Date('2026-07-25T02:00:00Z'));
+  const accepted = recordAcceptance(sent, validation.evidence, new Date('2026-07-25T02:00:00Z'), 'gm');
   assert.equal(accepted.status, 'accepted');
   assert.equal(accepted.method, 'deposit_payment');
   assert.equal(accepted.depositAmountCents, 12_000_00);
   assert.equal(accepted.evidenceReference, 'Gmail thread 123 / bank receipt 456');
+  assert.equal(accepted.preparedByUserId, 'gm');
+  assert.equal(accepted.sentByUserId, 'gm');
+  assert.equal(accepted.recordedBy, 'gm');
 });
 
 test('deposit evidence is rejected for an addendum and unapproved terms are gated', () => {

@@ -1,21 +1,19 @@
 # Beyond RV Contract Workflow Runbook
 
-Updated: 23 July 2026
+Updated: 9 August 2026
 
 ## Production activation
 
-The code is deliberately fail-closed. Do not enable customer sending while the Terms version contains `legal-review-draft`.
+The current agreement wording is the business-approved wording supplied by Beyond RV. The application uses the stable identifier `2026-08-09-v1-business-approved`; this label records Beyond RV's approval decision and does not claim independent legal or solicitor review.
 
-1. Have the new Terms and Conditions reviewed and approve the final wording.
-2. Change `CONTRACT_TERMS_VERSION` in `netlify/functions/contract-core.ts` to a final unique version, for example `2026-07-30-v1-approved`.
-3. Update the approved Terms document so it displays the same version.
-4. Deploy the site.
-5. In Netlify, open **Site configuration → Environment variables**.
-6. Add `CONTRACT_TERMS_APPROVED_VERSION` with the exact same final version.
-7. Trigger a fresh deploy so Functions receive the variable.
-8. Run the test cycle below before using a customer email.
+1. Confirm the generated agreement still displays the approved wording without changes.
+2. Deploy the tested build to a Netlify Deploy Preview.
+3. In the preview environment, set `CONTRACT_TERMS_APPROVED_VERSION` to exactly `2026-08-09-v1-business-approved`.
+4. Trigger a fresh preview deploy so Functions receive the variable.
+5. Run the test cycle below with an internal recipient.
+6. Promote only after the agreement, calculations, attachment workflow, and acceptance evidence have passed.
 
-Do not configure the current value `2026-07-23-v0.1-legal-review-draft`. The application intentionally shows an orange legal-approval warning and hides the Gmail action until the exact approved version is configured.
+The code remains fail-closed: the prepare/send controls stay unavailable if `CONTRACT_TERMS_APPROVED_VERSION` is missing or differs from the agreement's exact version. Do not reuse the retired identifier `2026-07-23-v0.1-legal-review-draft` for new agreements.
 
 ## First test cycle
 
@@ -61,7 +59,7 @@ Payment does not replace a signature where law requires one. Do not infer accept
 ## Addenda after acceptance
 
 1. Open the accepted contract.
-2. Create an addendum from the phone call, email, in-person discussion, or owner note.
+2. Create an addendum from the phone call, email, in-person discussion, or authorised business note.
 3. State each exact change, price delta, payment impact, and delivery impact.
 4. Confirm every change, validate, preview, review, and approve it.
 5. Prepare the immutable addendum, download it, open Gmail, attach it, and send it.
@@ -95,4 +93,4 @@ Do not paste full bank details, card information, access tokens, or unnecessary 
 
 ## No autonomous sending
 
-The website AI may classify emails and draft proposed contract changes. It cannot approve prices, approve documents, send customer email, or record acceptance. Those remain explicit owner actions.
+The website AI may classify emails and draft proposed contract changes. It cannot approve prices, approve documents, send customer email, or record acceptance. Those remain explicit actions by an authorised Beyond RV user and are attributed to that user's session.

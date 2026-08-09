@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { connectBlobStore, getBlobStore } from './blob-store';
 import { CONTRACT_STORE, contractKey, createContractRevision, type ContractRecord } from './contract-core';
 import {
@@ -23,13 +23,17 @@ function clean(value: unknown, max = 1000) {
 
 export const handler: Handler = async event => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, 'agreements:write')) return forbiddenResponse('agreements:write');
   connectBlobStore(event);
   let body: Record<string, unknown>;
   try { body = JSON.parse(event.body || '{}') as Record<string, unknown>; }
   catch { return json(400, { error: 'Invalid JSON request.' }); }
   const id = clean(body.id, 240);
-  if (!id || body.ownerApprovedInterpretation !== true) return json(400, { error: 'Owner confirmation of the extracted interpretation is required.' });
+  if (!id || (body.ownerApprovedInterpretation !== true && body.businessApprovedInterpretation !== true)) {
+    return json(400, { error: 'Authorised business confirmation of the extracted interpretation is required.' });
+  }
 
   const actionStore = getBlobStore(OWNER_COPILOT_AI_ACTION_STORE);
   const aiAction = await actionStore.get(aiActionKey(id), { type: 'json' }) as Record<string, unknown> | null;
@@ -75,7 +79,7 @@ export const handler: Handler = async event => {
       paymentImpact: '',
       deliveryImpact: '',
       status: 'draft',
-    }, contract, effectiveDeal.effectiveTotalCents, sequence);
+    }, contract, effectiveDeal.effectiveTotalCents, sequence, null, { actorUserId: actor.id });
     await getBlobStore(CONTRACT_ADDENDUM_STORE).setJSON(addendumKey(addendum.id), addendum);
     target = addendum;
     targetType = 'contract_addendum';
@@ -85,12 +89,13 @@ export const handler: Handler = async event => {
     }
     const chain = (await listJsonStore(CONTRACT_STORE).catch(() => [])) as unknown as ContractRecord[];
     const nextVersion = Math.max(0, ...chain.filter(item => item.contractNumber === contract.contractNumber).map(item => item.version || 1)) + 1;
-    const revision = createContractRevision(contract, nextVersion, extraction.ownerSummary || 'Customer requested changes by email');
+    const revision = createContractRevision(contract, nextVersion, extraction.ownerSummary || 'Customer requested changes by email', new Date(), actor.id);
     revision.sourceAiActionId = id;
     revision.proposedChanges = extraction.requestedChanges.map(change => ({ ...change }));
     contract.status = 'superseded';
     contract.supersededByContractId = revision.id;
     contract.updatedAt = now;
+    contract.updatedByUserId = actor.id;
     await Promise.all([
       contractStore.setJSON(contractKey(contract.id), contract),
       contractStore.setJSON(contractKey(revision.id), revision),
@@ -104,7 +109,7 @@ export const handler: Handler = async event => {
     extraction,
     approvalState: 'approved',
     processingStatus: 'converted',
-    reviewedBy: 'owner',
+    reviewedBy: actor.id,
     reviewedAt: now,
     convertedTargetType: targetType,
     convertedTargetId: target.id,
@@ -112,8 +117,8 @@ export const handler: Handler = async event => {
   };
   await actionStore.setJSON(aiActionKey(id), updatedAction);
   await Promise.all([
-    appendOwnerAudit('gmail_contract_action_converted', targetType, target.id, { aiActionId: id, contractId: contract.id, sourceMessageId: aiAction.sourceMessageId }),
-    appendOwnerTimeline('gmail_contract_action_converted', `Owner approved Gmail interpretation and prepared ${targetType === 'contract_addendum' ? 'an addendum' : 'a contract revision'} for review.`, {
+    appendOwnerAudit('gmail_contract_action_converted', targetType, target.id, { aiActionId: id, contractId: contract.id, sourceMessageId: aiAction.sourceMessageId }, actor),
+    appendOwnerTimeline('gmail_contract_action_converted', `${actor.displayName} approved the Gmail interpretation and prepared ${targetType === 'contract_addendum' ? 'an addendum' : 'an agreement revision'} for review.`, {
       relatedLeadId: clean(aiAction.relatedLeadId, 240),
       relatedCustomerId: clean(aiAction.relatedCustomerId, 240),
       source: 'admin-contract-change-actions',

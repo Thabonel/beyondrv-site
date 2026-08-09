@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { adminFetch, adminJson, clearAdminToken } from '../lib/adminApi';
 import ContractChangeManager from './ContractChangeManager';
 
@@ -42,11 +42,20 @@ interface ContractRecord {
   deliveryNotes: string;
   validityDate: string;
   ownerApproval?: { approvedAt?: string; approvedBy?: string };
+  businessApproval?: { approvedAt?: string; approvedByUserId?: string; approvalVersion?: string };
   parentContractId?: string;
   supersededByContractId?: string;
   revisionReason?: string;
   sourceAiActionId?: string;
   proposedChanges?: Array<{ action: string; item: string; previousValue: string; requestedValue: string; sourceExcerpt: string }>;
+  salesContext?: {
+    source: string;
+    sourceReference: string;
+    enquiryMessage: string;
+    statedProductInterest: string;
+    submittedAt: string;
+    capturedAt: string;
+  };
   acceptance?: {
     status?: string; method?: string; preparedAt?: string; sentAt?: string; sentToEmail?: string; acceptedAt?: string;
     acceptedByName?: string; acceptedByEmail?: string; evidenceReference?: string; evidenceNotes?: string;
@@ -67,12 +76,13 @@ interface ContractValidation {
 }
 
 const EMPTY_CONTRACT: ContractRecord = {
-  id: '', contractNumber: '', version: 1, templateVersion: '12c-master-v2-manual-acceptance', termsVersion: '2026-07-23-v0.1-legal-review-draft', status: 'draft', customerId: '', leadId: '',
+  id: '', contractNumber: '', version: 1, templateVersion: '12c-master-v2-manual-acceptance', termsVersion: '2026-08-09-v1-business-approved', status: 'draft', customerId: '', leadId: '',
   buyer: { name: '', organisation: '', address: '', phone: '', email: '' },
   product: { slug: '', name: '', category: '', buildIdentifier: '', dimensions: '', weights: '' },
   lineItems: [{ id: 'base', description: 'Camper', quantity: 1, unitPriceCents: 0, kind: 'base' }],
   specificationSections: [{ heading: 'Specifications & Inclusions', items: [] }],
   exclusions: [], deliveryNotes: '', validityDate: '',
+  salesContext: { source: '', sourceReference: '', enquiryMessage: '', statedProductInterest: '', submittedAt: '', capturedAt: '' },
 };
 
 const TWELVE_C_SECTIONS = [
@@ -103,7 +113,7 @@ function displayStatus(status: string) {
   return status === 'signed' ? 'accepted' : status.replace(/_/g, ' ');
 }
 
-export default function ContractManager({ products, customers, leads }: { products: ProductOption[]; customers: CustomerOption[]; leads: LeadOption[] }) {
+export default function ContractManager({ products, customers, leads, initialContractId = '' }: { products: ProductOption[]; customers: CustomerOption[]; leads: LeadOption[]; initialContractId?: string }) {
   const [contracts, setContracts] = useState<ContractRecord[]>([]);
   const [draft, setDraft] = useState<ContractRecord>(() => cloneEmpty());
   const [validation, setValidation] = useState<ContractValidation | null>(null);
@@ -114,6 +124,7 @@ export default function ContractManager({ products, customers, leads }: { produc
   const [persisted, setPersisted] = useState(false);
   const [termsApproved, setTermsApproved] = useState(false);
   const [composeUrl, setComposeUrl] = useState('');
+  const openedInitialContractId = useRef('');
   const [acceptanceForm, setAcceptanceForm] = useState({
     method: 'hand_signed_copy',
     acceptedAt: new Date().toISOString().slice(0, 16),
@@ -216,7 +227,7 @@ export default function ContractManager({ products, customers, leads }: { produc
       if (!res.ok || !data.contract) throw new Error(data.error || 'Could not save contract.');
       setDraft(data.contract); setPersisted(true);
       await loadContracts();
-      setStatus(nextStatus === 'approved' ? 'Contract approved. Prepare the immutable final copy when the terms version has legal approval.' : 'Contract saved.');
+      setStatus(nextStatus === 'approved' ? 'Agreement approved for business use. Prepare the immutable final copy when ready.' : 'Agreement saved.');
     } catch (error) { setStatus(error instanceof Error ? error.message : 'Could not save contract.'); }
     finally { setLoading(false); }
   }
@@ -305,6 +316,14 @@ export default function ContractManager({ products, customers, leads }: { produc
     void loadAcceptanceInfo(contract.id);
   }
 
+  useEffect(() => {
+    if (!initialContractId || openedInitialContractId.current === initialContractId) return;
+    const contract = contracts.find(item => item.id === initialContractId);
+    if (!contract) return;
+    openedInitialContractId.current = initialContractId;
+    openContract(contract);
+  }, [contracts, initialContractId]);
+
   function newContract() {
     setDraft(cloneEmpty()); setPersisted(false); setValidation(null); setPreviewHtml(''); setShowEditor(true); setStatus('');
     setTermsApproved(false); setComposeUrl('');
@@ -328,6 +347,13 @@ export default function ContractManager({ products, customers, leads }: { produc
     <div style={{ padding: '1rem', overflowY: 'auto', display: 'grid', gap: '0.9rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}><div><button type="button" onClick={() => setShowEditor(false)} style={{ ...secondaryButton, padding: '0.35rem 0.55rem', marginBottom: '0.5rem' }}>← All contracts</button><div style={{ color: '#fff', fontWeight: 800 }}>{draft.contractNumber || 'New Contract'}</div><div style={{ color: '#888', fontSize: '0.72rem' }}>Status: {displayStatus(draft.status)} · Version {draft.version} · Terms {draft.termsVersion}</div></div><div style={{ color: '#fff', fontWeight: 900, fontSize: '1.15rem' }}>{money(totalCents)}</div></div>
 
+      {Boolean(draft.salesContext?.enquiryMessage || draft.salesContext?.statedProductInterest) && <section data-testid="website-enquiry-context" style={{ background: '#201a12', border: '1px solid #92400e', borderRadius: '8px', padding: '0.85rem', display: 'grid', gap: '0.5rem' }}>
+        <strong style={{ color: '#fdba74' }}>Website enquiry context — not yet contractual</strong>
+        <div style={{ color: '#ddd', fontSize: '0.76rem', lineHeight: 1.5 }}>Use this to confirm the phone discussion. Nothing here is added to the customer agreement unless you put it into the structured product, pricing, specification, or delivery fields below.</div>
+        {draft.salesContext?.statedProductInterest && <div style={{ color: '#ddd', fontSize: '0.76rem' }}><strong>Customer selected:</strong> {draft.salesContext.statedProductInterest}</div>}
+        {draft.salesContext?.enquiryMessage && <div style={{ color: '#ddd', fontSize: '0.76rem', whiteSpace: 'pre-wrap' }}><strong>Customer message:</strong><br />{draft.salesContext.enquiryMessage}</div>}
+      </section>}
+
       {Boolean(draft.proposedChanges?.length) && <section style={{ background: '#201a12', border: '1px solid #92400e', borderRadius: '8px', padding: '0.85rem', display: 'grid', gap: '0.5rem' }}><strong style={{ color: '#fdba74' }}>Customer email changes to apply</strong><div style={{ color: '#ddd', fontSize: '0.74rem' }}>{draft.revisionReason}</div>{draft.proposedChanges?.map((change,index)=><div key={`${change.item}-${index}`} style={{color:'#ddd',fontSize:'0.74rem',borderTop:'1px solid #5b3419',paddingTop:'0.4rem'}}><strong style={{textTransform:'capitalize'}}>{change.action}</strong> {change.item}: {change.previousValue || 'current value not stated'} → {change.requestedValue || 'requested value not stated'}{change.sourceExcerpt && <div style={{color:'#999',marginTop:'0.2rem'}}>Email evidence: “{change.sourceExcerpt}”</div>}</div>)}<div style={{color:'#fb923c',fontSize:'0.7rem'}}>Apply these changes to the structured contract fields, then validate the totals and full preview. The AI has not changed pricing or delivery terms.</div></section>}
 
       <section style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.85rem', display: 'grid', gap: '0.6rem' }}><strong style={{ color: '#fff' }}>Buyer</strong><div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(190px,1fr))', gap: '0.5rem' }}><select value={draft.customerId} onChange={e => selectCustomer(e.target.value)} style={inputStyle}><option value="">Link existing customer (optional)</option>{customers.map(customer => <option key={customer.id} value={customer.id}>{customer.name || customer.email || customer.phone || customer.id}</option>)}</select><input value={draft.buyer.name} onChange={e => updateBuyer({ name: e.target.value })} placeholder="Legal name *" style={inputStyle}/><input value={draft.buyer.organisation} onChange={e => updateBuyer({ organisation: e.target.value })} placeholder="Organisation" style={inputStyle}/><input value={draft.buyer.email} onChange={e => updateBuyer({ email: e.target.value })} placeholder="Email *" type="email" style={inputStyle}/><input value={draft.buyer.phone} onChange={e => updateBuyer({ phone: e.target.value })} placeholder="Phone" style={inputStyle}/><input value={draft.buyer.address} onChange={e => updateBuyer({ address: e.target.value })} placeholder="Address" style={inputStyle}/></div></section>
@@ -340,14 +366,14 @@ export default function ContractManager({ products, customers, leads }: { produc
 
       <section style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.85rem', display: 'grid', gap: '0.55rem' }}><strong style={{ color: '#fff' }}>Delivery and exclusions</strong><textarea value={draft.deliveryNotes} onChange={e=>setDraft(current=>({...current,deliveryNotes:e.target.value}))} rows={3} placeholder="Delivery and handover notes" style={{...inputStyle,resize:'vertical'}}/><textarea value={draft.exclusions.join('\n')} onChange={e=>setDraft(current=>({...current,exclusions:e.target.value.split('\n').map(v=>v.trim()).filter(Boolean)}))} rows={3} placeholder="Exclusions — one per line" style={{...inputStyle,resize:'vertical'}}/><label style={{color:'#aaa',fontSize:'0.74rem'}}>Valid until<input type="date" value={draft.validityDate} onChange={e=>setDraft(current=>({...current,validityDate:e.target.value}))} style={{...inputStyle,marginTop:'0.3rem',maxWidth:'220px'}}/></label></section>
 
-      {validation && <div style={{ background: validation.valid ? '#10251a' : '#2b1712', border: `1px solid ${validation.valid ? '#166534' : '#9a3412'}`, borderRadius:'8px',padding:'0.75rem',fontSize:'0.76rem',lineHeight:1.5,color:'#ddd' }}><strong>{validation.valid ? 'Ready for owner approval' : 'Needs attention'}</strong>{validation.errors.map(error=><div key={error} style={{color:'#fca5a5'}}>• {error}</div>)}{validation.warnings.map(warning=><div key={warning} style={{color:'#fdba74'}}>• {warning}</div>)}</div>}
+      {validation && <div style={{ background: validation.valid ? '#10251a' : '#2b1712', border: `1px solid ${validation.valid ? '#166534' : '#9a3412'}`, borderRadius:'8px',padding:'0.75rem',fontSize:'0.76rem',lineHeight:1.5,color:'#ddd' }}><strong>{validation.valid ? 'Ready for business approval' : 'Needs attention'}</strong>{validation.errors.map(error=><div key={error} style={{color:'#fca5a5'}}>• {error}</div>)}{validation.warnings.map(warning=><div key={warning} style={{color:'#fdba74'}}>• {warning}</div>)}</div>}
       {status && <div style={{color:/could|fix|error|disabled/i.test(status)?'#fb923c':'#aaa',fontSize:'0.76rem'}}>{status}</div>}
       <div style={{display:'flex',gap:'0.5rem',flexWrap:'wrap'}}><button type="button" onClick={()=>void preview()} disabled={loading} style={secondaryButton}>Validate & Preview</button><button type="button" onClick={()=>void save(draft.status==='approved'?'draft':draft.status)} disabled={loading||['sent','signed','superseded'].includes(draft.status)||Boolean(draft.signature?.documentId)||Boolean(draft.documentSnapshot?.sha256)} style={secondaryButton}>Save Draft</button><button type="button" onClick={()=>void save('ready_for_review')} disabled={loading||['sent','signed','superseded'].includes(draft.status)||Boolean(draft.signature?.documentId)||Boolean(draft.documentSnapshot?.sha256)} style={secondaryButton}>Ready for Review</button><button type="button" onClick={()=>void save('approved')} disabled={loading||validation?.valid!==true||['sent','signed','superseded'].includes(draft.status)||Boolean(draft.signature?.documentId)||Boolean(draft.documentSnapshot?.sha256)} style={{...secondaryButton,background:validation?.valid?'#E8540A':'#333',borderColor:validation?.valid?'#E8540A':'#444'}}>Approve Contract</button></div>
       {previewHtml && <section style={{display:'grid',gap:'0.4rem'}}><strong style={{color:'#fff'}}>Document preview</strong><iframe title="Contract preview" srcDoc={previewHtml} sandbox="" style={{width:'100%',height:'780px',border:'1px solid #444',borderRadius:'8px',background:'#fff'}}/></section>}
       <section style={{ background:'#111',border:'1px solid #303030',borderRadius:'8px',padding:'0.85rem',display:'grid',gap:'0.65rem' }}>
         <div style={{display:'flex',justifyContent:'space-between',gap:'0.7rem',alignItems:'baseline',flexWrap:'wrap'}}>
           <strong style={{color:'#fff'}}>Customer acceptance</strong>
-          <span style={{color:termsApproved?'#86efac':'#fb923c',fontSize:'0.72rem'}}>{termsApproved ? `Terms ${draft.termsVersion} approved` : `Legal approval required for ${draft.termsVersion}`}</span>
+          <span style={{color:termsApproved?'#86efac':'#fb923c',fontSize:'0.72rem'}}>{termsApproved ? `Terms ${draft.termsVersion} approved` : `Business approval configuration required for ${draft.termsVersion}`}</span>
         </div>
         <div style={{color:'#aaa',fontSize:'0.74rem',lineHeight:1.5}}>No paid e-signature provider is used. Prepare a locked final copy, download it, and attach both that file and the matching approved Terms document to the company Gmail draft. After sending, record the returned signed copy, explicit email acceptance, or deposit receipt as evidence.</div>
         {draft.documentSnapshot?.sha256 && <div style={{color:'#aaa',fontSize:'0.72rem'}}>Final-copy fingerprint: <code>{draft.documentSnapshot.sha256.slice(0,20)}…</code> · prepared {draft.acceptance?.preparedAt ? new Date(draft.acceptance.preparedAt).toLocaleString() : 'date not recorded'}</div>}

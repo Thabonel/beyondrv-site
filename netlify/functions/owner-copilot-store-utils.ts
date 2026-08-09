@@ -6,6 +6,7 @@ import {
   OWNER_COPILOT_TIMELINE_STORE,
   timelineKey,
 } from './owner-copilot-core';
+import type { AdminActor } from './admin-auth';
 
 export function clean(value: unknown, max = 1000) {
   return typeof value === 'string' ? value.trim().slice(0, max) : '';
@@ -24,16 +25,32 @@ export async function listJsonStore(storeName: string) {
   return records.filter((record): record is Record<string, unknown> => Boolean(record?.id));
 }
 
-export async function appendOwnerAudit(action: string, targetType: string, targetId: string, detail: Record<string, unknown>) {
+function auditActor(actor?: Pick<AdminActor, 'id' | 'displayName' | 'role'> | string) {
+  if (typeof actor === 'string') return { id: actor || 'legacy-admin', displayName: actor || 'Legacy administrator', role: 'legacy_admin' };
+  return actor
+    ? { id: actor.id, displayName: actor.displayName, role: actor.role }
+    : { id: 'legacy-admin', displayName: 'Legacy administrator', role: 'legacy_admin' };
+}
+
+export async function appendOwnerAudit(
+  action: string,
+  targetType: string,
+  targetId: string,
+  detail: Record<string, unknown>,
+  actor?: Pick<AdminActor, 'id' | 'displayName' | 'role'> | string,
+) {
   try {
     const store = getBlobStore(OWNER_COPILOT_AUDIT_STORE);
     const id = newOwnerCopilotId('audit');
+    const resolvedActor = auditActor(actor);
     await store.setJSON(auditLogKey(id), {
       id,
       action,
       targetType,
       targetId,
-      actor: 'owner',
+      actor: resolvedActor.id,
+      actorDisplayName: resolvedActor.displayName,
+      actorRole: resolvedActor.role,
       detail,
       createdAt: new Date().toISOString(),
     });

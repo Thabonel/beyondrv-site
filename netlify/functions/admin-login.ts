@@ -1,5 +1,6 @@
 import type { Handler, HandlerResponse } from '@netlify/functions';
-import { createAdminToken } from './admin-auth';
+import { authenticateAdminCredentials, createAdminToken, getConfiguredAdminAccounts } from './admin-auth';
+import { isRateLimited } from './security-utils';
 
 const COOKIE_NAME = 'brv_admin_auth';
 
@@ -40,6 +41,7 @@ function successResponse(location: string, cookie: string): HandlerResponse {
 }
 
 function loginPage(error = '') {
+  const individualAccountsConfigured = getConfiguredAdminAccounts().length > 0;
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -70,12 +72,16 @@ function loginPage(error = '') {
         border-radius: 6px; padding: 0.75rem; font-weight: 700; cursor: pointer;
       }
       p { color: #f87171; font-size: 0.85rem; min-height: 1.2rem; }
+      .hint { color: #999; font-size: 0.78rem; line-height: 1.45; min-height: 0; margin: 0.5rem 0 1rem; }
     </style>
   </head>
   <body>
     <form method="POST" action="/.netlify/functions/admin-login">
       <img src="/images/site/admin-logo.png" alt="Beyond RV" />
       <h1>Admin Login</h1>
+      <label for="user">User</label>
+      <input id="user" name="user" type="text" autocomplete="username" placeholder="${individualAccountsConfigured ? 'gm, owner, or site-admin' : 'Optional for current admin password'}" />
+      <p class="hint">${individualAccountsConfigured ? 'Use your assigned Beyond RV user and password.' : 'Individual user accounts are not configured yet. The current admin password remains available during migration.'}</p>
       <label for="password">Password</label>
       <input id="password" name="password" type="password" autocomplete="current-password" autofocus required />
       <p>${error}</p>
@@ -86,9 +92,10 @@ function loginPage(error = '') {
 }
 
 export const handler: Handler = async (event) => {
-  const expected = process.env.ADMIN_PASSWORD ?? '';
-  if (!expected) {
-    return htmlResponse(500, loginPage('Admin password is not configured.'));
+  const hasLegacyPassword = Boolean(process.env.ADMIN_PASSWORD);
+  const hasIndividualAccounts = getConfiguredAdminAccounts().length > 0;
+  if (!hasLegacyPassword && !hasIndividualAccounts) {
+    return htmlResponse(500, loginPage('Admin users are not configured.'));
   }
 
   if (event.httpMethod === 'GET') {
@@ -99,14 +106,28 @@ export const handler: Handler = async (event) => {
     return textResponse(405, 'Method Not Allowed');
   }
 
-  const params = new URLSearchParams(event.body ?? '');
-  const password = params.get('password') ?? '';
-
-  if (password !== expected) {
-    return loginPageResponse('Incorrect password.');
+  if (await isRateLimited(event, 'admin-login', 10, 15 * 60)) {
+    return {
+      ...loginPageResponse('Too many sign-in attempts. Please wait 15 minutes and try again.'),
+      statusCode: 429,
+      headers: {
+        ...loginPageResponse().headers,
+        'Retry-After': '900',
+      },
+    };
   }
 
-  const token = createAdminToken();
+  const params = new URLSearchParams(event.body ?? '');
+  const user = params.get('user') ?? '';
+  const password = params.get('password') ?? '';
+  const actor = authenticateAdminCredentials(user, password);
+
+  if (!actor) {
+    return loginPageResponse('Incorrect user or password.');
+  }
+
+  const token = createAdminToken(actor);
+  if (!token) return htmlResponse(500, loginPage('Admin session signing is not configured.'));
   return successResponse(
     '/admin/',
     `${COOKIE_NAME}=${encodeURIComponent(token)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=28800`

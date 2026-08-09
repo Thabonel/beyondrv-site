@@ -71,11 +71,12 @@ export function validateAcceptanceEvidence(
   };
 }
 
-export function markPrepared(acceptance: AgreementAcceptance, now = new Date()): AgreementAcceptance {
+export function markPrepared(acceptance: AgreementAcceptance, now = new Date(), actorUserId = 'legacy-admin'): AgreementAcceptance {
   return {
     ...acceptance,
     status: acceptance.status === 'accepted' ? 'accepted' : 'prepared',
     preparedAt: acceptance.preparedAt || now.toISOString(),
+    preparedByUserId: acceptance.preparedByUserId || actorUserId,
   };
 }
 
@@ -83,6 +84,7 @@ export function markSent(
   acceptance: AgreementAcceptance,
   sentToEmail: string,
   now = new Date(),
+  actorUserId = 'legacy-admin',
 ): AgreementAcceptance {
   return {
     ...acceptance,
@@ -90,6 +92,7 @@ export function markSent(
     preparedAt: acceptance.preparedAt || now.toISOString(),
     sentAt: now.toISOString(),
     sentToEmail: sentToEmail.trim().toLowerCase(),
+    sentByUserId: actorUserId,
   };
 }
 
@@ -97,6 +100,7 @@ export function recordAcceptance(
   acceptance: AgreementAcceptance,
   evidence: ReturnType<typeof validateAcceptanceEvidence>['evidence'],
   now = new Date(),
+  actorUserId = 'legacy-admin',
 ): AgreementAcceptance {
   return {
     ...acceptance,
@@ -110,6 +114,6 @@ export function recordAcceptance(
     depositAmountCents: evidence.depositAmountCents,
     depositReference: evidence.depositReference,
     recordedAt: now.toISOString(),
-    recordedBy: 'owner',
+    recordedBy: actorUserId,
   };
 }

@@ -1,11 +1,12 @@
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 import { appendOwnerAudit, appendOwnerTimeline } from './owner-copilot-store-utils';
 import type { ConfigurationRecord, ConfigurationSnapshot } from '../../src/lib/configurator/types.ts';
 import { CONTRACT_STORE, contractKey, normaliseContractInput, validateContract } from './contract-core.ts';
 import { CONFIGURATION_STORE, configurationKey, configurationSnapshotToContractInput, hydrateConfigurationRecord } from './configuration-core.ts';
 import { getEffectiveConfiguratorCatalogue } from './configurator-catalogue-core.ts';
+import { appendSalesActivity, buildSalesActivityEvent } from './sales-activity-core';
 
 function json(statusCode: number, body: Record<string, unknown>) {
   return {
@@ -29,7 +30,10 @@ function readBody(raw: string | null) {
 
 export const handler: Handler = async event => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, 'configurations:write')) return forbiddenResponse('configurations:write');
+  if (!hasAdminCapability(actor, 'agreements:write')) return forbiddenResponse('agreements:write');
   const blobRuntimeSource = connectBlobStore(event);
   const body = readBody(event.body);
   if (!body) return json(400, { error: 'Invalid JSON request.' });
@@ -53,7 +57,7 @@ export const handler: Handler = async event => {
     const snapshot = await configurationStore.get(configuration.approvedSnapshotKey, { type: 'json' }) as ConfigurationSnapshot | null;
     if (!snapshot || snapshot.digest !== configuration.approvedSnapshotDigest) return json(409, { error: 'The approved configuration snapshot could not be verified.' });
 
-    const contract = normaliseContractInput(configurationSnapshotToContractInput(snapshot, catalogue));
+    const contract = normaliseContractInput(configurationSnapshotToContractInput(snapshot, catalogue), null, { actorUserId: actor.id });
     const validation = validateContract(contract);
     const contractStore = getBlobStore(CONTRACT_STORE);
     await contractStore.setJSON(contractKey(contract.id), contract);
@@ -62,7 +66,7 @@ export const handler: Handler = async event => {
       status: 'converted_to_contract',
       linkedContractIds: [contract.id],
       updatedAt: new Date().toISOString(),
-      updatedBy: 'owner',
+      updatedBy: actor.id,
     };
     await configurationStore.setJSON(configurationKey(configuration.id), updatedConfiguration);
     await Promise.all([
@@ -72,17 +76,28 @@ export const handler: Handler = async event => {
         configurationNumber: configuration.configurationNumber,
         revision: configuration.revision,
         snapshotDigest: configuration.approvedSnapshotDigest,
-      }),
+      }, actor),
       appendOwnerAudit('contract_created_from_configuration', 'contract', contract.id, {
         configurationId: configuration.id,
         configurationNumber: configuration.configurationNumber,
         configuredTotalCents: snapshot.pricing.configuredTotalCents,
-      }),
+      }, actor),
       appendOwnerTimeline('configuration_converted_to_contract', `${configuration.configurationNumber} revision ${configuration.revision} converted to contract ${contract.contractNumber}.`, {
         relatedLeadId: configuration.leadId,
         relatedCustomerId: configuration.customerId,
         source: 'admin-configuration-contract',
       }),
+      appendSalesActivity(buildSalesActivityEvent({
+        activityType: 'agreement_created_from_configuration',
+        summary: `${configuration.configurationNumber} converted to agreement ${contract.contractNumber}.`,
+        customerId: configuration.customerId,
+        opportunityId: contract.opportunityId,
+        enquiryId: contract.sourceEnquiryId,
+        agreementId: contract.id,
+        configurationId: configuration.id,
+        source: 'gm_ui',
+        metadata: { configurationRevision: configuration.revision, snapshotDigest: configuration.approvedSnapshotDigest },
+      }, actor)),
     ]);
 
     return json(201, { ok: true, configuration: updatedConfiguration, contract, validation });

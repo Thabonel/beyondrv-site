@@ -99,8 +99,10 @@ export function normaliseAddendumInput(
   previousTotalCents: number,
   sequence: number,
   existing?: ContractAddendumRecord | null,
+  options: { actorUserId?: string } = {},
 ): ContractAddendumRecord {
   const now = new Date();
+  const actorUserId = text(options.actorUserId, 180) || 'legacy-admin';
   const changes = cleanChanges(input.changes);
   const pricing = calculateAddendumPricing(previousTotalCents, changes);
   const status = ['draft', 'ready_for_review', 'approved', 'sent', 'signed', 'cancelled'].includes(String(input.status))
@@ -124,12 +126,12 @@ export function normaliseAddendumInput(
     deliveryImpact: text(input.deliveryImpact, 2000),
     status,
     ownerApproval: status === 'approved' && !priorApproval.approvedAt
-      ? { approvedAt: now.toISOString(), approvedBy: 'owner' }
+      ? { approvedAt: now.toISOString(), approvedBy: actorUserId }
       : ['draft', 'ready_for_review'].includes(status) ? { approvedAt: '', approvedBy: '' } : priorApproval,
     acceptance: existing?.acceptance || {
       status: 'not_prepared', method: '', preparedAt: '', sentAt: '', sentToEmail: '', acceptedAt: '',
       acceptedByName: '', acceptedByEmail: '', evidenceReference: '', evidenceNotes: '', depositAmountCents: 0,
-      depositReference: '', recordedAt: '', recordedBy: '',
+      depositReference: '', recordedAt: '', recordedBy: '', preparedByUserId: '', sentByUserId: '',
     },
     signature: existing?.signature || { provider: '', documentId: '', status: '', testMode: true, editUrl: '', completedPdfUrl: '', createdAt: '', sentAt: '', completedAt: '', lastCheckedAt: '' },
     documentSnapshot: existing?.documentSnapshot || { store: '', key: '', sha256: '', mimeType: '', createdAt: '' },

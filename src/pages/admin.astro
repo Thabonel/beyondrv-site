@@ -1,5 +1,5 @@
 ---
-import AdminPanel from '../components/AdminPanel';
+import AdminApp from '../components/AdminApp';
 ---
 <!doctype html>
 <html lang="en">
@@ -7,7 +7,7 @@ import AdminPanel from '../components/AdminPanel';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Beyond RV Admin</title>
-    <meta name="description" content="Private Beyond RV administration area for managing site content and product information." />
+    <meta name="description" content="Private Beyond RV sales and administration workspace." />
     <meta name="robots" content="noindex, nofollow" />
     <link rel="canonical" href="https://beyondrv.com.au/admin/" />
     <meta property="og:title" content="Beyond RV Admin" />
@@ -122,13 +122,9 @@ import AdminPanel from '../components/AdminPanel';
     <header>
       <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
         <img src="/images/site/admin-logo.png" alt="Beyond RV" width="48" height="36" loading="eager" decoding="async" />
-        <nav style="display:flex">
-          <a href="/admin" style="color:#fff;text-decoration:none;font-size:0.85rem;padding:0.3rem 0.75rem;background:#1a1a1a;border-radius:4px">Admin</a>
-          <a href="/admin/analytics" style="color:#888;text-decoration:none;font-size:0.85rem;padding:0.3rem 0.75rem;border-radius:4px;margin-left:0.5rem">Analytics</a>
-        </nav>
       </div>
-      <span class="admin-topbar-note">Site Admin — changes deploy directly to production</span>
+      <span class="admin-topbar-note">Secure Beyond RV workspace</span>
     </header>
-    <AdminPanel client:load />
+    <AdminApp client:load />
   </body>
 </html>

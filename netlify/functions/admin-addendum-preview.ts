@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { connectBlobStore, getBlobStore } from './blob-store';
 import { CONTRACT_STORE, contractKey, type ContractRecord } from './contract-core';
 import {
@@ -11,7 +11,9 @@ import {
 
 export const handler: Handler = async event => {
   if (event.httpMethod !== 'GET') return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, 'agreements:read')) return forbiddenResponse('agreements:read');
   connectBlobStore(event);
   const id = typeof event.queryStringParameters?.id === 'string' ? event.queryStringParameters.id.trim().slice(0, 240) : '';
   if (!id) return { statusCode: 400, body: 'Missing addendum id.' };

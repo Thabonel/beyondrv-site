@@ -1,8 +1,9 @@
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { connectBlobStore, getBlobStore } from './blob-store';
 import { CONTRACT_STORE, contractKey, createContractRevision, diffContractVersions, type ContractRecord } from './contract-core';
 import { appendOwnerAudit, appendOwnerTimeline } from './owner-copilot-store-utils';
+import { appendSalesActivity, buildSalesActivityEvent } from './sales-activity-core';
 
 function json(statusCode: number, body: Record<string, unknown>) {
   return { statusCode, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }, body: JSON.stringify(body) };
@@ -21,7 +22,11 @@ async function listContracts() {
 
 export const handler: Handler = async event => {
   if (!['GET', 'POST'].includes(event.httpMethod)) return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, event.httpMethod === 'GET' ? 'agreements:read' : 'agreements:write')) {
+    return forbiddenResponse(event.httpMethod === 'GET' ? 'agreements:read' : 'agreements:write');
+  }
   connectBlobStore(event);
   const store = getBlobStore(CONTRACT_STORE);
 
@@ -47,18 +52,31 @@ export const handler: Handler = async event => {
 
   const chain = (await listContracts()).filter(contract => contract.contractNumber === parent.contractNumber);
   const nextVersion = Math.max(...chain.map(contract => contract.version || 1), 0) + 1;
-  const revision = createContractRevision(parent, nextVersion, reason);
+  const revision = createContractRevision(parent, nextVersion, reason, new Date(), actor.id);
   parent.status = 'superseded';
   parent.supersededByContractId = revision.id;
   parent.updatedAt = revision.createdAt;
+  parent.updatedByUserId = actor.id;
   await Promise.all([
     store.setJSON(contractKey(parent.id), parent),
     store.setJSON(contractKey(revision.id), revision),
   ]);
   const comparison = diffContractVersions(parent, revision);
   await Promise.all([
-    appendOwnerAudit('contract_revision_created', 'contract', revision.id, { contractNumber: revision.contractNumber, version: revision.version, parentContractId: parent.id, reason }),
+    appendOwnerAudit('contract_revision_created', 'contract', revision.id, { contractNumber: revision.contractNumber, version: revision.version, parentContractId: parent.id, reason }, actor),
     appendOwnerTimeline('contract_revision_created', `Contract ${revision.contractNumber} revision ${revision.version} created: ${reason}`, { relatedLeadId: revision.leadId, relatedCustomerId: revision.customerId, source: 'admin-contract-revisions' }),
+    appendSalesActivity(buildSalesActivityEvent({
+      activityType: 'agreement_revision_created',
+      summary: `Agreement ${revision.contractNumber} revision ${revision.version} created.`,
+      customerId: revision.customerId,
+      opportunityId: revision.opportunityId,
+      enquiryId: revision.sourceEnquiryId,
+      agreementId: revision.id,
+      configurationId: revision.configurationReference?.configurationId || '',
+      sourceReference: parent.id,
+      source: 'gm_ui',
+      metadata: { version: revision.version, parentAgreementId: parent.id, reason },
+    }, actor)),
   ]);
   return json(201, { ok: true, revision, parent, comparison });
 };

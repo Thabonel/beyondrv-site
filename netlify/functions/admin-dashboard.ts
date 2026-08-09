@@ -1,6 +1,12 @@
 import type { Handler } from '@netlify/functions';
 import OpenAI from 'openai';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import {
+  forbiddenResponse,
+  getAdminActor,
+  getConfiguredAdminAccounts,
+  hasAdminCapability,
+  unauthorizedResponse,
+} from './admin-auth';
 import { connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 import {
   buildLeadIntelligence,
@@ -658,7 +664,9 @@ Rules:
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'GET') return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, 'sales:read')) return forbiddenResponse('sales:read');
   connectBlobStore(event);
 
   const range = event.queryStringParameters?.range ?? '30';
@@ -828,8 +836,11 @@ export const handler: Handler = async (event) => {
   const paidOrders = orders.filter((order) => Boolean(order.depositPaid || order.paymentStatus === 'paid' || order.paymentStatus === 'succeeded'));
 
   const contactReady = Boolean(process.env.RESEND_API_KEY && process.env.CONTACT_FROM_EMAIL);
+  const configuredAdminAccounts = getConfiguredAdminAccounts();
+  const hasAdminAuthentication = configuredAdminAccounts.length > 0 || Boolean(process.env.ADMIN_PASSWORD);
   const readiness = [
-    { label: 'Admin password configured', status: process.env.ADMIN_PASSWORD ? 'ready' : 'blocker', detail: process.env.ADMIN_PASSWORD ? 'Admin endpoints are protected.' : 'Set ADMIN_PASSWORD in Netlify.' },
+    { label: 'Admin authentication configured', status: hasAdminAuthentication ? 'ready' : 'blocker', detail: configuredAdminAccounts.length > 0 ? `${configuredAdminAccounts.length} individual admin account${configuredAdminAccounts.length === 1 ? '' : 's'} configured.` : process.env.ADMIN_PASSWORD ? 'Legacy shared password active during migration.' : 'Configure individual admin accounts in Netlify.' },
+    { label: 'Dedicated session signing secret', status: process.env.ADMIN_COOKIE_SECRET ? 'ready' : 'warning', detail: process.env.ADMIN_COOKIE_SECRET ? 'Admin sessions use a dedicated signing secret.' : 'Set ADMIN_COOKIE_SECRET before removing the legacy password.' },
     { label: 'Contact recipient configured', status: process.env.CONTACT_TO_EMAIL ? 'ready' : 'warning', detail: process.env.CONTACT_TO_EMAIL ?? 'Using fallback beyondcaravans@gmail.com.' },
     { label: 'Resend email API configured', status: process.env.RESEND_API_KEY ? 'ready' : 'blocker', detail: process.env.RESEND_API_KEY ? 'Email provider key is present.' : 'Set RESEND_API_KEY in Netlify.' },
     { label: 'Verified sender configured', status: process.env.CONTACT_FROM_EMAIL ? 'ready' : 'blocker', detail: process.env.CONTACT_FROM_EMAIL ? process.env.CONTACT_FROM_EMAIL : 'Set CONTACT_FROM_EMAIL in Netlify.' },
