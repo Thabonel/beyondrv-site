@@ -55,7 +55,6 @@ test('organization schema defines truthful global merchant policies', () => {
   assert.equal(shippingService?.shippingConditions?.shippingRate, undefined);
   assert.equal(shippingService?.shippingConditions?.transitTime, undefined);
 });
-
 test('merchant product schema is omitted when no genuine offer price exists', () => {
   const product = buildMerchantProduct({
     slug: 'expedition/example-build',
