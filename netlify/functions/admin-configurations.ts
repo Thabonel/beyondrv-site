@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 import { appendOwnerAudit, appendOwnerTimeline } from './owner-copilot-store-utils';
 import type { ConfigurationRecord, ConfigurationSnapshot } from '../../src/lib/configurator/types';
@@ -53,7 +53,9 @@ async function listConfigurations() {
 
 export const handler: Handler = async event => {
   if (!['GET', 'POST', 'PATCH'].includes(event.httpMethod)) return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, 'configurations:read')) return forbiddenResponse('configurations:read');
   const blobRuntimeSource = connectBlobStore(event);
   const { catalogue, validation: catalogueValidation, source: catalogueSource } = await getEffectiveConfiguratorCatalogue();
 
@@ -79,6 +81,13 @@ export const handler: Handler = async event => {
   const body = readBody(event.body);
   if (!body) return json(400, { error: 'Invalid JSON request.' });
 
+  const requiredCapability = event.httpMethod === 'POST' && body.action === 'preview'
+    ? 'configurations:read'
+    : event.httpMethod === 'PATCH' && body.action === 'approve'
+      ? 'configurations:approve'
+      : 'configurations:write';
+  if (!hasAdminCapability(actor, requiredCapability)) return forbiddenResponse(requiredCapability);
+
   if (event.httpMethod === 'POST' && body.action === 'preview') {
     const configurationInput = body.configuration && typeof body.configuration === 'object' ? body.configuration as Record<string, unknown> : body;
     const configuration = normaliseConfigurationInput(configurationInput, undefined, new Date(), catalogue);
@@ -98,7 +107,7 @@ export const handler: Handler = async event => {
         sourceConfigurationId: source.id,
         configurationNumber: copy.configurationNumber,
         revision: copy.revision,
-      }),
+      }, actor),
       appendOwnerTimeline('configuration_created', `${copy.configurationNumber} ${body.action === 'revise' ? `revision ${copy.revision}` : 'copy'} created.`, {
         relatedLeadId: copy.leadId,
         relatedCustomerId: copy.customerId,
@@ -118,7 +127,7 @@ export const handler: Handler = async event => {
         configurationNumber: configuration.configurationNumber,
         modelId: configuration.modelId,
         configuredTotalCents: evaluation.pricing.configuredTotalCents,
-      }),
+      }, actor),
       appendOwnerTimeline('configuration_created', `${configuration.configurationNumber} created for ${configuration.customer.name || configuration.customer.email || evaluation.model?.name || 'camper'}.`, {
         relatedLeadId: configuration.leadId,
         relatedCustomerId: configuration.customerId,
@@ -184,7 +193,7 @@ export const handler: Handler = async event => {
       status: configuration.status,
       configuredTotalCents: evaluation.pricing.configuredTotalCents,
       snapshotDigest: snapshot?.digest || '',
-    }),
+    }, actor),
     appendOwnerTimeline(action === 'approve' ? 'configuration_approved' : 'configuration_updated', `${configuration.configurationNumber} revision ${configuration.revision} ${action === 'approve' ? 'approved' : 'updated'}.`, {
       relatedLeadId: configuration.leadId,
       relatedCustomerId: configuration.customerId,

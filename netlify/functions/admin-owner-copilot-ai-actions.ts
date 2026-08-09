@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 import {
   aiActionKey,
@@ -71,7 +71,10 @@ async function appendTimeline(aiAction: Record<string, unknown>, summary: string
 
 export const handler: Handler = async (event) => {
   if (!['GET', 'PATCH'].includes(event.httpMethod)) return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  const requiredCapability = event.httpMethod === 'GET' ? 'sales:read' : 'sales:write';
+  if (!hasAdminCapability(actor, requiredCapability)) return forbiddenResponse(requiredCapability);
   const blobRuntimeSource = connectBlobStore(event);
 
   let store: ReturnType<typeof getBlobStore>;

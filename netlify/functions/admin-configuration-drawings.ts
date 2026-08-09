@@ -1,6 +1,6 @@
 import type { Handler } from '@netlify/functions';
 import { randomUUID } from 'node:crypto';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore } from './blob-store';
 import { appendOwnerAudit } from './owner-copilot-store-utils';
 import { CONFIGURATION_STORE, configurationKey, hydrateConfigurationRecord } from './configuration-core';
@@ -16,7 +16,10 @@ function safeFilename(value: string) { return value.toLowerCase().replace(/[^a-z
 
 export const handler: Handler = async event => {
   if (!['POST', 'PATCH'].includes(event.httpMethod)) return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  const requiredCapability = event.httpMethod === 'PATCH' ? 'configurations:approve' : 'configurations:write';
+  if (!hasAdminCapability(actor, requiredCapability)) return forbiddenResponse(requiredCapability);
   connectBlobStore(event);
   let body: Record<string, unknown>;
   try { body = JSON.parse(event.body || '{}') as Record<string, unknown>; }
@@ -48,7 +51,7 @@ export const handler: Handler = async event => {
         : item);
       const updated = { ...configuration, drawings, customItems, updatedAt: now, updatedBy: 'owner' };
       await configurationStore.setJSON(configurationKey(configuration.id), updated);
-      await appendOwnerAudit('configuration_drawing_reviewed', 'configuration', configuration.id, { drawingId, customItemId: target.customItemId, status, version: target.version });
+      await appendOwnerAudit('configuration_drawing_reviewed', 'configuration', configuration.id, { drawingId, customItemId: target.customItemId, status, version: target.version }, actor);
       return json(200, { ok: true, configuration: updated });
     }
 
@@ -89,7 +92,7 @@ export const handler: Handler = async event => {
       updatedBy: 'owner',
     };
     await configurationStore.setJSON(configurationKey(configuration.id), updated);
-    await appendOwnerAudit('configuration_drawing_added', 'configuration', configuration.id, { drawingId: id, customItemId, version, source: externalUrl ? 'link' : 'upload' });
+    await appendOwnerAudit('configuration_drawing_added', 'configuration', configuration.id, { drawingId: id, customItemId, version, source: externalUrl ? 'link' : 'upload' }, actor);
     return json(201, { ok: true, configuration: updated, drawing });
   } catch (error) {
     return json(503, { error: blobStoreUserMessage(error) });

@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import type { Handler } from '@netlify/functions';
 import { randomUUID } from 'crypto';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore } from './blob-store';
 import {
   applyExactTextReplacements,
@@ -727,7 +727,9 @@ async function getSeoHealthTool() {
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, 'audit:read')) return forbiddenResponse('audit:read');
   connectBlobStore(event);
 
   if (!client || !GITHUB_TOKEN || !GITHUB_REPO) {

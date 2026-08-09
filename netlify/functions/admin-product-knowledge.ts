@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { buildProductKnowledgeContext } from './product-knowledge-core';
 import catalogue from './product-catalogue.json';
 import chatbotKnowledge from './chatbot-knowledge.json';
@@ -10,7 +10,10 @@ function clean(value: unknown, max = 2000) {
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'GET' && event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  const requiredCapability = event.httpMethod === 'GET' ? 'site:read' : 'site:write';
+  if (!hasAdminCapability(actor, requiredCapability)) return forbiddenResponse(requiredCapability);
 
   let query = '';
   let productInterest = '';

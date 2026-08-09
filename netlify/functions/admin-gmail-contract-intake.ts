@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { connectBlobStore, getBlobStore } from './blob-store';
 import { CONTRACT_STORE, contractKey, type ContractRecord } from './contract-core';
 import {
@@ -83,7 +83,9 @@ function groundExcerpts(extraction: ContractChangeExtraction, bodyText: string) 
 
 export const handler: Handler = async event => {
   if (!['GET', 'POST'].includes(event.httpMethod)) return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, 'agreements:send')) return forbiddenResponse('agreements:send');
   connectBlobStore(event);
   const config = contractAiConfig();
   if (event.httpMethod === 'GET') {
@@ -198,7 +200,7 @@ Return only the required JSON schema.`,
       updatedAt: now,
     });
     await Promise.all([
-      appendOwnerAudit('gmail_contract_message_triaged', 'ai_action', actionId, { messageId, threadId, contractId: contract?.id || '', model: config.triage.model, material: triage.material, classification: triage.classification }),
+      appendOwnerAudit('gmail_contract_message_triaged', 'ai_action', actionId, { messageId, threadId, contractId: contract?.id || '', model: config.triage.model, material: triage.material, classification: triage.classification }, actor),
       appendOwnerTimeline('gmail_contract_message_triaged', `Gmail contract review created: ${triage.reason}`, { relatedLeadId: actionRecord.relatedLeadId, relatedCustomerId: actionRecord.relatedCustomerId, source: 'admin-gmail-contract-intake' }),
     ]);
     return json(201, { ok: true, action: actionRecord });
@@ -269,6 +271,6 @@ Return only the required JSON schema.`,
   await appendOwnerAudit('gmail_contract_change_extracted', 'ai_action', clean(existing.id, 240), {
     messageId, contractId: contract?.id || '', model: tier.model, reasoningEffort: tier.reasoning,
     classification: extraction.classification, confidence: extraction.confidence, requestedChanges: extraction.requestedChanges.length, needsEscalation,
-  });
+  }, actor);
   return json(200, { ok: true, action: updated });
 };

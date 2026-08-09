@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN!;
 const GITHUB_REPO = process.env.GITHUB_REPO!;
@@ -50,7 +50,9 @@ export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, 'site:write')) return forbiddenResponse('site:write');
 
   const { changes } = JSON.parse(event.body ?? '{}') as { changes: PendingChange[] };
 

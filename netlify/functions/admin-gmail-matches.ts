@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 import {
   gmailThreadKey,
@@ -32,7 +32,9 @@ async function loadSuggestions(thread: Record<string, unknown>) {
 
 export const handler: Handler = async (event) => {
   if (!['GET', 'POST', 'PATCH'].includes(event.httpMethod)) return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, 'integrations:manage')) return forbiddenResponse('integrations:manage');
   connectBlobStore(event);
 
   try {
@@ -85,7 +87,7 @@ export const handler: Handler = async (event) => {
       const suggestions = await loadSuggestions(thread);
       const saved = { ...thread, suggestions };
       await store.setJSON(gmailThreadKey(id), saved);
-      await appendOwnerAudit(existing ? 'gmail_thread_updated' : 'gmail_thread_created', 'gmail_thread', id, { source: saved.source, suggestions: suggestions.length });
+      await appendOwnerAudit(existing ? 'gmail_thread_updated' : 'gmail_thread_created', 'gmail_thread', id, { source: saved.source, suggestions: suggestions.length }, actor);
       return { statusCode: 200, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ok: true, thread: saved }) };
     }
 
@@ -106,7 +108,7 @@ export const handler: Handler = async (event) => {
       updatedAt: new Date().toISOString(),
     };
     await store.setJSON(gmailThreadKey(id), updated);
-    await appendOwnerAudit(`gmail_match_${decision}`, 'gmail_thread', id, { targetType, targetId });
+    await appendOwnerAudit(`gmail_match_${decision}`, 'gmail_thread', id, { targetType, targetId }, actor);
     if (decision !== 'rejected') {
       await appendOwnerTimeline('email_received', `Gmail thread ${decision}: ${String(updated.subject || id)}`, {
         relatedLeadId: targetType === 'lead' ? targetId : '',

@@ -1,6 +1,6 @@
 import type { Handler } from '@netlify/functions';
 import OpenAI from 'openai';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import catalogue from './product-catalogue.json';
 
 const client = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
@@ -106,7 +106,9 @@ function validateResult(value: unknown) {
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, 'site:write')) return forbiddenResponse('site:write');
 
   let body: Record<string, unknown>;
   try {

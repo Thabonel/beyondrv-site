@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 import {
   marketingIdeaKey,
@@ -12,7 +12,10 @@ const VALID_STATUSES = new Set(['idea', 'drafted', 'approved', 'rejected', 'publ
 
 export const handler: Handler = async (event) => {
   if (!['GET', 'POST', 'PATCH'].includes(event.httpMethod)) return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  const requiredCapability = event.httpMethod === 'GET' ? 'site:read' : 'site:write';
+  if (!hasAdminCapability(actor, requiredCapability)) return forbiddenResponse(requiredCapability);
   connectBlobStore(event);
 
   try {
@@ -50,7 +53,7 @@ export const handler: Handler = async (event) => {
       updatedAt: now,
     };
     await store.setJSON(marketingIdeaKey(id), idea);
-    await appendOwnerAudit(existing ? 'marketing_idea_updated' : 'marketing_idea_created', 'marketing_idea', id, { status });
+    await appendOwnerAudit(existing ? 'marketing_idea_updated' : 'marketing_idea_created', 'marketing_idea', id, { status }, actor);
     return { statusCode: 200, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ok: true, idea }) };
   } catch (error) {
     console.warn('admin-marketing-ideas: unavailable', { error: safeBlobStoreError(error) });

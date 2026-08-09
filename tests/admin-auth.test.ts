@@ -7,6 +7,7 @@ import {
   createAdminToken,
   getActorFromAdminToken,
   getAdminActor,
+  getAuthorizedAdminActor,
   getConfiguredAdminAccounts,
   hasAdminCapability,
 } from '../netlify/functions/admin-auth.ts';
@@ -143,6 +144,17 @@ test('site administrator can inspect sales but cannot make commercial commitment
   assert.equal(hasAdminCapability(actor, 'agreements:approve'), false);
   assert.equal(hasAdminCapability(actor, 'deposits:verify'), false);
   assert.equal(hasAdminCapability(actor, 'builds:release'), false);
+});
+
+test('capability guard rejects a site administrator from commercial and production mutations', () => {
+  process.env.ADMIN_SITE_ADMIN_PASSWORD = 'site-secret';
+  const siteAdminHeaders = { 'x-admin-user': 'site-admin', 'x-admin-password': 'site-secret' };
+  const request = event({ httpMethod: 'POST', headers: siteAdminHeaders, body: '{}' });
+  assert.equal(getAuthorizedAdminActor(request, 'sales:write'), null);
+  assert.equal(getAuthorizedAdminActor(request, 'agreements:approve'), null);
+  assert.equal(getAuthorizedAdminActor(request, 'deposits:verify'), null);
+  assert.equal(getAuthorizedAdminActor(request, 'builds:release'), null);
+  assert.equal(getAuthorizedAdminActor(request, 'site:write')?.role, 'site_admin');
 });
 
 test('global and role-specific session cutoffs revoke existing sessions', () => {

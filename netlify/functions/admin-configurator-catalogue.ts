@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore } from './blob-store';
 import { appendOwnerAudit } from './owner-copilot-store-utils';
 import { validateConfiguratorCatalogue } from '../../src/lib/configurator/engine';
@@ -16,7 +16,9 @@ function json(statusCode: number, body: Record<string, unknown>) {
 
 export const handler: Handler = async event => {
   if (!['GET', 'PATCH'].includes(event.httpMethod)) return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (event.httpMethod === 'GET' && !hasAdminCapability(actor, 'configurations:read')) return forbiddenResponse('configurations:read');
   connectBlobStore(event);
 
   if (event.httpMethod === 'GET') return json(200, await getEffectiveConfiguratorCatalogue());
@@ -24,6 +26,8 @@ export const handler: Handler = async event => {
   let body: Record<string, unknown>;
   try { body = JSON.parse(event.body || '{}') as Record<string, unknown>; }
   catch { return json(400, { error: 'Invalid JSON request.' }); }
+  const requiredCapability = body.action === 'approve' ? 'configurations:approve' : 'configurations:write';
+  if (!hasAdminCapability(actor, requiredCapability)) return forbiddenResponse(requiredCapability);
 
   try {
     const draft = normaliseCatalogueDraft(body.catalogue);
@@ -40,7 +44,7 @@ export const handler: Handler = async event => {
       optionCount: draft.options.length,
       readiness: draft.readiness,
       action: body.action === 'approve' ? 'approved' : 'saved',
-    });
+    }, actor);
     return json(200, { ok: true, catalogue: draft, validation, source: 'operational' });
   } catch (error) {
     return json(503, { error: blobStoreUserMessage(error) });

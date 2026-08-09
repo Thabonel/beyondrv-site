@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { connectBlobStore, getBlobStore } from './blob-store';
 import {
   DEFAULT_TIMEZONE,
@@ -89,7 +89,11 @@ async function sendSummaryEmail(text: string, html: string) {
 }
 
 export const handler: Handler = async (event) => {
-  if (!isScheduledInvocation(event) && !isAdminAuthorized(event)) return unauthorizedResponse();
+  if (!isScheduledInvocation(event)) {
+    const actor = getAdminActor(event);
+    if (!actor) return unauthorizedResponse();
+    if (!hasAdminCapability(actor, 'sales:write')) return forbiddenResponse('sales:write');
+  }
 
   const blobRuntimeSource = connectBlobStore(event);
   const date = todayKey(new Date(), process.env.LEAD_REMINDER_TIMEZONE || DEFAULT_TIMEZONE);

@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 import {
   driveFileKey,
@@ -31,7 +31,9 @@ async function loadSuggestions(file: Record<string, unknown>) {
 
 export const handler: Handler = async (event) => {
   if (!['GET', 'POST', 'PATCH'].includes(event.httpMethod)) return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, 'integrations:manage')) return forbiddenResponse('integrations:manage');
   connectBlobStore(event);
 
   try {
@@ -86,7 +88,7 @@ export const handler: Handler = async (event) => {
       const suggestions = await loadSuggestions(file);
       const saved = { ...file, suggestions };
       await store.setJSON(driveFileKey(id), saved);
-      await appendOwnerAudit(existing ? 'drive_file_updated' : 'drive_file_created', 'drive_file', id, { source: saved.source, suggestions: suggestions.length });
+      await appendOwnerAudit(existing ? 'drive_file_updated' : 'drive_file_created', 'drive_file', id, { source: saved.source, suggestions: suggestions.length }, actor);
       return { statusCode: 200, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ok: true, file: saved }) };
     }
 
@@ -107,7 +109,7 @@ export const handler: Handler = async (event) => {
       updatedAt: new Date().toISOString(),
     };
     await store.setJSON(driveFileKey(id), updated);
-    await appendOwnerAudit(`drive_match_${decision}`, 'drive_file', id, { targetType, targetId });
+    await appendOwnerAudit(`drive_match_${decision}`, 'drive_file', id, { targetType, targetId }, actor);
     if (decision !== 'rejected') {
       await appendOwnerTimeline('file_matched', `Drive file ${decision}: ${String(updated.name || id)}`, {
         relatedLeadId: targetType === 'lead' ? targetId : '',

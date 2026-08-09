@@ -1,6 +1,6 @@
 import type { Handler } from '@netlify/functions';
 import { randomUUID } from 'node:crypto';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore } from './blob-store';
 import { appendOwnerAudit, appendOwnerTimeline } from './owner-copilot-store-utils';
 import { CONFIGURATION_STORE, configurationKey, hydrateConfigurationRecord } from './configuration-core';
@@ -15,7 +15,9 @@ function orderKey(id: string) { return `orders/${encodeURIComponent(id)}.json`; 
 
 export const handler: Handler = async event => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, 'builds:release')) return forbiddenResponse('builds:release');
   connectBlobStore(event);
   let body: Record<string, unknown>;
   try { body = JSON.parse(event.body || '{}') as Record<string, unknown>; }
@@ -55,7 +57,7 @@ export const handler: Handler = async event => {
       const updated: ConfigurationRecord = { ...configuration, status: 'ordered', linkedOrderIds: [orderId], production, updatedAt: now, updatedBy: 'owner' };
       await Promise.all([orderStore.setJSON(orderKey(orderId), order), configurationStore.setJSON(configurationKey(id), updated)]);
       await Promise.all([
-        appendOwnerAudit('configuration_released_to_production', 'configuration', id, { orderId, depositReference, contractId: configuration.linkedContractIds[0] }),
+        appendOwnerAudit('configuration_released_to_production', 'configuration', id, { orderId, depositReference, contractId: configuration.linkedContractIds[0] }, actor),
         appendOwnerTimeline('production_status_updated', `${configuration.configurationNumber} released to production after deposit verification.`, { relatedCustomerId: configuration.customerId, relatedLeadId: configuration.leadId, source: 'admin-configuration-production' }),
       ]);
       return json(201, { ok: true, configuration: updated, order });
@@ -78,7 +80,10 @@ export const handler: Handler = async event => {
     const order = { ...existingOrder, status, expectedArrivalDate: production.expectedArrivalDate, expectedHandoverDate: production.expectedHandoverDate, nextActionDate: production.nextActionDate, statusHistory: [...(Array.isArray(existingOrder.statusHistory) ? existingOrder.statusHistory : []), eventRecord].slice(-100), updatedAt: now };
     const updated: ConfigurationRecord = { ...configuration, production, updatedAt: now, updatedBy: 'owner' };
     await Promise.all([orderStore.setJSON(orderKey(configuration.production.orderId), order), configurationStore.setJSON(configurationKey(id), updated)]);
-    await appendOwnerTimeline('production_status_updated', `${configuration.configurationNumber} moved to ${status.replace(/_/g, ' ')}.`, { relatedCustomerId: configuration.customerId, relatedLeadId: configuration.leadId, source: 'admin-configuration-production' });
+    await Promise.all([
+      appendOwnerAudit('configuration_production_status_updated', 'configuration', id, { status }, actor),
+      appendOwnerTimeline('production_status_updated', `${configuration.configurationNumber} moved to ${status.replace(/_/g, ' ')}.`, { relatedCustomerId: configuration.customerId, relatedLeadId: configuration.leadId, source: 'admin-configuration-production' }),
+    ]);
     return json(200, { ok: true, configuration: updated, order });
   } catch (error) {
     return json(400, { error: error instanceof Error ? error.message : blobStoreUserMessage(error) });

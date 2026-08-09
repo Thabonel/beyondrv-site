@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 
 const STORE_NAME = 'product-media';
@@ -30,7 +30,10 @@ function legacySafeSlug(value: string) {
 }
 
 export const handler: Handler = async (event) => {
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  const requiredCapability = event.httpMethod === 'GET' ? 'site:read' : 'site:write';
+  if (!hasAdminCapability(actor, requiredCapability)) return forbiddenResponse(requiredCapability);
   const blobConnection = connectBlobStore(event);
 
   if (event.httpMethod === 'GET') {

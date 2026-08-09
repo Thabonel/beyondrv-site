@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore } from './blob-store';
 import { appendOwnerAudit } from './owner-copilot-store-utils';
 import { CONFIGURATION_STORE, configurationKey, evaluateConfigurationRecord, hydrateConfigurationRecord } from './configuration-core';
@@ -12,7 +12,9 @@ function clean(value: unknown, max = 1000) { return typeof value === 'string' ? 
 
 export const handler: Handler = async event => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, 'configurations:write')) return forbiddenResponse('configurations:write');
   connectBlobStore(event);
   let body: Record<string, unknown>;
   try { body = JSON.parse(event.body || '{}') as Record<string, unknown>; }
@@ -29,7 +31,7 @@ export const handler: Handler = async event => {
     if (action === 'revoke') {
       const updated = { ...configuration, customerReview: { ...configuration.customerReview, status: 'revoked' as const } };
       await store.setJSON(configurationKey(id), updated);
-      await appendOwnerAudit('configuration_review_revoked', 'configuration', id, { configurationNumber: configuration.configurationNumber });
+      await appendOwnerAudit('configuration_review_revoked', 'configuration', id, { configurationNumber: configuration.configurationNumber }, actor);
       return json(200, { ok: true, configuration: updated });
     }
     if (!['draft', 'ready_for_review'].includes(configuration.status)) return json(409, { error: 'Create customer review links before internal approval.' });
@@ -54,7 +56,7 @@ export const handler: Handler = async event => {
     };
     const index: ReviewTokenIndex = { configurationId: id, tokenHash: generated.hash, expiresAt, createdAt: now.toISOString() };
     await Promise.all([store.setJSON(configurationKey(id), updated), store.setJSON(reviewTokenKey(generated.hash), index)]);
-    await appendOwnerAudit('configuration_review_created', 'configuration', id, { expiresAt, tokenHint: generated.hint });
+    await appendOwnerAudit('configuration_review_created', 'configuration', id, { expiresAt, tokenHint: generated.hint }, actor);
     const origin = clean(body.origin, 500).replace(/\/$/, '');
     const reviewPath = `/configuration-review?token=${encodeURIComponent(generated.token)}`;
     return json(201, { ok: true, configuration: updated, token: generated.token, reviewUrl: origin ? `${origin}${reviewPath}` : reviewPath, expiresAt });

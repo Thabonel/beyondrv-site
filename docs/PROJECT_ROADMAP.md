@@ -20,9 +20,9 @@ Current state: Phase 0 foundations, the Phase 1 GM workspace, and the first Phas
 
 Primary design: [`plans/2026-08-09-gm-sales-workspace-agreement-voice-capture-prd.md`](./plans/2026-08-09-gm-sales-workspace-agreement-voice-capture-prd.md).
 
-Current implementation gate: complete the remaining role/capability migration for older endpoints, then add one-touch follow-up outcomes and automatic next follow-ups. Continue the fast-agreement slice with product-specific approved inclusions and structured alteration readiness before piloting the GM default in staging.
+Current implementation gate: the role/capability migration for every `admin-*` endpoint is complete locally. Next, add one-touch follow-up outcomes and automatic next follow-ups. Continue the fast-agreement slice with product-specific approved inclusions and structured alteration readiness before piloting the GM default in staging.
 
-Acceptance criteria for the current gate: individual GM/owner/site-admin sessions produce actor-aware audit events and server-enforced capabilities; the current agreement wording and calculations remain unchanged; new agreement records use the business-approved version; stable source links and idempotency foundations are tested; existing shared-password sessions remain temporarily compatible for rollback.
+Acceptance criteria for the current gate: individual GM/owner/site-admin sessions produce actor-aware audit events and server-enforced capabilities across all `admin-*` handlers; the current agreement wording and calculations remain unchanged; new agreement records use the business-approved version; stable source links and idempotency foundations are tested; existing shared-password sessions remain temporarily compatible for rollback.
 
 Phase 1 implementation note: [`GM-SALES-PHASE-1-WORKSPACE.md`](./GM-SALES-PHASE-1-WORKSPACE.md).
 

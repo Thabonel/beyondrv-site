@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto';
 import { parse, stringify } from 'yaml';
 import { replaceProductHero } from '../../src/lib/productImages';
 import { vehicleSaleStateForStatus } from '../../src/lib/productSaleState';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_REPO = process.env.GITHUB_REPO;
@@ -196,7 +196,9 @@ function cleanSuitabilityData(value: ProductEditPayload['suitabilityData']) {
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, 'site:write')) return forbiddenResponse('site:write');
 
   let payload: ProductEditPayload;
   try {

@@ -2,7 +2,7 @@ import type { Handler } from '@netlify/functions';
 import { randomUUID } from 'crypto';
 import manifest from './shop-catalogue.json';
 import { buildCatalogue, type ShopManifestEntry } from '../../src/lib/checkout';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 import { escapeHtml, json, sendResendEmail, siteUrl } from './stripe-shared';
 import {
@@ -70,7 +70,10 @@ async function saveOrder(store: ReturnType<typeof getBlobStore>, order: Shipping
 }
 
 export const handler: Handler = async (event) => {
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  const requiredCapability = event.httpMethod === 'GET' ? 'builds:read' : 'builds:release';
+  if (!hasAdminCapability(actor, requiredCapability)) return forbiddenResponse(requiredCapability);
   const blobRuntimeSource = connectBlobStore(event);
 
   let store: ReturnType<typeof getBlobStore>;

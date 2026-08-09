@@ -1,6 +1,6 @@
 import type { Handler } from '@netlify/functions';
 import { randomUUID } from 'crypto';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 import { syncEnquiryToOwnerCopilotRecords } from './owner-copilot-record-sync';
 
@@ -25,7 +25,9 @@ function parseReceivedAt(value: string) {
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, 'sales:write')) return forbiddenResponse('sales:write');
   const blobRuntimeSource = connectBlobStore(event);
 
   let body: Record<string, unknown>;

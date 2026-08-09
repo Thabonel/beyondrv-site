@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 import type { ConfigurationRecord } from '../../src/lib/configurator/types';
 import { CONFIGURATION_STORE, configurationKey, hydrateConfigurationRecord, renderConfigurationSummaryHtml } from './configuration-core';
@@ -11,7 +11,9 @@ function clean(value: unknown, max = 240) {
 
 export const handler: Handler = async event => {
   if (event.httpMethod !== 'GET') return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, 'configurations:read')) return forbiddenResponse('configurations:read');
   const blobRuntimeSource = connectBlobStore(event);
   const id = clean(event.queryStringParameters?.id);
   if (!id) return { statusCode: 400, body: 'Missing configuration id.' };

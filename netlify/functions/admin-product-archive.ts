@@ -1,6 +1,6 @@
 import type { Handler } from '@netlify/functions';
 import { randomUUID } from 'crypto';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { archiveProductMarkdown, isSafeProductSlug, productPathCandidates } from './product-archive-core';
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
@@ -21,7 +21,9 @@ async function githubFetch(path: string): Promise<string | null> {
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, 'site:write')) return forbiddenResponse('site:write');
 
   let slug = '';
   try {

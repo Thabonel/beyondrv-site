@@ -1,9 +1,11 @@
 import type { Handler } from '@netlify/functions';
-import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'GET') return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!isAdminAuthorized(event)) return unauthorizedResponse();
+  const actor = getAdminActor(event);
+  if (!actor) return unauthorizedResponse();
+  if (!hasAdminCapability(actor, 'integrations:manage')) return forbiddenResponse('integrations:manage');
 
   const toEmail = process.env.CONTACT_TO_EMAIL ?? 'beyondcaravans@gmail.com';
   const fromEmail = process.env.CONTACT_FROM_EMAIL ?? '';
