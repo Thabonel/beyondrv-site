@@ -180,5 +180,5 @@ test('GM starts a phone or walk-in agreement with non-contractual conversation c
   await expect(page.getByTestId('conversation-context')).toContainText('not yet contractual');
   await page.getByLabel('Conversation source').selectOption('visit');
   await page.getByLabel('Customer request or discussion').fill('Customer wants to inspect samples before deciding.');
-  await expect(page.getByText('Customer wants to inspect samples before deciding.')).toHaveCount(0);
+  await expect(page.getByTestId('website-enquiry-context')).toHaveCount(0);
 });
