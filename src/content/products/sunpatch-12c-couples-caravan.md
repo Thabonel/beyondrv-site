@@ -146,6 +146,10 @@ relatedSlugs:
   - sunpatch-15xc-couples-offroad-van
   - sunpatch-19xc-hardtop-couples-offroad-van
   - sunpatch-21xf-hardtop-family-offroad-van
+youtubeVideo:
+  id: 6MzaA9WCYU4
+  title: Beyond RV Sunpatch 12C Walkthrough
+  description: Video walkthrough for the Beyond RV Sunpatch 12C couples off-road van.
 seoTitle: Sunpatch 12C Couples Off-Road Van | Beyond RV
 seoDesc: The Sunpatch 12C is a compact hardtop couples off-road van available from Beyond RV.
 suitabilityData:
