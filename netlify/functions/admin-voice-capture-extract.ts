@@ -3,7 +3,7 @@ import type { Handler } from '@netlify/functions';
 import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore } from './blob-store';
 import { normaliseIdempotencyKey, readIdempotencyRecord, writeIdempotencyRecord } from './command-idempotency-core';
-import { VOICE_CAPTURE_STORE, createVoiceCaptureId, normaliseVoiceProposal, type VoiceProposal, voiceCaptureKey } from './voice-capture-core';
+import { VOICE_CAPTURE_STORE, createVoiceCaptureId, normaliseAudioMimeType, normaliseVoiceProposal, type VoiceProposal, voiceCaptureKey } from './voice-capture-core';
 
 const client = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
 const EXTRACTION_MODEL = process.env.OPENAI_VOICE_EXTRACTION_MODEL || process.env.OPENAI_ADMIN_MODEL || 'gpt-5.6-terra';
@@ -29,11 +29,12 @@ function clean(value: unknown, max = 12000) { return typeof value === 'string' ?
 
 async function transcribeAudio(audioBase64: string, mimeType: string) {
   if (!client) throw new Error('OpenAI is not configured.');
-  if (!ALLOWED_AUDIO_TYPES.has(mimeType)) throw new Error('Use a WebM, MP4, MP3, or WAV recording.');
+  const normalisedMimeType = normaliseAudioMimeType(mimeType);
+  if (!ALLOWED_AUDIO_TYPES.has(normalisedMimeType)) throw new Error('Use a WebM, MP4, MP3, or WAV recording.');
   const bytes = Buffer.from(audioBase64, 'base64');
   if (!bytes.length || bytes.length > MAX_AUDIO_BYTES) throw new Error('Keep the recording under 6 MB and try again.');
-  const extension = mimeType === 'audio/mp4' ? 'm4a' : mimeType === 'audio/mpeg' ? 'mp3' : mimeType.includes('wav') ? 'wav' : 'webm';
-  const response = await client.audio.transcriptions.create({ file: new File([bytes], `customer-call.${extension}`, { type: mimeType }), model: TRANSCRIPTION_MODEL });
+  const extension = normalisedMimeType === 'audio/mp4' ? 'm4a' : normalisedMimeType === 'audio/mpeg' ? 'mp3' : normalisedMimeType.includes('wav') ? 'wav' : 'webm';
+  const response = await client.audio.transcriptions.create({ file: new File([bytes], `customer-call.${extension}`, { type: normalisedMimeType }), model: TRANSCRIPTION_MODEL });
   return clean(response.text, 12000);
 }
 

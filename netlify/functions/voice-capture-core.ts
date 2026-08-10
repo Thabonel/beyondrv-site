@@ -38,6 +38,12 @@ function clean(value: unknown, max = 1000) {
   return typeof value === 'string' ? value.trim().slice(0, max) : '';
 }
 
+// Android Chrome correctly reports its recording as e.g. "audio/webm;codecs=opus".
+// The codec parameter describes the same WebM file.
+export function normaliseAudioMimeType(value: unknown) {
+  return clean(value, 160).split(';', 1)[0].trim().toLowerCase();
+}
+
 function cleanList(value: unknown, maxItems = 12, maxLength = 240) {
   return Array.isArray(value)
     ? value.map(item => clean(item, maxLength)).filter(Boolean).slice(0, maxItems)

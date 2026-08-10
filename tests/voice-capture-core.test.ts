@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { normaliseVoiceProposal, voiceCaptureSummary } from '../netlify/functions/voice-capture-core.ts';
+import { normaliseAudioMimeType, normaliseVoiceProposal, voiceCaptureSummary } from '../netlify/functions/voice-capture-core.ts';
 
 test('voice proposal keeps only supported, bounded fields and safe date values', () => {
   const proposal = normaliseVoiceProposal({
@@ -20,4 +20,9 @@ test('voice proposal rejects untrusted dates and unknown confidence values', () 
   assert.equal(proposal.followUpDate, '');
   assert.equal(proposal.confidence, 'medium');
   assert.equal(proposal.moneyMentions.length, 0);
+});
+
+test('Android WebM recordings retain their supported media type when Chrome adds codecs', () => {
+  assert.equal(normaliseAudioMimeType('audio/webm;codecs=opus'), 'audio/webm');
+  assert.equal(normaliseAudioMimeType(' Audio/MP4 ; codecs=mp4a.40.2'), 'audio/mp4');
 });
