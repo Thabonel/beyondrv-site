@@ -136,6 +136,10 @@ relatedSlugs:
   - advent-2300-hardtop-slide-on
   - advent-2450-hardtop-slide-on
   - 7ft-electric-poptop-slide-on
+youtubeVideo:
+  id: Dd_JKzK9jUo
+  title: Beyond RV Advent 2150 Walkthrough
+  description: Video walkthrough for the Beyond RV Advent 2150 hardtop ute slide-on camper.
 seoTitle: Advent 2150 Hardtop Ute Slide-On Camper | Beyond RV
 seoDesc: The Advent 2150 hardtop ute slide-on camper is built for 4x4 space cab utes and selected dual cab ute owners.
 availability: made_to_order
