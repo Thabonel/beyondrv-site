@@ -343,6 +343,15 @@ const schemas = [primarySchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
     </div>
   </section>
 
+  {!isComingSoon && (
+    <OptionalExtras
+      client:load
+      basePrice={data.price}
+      productSlug={product.id}
+      productName={data.title}
+    />
+  )}
+
   {(canDeposit || canFullPayment) && (
     <div class="checkout-notice-modal" data-checkout-notice hidden>
       <div class="checkout-notice-backdrop" data-checkout-notice-cancel></div>
@@ -510,15 +519,6 @@ const schemas = [primarySchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
         </details>
       </div>
     </section>
-  )}
-
-  {!isComingSoon && (
-    <OptionalExtras
-      client:load
-      basePrice={data.price}
-      productSlug={product.id}
-      productName={data.title}
-    />
   )}
 
   {data.features && data.features.length > 0 && (
