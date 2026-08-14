@@ -121,6 +121,48 @@ function StatusPill({ status }: { status: 'ready' | 'warning' | 'critical' | str
   );
 }
 
+function TrafficSourcesChart({ sources }: { sources: AnalyticsData['sources'] }) {
+  const totalVisits = sources.reduce((sum, source) => sum + source.visits, 0);
+  const chartData = sources.map((source, index) => ({
+    ...source,
+    fill: PIE_COLORS[index % PIE_COLORS.length],
+  }));
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap', minHeight: '200px' }}>
+      <div style={{ flex: '0 0 160px', width: '160px', height: '160px' }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={chartData}
+              dataKey="visits"
+              nameKey="source"
+              cx="50%"
+              cy="50%"
+              outerRadius={68}
+              stroke="#111"
+              strokeWidth={1}
+            />
+            <Tooltip contentStyle={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '6px', color: '#fff' }} />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+      <ul aria-label="Traffic source breakdown" style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '0.55rem', flex: '1 1 150px', minWidth: '140px' }}>
+        {chartData.map((source) => {
+          const percentage = totalVisits > 0 ? Math.round((source.visits / totalVisits) * 100) : 0;
+          return (
+            <li key={source.source} style={{ display: 'grid', gridTemplateColumns: '10px minmax(0, 1fr) auto', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem' }}>
+              <span aria-hidden="true" style={{ width: '10px', height: '10px', borderRadius: '3px', background: source.fill }} />
+              <span style={{ color: '#bbb', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{source.source}</span>
+              <strong style={{ color: '#f5f5f5', fontVariantNumeric: 'tabular-nums' }}>{percentage}%</strong>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
 export default function AnalyticsDashboard() {
   const [range, setRange] = useState('30');
   const [data, setData] = useState<AnalyticsData | null>(null);
@@ -504,21 +546,7 @@ export default function AnalyticsDashboard() {
             {data.sources.length === 0 ? (
               <p style={{ color: '#555', fontSize: '0.85rem' }}>No data yet</p>
             ) : (
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie
-                    data={data.sources.map((s, i) => ({ ...s, fill: PIE_COLORS[i % PIE_COLORS.length] }))}
-                    dataKey="visits"
-                    nameKey="source"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={70}
-                    label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
-                    labelLine={false}
-                  />
-                  <Tooltip contentStyle={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '6px', color: '#fff' }} />
-                </PieChart>
-              </ResponsiveContainer>
+              <TrafficSourcesChart sources={data.sources} />
             )}
           </div>
         </div>
