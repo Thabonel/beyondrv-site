@@ -12,7 +12,8 @@ test('analytics navigation is protected in the permanent admin shell and mobile 
 
   assert.match(adminPage, /data-persistent-admin-navigation/);
   assert.match(adminPage, /href="\/admin\/analytics\/"[^>]*>Analytics<\/a>/);
-  assert.match(adminPanel, /href="\/admin\/analytics\/"/);
+  assert.equal(adminPanel.match(/href="\/admin\/analytics\/"/g)?.length, 2);
+  assert.match(adminPanel, /aria-label="Open analytics dashboard"/);
   assert.match(adminPanel, />\s*Analytics dashboard\s*<\/a>/);
   assert.match(analyticsPage, /href="\/admin"[^>]*>Admin<\/a>/);
 });
