@@ -1,9 +1,29 @@
 import type { Handler } from '@netlify/functions';
 import { isAdminAuthorized, unauthorizedResponse } from './admin-auth';
+import { mergeSocialCampaignRows } from './analytics-attribution-core';
 
 const API_KEY = process.env.POSTHOG_API_KEY;
 const PROJECT_ID = process.env.POSTHOG_PROJECT_ID;
 const BASE = PROJECT_ID ? `https://app.posthog.com/api/projects/${PROJECT_ID}/query/` : '';
+
+const attributedSource = `
+  multiIf(
+    lower(coalesce(nullIf(properties.utm_source, ''), nullIf(properties.latest_touch_source, ''), nullIf(properties.$session_entry_utm_source, ''), '')) LIKE '%youtube%', 'YouTube',
+    lower(coalesce(nullIf(properties.utm_source, ''), nullIf(properties.latest_touch_source, ''), nullIf(properties.$session_entry_utm_source, ''), '')) LIKE '%instagram%', 'Instagram',
+    lower(coalesce(nullIf(properties.utm_source, ''), nullIf(properties.latest_touch_source, ''), nullIf(properties.$session_entry_utm_source, ''), '')) LIKE '%facebook%', 'Facebook',
+    lower(coalesce(nullIf(properties.utm_source, ''), nullIf(properties.latest_touch_source, ''), nullIf(properties.$session_entry_utm_source, ''), '')) LIKE '%google%', 'Google',
+    lower(coalesce(properties.$referring_domain, '')) LIKE '%youtube%', 'YouTube',
+    lower(coalesce(properties.$referring_domain, '')) LIKE '%instagram%', 'Instagram',
+    lower(coalesce(properties.$referring_domain, '')) LIKE '%facebook%', 'Facebook',
+    lower(coalesce(properties.$referring_domain, '')) LIKE '%google%', 'Google',
+    properties.$referring_domain IS NULL OR properties.$referring_domain = '', 'Direct',
+    'Other'
+  )
+`;
+
+const attributedCampaign = `coalesce(nullIf(properties.utm_campaign, ''), nullIf(properties.latest_touch_campaign, ''), nullIf(properties.$session_entry_utm_campaign, ''), 'Unknown campaign')`;
+const attributedMedium = `coalesce(nullIf(properties.utm_medium, ''), nullIf(properties.latest_touch_medium, ''), nullIf(properties.$session_entry_utm_medium, ''), 'Unspecified')`;
+const attributedContent = `coalesce(nullIf(properties.utm_content, ''), nullIf(properties.latest_touch_content, ''), nullIf(properties.$session_entry_utm_content, ''), 'Unspecified')`;
 
 async function hogql(query: string) {
   if (!API_KEY || !BASE) throw new Error('PostHog analytics are not configured.');
@@ -34,6 +54,7 @@ export const handler: Handler = async (event) => {
         trend: [],
         topPages: [],
         sources: [],
+        socialCampaigns: [],
         youtube: [],
         warning: 'PostHog analytics are not configured.',
       }),
@@ -44,7 +65,7 @@ export const handler: Handler = async (event) => {
   const days = ['7', '30', '90'].includes(range) ? range : '30';
 
   try {
-    const [trendRes, sessionsRes, enquiriesRes, pagesRes, sourcesRes, youtubeRes] =
+    const [trendRes, sessionsRes, enquiriesRes, pagesRes, sourcesRes, socialSessionsRes, socialEnquiriesRes] =
       await Promise.all([
         // Daily pageview trend
         hogql(`
@@ -75,36 +96,47 @@ export const handler: Handler = async (event) => {
         `),
         // Traffic sources
         hogql(`
-          SELECT
-            multiIf(
-              properties.$referring_domain LIKE '%google%', 'Google',
-              properties.$referring_domain LIKE '%youtube%', 'YouTube',
-              properties.$referring_domain LIKE '%facebook%', 'Facebook',
-              properties.$referring_domain LIKE '%instagram%', 'Instagram',
-              properties.$referring_domain IS NULL OR properties.$referring_domain = '', 'Direct',
-              'Other'
-            ) as source,
-            count() as visits
+          SELECT ${attributedSource} as source, count() as visits
           FROM events
           WHERE event = '$pageview' AND timestamp > now() - INTERVAL ${days} DAY
           GROUP BY source ORDER BY visits DESC
         `),
-        // YouTube UTM attribution
+        // Social sessions grouped by UTM values, with referrer fallback for untagged links.
         hogql(`
           SELECT
-            coalesce(properties.utm_campaign, 'Unknown campaign') as campaign,
-            count() as visits
+            ${attributedSource} as source,
+            ${attributedCampaign} as campaign,
+            ${attributedMedium} as medium,
+            ${attributedContent} as content,
+            count(DISTINCT properties.$session_id) as sessions
           FROM events
           WHERE event = '$pageview'
             AND timestamp > now() - INTERVAL ${days} DAY
-            AND (properties.utm_source LIKE '%youtube%'
-              OR properties.$referring_domain LIKE '%youtube%')
-          GROUP BY campaign ORDER BY visits DESC LIMIT 5
+          GROUP BY source, campaign, medium, content
+          ORDER BY sessions DESC LIMIT 100
+        `),
+        // Enquiries use the same latest-touch UTM dimensions captured on success.
+        hogql(`
+          SELECT
+            ${attributedSource} as source,
+            ${attributedCampaign} as campaign,
+            ${attributedMedium} as medium,
+            ${attributedContent} as content,
+            count(DISTINCT coalesce(properties.enquiry_submission_id, properties.$session_id)) as enquiries
+          FROM events
+          WHERE event = 'enquiry_submitted'
+            AND timestamp > now() - INTERVAL ${days} DAY
+          GROUP BY source, campaign, medium, content
+          ORDER BY enquiries DESC LIMIT 100
         `),
       ]);
 
     const sessions = (sessionsRes.results[0]?.[0] as number) ?? 0;
     const enquiries = (enquiriesRes.results[0]?.[0] as number) ?? 0;
+    const socialCampaigns = mergeSocialCampaignRows(
+      socialSessionsRes.results as [unknown, unknown, unknown, unknown, unknown][],
+      socialEnquiriesRes.results as [unknown, unknown, unknown, unknown, unknown][],
+    );
 
     return {
       statusCode: 200,
@@ -120,7 +152,10 @@ export const handler: Handler = async (event) => {
         trend: trendRes.results.map(([date, views]) => ({ date, views })),
         topPages: pagesRes.results.map(([path, views]) => ({ path, views })),
         sources: sourcesRes.results.map(([source, visits]) => ({ source, visits })),
-        youtube: youtubeRes.results.map(([campaign, visits]) => ({ campaign, visits })),
+        socialCampaigns,
+        youtube: socialCampaigns
+          .filter(row => row.source === 'YouTube')
+          .map(row => ({ campaign: row.campaign, visits: row.sessions })),
       }),
     };
   } catch (err) {

@@ -487,6 +487,10 @@ const schema = {
       });
       const data = await res.json() as { error?: string };
       if (!res.ok) throw new Error(data.error ?? 'Could not send enquiry');
+      sessionStorage.setItem(
+        'brv_pending_enquiry_event',
+        globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      );
       window.location.href = '/inquiry-form/success/';
     } catch (err) {
       if (status) {

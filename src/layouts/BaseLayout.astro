@@ -51,7 +51,10 @@ const { activePath = '', productTitle, productSlug, ...headProps } = Astro.props
       const utmSource = params.get('utm_source');
       const utmMedium = params.get('utm_medium');
       const utmCampaign = params.get('utm_campaign');
-      const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
+      const utmContent = params.get('utm_content');
+      const NINETY_DAYS = 90 * 24 * 60 * 60 * 1000;
+      const now = new Date().toISOString();
+      const expires = Date.now() + NINETY_DAYS;
 
       if (ref) {
         let existing: { ref: string; expires: number } | null = null;
@@ -65,19 +68,29 @@ const { activePath = '', productTitle, productSlug, ...headProps } = Astro.props
             utm_source: utmSource || '',
             utm_medium: utmMedium || '',
             utm_campaign: utmCampaign || '',
-            expires: Date.now() + THIRTY_DAYS,
+            utm_content: utmContent || '',
+            expires,
           }));
         }
       }
 
-      if (!ref && utmSource) {
-        localStorage.setItem('brv_utm', JSON.stringify({
+      if (utmSource) {
+        const touch = {
           utm_source: utmSource,
           utm_medium: utmMedium || '',
           utm_campaign: utmCampaign || '',
+          utm_content: utmContent || '',
           entry_page: window.location.pathname,
-          stored_at: new Date().toISOString(),
-        }));
+          stored_at: now,
+          expires,
+        };
+        let firstTouch: { expires?: number } | null = null;
+        try { firstTouch = JSON.parse(localStorage.getItem('brv_utm_first') || 'null'); } catch {}
+        if (!firstTouch?.expires || firstTouch.expires <= Date.now()) {
+          localStorage.setItem('brv_utm_first', JSON.stringify(touch));
+        }
+        localStorage.setItem('brv_utm_latest', JSON.stringify(touch));
+        localStorage.setItem('brv_utm', JSON.stringify(touch));
       }
     })();
   </script>

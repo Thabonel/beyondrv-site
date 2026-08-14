@@ -28,12 +28,37 @@ const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY as string | undefined;
 
   async function captureSuccessfulEnquiry() {
     if (!window.location.pathname.includes('/inquiry-form/success')) return;
+    const submissionId = sessionStorage.getItem('brv_pending_enquiry_event');
+    if (!submissionId) return;
     const posthog = await initialisePostHog();
     if (!posthog) return;
-    let extra: Record<string, unknown> = {};
-    try { extra = { ...JSON.parse(localStorage.getItem('brv_referral') || '{}') }; } catch {}
-    try { extra = { ...extra, ...JSON.parse(localStorage.getItem('brv_utm') || '{}') }; } catch {}
-    posthog.capture('enquiry_submitted', extra);
+    function readTouch(key: string) {
+      try { return JSON.parse(localStorage.getItem(key) || '{}') as Record<string, unknown>; } catch { return {}; }
+    }
+    const referral = readTouch('brv_referral');
+    const first = readTouch('brv_utm_first');
+    const latest = Object.keys(readTouch('brv_utm_latest')).length > 0
+      ? readTouch('brv_utm_latest')
+      : readTouch('brv_utm');
+    posthog.capture('enquiry_submitted', {
+      enquiry_submission_id: submissionId,
+      referral_partner: referral.ref || '',
+      first_touch_source: first.utm_source || referral.utm_source || '',
+      first_touch_medium: first.utm_medium || referral.utm_medium || '',
+      first_touch_campaign: first.utm_campaign || referral.utm_campaign || '',
+      first_touch_content: first.utm_content || referral.utm_content || '',
+      first_touch_entry_page: first.entry_page || referral.entry_page || '',
+      latest_touch_source: latest.utm_source || referral.utm_source || '',
+      latest_touch_medium: latest.utm_medium || referral.utm_medium || '',
+      latest_touch_campaign: latest.utm_campaign || referral.utm_campaign || '',
+      latest_touch_content: latest.utm_content || referral.utm_content || '',
+      latest_touch_entry_page: latest.entry_page || referral.entry_page || '',
+      utm_source: latest.utm_source || referral.utm_source || '',
+      utm_medium: latest.utm_medium || referral.utm_medium || '',
+      utm_campaign: latest.utm_campaign || referral.utm_campaign || '',
+      utm_content: latest.utm_content || referral.utm_content || '',
+    });
+    sessionStorage.removeItem('brv_pending_enquiry_event');
   }
 
   if (localStorage.getItem('brv_cookie_consent') === 'accepted') {

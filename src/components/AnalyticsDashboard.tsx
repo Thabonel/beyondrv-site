@@ -13,6 +13,15 @@ interface AnalyticsData {
   trend: { date: string; views: number }[];
   topPages: { path: string; views: number }[];
   sources: { source: string; visits: number }[];
+  socialCampaigns: {
+    source: string;
+    campaign: string;
+    medium: string;
+    content: string;
+    sessions: number;
+    enquiries: number;
+    conversionRate: string;
+  }[];
   youtube: { campaign: string; visits: number }[];
   warning?: string;
 }
@@ -83,11 +92,20 @@ function campaignSlug(value: string) {
     .replace(/^-+|-+$/g, '');
 }
 
-function buildTrackedUrl(pageUrl: string, source: string, campaign: string) {
+function buildTrackedUrl(pageUrl: string, source: string, campaign: string, medium: string, content: string) {
   const base = pageUrl.trim() || 'https://beyondrv.com.au/';
-  const separator = base.includes('?') ? '&' : '?';
   const safeCampaign = campaignSlug(campaign) || SOURCE_OPTIONS.find(option => option.value === source)?.example || 'campaign';
-  return `${base}${separator}utm_source=${encodeURIComponent(source)}&utm_campaign=${encodeURIComponent(safeCampaign)}`;
+  try {
+    const url = new URL(base, 'https://beyondrv.com.au/');
+    url.searchParams.set('utm_source', source);
+    url.searchParams.set('utm_medium', campaignSlug(medium) || 'organic_social');
+    url.searchParams.set('utm_campaign', safeCampaign);
+    if (campaignSlug(content)) url.searchParams.set('utm_content', campaignSlug(content));
+    else url.searchParams.delete('utm_content');
+    return url.toString();
+  } catch {
+    return base;
+  }
 }
 
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
@@ -172,7 +190,9 @@ export default function AnalyticsDashboard() {
   const [error, setError] = useState('');
   const [seoError, setSeoError] = useState('');
   const [campaignSource, setCampaignSource] = useState('youtube');
+  const [campaignMedium, setCampaignMedium] = useState('organic-social');
   const [campaignName, setCampaignName] = useState('unimog-video');
+  const [campaignContent, setCampaignContent] = useState('video-description');
   const [campaignPage, setCampaignPage] = useState('https://beyondrv.com.au/our-slide-on-campers/');
   const [copyStatus, setCopyStatus] = useState('');
 
@@ -231,7 +251,7 @@ export default function AnalyticsDashboard() {
     padding: '0.6rem',
     fontSize: '0.82rem',
   };
-  const trackedUrl = buildTrackedUrl(campaignPage, campaignSource, campaignName);
+  const trackedUrl = buildTrackedUrl(campaignPage, campaignSource, campaignName, campaignMedium, campaignContent);
   const seoReadyChecks = seoData?.technical.checks.filter(check => check.status === 'ready').length ?? 0;
   const seoWarningChecks = seoData?.technical.checks.filter(check => check.status === 'warning').length ?? 0;
   const seoCriticalChecks = seoData?.technical.checks.filter(check => check.status === 'critical').length ?? 0;
@@ -456,7 +476,7 @@ export default function AnalyticsDashboard() {
         <p style={{ color: '#aaa', fontSize: '0.84rem', lineHeight: 1.55, margin: '0 0 1rem' }}>
           Use these tracked links anywhere Beyond RV posts content. They tell the dashboard which platform and post sent the visitor, so Facebook, Instagram, and YouTube traffic can be measured properly.
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr 1.4fr', gap: '0.75rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.75rem' }}>
           <label style={{ display: 'grid', gap: '0.35rem', color: '#888', fontSize: '0.74rem' }}>
             Platform
             <select value={campaignSource} onChange={event => setCampaignSource(event.target.value)} style={inputStyle}>
@@ -466,11 +486,28 @@ export default function AnalyticsDashboard() {
             </select>
           </label>
           <label style={{ display: 'grid', gap: '0.35rem', color: '#888', fontSize: '0.74rem' }}>
+            Medium
+            <select value={campaignMedium} onChange={event => setCampaignMedium(event.target.value)} style={inputStyle}>
+              <option value="organic-social">Organic social</option>
+              <option value="paid-social">Paid social</option>
+              <option value="creator-partnership">Creator partnership</option>
+            </select>
+          </label>
+          <label style={{ display: 'grid', gap: '0.35rem', color: '#888', fontSize: '0.74rem' }}>
             Campaign / post name
             <input
               value={campaignName}
               onChange={event => setCampaignName(event.target.value)}
               placeholder="Example: unimog-video"
+              style={inputStyle}
+            />
+          </label>
+          <label style={{ display: 'grid', gap: '0.35rem', color: '#888', fontSize: '0.74rem' }}>
+            Placement / content
+            <input
+              value={campaignContent}
+              onChange={event => setCampaignContent(event.target.value)}
+              placeholder="Example: reel, story, bio, description"
               style={inputStyle}
             />
           </label>
@@ -552,30 +589,37 @@ export default function AnalyticsDashboard() {
         </div>
       )}
 
-      {/* YouTube attribution */}
-      {data && data.youtube.length > 0 && (
+      {/* Social campaign attribution */}
+      {data && data.socialCampaigns.length > 0 && (
         <div style={card}>
-          <div style={sectionTitle}>YouTube Attribution (last {range} days)</div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-            <thead>
-              <tr>
-                <th style={{ textAlign: 'left', color: '#666', fontWeight: 500, paddingBottom: '0.5rem' }}>Campaign / Video</th>
-                <th style={{ textAlign: 'right', color: '#666', fontWeight: 500, paddingBottom: '0.5rem' }}>Visits</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.youtube.map((row, i) => (
-                <tr key={i} style={{ borderTop: '1px solid #222' }}>
-                  <td style={{ color: '#ccc', padding: '0.4rem 0' }}>{row.campaign}</td>
-                  <td style={{ color: '#E8540A', textAlign: 'right', fontWeight: 600 }}>{row.visits}</td>
+          <div style={sectionTitle}>Social Campaign Attribution (last {range} days)</div>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', minWidth: '660px' }}>
+              <thead>
+                <tr>
+                  {['Platform', 'Campaign', 'Placement', 'Sessions', 'Enquiries', 'Conversion'].map((heading, index) => (
+                    <th key={heading} style={{ textAlign: index < 3 ? 'left' : 'right', color: '#666', fontWeight: 500, padding: '0 0.55rem 0.5rem' }}>{heading}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {data.socialCampaigns.map((row, i) => (
+                  <tr key={`${row.source}-${row.campaign}-${row.medium}-${row.content}-${i}`} style={{ borderTop: '1px solid #222' }}>
+                    <td style={{ color: '#E8540A', padding: '0.5rem 0.55rem', fontWeight: 700 }}>{row.source}</td>
+                    <td style={{ color: '#ccc', padding: '0.5rem 0.55rem' }}>{row.campaign}</td>
+                    <td style={{ color: '#999', padding: '0.5rem 0.55rem' }}>{row.content === 'Unspecified' ? row.medium : row.content}</td>
+                    <td style={{ color: '#ccc', padding: '0.5rem 0.55rem', textAlign: 'right' }}>{row.sessions}</td>
+                    <td style={{ color: '#ccc', padding: '0.5rem 0.55rem', textAlign: 'right' }}>{row.enquiries}</td>
+                    <td style={{ color: '#4ade80', padding: '0.5rem 0.55rem', textAlign: 'right', fontWeight: 700 }}>{row.conversionRate}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
-      {data && data.youtube.length === 0 && (
+      {data && data.socialCampaigns.length === 0 && (
         <div style={{ ...card, color: '#555', fontSize: '0.85rem' }}>
           No tracked social campaign traffic in the last {range} days. Use the Campaign Link Builder above for YouTube, Instagram, and Facebook links so visits can be attributed to the right post, video, reel, or ad.
         </div>
