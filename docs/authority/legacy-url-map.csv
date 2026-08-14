@@ -6,7 +6,7 @@ Legacy_URL,Destination,Status,Source_or_reason,Verification
 /15-ft-pop-top/,/our-caravans/,301,"Existing Netlify redirect","Verified on production 2026-07-29"
 /17-ft/,/our-caravans/,301,"Existing Netlify redirect","Verified on production 2026-07-29"
 /advent-2150,/advent-2150-hardtop-slide-on/,301,"Existing Netlify redirect","Verified on production 2026-07-29"
-/3-5m-poptop-truck-camper/,/expedition/3-5m-electric-poptop-cabover-family-camper/,301,"Archived sold product; redirect to its current 3.5m Expedition successor","Pending production verification"
+/3-5m-poptop-truck-camper/,/expedition/3-5m-electric-poptop-cabover-family-camper/,301,"Archived sold product; redirect to its current 3.5m Expedition successor","Verified on production 2026-08-15"
 /3-5m-truck-camper,/expedition/,301,"Former product destination is archived; nearest truthful category fallback","Verified one hop to production 200 on 2026-07-29"
 /3-5m-truck-camper/,/expedition/,301,"Former product destination is archived; nearest truthful category fallback","Verified one hop to production 200 on 2026-07-29"
 /15ft-truck-camper-combined-shower-toilet/,/expedition/,301,"Former product destination is archived; nearest truthful category fallback","Verified one hop to production 200 on 2026-07-29"
