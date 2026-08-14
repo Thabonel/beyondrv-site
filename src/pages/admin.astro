@@ -24,6 +24,13 @@ import AdminApp from '../components/AdminApp';
       }
       header img { height: 36px; }
       header span { color: #888; font-size: 0.85rem; }
+      .admin-shell-nav { display: flex; align-items: center; gap: 0.4rem; }
+      .admin-shell-nav a {
+        color: #aaa; text-decoration: none; font-size: 0.85rem; font-weight: 700;
+        padding: 0.4rem 0.65rem; border-radius: 6px; border: 1px solid transparent;
+      }
+      .admin-shell-nav a:hover { color: #fff; border-color: #444; }
+      .admin-shell-nav a.active { color: #fff; background: #1a1a1a; border-color: #333; }
       .sr-only {
         position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
         overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
@@ -122,6 +129,10 @@ import AdminApp from '../components/AdminApp';
     <header>
       <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
         <img src="/images/site/admin-logo.png" alt="Beyond RV" width="48" height="36" loading="eager" decoding="async" />
+        <nav class="admin-shell-nav" data-persistent-admin-navigation aria-label="Admin navigation">
+          <a href="/admin/" class="active" aria-current="page">Admin</a>
+          <a href="/admin/analytics/">Analytics</a>
+        </nav>
       </div>
       <span class="admin-topbar-note">Secure Beyond RV workspace</span>
     </header>

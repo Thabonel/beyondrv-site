@@ -4407,13 +4407,8 @@ export default function AdminPanel({ onOpenGmWorkspace, onSignOut }: { onOpenGmW
     <>
     <div style={{ height: 'calc(100vh - 60px)', padding: '1rem', fontFamily: 'inherit' }}>
       <div style={{ minWidth: 0, minHeight: 0, height: '100%', display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333' }}>
-        <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
-            <div style={{ color: '#fff', fontWeight: 800 }}>Admin Tools</div>
-            <a href="/admin/analytics/" style={{ color: '#fff', textDecoration: 'none', border: '1px solid #444', background: '#222', borderRadius: '6px', padding: '0.42rem 0.65rem', fontSize: '0.9rem', fontWeight: 700 }}>
-              Analytics
-            </a>
-          </div>
+        <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <div style={{ color: '#fff', fontWeight: 800 }}>Admin Tools</div>
           <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
             {onOpenGmWorkspace && (
               <button
@@ -4495,6 +4490,23 @@ export default function AdminPanel({ onOpenGmWorkspace, onSignOut }: { onOpenGmW
                 Admin sections
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                <a
+                  href="/admin/analytics/"
+                  style={{
+                    display: 'block',
+                    background: '#222',
+                    color: '#fff',
+                    border: '1px solid #E8540A',
+                    borderRadius: '8px',
+                    padding: '0.8rem 0.75rem',
+                    textDecoration: 'none',
+                    fontWeight: 800,
+                    fontSize: '0.9rem',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  Analytics dashboard
+                </a>
                 {panelTabs.map(tab => {
                   const isActive = activeTab === tab;
                   return (
