@@ -19,6 +19,9 @@ test('returns neutral before the customer has started', () => {
 test('a comfortable combination with all confirmations ticked is green', () => {
   const result = calculateSlideOnSuitability(base, { started: true });
   assert.equal(result.status, 'green');
+  if (!('values' in result)) {
+    assert.fail('expected calculateSlideOnSuitability to return values for a green result');
+  }
   assert.equal(result.values.remainingGvmMargin, 3350 - 3170);
 });
 
