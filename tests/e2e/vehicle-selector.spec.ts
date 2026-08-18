@@ -28,28 +28,55 @@ test('a figure the customer typed survives re-picking a vehicle', async ({ page 
 
 test('the form still works if the catalogue fails to load', async ({ page, context }) => {
   // Spec section 9: the selector enhances a working tool and is never a dependency of it.
-  // Case 1: the catalogue element is absent entirely.
-  await page.addInitScript(() => {
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('vehicleCatalogueData')?.remove();
-    });
+  //
+  // The calculator's inline script is type="module", which per the HTML spec
+  // finishes executing BEFORE DOMContentLoaded fires. Mutating the DOM from a
+  // DOMContentLoaded listener (as an earlier version of this test did) is too
+  // late: parseCatalogue() has already read and parsed the original, valid
+  // catalogue by then. To genuinely exercise catalogue failure, the markup
+  // itself must be broken before the browser ever parses it — so we rewrite
+  // the HTML response in flight with page.route.
+  const catalogueTag = /<script[^>]*id="vehicleCatalogueData"[^>]*>[\s\S]*?<\/script>/;
+  const catalogueTagOpenClose = /(<script[^>]*id="vehicleCatalogueData"[^>]*>)[\s\S]*?(<\/script>)/;
+
+  // Case 1: the catalogue element is absent entirely from the markup.
+  await page.route('**/slide-on-camper-weight-calculator/', async (route) => {
+    const response = await route.fetch();
+    const html = await response.text();
+    await route.fulfill({ response, body: html.replace(catalogueTag, '') });
   });
-  await page.reload();
+  await page.goto('/slide-on-camper-weight-calculator/');
+
+  // Positive evidence the catalogue-absent path actually ran: parseCatalogue()
+  // returns an empty catalogue, so the make dropdown has only its placeholder
+  // option — none of the 13 real makes it shows when the catalogue loads.
+  await expect(page.locator('#vehicleMake option')).toHaveCount(1);
+
   await page.fill('#gvm', '3350');
   await page.fill('#currentWeight', '2200');
   await expect(page.locator('#gvm')).toHaveValue('3350');
 
-  // Case 2: the catalogue element is present but its JSON is malformed. This
-  // used to throw at top-level script scope and kill the whole form; it is
-  // now caught, so manual entry must still work.
+  // Case 2: the catalogue element is present in the markup but its JSON is
+  // malformed. This used to throw at top-level script scope and kill the
+  // whole form; it is now caught, so manual entry must still work.
   const malformedPage = await context.newPage();
-  await malformedPage.addInitScript(() => {
-    document.addEventListener('DOMContentLoaded', () => {
-      const el = document.getElementById('vehicleCatalogueData');
-      if (el) el.textContent = '{not valid json';
-    });
+  const consoleWarnings: string[] = [];
+  malformedPage.on('console', (msg) => {
+    if (msg.type() === 'warning') consoleWarnings.push(msg.text());
+  });
+  await malformedPage.route('**/slide-on-camper-weight-calculator/', async (route) => {
+    const response = await route.fetch();
+    const html = await response.text();
+    await route.fulfill({ response, body: html.replace(catalogueTagOpenClose, '$1{not valid json$2') });
   });
   await malformedPage.goto('/slide-on-camper-weight-calculator/');
+
+  // Positive evidence the catch branch actually ran: it logs the warning the
+  // calculator script emits on a parse failure, and the make dropdown falls
+  // back to only its placeholder option.
+  await expect(malformedPage.locator('#vehicleMake option')).toHaveCount(1);
+  expect(consoleWarnings.some((text) => text.includes('Vehicle catalogue data could not be parsed'))).toBe(true);
+
   await malformedPage.fill('#gvm', '3350');
   await malformedPage.fill('#currentWeight', '2200');
   await expect(malformedPage.locator('#gvm')).toHaveValue('3350');
