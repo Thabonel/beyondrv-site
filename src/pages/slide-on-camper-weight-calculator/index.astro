@@ -278,7 +278,16 @@ const schema = [
   const fmtMm = (value: number) => `${Math.round(value).toLocaleString()} mm`;
 
   const catalogueEl = document.getElementById('vehicleCatalogueData');
-  const catalogue = catalogueEl ? JSON.parse(catalogueEl.textContent || '{"models":[],"variants":[]}') : { models: [], variants: [] };
+  function parseCatalogue() {
+    if (!catalogueEl) return { models: [], variants: [] };
+    try {
+      return JSON.parse(catalogueEl.textContent || '{"models":[],"variants":[]}');
+    } catch (err) {
+      console.warn('Vehicle catalogue data could not be parsed; the vehicle picker will be unavailable.', err);
+      return { models: [], variants: [] };
+    }
+  }
+  const catalogue = parseCatalogue();
   const customerEdited = new Set<string>();
 
   const selectById = (id: string) => document.getElementById(id) as HTMLSelectElement | null;
@@ -305,7 +314,7 @@ const schema = [
     if (input) input.value = String(value);
   }
 
-  ['gvm', 'currentWeight', 'trayLength', 'trayWidth', 'trayMass'].forEach((id) => {
+  ['vehicleName', 'gvm', 'currentWeight', 'trayLength', 'trayWidth', 'trayMass'].forEach((id) => {
     inputById(id)?.addEventListener('input', () => customerEdited.add(id));
   });
 
