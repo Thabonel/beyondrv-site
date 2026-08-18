@@ -1579,6 +1579,37 @@ nav.scrolled {
   font-size: 0.78rem;
   line-height: 1.5;
 }
+.vehicle-picker {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+.vehicle-picker .form-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.vehicle-provenance {
+  margin-top: 0.75rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+}
+.vehicle-provenance p {
+  margin: 0;
+  color: rgba(240,235,227,0.76);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+.vehicle-provenance p + p {
+  margin-top: 0.5rem;
+}
+.vehicle-provenance a {
+  color: var(--orange);
+}
+.vehicle-provenance-note {
+  color: var(--muted);
+  font-style: italic;
+}
 .calculator-disclaimer {
   margin-top: 1.5rem;
   padding: 1rem;
@@ -2320,6 +2351,7 @@ footer {
 }
 @media (max-width: 768px) {
   .checker-form { grid-template-columns: 1fr; }
+  .vehicle-picker { grid-template-columns: 1fr; }
   .checker-panel,
   .result-panel,
   .authority-card { padding: 1.4rem; }

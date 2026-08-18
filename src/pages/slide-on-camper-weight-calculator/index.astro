@@ -269,7 +269,7 @@ const schema = [
 
   const form = document.getElementById('slideCalculator');
   const resultPanel = document.getElementById('resultPanel');
-  const fields = ['vehicleName', 'gvm', 'currentWeight', 'passengers', 'accessories', 'luggageGear', 'camperDry', 'camperWater', 'camperGear', 'camperOptions', 'trayLength', 'trayWidth', 'requiredTrayLength', 'requiredTrayWidth', 'rearAxleChecked', 'tyreRatingsChecked', 'centreOfGravityChecked'];
+  const fields = ['vehicleName', 'gvm', 'currentWeight', 'trayMass', 'passengers', 'accessories', 'luggageGear', 'camperDry', 'camperWater', 'camperGear', 'camperOptions', 'trayLength', 'trayWidth', 'requiredTrayLength', 'requiredTrayWidth', 'rearAxleChecked', 'tyreRatingsChecked', 'centreOfGravityChecked'];
   let hasStarted = false;
   const byId = (id: string) => document.getElementById(id);
   const inputById = (id: string) => document.getElementById(id) as HTMLInputElement | null;
@@ -289,6 +289,16 @@ const schema = [
   }
   const catalogue = parseCatalogue();
   const customerEdited = new Set<string>();
+  const PREFILLABLE_FIELDS = ['vehicleName', 'gvm', 'currentWeight', 'trayLength', 'trayWidth', 'trayMass'];
+  const FIELD_LABELS: Record<string, string> = {
+    vehicleName: 'the vehicle name',
+    gvm: 'GVM',
+    currentWeight: 'the current vehicle weight',
+    trayLength: 'the tray length',
+    trayWidth: 'the tray width',
+    trayMass: 'the tray weight',
+  };
+  const fieldLabel = (id: string) => FIELD_LABELS[id] ?? id;
 
   const selectById = (id: string) => document.getElementById(id) as HTMLSelectElement | null;
 
@@ -309,19 +319,20 @@ const schema = [
   }
 
   function setIfNotEdited(id: string, value: number | null) {
-    if (value === null || customerEdited.has(id)) return;
+    if (customerEdited.has(id)) return;
     const input = inputById(id);
-    if (input) input.value = String(value);
+    if (input) input.value = value === null ? '' : String(value);
   }
 
-  ['vehicleName', 'gvm', 'currentWeight', 'trayLength', 'trayWidth', 'trayMass'].forEach((id) => {
+  PREFILLABLE_FIELDS.forEach((id) => {
     inputById(id)?.addEventListener('input', () => customerEdited.add(id));
   });
 
   function formatAccessedDate(iso: string) {
-    const [year, month, day] = iso.split('-').map(Number);
+    const [year, month, day] = (iso ?? '').split('-').map(Number);
     const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    return `${day} ${months[month - 1]} ${year}`;
+    const valid = Number.isFinite(year) && Number.isFinite(day) && month >= 1 && month <= 12;
+    return valid ? `${day} ${months[month - 1]} ${year}` : String(iso);
   }
 
   function trayLine(trayState: string) {
@@ -356,7 +367,31 @@ const schema = [
       panel.appendChild(note);
     }
 
+    const editedFields = PREFILLABLE_FIELDS.filter((id) => customerEdited.has(id));
+    if (editedFields.length > 0) {
+      const editedNote = document.createElement('p');
+      editedNote.className = 'vehicle-provenance-note';
+      editedNote.textContent = `You supplied ${editedFields.map(fieldLabel).join(', ')}. Those figures are not from the manufacturer document.`;
+      panel.appendChild(editedNote);
+    }
+
     (panel as HTMLElement).hidden = false;
+  }
+
+  function resetVehicleSelection() {
+    PREFILLABLE_FIELDS.forEach((id) => {
+      if (customerEdited.has(id)) return;
+      const input = inputById(id);
+      if (input) input.value = '';
+    });
+    const trayField = byId('trayMassField');
+    if (trayField) (trayField as HTMLElement).hidden = true;
+    const panel = byId('vehicleProvenance');
+    if (panel) {
+      panel.replaceChildren();
+      (panel as HTMLElement).hidden = true;
+    }
+    calculateSlideOn();
   }
 
   function applyVariant(variantId: string) {
@@ -376,8 +411,8 @@ const schema = [
     if (trayField) (trayField as HTMLElement).hidden = !showTray;
     if (trayHelp) {
       trayHelp.textContent = variant.trayState === 'excluded'
-        ? 'The published kerb weight for this vehicle excludes the tray, so enter your tray weight here.'
-        : 'The manufacturer does not state whether the published kerb weight includes a tray. If your vehicle has one, enter its weight here.';
+        ? 'The published kerb weight for this vehicle excludes the tray. Enter your tray weight here and it will be added to the vehicle weight — do not count it again under accessories.'
+        : 'The manufacturer does not state whether the published kerb weight includes a tray. If your vehicle has one, enter its weight here and it will be added to the vehicle weight — do not count it again under accessories.';
     }
     renderProvenance(variant);
     calculateSlideOn();
@@ -388,6 +423,7 @@ const schema = [
     const models = catalogue.models.filter((m: any) => m.make === make).map((m: any) => m.model);
     fillSelect(selectById('vehicleModel'), models, 'Select a model');
     fillSelect(selectById('vehicleVariant'), [], 'Select a variant');
+    resetVehicleSelection();
   });
 
   selectById('vehicleModel')?.addEventListener('change', (event) => {
@@ -408,10 +444,16 @@ const schema = [
       select.appendChild(option);
     }
     select.disabled = variants.length === 0;
+    resetVehicleSelection();
   });
 
   selectById('vehicleVariant')?.addEventListener('change', (event) => {
-    applyVariant((event.target as HTMLSelectElement).value);
+    const variantId = (event.target as HTMLSelectElement).value;
+    if (!variantId) {
+      resetVehicleSelection();
+      return;
+    }
+    applyVariant(variantId);
   });
 
   fillSelect(selectById('vehicleMake'), [...new Set<string>(catalogue.models.map((m: any) => m.make))].sort(), 'Select a make');
@@ -444,11 +486,25 @@ const schema = [
     });
   }
 
+  // The tray is part of the vehicle's mass before the listed additions, so it
+  // is folded into currentVehicleWeight rather than passed separately. A blank
+  // or non-numeric tray mass counts as 0kg. A blank or non-numeric current
+  // weight is left untouched so the existing missing-field path is unchanged.
+  function currentVehicleWeightWithTray() {
+    const currentWeightRaw = value('currentWeight');
+    const currentWeightNumber = Number(currentWeightRaw);
+    if (currentWeightRaw === '' || !Number.isFinite(currentWeightNumber)) return currentWeightRaw;
+    const trayMassRaw = value('trayMass');
+    const trayMassNumber = Number(trayMassRaw);
+    const trayMass = trayMassRaw !== '' && Number.isFinite(trayMassNumber) ? trayMassNumber : 0;
+    return String(currentWeightNumber + trayMass);
+  }
+
   function calculateSlideOn() {
     const vehicleName = inputById('vehicleName')?.value || 'your vehicle';
     const result = calculateSlideOnSuitability({
       vehicleGvm: value('gvm'),
-      currentVehicleWeight: value('currentWeight'),
+      currentVehicleWeight: currentVehicleWeightWithTray(),
       passengerWeight: value('passengers'),
       accessoryWeight: value('accessories'),
       luggageOrGearWeight: value('luggageGear'),

@@ -48,7 +48,7 @@ const variants = rows
     trayWidthMm: r.usable_load_width_mm ?? null,
     trayState: deriveTrayState(r.kerb_mass_basis, r.body_type),
     trayMassKg: null,
-    promotedByOverride: overrides.show.includes(r.id),
+    promotedByOverride: overrides.show.includes(r.id) && r.verification_status !== 'source_verified',
     source: { manufacturer: r.manufacturer, title: r.title, url: r.url, accessedDate: r.accessed_date },
   }));
 

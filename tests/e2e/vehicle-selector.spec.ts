@@ -1,17 +1,25 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
+
+const catalogue = JSON.parse(
+  readFileSync(fileURLToPath(new URL('../../src/data/vehicle-selector/catalogue.json', import.meta.url)), 'utf8')
+);
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/slide-on-camper-weight-calculator/');
 });
 
 test('picking a vehicle fills the published figures', async ({ page }) => {
+  const variant = catalogue.variants.find((v: any) => v.make === 'Mazda' && v.model === 'BT-50');
+  if (!variant) throw new Error('Expected a Mazda BT-50 variant in the catalogue used by this test.');
+
   await page.selectOption('#vehicleMake', 'Mazda');
   await page.selectOption('#vehicleModel', 'BT-50');
-  const variant = page.locator('#vehicleVariant option').nth(1);
-  await page.selectOption('#vehicleVariant', await variant.getAttribute('value') ?? '');
+  await page.selectOption('#vehicleVariant', variant.id);
 
-  await expect(page.locator('#gvm')).not.toHaveValue('');
-  await expect(page.locator('#currentWeight')).not.toHaveValue('');
+  await expect(page.locator('#gvm')).toHaveValue(String(variant.gvmKg));
+  await expect(page.locator('#currentWeight')).toHaveValue(String(variant.kerbKg));
   await expect(page.locator('#vehicleProvenance')).toContainText('Published by Mazda Australia');
 });
 
@@ -40,6 +48,8 @@ test('the form still works if the catalogue fails to load', async ({ page, conte
   const catalogueTagOpenClose = /(<script[^>]*id="vehicleCatalogueData"[^>]*>)[\s\S]*?(<\/script>)/;
 
   // Case 1: the catalogue element is absent entirely from the markup.
+  const pageErrors: Error[] = [];
+  page.on('pageerror', (err) => pageErrors.push(err));
   await page.route('**/slide-on-camper-weight-calculator/', async (route) => {
     const response = await route.fetch();
     const html = await response.text();
@@ -50,7 +60,10 @@ test('the form still works if the catalogue fails to load', async ({ page, conte
   // Positive evidence the catalogue-absent path actually ran: parseCatalogue()
   // returns an empty catalogue, so the make dropdown has only its placeholder
   // option — none of the 13 real makes it shows when the catalogue loads.
+  // toHaveCount(1) alone can't tell a working guard from a crashed script (both
+  // leave the one server-rendered option), so also assert the script never threw.
   await expect(page.locator('#vehicleMake option')).toHaveCount(1);
+  expect(pageErrors).toEqual([]);
 
   await page.fill('#gvm', '3350');
   await page.fill('#currentWeight', '2200');

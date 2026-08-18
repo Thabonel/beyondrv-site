@@ -2,7 +2,7 @@ import rawCatalogue from '../data/vehicle-selector/catalogue.json' with { type: 
 import { validateVehicleCatalogue } from './vehicleCatalogue/validate.ts';
 import type { VehicleCatalogue } from './vehicleCatalogue/types.ts';
 
-export const VEHICLE_CATALOGUE = rawCatalogue as unknown as VehicleCatalogue;
+const VEHICLE_CATALOGUE = rawCatalogue as unknown as VehicleCatalogue;
 
 export function getVehicleCatalogue(): VehicleCatalogue {
   const validation = validateVehicleCatalogue(VEHICLE_CATALOGUE);

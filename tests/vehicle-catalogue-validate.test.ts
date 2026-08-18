@@ -64,3 +64,10 @@ test('a variant with an empty id is an error', () => {
   const bad = { ...catalogue, variants: [{ ...variant, id: '' }] };
   assert.equal(validateVehicleCatalogue(bad).valid, false);
 });
+
+test('a variant with an empty source accessedDate is an error mentioning the variant id', () => {
+  const bad = { ...catalogue, variants: [{ ...variant, source: { ...variant.source, accessedDate: '' } }] };
+  const result = validateVehicleCatalogue(bad);
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((e) => e.includes(variant.id) && e.includes('accessedDate')));
+});

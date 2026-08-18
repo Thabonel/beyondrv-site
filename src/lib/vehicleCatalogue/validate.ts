@@ -24,6 +24,7 @@ export function validateVehicleCatalogue(catalogue: VehicleCatalogue) {
       errors.push(`Variant ${v.id} refers to a make and model missing from the model index.`);
     }
     if (!v.source?.url) errors.push(`Variant ${v.id} has no source url.`);
+    if (!v.source?.accessedDate) errors.push(`Variant ${v.id} has no source accessedDate.`);
   }
 
   if (catalogue.variants.length === 0) {
