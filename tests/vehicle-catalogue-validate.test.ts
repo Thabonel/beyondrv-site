@@ -52,3 +52,15 @@ test('an empty catalogue is valid but warns', () => {
   assert.equal(result.valid, true);
   assert.ok(result.warnings.length > 0);
 });
+
+test('a variant with an empty source url is an error mentioning the variant id', () => {
+  const bad = { ...catalogue, variants: [{ ...variant, source: { ...variant.source, url: '' } }] };
+  const result = validateVehicleCatalogue(bad);
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((e) => e.includes(variant.id) && e.includes('source url')));
+});
+
+test('a variant with an empty id is an error', () => {
+  const bad = { ...catalogue, variants: [{ ...variant, id: '' }] };
+  assert.equal(validateVehicleCatalogue(bad).valid, false);
+});
