@@ -28,7 +28,7 @@ Together they help an Australian customer identify:
 
 The selector will combine an effective-dated Australian vehicle catalogue, customer-specific measurements, verified Beyond RV camper data, load-position calculations and transparent confidence states. It must never describe a generic model as suitable merely because one variant has adequate published payload.
 
-The research seed contains 136 slide-on/pickup variants and 13 heavy-overland chassis records from 26 primary Australian manufacturer sources, plus a 41-model coverage register. It also demonstrates why the current experience needs stricter data governance:
+The research seed contains 159 slide-on/pickup variants and 13 heavy-overland chassis records from 28 primary Australian manufacturer sources, plus a 41-model coverage register. It also demonstrates why the current experience needs stricter data governance:
 
 - Published payload may exclude the tray.
 - GVM upgrades create a distinct configuration, not an interchangeable number.
