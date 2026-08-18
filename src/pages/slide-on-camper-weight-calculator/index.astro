@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { displayImageUrl } from '../../lib/media';
+import { getVehicleCatalogue } from '../../lib/vehicleCatalogue.ts';
+const vehicleCatalogue = getVehicleCatalogue();
 
 const pageUrl = 'https://beyondrv.com.au/slide-on-camper-weight-calculator/';
 const heroImage = '/images/site/homepage-slide-on-campers.webp';
@@ -96,6 +98,20 @@ const schema = [
     <div class="checker-panel">
       <form class="checker-form" id="slideCalculator">
         <div class="form-field form-field--full">
+          <label class="form-label" for="vehicleMake">Find your vehicle (optional)</label>
+          <div class="vehicle-picker">
+            <select class="form-input" id="vehicleMake"><option value="">Select a make</option></select>
+            <select class="form-input" id="vehicleModel" disabled><option value="">Select a model</option></select>
+            <select class="form-input" id="vehicleVariant" disabled><option value="">Select a variant</option></select>
+          </div>
+          <span class="form-help">
+            Picking a vehicle fills the published figures below. You can change any of them,
+            and a weighbridge figure for your own vehicle is always better than a published one.
+          </span>
+          <div id="vehicleProvenance" class="vehicle-provenance" hidden></div>
+        </div>
+        <script type="application/json" id="vehicleCatalogueData" set:html={JSON.stringify(vehicleCatalogue)}></script>
+        <div class="form-field form-field--full">
           <label class="form-label" for="vehicleName">Vehicle</label>
           <input class="form-input" id="vehicleName" type="text" placeholder="Example: Ford Ranger dual cab" />
         </div>
@@ -107,6 +123,11 @@ const schema = [
           <label class="form-label" for="currentWeight">Current vehicle weight before listed additions (kg)</label>
           <input class="form-input" id="currentWeight" type="number" min="0" placeholder="2200" />
           <span class="form-help">Use a current weighbridge weight if possible. If it already includes passengers or accessories, enter 0 for those items below.</span>
+        </div>
+        <div class="form-field" id="trayMassField" hidden>
+          <label class="form-label" for="trayMass">Tray weight (kg)</label>
+          <input class="form-input" id="trayMass" type="number" min="0" placeholder="120" />
+          <span class="form-help" id="trayMassHelp"></span>
         </div>
         <div class="form-field">
           <label class="form-label" for="passengers">Passengers (kg)</label>
@@ -255,6 +276,136 @@ const schema = [
   const value = (id: string) => inputById(id)?.value ?? '';
   const fmt = (value: number) => `${Math.round(value).toLocaleString()} kg`;
   const fmtMm = (value: number) => `${Math.round(value).toLocaleString()} mm`;
+
+  const catalogueEl = document.getElementById('vehicleCatalogueData');
+  const catalogue = catalogueEl ? JSON.parse(catalogueEl.textContent || '{"models":[],"variants":[]}') : { models: [], variants: [] };
+  const customerEdited = new Set<string>();
+
+  const selectById = (id: string) => document.getElementById(id) as HTMLSelectElement | null;
+
+  function fillSelect(select: HTMLSelectElement | null, values: string[], placeholder: string) {
+    if (!select) return;
+    select.replaceChildren();
+    const first = document.createElement('option');
+    first.value = '';
+    first.textContent = placeholder;
+    select.appendChild(first);
+    for (const value of values) {
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = value;
+      select.appendChild(option);
+    }
+    select.disabled = values.length === 0;
+  }
+
+  function setIfNotEdited(id: string, value: number | null) {
+    if (value === null || customerEdited.has(id)) return;
+    const input = inputById(id);
+    if (input) input.value = String(value);
+  }
+
+  ['gvm', 'currentWeight', 'trayLength', 'trayWidth', 'trayMass'].forEach((id) => {
+    inputById(id)?.addEventListener('input', () => customerEdited.add(id));
+  });
+
+  function formatAccessedDate(iso: string) {
+    const [year, month, day] = iso.split('-').map(Number);
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    return `${day} ${months[month - 1]} ${year}`;
+  }
+
+  function trayLine(trayState: string) {
+    if (trayState === 'included') return 'Kerb mass includes the standard tray.';
+    if (trayState === 'excluded') return 'Kerb mass excludes the tray.';
+    if (trayState === 'not_applicable') return 'This is a tub vehicle, so no tray applies.';
+    return 'The manufacturer does not state whether kerb mass includes a tray.';
+  }
+
+  function renderProvenance(variant: any) {
+    const panel = byId('vehicleProvenance');
+    if (!panel) return;
+    panel.replaceChildren();
+
+    const line = document.createElement('p');
+    const link = document.createElement('a');
+    link.href = variant.source.url;
+    link.textContent = variant.source.title;
+    link.rel = 'noopener';
+    link.target = '_blank';
+    line.append(
+      document.createTextNode(`Published by ${variant.source.manufacturer} in `),
+      link,
+      document.createTextNode(`, checked ${formatAccessedDate(variant.source.accessedDate)}. ${trayLine(variant.trayState)}`),
+    );
+    panel.appendChild(line);
+
+    if (variant.promotedByOverride) {
+      const note = document.createElement('p');
+      note.className = 'vehicle-provenance-note';
+      note.textContent = 'This variant was published to the selector manually by Beyond RV.';
+      panel.appendChild(note);
+    }
+
+    (panel as HTMLElement).hidden = false;
+  }
+
+  function applyVariant(variantId: string) {
+    const variant = catalogue.variants.find((v: any) => v.id === variantId);
+    if (!variant) return;
+    setIfNotEdited('gvm', variant.gvmKg);
+    setIfNotEdited('currentWeight', variant.kerbKg);
+    setIfNotEdited('trayLength', variant.trayLengthMm);
+    setIfNotEdited('trayWidth', variant.trayWidthMm);
+
+    const nameInput = inputById('vehicleName');
+    if (nameInput && !customerEdited.has('vehicleName')) nameInput.value = variant.label;
+
+    const trayField = byId('trayMassField');
+    const trayHelp = byId('trayMassHelp');
+    const showTray = variant.trayState === 'excluded' || variant.trayState === 'unknown';
+    if (trayField) (trayField as HTMLElement).hidden = !showTray;
+    if (trayHelp) {
+      trayHelp.textContent = variant.trayState === 'excluded'
+        ? 'The published kerb weight for this vehicle excludes the tray, so enter your tray weight here.'
+        : 'The manufacturer does not state whether the published kerb weight includes a tray. If your vehicle has one, enter its weight here.';
+    }
+    renderProvenance(variant);
+    calculateSlideOn();
+  }
+
+  selectById('vehicleMake')?.addEventListener('change', (event) => {
+    const make = (event.target as HTMLSelectElement).value;
+    const models = catalogue.models.filter((m: any) => m.make === make).map((m: any) => m.model);
+    fillSelect(selectById('vehicleModel'), models, 'Select a model');
+    fillSelect(selectById('vehicleVariant'), [], 'Select a variant');
+  });
+
+  selectById('vehicleModel')?.addEventListener('change', (event) => {
+    const make = selectById('vehicleMake')?.value;
+    const model = (event.target as HTMLSelectElement).value;
+    const variants = catalogue.variants.filter((v: any) => v.make === make && v.model === model);
+    const select = selectById('vehicleVariant');
+    if (!select) return;
+    select.replaceChildren();
+    const first = document.createElement('option');
+    first.value = '';
+    first.textContent = 'Select a variant';
+    select.appendChild(first);
+    for (const variant of variants) {
+      const option = document.createElement('option');
+      option.value = variant.id;
+      option.textContent = variant.label;
+      select.appendChild(option);
+    }
+    select.disabled = variants.length === 0;
+  });
+
+  selectById('vehicleVariant')?.addEventListener('change', (event) => {
+    applyVariant((event.target as HTMLSelectElement).value);
+  });
+
+  fillSelect(selectById('vehicleMake'), [...new Set<string>(catalogue.models.map((m: any) => m.make))].sort(), 'Select a make');
   type SlideOnResultValues = {
     availablePayloadBeforeCamper?: number;
     estimatedLoadedVehicleWeight?: number;
