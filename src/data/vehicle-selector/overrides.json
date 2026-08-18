@@ -1,0 +1,5 @@
+{
+  "show": [],
+  "hide": [],
+  "note": "show forces a variant into the picker even when flagged. hide removes one. An id in both is hidden. Record why in the commit message."
+}
