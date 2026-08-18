@@ -378,6 +378,16 @@ const schema = [
     (panel as HTMLElement).hidden = false;
   }
 
+  // A hidden tray field must never contribute to the calculation, even if the
+  // customer had typed a value into it for a previously selected vehicle —
+  // so this clears the value and drops it from customerEdited, not just
+  // hides the field.
+  function clearTrayMass() {
+    const trayInput = inputById('trayMass');
+    if (trayInput) trayInput.value = '';
+    customerEdited.delete('trayMass');
+  }
+
   function resetVehicleSelection() {
     PREFILLABLE_FIELDS.forEach((id) => {
       if (customerEdited.has(id)) return;
@@ -386,6 +396,7 @@ const schema = [
     });
     const trayField = byId('trayMassField');
     if (trayField) (trayField as HTMLElement).hidden = true;
+    clearTrayMass();
     const panel = byId('vehicleProvenance');
     if (panel) {
       panel.replaceChildren();
@@ -409,6 +420,7 @@ const schema = [
     const trayHelp = byId('trayMassHelp');
     const showTray = variant.trayState === 'excluded' || variant.trayState === 'unknown';
     if (trayField) (trayField as HTMLElement).hidden = !showTray;
+    if (!showTray) clearTrayMass();
     if (trayHelp) {
       trayHelp.textContent = variant.trayState === 'excluded'
         ? 'The published kerb weight for this vehicle excludes the tray. Enter your tray weight here and it will be added to the vehicle weight — do not count it again under accessories.'
@@ -487,16 +499,20 @@ const schema = [
   }
 
   // The tray is part of the vehicle's mass before the listed additions, so it
-  // is folded into currentVehicleWeight rather than passed separately. A blank
-  // or non-numeric tray mass counts as 0kg. A blank or non-numeric current
-  // weight is left untouched so the existing missing-field path is unchanged.
+  // is folded into currentVehicleWeight rather than passed separately. Only a
+  // finite, positive current weight is summed — mirroring parseRequired's own
+  // `> 0` gate inside the calculator — so a blank, zero or negative value
+  // passes straight through and still hits the existing missing-field path
+  // unchanged. Only a finite, non-negative tray mass is added; a blank,
+  // non-numeric or negative tray mass counts as 0kg rather than being summed
+  // in, so a negative tray entry can never understate the vehicle's weight.
   function currentVehicleWeightWithTray() {
     const currentWeightRaw = value('currentWeight');
     const currentWeightNumber = Number(currentWeightRaw);
-    if (currentWeightRaw === '' || !Number.isFinite(currentWeightNumber)) return currentWeightRaw;
+    if (!Number.isFinite(currentWeightNumber) || currentWeightNumber <= 0) return currentWeightRaw;
     const trayMassRaw = value('trayMass');
     const trayMassNumber = Number(trayMassRaw);
-    const trayMass = trayMassRaw !== '' && Number.isFinite(trayMassNumber) ? trayMassNumber : 0;
+    const trayMass = trayMassRaw !== '' && Number.isFinite(trayMassNumber) && trayMassNumber >= 0 ? trayMassNumber : 0;
     return String(currentWeightNumber + trayMass);
   }
 

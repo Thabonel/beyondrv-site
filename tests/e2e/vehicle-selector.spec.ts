@@ -102,3 +102,91 @@ test('the form still works when no vehicle is picked', async ({ page }) => {
   await expect(page.locator('#gvm')).toHaveValue('3350');
   await expect(page.locator('#trayMassField')).toBeHidden();
 });
+
+test('tray weight sums into the vehicle weight, but a negative entry cannot reduce it', async ({ page }) => {
+  // Ford Ranger XL double cab (single turbo): kerb mass excludes the tray,
+  // so the tray field is shown and published kerb mass pre-fills at 2046kg.
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
+  await expect(page.locator('#trayMassField')).toBeVisible();
+
+  // Every other required field is set to 1kg (parseRequired demands > 0
+  // throughout the calculator, so 0 would itself trigger the missing-field
+  // path) so #loadedWeight reads back the combined current-weight-plus-tray
+  // figure plus a fixed, known 7kg of other additions.
+  await page.fill('#gvm', '5000');
+  await page.fill('#passengers', '1');
+  await page.fill('#accessories', '1');
+  await page.fill('#luggageGear', '1');
+  await page.fill('#camperDry', '1');
+  await page.fill('#camperWater', '1');
+  await page.fill('#camperGear', '1');
+  await page.fill('#camperOptions', '1');
+  await page.fill('#trayLength', '2000');
+  await page.fill('#trayWidth', '1800');
+  await page.fill('#requiredTrayLength', '1900');
+  await page.fill('#requiredTrayWidth', '1700');
+  await page.check('#rearAxleChecked');
+  await page.check('#tyreRatingsChecked');
+  await page.check('#centreOfGravityChecked');
+
+  // Ordinary case: 2046kg current weight + 120kg tray + 7kg fixed additions = 2173kg.
+  await page.fill('#trayMass', '120');
+  await expect(page.locator('#loadedWeight')).toHaveText(/2,?173 kg/);
+
+  // A negative tray entry must not reduce the vehicle weight below the
+  // published figure — it is treated as 0kg, not subtracted: 2046kg + 7kg = 2053kg.
+  await page.fill('#trayMass', '-50');
+  await expect(page.locator('#loadedWeight')).toHaveText(/2,?053 kg/);
+});
+
+test('a zero current vehicle weight still needs review even with a tray entered', async ({ page }) => {
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
+
+  await page.fill('#currentWeight', '0');
+  await page.fill('#trayMass', '120');
+
+  // A zero current weight must still fall into the missing-field path, not
+  // silently be replaced by the tray weight alone.
+  await expect(page.locator('#resultSummary')).toContainText('Needs review');
+  await expect(page.locator('#loadedWeight')).toHaveText('0 kg');
+});
+
+test('an invisible tray value from a previous vehicle cannot leak into the calculation', async ({ page }) => {
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
+  await expect(page.locator('#trayMassField')).toBeVisible();
+  await page.fill('#trayMass', '150');
+
+  // Switch to a variant whose kerb mass already includes the tray (same make
+  // and model, so this exercises applyVariant's hide path, not the broader
+  // make/model reset). The field must hide, and the old tray entry must not
+  // survive hidden.
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-pickup-singleturbo');
+  await expect(page.locator('#trayMassField')).toBeHidden();
+  await expect(page.locator('#trayMass')).toHaveValue('');
+
+  await page.fill('#gvm', '5000');
+  await page.fill('#passengers', '1');
+  await page.fill('#accessories', '1');
+  await page.fill('#luggageGear', '1');
+  await page.fill('#camperDry', '1');
+  await page.fill('#camperWater', '1');
+  await page.fill('#camperGear', '1');
+  await page.fill('#camperOptions', '1');
+  await page.fill('#trayLength', '2000');
+  await page.fill('#trayWidth', '1800');
+  await page.fill('#requiredTrayLength', '1900');
+  await page.fill('#requiredTrayWidth', '1700');
+  await page.check('#rearAxleChecked');
+  await page.check('#tyreRatingsChecked');
+  await page.check('#centreOfGravityChecked');
+
+  // 2201kg published kerb mass + 7kg fixed additions = 2208kg, with no 150kg
+  // carried over from the previous vehicle's tray.
+  await expect(page.locator('#loadedWeight')).toHaveText(/2,?208 kg/);
+});
