@@ -4,10 +4,10 @@ category: caravan
 tagline: Compact hardtop couples van for buyers who want a lighter off-road setup.
 price: $39,999
 priceBadge: IMMEDIATE DELIVERY
-status: on-sale
+status: available
 onlinePurchaseEnabled: true
-onSale: true
-featured: true
+onSale: false
+featured: false
 heroImage: /images/optimized/products/sunpatch-12c-couples-caravan/01-sunpatch-12c-couples-caravan-hero.webp
 gallery:
   - /images/optimized/products/sunpatch-12c-couples-caravan/03-img-0941.webp
@@ -156,6 +156,12 @@ suitabilityData:
   status: draft
 archived: true
 archivedAt: 2026-08-18T00:42:18.388Z
+availability: available_in_australia
+purchasableOnline: false
+depositEnabled: false
+fullPaymentEnabled: false
+sourceType: other
+containerEligible: false
 ---
 
 The **Sunpatch 12C** is the compact couples option in the Beyond RV caravan range, priced at the owner-confirmed $39,999.
