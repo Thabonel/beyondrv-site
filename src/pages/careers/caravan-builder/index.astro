@@ -1,0 +1,244 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+const SITE = 'https://beyondrv.com.au';
+const PAGE_URL = `${SITE}/careers/caravan-builder/`;
+const POSTER = '/images/site/careers-caravan-builder.jpg';
+
+// Google removes a JobPosting from Jobs search once validThrough passes.
+// Bump this date if the role is still open, or unpublish the page once it is filled.
+const DATE_POSTED = '2026-08-19';
+const VALID_THROUGH = '2026-11-19';
+
+const APPLY_EMAIL = 'beyondcaravans@gmail.com';
+const APPLY_MAILTO =
+  `mailto:${APPLY_EMAIL}?subject=${encodeURIComponent('Application: Caravan & Slide-On Camper Builder')}`;
+
+const jobPosting = {
+  '@context': 'https://schema.org',
+  '@type': 'JobPosting',
+  title: 'Experienced Caravan & Slide-On Camper Builder',
+  description:
+    '<p>Beyond RV is expanding its factory team to meet strong demand. We are seeking one experienced caravan or slide-on camper builder to join our team in Mutdapilly, Queensland.</p>' +
+    '<p>You will help build and complete high-quality caravans and slide-on campers in a practical, safety-focused factory environment. Depending on your experience, your work may include caravan and slide-on camper assembly, interior fit-out and finishing, cabinetry and furniture installation, aluminium or steel fabrication, plumbing and appliance installation, sealing, waterproofing and exterior finishing, diagnosing and correcting construction or fit-out problems, and final quality inspections and preparation for delivery.</p>' +
+    '<p>Electrical installation is handled by Beyond RV’s experienced electrician and is not part of this position. All tools required for the position are provided.</p>' +
+    '<p>We are looking for at least two years of hands-on experience building caravans, RVs, campers or similar products, strong practical skills, excellent attention to detail, the ability to work safely and follow established production processes, reliable attendance, and Australian working rights. A relevant trade qualification is preferred but not essential where an applicant can demonstrate substantial practical experience and high-quality work.</p>',
+  identifier: {
+    '@type': 'PropertyValue',
+    name: 'Beyond RV',
+    value: 'BRV-CARAVAN-BUILDER-2026',
+  },
+  datePosted: DATE_POSTED,
+  validThrough: `${VALID_THROUGH}T23:59:59+10:00`,
+  employmentType: 'FULL_TIME',
+  hiringOrganization: {
+    '@type': 'Organization',
+    name: 'Beyond RV',
+    sameAs: SITE,
+    logo: `${SITE}/images/site/logo.png`,
+  },
+  jobLocation: {
+    '@type': 'Place',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '77 Coleyville Road',
+      addressLocality: 'Mutdapilly',
+      addressRegion: 'QLD',
+      postalCode: '4307',
+      addressCountry: 'AU',
+    },
+  },
+  baseSalary: {
+    '@type': 'MonetaryAmount',
+    currency: 'AUD',
+    value: {
+      '@type': 'QuantitativeValue',
+      minValue: 30,
+      maxValue: 50,
+      unitText: 'HOUR',
+    },
+  },
+  totalJobOpenings: 1,
+  industry: 'Recreational Vehicle Manufacturing',
+  qualifications:
+    'At least two years of hands-on experience building caravans, RVs, campers or similar products. A relevant trade qualification is preferred but not essential.',
+  skills:
+    'Caravan assembly, slide-on camper construction, interior fit-out, cabinetry, aluminium and steel fabrication, plumbing, sealing and waterproofing, exterior finishing, quality inspection',
+  directApply: false,
+  url: PAGE_URL,
+};
+
+const webPage = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'Experienced Caravan & Slide-On Camper Builder | Careers | Beyond RV',
+  url: PAGE_URL,
+  description:
+    'Beyond RV is hiring one experienced caravan or slide-on camper builder for its Mutdapilly, Queensland factory. Permanent full-time, $30–$50 per hour plus superannuation.',
+};
+
+const duties = [
+  'Caravan and slide-on camper assembly',
+  'Interior fit-out and finishing',
+  'Cabinetry and furniture installation',
+  'Aluminium or steel fabrication',
+  'Plumbing and appliance installation',
+  'Sealing, waterproofing and exterior finishing',
+  'Diagnosing and correcting construction or fit-out problems',
+  'Final quality inspections and preparation for delivery',
+];
+
+const criteria = [
+  'At least two years of hands-on experience building caravans, RVs, campers or similar products',
+  'Proven experience in caravan or slide-on camper construction',
+  'Strong practical skills across one or more areas such as cabinetry, fabrication, plumbing, assembly, sealing or finishing',
+  'Excellent attention to detail',
+  'Pride in producing high-quality workmanship',
+  'The ability to work safely and follow established production processes',
+  'Reliable attendance and the ability to travel to our Mutdapilly factory each working day',
+  'A positive attitude and the ability to contribute effectively within a factory team',
+  'Australian working rights',
+];
+
+const applicationDetails = [
+  'Your caravan, RV or camper-building experience',
+  'The areas of construction in which you are most skilled',
+  'Any relevant qualifications or licences',
+  'Examples or photographs of previous work, where available',
+  'Your current location and availability to start',
+];
+---
+<BaseLayout
+  title="Experienced Caravan & Slide-On Camper Builder | Careers | Beyond RV"
+  description="Beyond RV is hiring one experienced caravan or slide-on camper builder in Mutdapilly, QLD. Permanent full-time, $30–$50 per hour plus super. All tools provided."
+  image={POSTER}
+  activePath="/careers/"
+  structuredData={[webPage, jobPosting]}
+>
+  <section class="page-hero page-hero--short">
+    <div class="hero-overlay" style="background: rgba(10,10,10,0.425)"></div>
+    <div class="page-hero-content">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">We're Hiring</span>
+      </div>
+      <h1 class="hero-title">Experienced Caravan &amp;<br><span class="accent">Slide-On Camper Builder.</span></h1>
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="page-content">
+      <p>
+        Beyond RV is expanding its factory team to meet strong demand. We are seeking one experienced
+        caravan or slide-on camper builder to join our team in Mutdapilly, Queensland.
+      </p>
+
+      <p style="margin: 2rem 0;">
+        <a class="btn-primary" href={APPLY_MAILTO}>Apply Now</a>
+      </p>
+
+      <h2>Position Details</h2>
+      <ul>
+        <li><strong>Location:</strong> 77 Coleyville Road, Mutdapilly QLD 4307</li>
+        <li><strong>Employment:</strong> Permanent full-time</li>
+        <li><strong>Pay:</strong> $30–$50 per hour plus superannuation</li>
+        <li>
+          <strong>Hours:</strong> Monday to Friday, generally 8:00 am–5:00 pm, with a one-hour lunch
+          break from 12:00 pm–1:00 pm
+        </li>
+        <li><strong>Saturday work:</strong> Optional Saturday work may be available by agreement</li>
+        <li><strong>Positions available:</strong> One</li>
+      </ul>
+      <p>
+        The final hourly rate will be based on relevant experience, practical ability, qualifications
+        and the demonstrated quality of your work.
+      </p>
+      <p>
+        Applicants seeking the upper end of the pay range should have approximately 5–10 years of
+        proven experience producing high-quality caravans, RVs, slide-on campers or similar products.
+      </p>
+
+      <h2>About the Role</h2>
+      <p>
+        You will help build and complete high-quality caravans and slide-on campers in a practical,
+        safety-focused factory environment.
+      </p>
+      <p>Depending on your experience, your work may include:</p>
+      <ul>
+        {duties.map((duty) => <li>{duty}</li>)}
+      </ul>
+      <p>
+        Electrical installation is handled by Beyond RV's experienced electrician and is not part of
+        this position.
+      </p>
+
+      <figure class="job-poster">
+        <picture>
+          <source
+            type="image/webp"
+            srcset="/images/site/careers-caravan-builder-480.webp 480w, /images/site/careers-caravan-builder-800.webp 800w, /images/site/careers-caravan-builder-1122.webp 1122w"
+            sizes="(max-width: 800px) 100vw, 800px"
+          />
+          <img
+            src={POSTER}
+            width="1122"
+            height="1402"
+            loading="lazy"
+            decoding="async"
+            alt="Beyond RV recruitment poster: hiring an experienced caravan and slide-on camper builder in Mutdapilly, Queensland. Permanent full-time, $30 to $50 per hour plus super, Monday to Friday 8am to 5pm, all tools provided. Apply to beyondcaravans@gmail.com."
+          />
+        </picture>
+        <figcaption>Share this ad — the full details are on this page.</figcaption>
+      </figure>
+
+      <h2>What We're Looking For</h2>
+      <p>The successful applicant will ideally have:</p>
+      <ul>
+        {criteria.map((item) => <li>{item}</li>)}
+      </ul>
+      <p>
+        A relevant trade qualification is preferred but not essential where an applicant can
+        demonstrate substantial practical experience and high-quality work.
+      </p>
+      <p>All tools required for the position are provided.</p>
+      <p>Relocation assistance and temporary accommodation are not available.</p>
+      <p>
+        We welcome applications from experienced workers affected by caravan-industry redundancies or
+        business closures, as well as all other suitably qualified applicants.
+      </p>
+
+      <h2>How to Apply</h2>
+      <p>
+        Email your résumé and a short summary of your relevant experience to{' '}
+        <a href={APPLY_MAILTO}>{APPLY_EMAIL}</a>.
+      </p>
+      <p>Please include details of:</p>
+      <ul>
+        {applicationDetails.map((item) => <li>{item}</li>)}
+      </ul>
+      <p>Only applicants with Australian working rights will be considered.</p>
+
+      <p style="margin: 2.5rem 0 0;">
+        <a class="btn-primary" href={APPLY_MAILTO}>Email Your Résumé</a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .job-poster {
+    margin: 3rem 0;
+  }
+  .job-poster img {
+    display: block;
+    width: 100%;
+    max-width: 620px;
+    height: auto;
+    border: 1px solid var(--border);
+  }
+  .job-poster figcaption {
+    margin-top: 0.75rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+</style>

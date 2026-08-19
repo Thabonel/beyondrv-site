@@ -1,0 +1,100 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const SITE = 'https://beyondrv.com.au';
+
+// Add a role here when a new ad goes live; remove it once the position is filled.
+const openRoles = [
+  {
+    title: 'Experienced Caravan & Slide-On Camper Builder',
+    href: '/careers/caravan-builder/',
+    type: 'Permanent full-time',
+    summary:
+      'Build and finish high-quality caravans and slide-on campers at our Mutdapilly factory. $30–$50 per hour plus superannuation, all tools provided.',
+  },
+];
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Careers | Beyond RV',
+  url: `${SITE}/careers/`,
+  description:
+    'Current job openings at Beyond RV, builders of Australian caravans, slide-on campers and expedition vehicles in Mutdapilly, Queensland.',
+};
+---
+<BaseLayout
+  title="Careers | Beyond RV"
+  description="Current job openings at Beyond RV in Mutdapilly, Queensland. We build Australian caravans, slide-on campers and expedition vehicles."
+  activePath="/careers/"
+  structuredData={schema}
+>
+  <section class="page-hero page-hero--short">
+    <div class="hero-overlay" style="background: rgba(10,10,10,0.425)"></div>
+    <div class="page-hero-content">
+      <div class="section-eyebrow">
+        <div class="section-eyebrow-line"></div>
+        <span class="section-eyebrow-text">Careers</span>
+      </div>
+      <h1 class="hero-title">Build For Where<br><span class="accent">Roads End.</span></h1>
+    </div>
+  </section>
+
+  <section class="authority-section">
+    <div class="container">
+      <div class="authority-copy">
+        <h2>Current Openings</h2>
+        <p>
+          Beyond RV builds caravans, slide-on campers and expedition vehicles at our factory at
+          77 Coleyville Road, Mutdapilly, Queensland. Our team works on units that are expected to hold
+          together a long way from the nearest workshop, so we hire people who take pride in getting
+          the details right.
+        </p>
+      </div>
+
+      {openRoles.length === 0 ? (
+        <p class="careers-none">
+          We have no advertised positions at the moment. You are welcome to send your résumé to{' '}
+          <a href="mailto:beyondcaravans@gmail.com">beyondcaravans@gmail.com</a> so we can contact
+          you when something opens up.
+        </p>
+      ) : (
+        <div class="authority-grid roles-grid">
+          {openRoles.map((role) => (
+            <a class="authority-card" href={role.href}>
+              <span class="authority-card-kicker">{role.type}</span>
+              <h3>{role.title}</h3>
+              <p>{role.summary}</p>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <section class="authority-section authority-section--dark">
+    <div class="container authority-copy">
+      <h2>General Enquiries</h2>
+      <p>
+        If none of our advertised roles suit but you have relevant caravan, RV or fabrication
+        experience, email your résumé and a short summary of your work to{' '}
+        <a href="mailto:beyondcaravans@gmail.com">beyondcaravans@gmail.com</a>.
+      </p>
+      <p>Only applicants with Australian working rights will be considered.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* One open role should not sit in a third of the row. */
+  .roles-grid {
+    margin-top: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+  .careers-none {
+    margin-top: 2rem;
+    color: rgba(240, 235, 227, 0.76);
+    font-size: 0.95rem;
+    line-height: 1.75;
+  }
+</style>

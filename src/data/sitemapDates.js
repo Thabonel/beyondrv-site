@@ -4,6 +4,8 @@ export const SITEMAP_LASTMOD = Object.freeze({
   '/': '2026-07-29',
   '/about-us/': '2026-07-29',
   '/custom/': '2026-07-29',
+  '/careers/': '2026-08-19',
+  '/careers/caravan-builder/': '2026-08-19',
   '/warranty/': '2026-07-29',
   '/guides/': '2026-07-29',
   '/guides/best-utes-for-slide-on-campers/': '2026-07-29',
