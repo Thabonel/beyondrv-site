@@ -1,4 +1,4 @@
-import { parse, stringify } from 'yaml';
+import { parse, stringify, Scalar } from 'yaml';
 
 export function isSafeProductSlug(slug: string) {
   return /^[a-z0-9][a-z0-9/-]*[a-z0-9]$/.test(slug) && !slug.includes('..') && !slug.includes('//');
@@ -26,7 +26,13 @@ export function archiveProductMarkdown(content: string, archivedAt: string) {
   }
 
   data.archived = true;
-  data.archivedAt = archivedAt;
+  // Quote the timestamp explicitly. This package follows YAML 1.2, which has no
+  // implicit timestamp type, so it would emit a bare ISO string. Astro reads
+  // frontmatter with gray-matter (js-yaml, YAML 1.1), where a bare ISO string
+  // parses as a Date and fails the z.string() content schema, breaking the build.
+  const archivedAtScalar = new Scalar(archivedAt);
+  archivedAtScalar.type = Scalar.QUOTE_DOUBLE;
+  data.archivedAt = archivedAtScalar;
 
   return {
     content: `---\n${stringify(data, { lineWidth: 0 }).trimEnd()}\n---\n\n${(match[2] ?? '').trimStart()}`,

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { parse } from 'yaml';
+import matter from 'gray-matter';
 import {
   archiveProductMarkdown,
   isSafeProductSlug,
@@ -33,6 +34,25 @@ Product body remains available for records.
   assert.equal(data.archived, true);
   assert.equal(data.archivedAt, archivedAt);
   assert.match(result.content, /Product body remains available for records\./);
+});
+
+test('archived timestamp stays a string when Astro parses the frontmatter', () => {
+  const current = `---
+title: Sold Camper
+status: on-sale
+---
+
+Body.
+`;
+  const result = archiveProductMarkdown(current, '2026-08-18T00:42:18.388Z');
+
+  // Astro reads content frontmatter with gray-matter (js-yaml, YAML 1.1), which
+  // has an implicit timestamp type. The content schema declares archivedAt as
+  // z.string(), so an unquoted ISO value parses to a Date and fails the build.
+  const data = matter(result.content).data as Record<string, unknown>;
+
+  assert.equal(typeof data.archivedAt, 'string');
+  assert.equal(data.archivedAt, '2026-08-18T00:42:18.388Z');
 });
 
 test('archive is idempotent for an already archived product', () => {
