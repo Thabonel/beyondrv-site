@@ -1,6 +1,12 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { toIsoDateString } from './lib/contentDates';
+
+// Frontmatter dates arrive as a Date when the value is written unquoted, because
+// Astro parses with js-yaml's YAML 1.1 schema. Coerce before validating so one
+// unquoted timestamp cannot fail the build. See src/lib/contentDates.ts.
+const dateString = z.preprocess(toIsoDateString, z.string());
 
 const specRow = z.object({ label: z.string(), value: z.string() });
 const specGroup = z.object({ group: z.string(), items: z.array(specRow) });
@@ -16,7 +22,7 @@ const youtubeVideo = z.object({
   title: z.string(),
   description: z.string().optional(),
   thumbnail: z.string().optional(),
-  uploadDate: z.string().optional(),
+  uploadDate: dateString.optional(),
   duration: z.string().optional(),
   startSeconds: z.number().int().nonnegative().optional(),
   transcriptSummary: z.string().optional(),
@@ -41,7 +47,7 @@ function availabilityFromStatus(status: 'available' | 'on-sale' | 'coming-soon')
 const vehicleProduct = z.object({
   store:         z.literal(false).optional(),
   archived:      z.boolean().default(false),
-  archivedAt:    z.string().optional(),
+  archivedAt:    dateString.optional(),
   title:         z.string(),
   compareAtPrice: z.string().optional(),
   saleLabel:     z.string().optional(),
@@ -58,7 +64,7 @@ const vehicleProduct = z.object({
   sourceType:    z.enum(['china_container', 'local_supplier', 'workshop_stock', 'custom_made_to_order', 'other']).optional(),
   leadTimeText:  z.string().optional(),
   containerEtaText: z.string().optional(),
-  containerEtaDate: z.string().optional(),
+  containerEtaDate: dateString.optional(),
   onSale:        z.boolean().default(false),
   featured:      z.boolean().default(false),
   heroImage:     z.string(),
@@ -93,7 +99,7 @@ const vehicleProduct = z.object({
 const shopBase = {
   store:       z.literal(true),
   archived:    z.boolean().default(false),
-  archivedAt:  z.string().optional(),
+  archivedAt:  dateString.optional(),
   name:        z.string().min(1),
   title:       z.string().optional(),
   slug:        z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
@@ -114,7 +120,7 @@ const shopBase = {
   sourceType:   z.enum(['china_container', 'local_supplier', 'workshop_stock', 'custom_made_to_order', 'other']).optional(),
   leadTimeText: z.string().optional(),
   containerEtaText: z.string().optional(),
-  containerEtaDate: z.string().optional(),
+  containerEtaDate: dateString.optional(),
   priceBadge:   z.string().optional(),
   depositEnabled: z.boolean().optional(),
   fullPaymentEnabled: z.boolean().optional(),
