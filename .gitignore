@@ -75,3 +75,6 @@ floorplanafphoto.afphoto
 mockup.html
 mog2.jpg
 unimog-hero.jpg
+
+# Unredacted ops inventory — private artifact only, never commit to a public repo
+docs/stack-inventory.html
