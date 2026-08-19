@@ -155,7 +155,7 @@ seoDesc: The Sunpatch 12C is a compact hardtop couples off-road van available fr
 suitabilityData:
   status: draft
 archived: true
-archivedAt: 2026-08-18T00:42:18.388Z
+archivedAt: "2026-08-18T00:42:18.388Z"
 availability: available_in_australia
 purchasableOnline: false
 depositEnabled: false
