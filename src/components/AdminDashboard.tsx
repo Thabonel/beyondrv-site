@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { adminFetch, adminJson, clearAdminToken } from '../lib/adminApi';
+import { activeReminders } from '../lib/adminReminders';
 
 type HealthStatus = 'ready' | 'warning' | 'blocker' | 'unavailable' | 'error';
 
@@ -391,6 +392,31 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
 
   return (
     <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.85rem', display: 'grid', gap: '0.85rem', alignContent: 'start' }}>
+      {activeReminders(new Date()).map((reminder) => (
+        <div
+          key={reminder.id}
+          style={{
+            background: '#1a1206',
+            border: '1px solid #fb923c',
+            borderLeft: '3px solid #fb923c',
+            borderRadius: '8px',
+            padding: '0.8rem 0.9rem',
+            display: 'grid',
+            gap: '0.3rem',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <span style={{ color: '#fb923c', fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+              Action needed
+            </span>
+            <span style={{ color: '#888', fontSize: '0.66rem' }}>
+              by {new Date(reminder.dueDate).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })}
+            </span>
+          </div>
+          <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.86rem' }}>{reminder.title}</div>
+          <div style={{ color: '#bbb', fontSize: '0.74rem', lineHeight: 1.55 }}>{reminder.detail}</div>
+        </div>
+      ))}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
         <div>
           <div style={{ color: '#fff', fontWeight: 800 }}>Business Dashboard</div>
