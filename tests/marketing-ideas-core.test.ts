@@ -9,11 +9,23 @@ test('marketing ideas built from the same insight title reuse one id', () => {
   const second = marketingIdeaId('  Promote the Advent 2450 to towing families  ');
 
   assert.equal(first, second);
-  assert.equal(first, 'marketing_idea_promote-the-advent-2450-to-towing-families');
+  assert.match(first, /^marketing_idea_promote-the-advent-2450-to-towing-families_[a-z0-9]+$/);
 });
 
 test('marketing ideas built from different insight titles get different ids', () => {
   assert.notEqual(marketingIdeaId('Promote the Advent 2450'), marketingIdeaId('Promote the Sunpatch 15'));
+});
+
+test('marketing idea titles that slug identically but differ still get different ids', () => {
+  // Differ only in punctuation: the slug is the same for both.
+  assert.notEqual(marketingIdeaId('Promote the Advent 2450'), marketingIdeaId('Promote the Advent 2450!'));
+});
+
+test('marketing idea titles sharing a long prefix past the slug limit still get different ids', () => {
+  // Titles are capped at 120 characters upstream while the slug truncates at 80,
+  // so two titles can share every sluggable character and still be different.
+  const prefix = 'promote the advent twenty four fifty to towing families across regional australia now';
+  assert.notEqual(marketingIdeaId(`${prefix} alpha`), marketingIdeaId(`${prefix} beta`));
 });
 
 test('marketing idea titles with no sluggable characters still get distinct stable ids', () => {

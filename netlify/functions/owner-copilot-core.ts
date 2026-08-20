@@ -316,9 +316,12 @@ export function marketingIdeaId(title: string) {
     .replace(/^-+|-+$/g, '')
     .slice(0, 80)
     .replace(/-+$/, '');
-  // A title of punctuation alone leaves no slug, so fall back to a fingerprint
-  // rather than letting every such title collide on one key.
-  return `marketing_idea_${slug || titleFingerprint(trimmed)}`;
+  // The slug is lossy: it drops punctuation and truncates at 80 characters, so two
+  // different titles can reduce to the same one. Always append a fingerprint of the
+  // full title so distinct titles never share a key, and keep the slug in front so
+  // the stored key stays readable.
+  const fingerprint = titleFingerprint(trimmed);
+  return slug ? `marketing_idea_${slug}_${fingerprint}` : `marketing_idea_${fingerprint}`;
 }
 
 export function buildMarketingIdea(

@@ -7,7 +7,7 @@ const insight = {
   priority: 'high',
 };
 
-const IDEA_ID = 'marketing_idea_promote-the-advent-2450-to-towing-families';
+const IDEA_ID = 'marketing_idea_promote-the-advent-2450-to-towing-families_1a2b3c';
 
 const dashboard = {
   generatedAt: '2026-08-21T00:00:00.000Z',
@@ -103,15 +103,21 @@ test('a dashboard marketing insight can be saved and moved through its review st
   await expect(insightCard.getByTestId('marketing-insight-priority')).toHaveText('High');
   await expect(ideaRow.getByTestId('marketing-idea-priority')).toHaveText('High');
 
-  // The insight's button flips to a disabled saved state, so it cannot be double-saved.
+  // The insight's button stays live so a regenerated insight can refresh the record.
   const savedButton = insightCard.getByRole('button');
-  await expect(savedButton).toBeDisabled();
-  await expect(savedButton).toHaveText('Saved · idea');
+  await expect(savedButton).toBeEnabled();
+  await expect(savedButton).toHaveText('Update saved idea');
+
+  // Re-saving posts the insight again rather than being blocked.
+  await savedButton.click();
+  await expect.poll(() => writes.length).toBe(2);
+  expect(writes[1].method).toBe('POST');
+  expect(writes[1].payload).toMatchObject({ title: insight.title, evidence: insight.evidence });
 
   // Changing the status patches only the id and the new status.
   await ideaRow.getByRole('combobox').selectOption('approved');
-  await expect.poll(() => writes.length).toBe(2);
-  expect(writes[1].method).toBe('PATCH');
-  expect(writes[1].payload).toEqual({ id: IDEA_ID, status: 'approved' });
+  await expect.poll(() => writes.length).toBe(3);
+  expect(writes[2].method).toBe('PATCH');
+  expect(writes[2].payload).toEqual({ id: IDEA_ID, status: 'approved' });
   await expect(ideaRow.getByRole('combobox')).toHaveValue('approved');
 });
