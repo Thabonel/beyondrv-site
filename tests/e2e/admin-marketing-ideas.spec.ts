@@ -81,6 +81,10 @@ test('a dashboard marketing insight can be saved and moved through its review st
   await expect(insightCard).toHaveCount(1);
   await expect(page.getByText('No saved ideas yet.', { exact: false })).toBeVisible();
 
+  // Each dashboard panel explains itself under its heading.
+  await expect(page.getByText('Insights you kept, tracked from idea through drafted, approved, and published.')).toBeVisible();
+  await expect(page.getByText('Campaign recommendations generated from your analytics, rebuilt on every page load.')).toBeVisible();
+
   await insightCard.getByRole('button', { name: 'Save idea' }).click();
 
   // Saving posts the full insight, including the evidence and priority.
