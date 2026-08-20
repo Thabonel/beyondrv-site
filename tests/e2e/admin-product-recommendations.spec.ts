@@ -83,6 +83,7 @@ test('AI product analysis merges alerts and renders grounded recommendations', a
   const result = page.getByTestId(`product-recommendations-${product.slug}`);
   await expect(result).toBeVisible();
   await expect(result.getByText('Clarify the sale offer')).toBeVisible();
+  await expect(result.getByTestId('product-recommendation-priority')).toHaveText('High');
   await expect(result.getByText('18 page views and 0 enquiries in 30 days.')).toBeVisible();
   await expect(result.getByText('Confirm the current sale price and included equipment.')).toBeVisible();
 });
