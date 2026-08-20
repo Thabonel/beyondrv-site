@@ -269,3 +269,90 @@ export function marketingIdeaKey(ideaId: string) {
 export function newOwnerCopilotId(prefix: string) {
   return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 }
+
+export function clean(value: unknown, max = 1000) {
+  return typeof value === 'string' ? value.trim().slice(0, max) : '';
+}
+
+export const MARKETING_IDEA_STATUSES = ['idea', 'drafted', 'approved', 'rejected', 'published'] as const;
+export const MARKETING_IDEA_PRIORITIES = ['high', 'medium', 'low'] as const;
+
+export type MarketingIdeaStatus = (typeof MARKETING_IDEA_STATUSES)[number];
+export type MarketingIdeaPriority = (typeof MARKETING_IDEA_PRIORITIES)[number];
+
+export interface MarketingIdeaRecord {
+  [key: string]: unknown;
+  id: string;
+  title: string;
+  audience: string;
+  sourceQuestion: string;
+  recommendation: string;
+  evidence: string;
+  priority: string;
+  status: string;
+  relatedLeadId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Dashboard insights are regenerated on every request and carry no identifier, so
+ * the title is the only stable handle. Deriving the id from it makes re-saving the
+ * same insight an update rather than a duplicate.
+ */
+function titleFingerprint(title: string) {
+  let hash = 0;
+  for (let index = 0; index < title.length; index += 1) {
+    hash = (hash * 31 + title.charCodeAt(index)) | 0;
+  }
+  return (hash >>> 0).toString(36);
+}
+
+export function marketingIdeaId(title: string) {
+  const trimmed = clean(title, 200);
+  const slug = trimmed
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80)
+    .replace(/-+$/, '');
+  // A title of punctuation alone leaves no slug, so fall back to a fingerprint
+  // rather than letting every such title collide on one key.
+  return `marketing_idea_${slug || titleFingerprint(trimmed)}`;
+}
+
+export function buildMarketingIdea(
+  body: Record<string, unknown>,
+  existing: Record<string, unknown> | null,
+  now: string,
+): { idea: MarketingIdeaRecord } | { error: string } {
+  const title = clean(body.title, 180) || clean(existing?.title, 180);
+  if (!title) return { error: 'Missing marketing idea title.' };
+
+  const status = clean(body.status, 40) || clean(existing?.status, 40) || 'idea';
+  if (!(MARKETING_IDEA_STATUSES as readonly string[]).includes(status)) {
+    return { error: 'Invalid marketing idea status.' };
+  }
+
+  const priority = clean(body.priority, 20) || clean(existing?.priority, 20);
+  if (priority && !(MARKETING_IDEA_PRIORITIES as readonly string[]).includes(priority)) {
+    return { error: 'Invalid marketing idea priority.' };
+  }
+
+  return {
+    idea: {
+      ...existing,
+      id: clean(body.id, 240) || clean(existing?.id, 240) || marketingIdeaId(title),
+      title,
+      audience: clean(body.audience, 180) || clean(existing?.audience, 180),
+      sourceQuestion: clean(body.sourceQuestion, 600) || clean(existing?.sourceQuestion, 600),
+      recommendation: clean(body.recommendation, 1000) || clean(existing?.recommendation, 1000),
+      evidence: clean(body.evidence, 400) || clean(existing?.evidence, 400),
+      priority,
+      status,
+      relatedLeadId: clean(body.relatedLeadId, 240) || clean(existing?.relatedLeadId, 240),
+      createdAt: typeof existing?.createdAt === 'string' ? existing.createdAt : now,
+      updatedAt: now,
+    },
+  };
+}

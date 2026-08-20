@@ -8,9 +8,7 @@ import {
 } from './owner-copilot-core';
 import type { AdminActor } from './admin-auth';
 
-export function clean(value: unknown, max = 1000) {
-  return typeof value === 'string' ? value.trim().slice(0, max) : '';
-}
+export { clean } from './owner-copilot-core';
 
 export async function listJsonStore(storeName: string) {
   const store = getBlobStore(storeName);

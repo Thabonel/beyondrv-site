@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { adminFetch, adminJson, clearAdminToken } from '../lib/adminApi';
 import { activeReminders } from '../lib/adminReminders';
+import MarketingIdeas, { type MarketingIdea } from './MarketingIdeas';
 
 type HealthStatus = 'ready' | 'warning' | 'blocker' | 'unavailable' | 'error';
 
@@ -278,9 +279,9 @@ function Panel({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
-function StatusPill({ status }: { status: string }) {
+function StatusPill({ status, testId }: { status: string; testId?: string }) {
   return (
-    <span style={{
+    <span data-testid={testId} style={{
       color: STATUS_COLOUR[status] ?? '#aaa',
       border: `1px solid ${STATUS_COLOUR[status] ?? '#444'}`,
       borderRadius: '999px',
@@ -305,6 +306,10 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
   const [recommendations, setRecommendations] = useState<Record<string, ProductRecommendationResult>>({});
   const [recommendationLoading, setRecommendationLoading] = useState<string | null>(null);
   const [recommendationErrors, setRecommendationErrors] = useState<Record<string, string>>({});
+  const [savedIdeas, setSavedIdeas] = useState<MarketingIdea[]>([]);
+  const [ideasLoading, setIdeasLoading] = useState(true);
+  const [ideasError, setIdeasError] = useState('');
+  const [ideaSavingId, setIdeaSavingId] = useState<string | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -330,6 +335,71 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
       .finally(() => setLoading(false));
     return () => controller.abort();
   }, [range]);
+
+  async function loadSavedIdeas() {
+    setIdeasError('');
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-marketing-ideas');
+      if (res.status === 401) {
+        clearAdminToken();
+        window.location.href = '/.netlify/functions/admin-login';
+        return;
+      }
+      const body = await adminJson<{ ideas?: MarketingIdea[] }>(res, 'Could not load marketing ideas');
+      if (!res.ok) throw new Error(body.error ?? 'Could not load marketing ideas');
+      setSavedIdeas(body.ideas ?? []);
+    } catch (err) {
+      setIdeasError(err instanceof Error ? err.message : 'Could not load marketing ideas.');
+    } finally {
+      setIdeasLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void loadSavedIdeas();
+  }, []);
+
+  // The server derives the record id from the title, so matching on title is
+  // enough to tell whether an insight has already been saved.
+  function savedIdeaFor(title: string) {
+    return savedIdeas.find((idea) => idea.title === title) ?? null;
+  }
+
+  async function writeIdea(payload: Record<string, unknown>, key: string, fallbackError: string, method: 'POST' | 'PATCH' = 'POST') {
+    setIdeaSavingId(key);
+    setIdeasError('');
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-marketing-ideas', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.status === 401) {
+        clearAdminToken();
+        window.location.href = '/.netlify/functions/admin-login';
+        return;
+      }
+      const body = await adminJson<{ idea?: MarketingIdea }>(res, fallbackError);
+      if (!res.ok || !body.idea) throw new Error(body.error ?? fallbackError);
+      const saved = body.idea;
+      setSavedIdeas((prev) => {
+        const rest = prev.filter((idea) => idea.id !== saved.id);
+        return [saved, ...rest];
+      });
+    } catch (err) {
+      setIdeasError(err instanceof Error ? err.message : `${fallbackError}.`);
+    } finally {
+      setIdeaSavingId(null);
+    }
+  }
+
+  function saveInsight(insight: { title: string; recommendation: string; evidence: string; priority: string }) {
+    return writeIdea(insight, insight.title, 'Could not save marketing idea');
+  }
+
+  function changeIdeaStatus(idea: MarketingIdea, status: string) {
+    return writeIdea({ id: idea.id, status }, idea.id, 'Could not update marketing idea', 'PATCH');
+  }
 
   if (error) {
     return (
@@ -716,7 +786,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
                             <div key={`${item.category}-${item.title}`} style={{ borderTop: '1px solid #292929', paddingTop: '0.5rem', display: 'grid', gap: '0.2rem' }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center' }}>
                                 <div style={{ color: '#fff', fontSize: '0.74rem', fontWeight: 800 }}>{item.title}</div>
-                                <StatusPill status={item.priority === 'high' ? 'blocker' : item.priority === 'medium' ? 'warning' : 'ready'} />
+                                <StatusPill status={item.priority} testId="product-recommendation-priority" />
                               </div>
                               <div style={{ color: '#ddd', fontSize: '0.72rem', lineHeight: 1.4 }}>{item.action}</div>
                               <div style={{ color: '#777', fontSize: '0.66rem', lineHeight: 1.35 }}>{labelise(item.category)} · {item.evidence}</div>
@@ -769,17 +839,51 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
                   <p style={{ margin: 0, color: '#888', fontSize: '0.72rem', lineHeight: 1.4 }}>{data.marketingInsights.message}</p>
                 )}
                 {data.marketingInsights.items.map((insight) => (
-                  <div key={`${insight.title}-${insight.evidence}`} style={{ borderBottom: '1px solid #252525', paddingBottom: '0.55rem', display: 'grid', gap: '0.25rem' }}>
+                  <div key={`${insight.title}-${insight.evidence}`} data-testid="marketing-insight" style={{ borderBottom: '1px solid #252525', paddingBottom: '0.55rem', display: 'grid', gap: '0.25rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center' }}>
                       <div style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 800 }}>{insight.title}</div>
-                      <StatusPill status={insight.priority === 'high' ? 'blocker' : insight.priority === 'medium' ? 'warning' : 'ready'} />
+                      <StatusPill status={insight.priority} testId="marketing-insight-priority" />
                     </div>
                     <div style={{ color: '#ddd', fontSize: '0.74rem', lineHeight: 1.4 }}>{insight.recommendation}</div>
                     <div style={{ color: '#888', fontSize: '0.68rem', lineHeight: 1.35 }}>{insight.evidence}</div>
+                    {(() => {
+                      const saved = savedIdeaFor(insight.title);
+                      return (
+                        <button
+                          type="button"
+                          onClick={() => saveInsight(insight)}
+                          disabled={Boolean(saved) || ideaSavingId === insight.title}
+                          style={{
+                            justifySelf: 'start',
+                            marginTop: '0.15rem',
+                            background: saved ? 'transparent' : '#222',
+                            border: `1px solid ${saved ? '#333' : '#444'}`,
+                            color: saved ? '#777' : '#fff',
+                            borderRadius: '6px',
+                            padding: '0.28rem 0.55rem',
+                            cursor: saved || ideaSavingId === insight.title ? 'default' : 'pointer',
+                            fontWeight: 700,
+                            fontSize: '0.7rem',
+                          }}
+                        >
+                          {saved ? `Saved · ${saved.status}` : ideaSavingId === insight.title ? 'Saving…' : 'Save idea'}
+                        </button>
+                      );
+                    })()}
                   </div>
                 ))}
               </div>
             )}
+          </Panel>
+
+          <Panel title="Saved Marketing Ideas">
+            <MarketingIdeas
+              ideas={savedIdeas}
+              loading={ideasLoading}
+              error={ideasError}
+              savingId={ideaSavingId}
+              onStatusChange={changeIdeaStatus}
+            />
           </Panel>
 
           <Panel title="Chatbot Questions">
