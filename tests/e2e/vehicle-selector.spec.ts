@@ -135,10 +135,13 @@ test('tray weight sums into the vehicle weight, but a negative entry cannot redu
   await page.fill('#trayMass', '120');
   await expect(page.locator('#loadedWeight')).toHaveText(/2,?173 kg/);
 
-  // A negative tray entry must not reduce the vehicle weight below the
-  // published figure — it is treated as 0kg, not subtracted: 2046kg + 7kg = 2053kg.
+  // A negative tray entry is not a tray weight of zero. On a vehicle whose kerb
+  // mass excludes the tray, silently proceeding without it under-counts the
+  // vehicle and overstates the payload, so the result goes to needs-review
+  // instead. It can still never reduce the weight below the published figure.
   await page.fill('#trayMass', '-50');
-  await expect(page.locator('#loadedWeight')).toHaveText(/2,?053 kg/);
+  await expect(page.locator('#statusLabel')).toContainText(/not enough information/i);
+  await expect(page.locator('#loadedWeight')).not.toHaveText(/1,?9\d\d kg/);
 });
 
 test('a zero current vehicle weight still needs review even with a tray entered', async ({ page }) => {
@@ -189,4 +192,92 @@ test('an invisible tray value from a previous vehicle cannot leak into the calcu
   // 2201kg published kerb mass + 7kg fixed additions = 2208kg, with no 150kg
   // carried over from the previous vehicle's tray.
   await expect(page.locator('#loadedWeight')).toHaveText(/2,?208 kg/);
+});
+
+test('a vehicle whose kerb mass excludes the tray will not calculate until the tray weight is entered', async ({ page }) => {
+  await page.goto('/slide-on-camper-weight-calculator/');
+
+  // Ford Ranger XL cab chassis: published kerb mass excludes the tray.
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  const options = await page.locator('#vehicleVariant option').allTextContents();
+  const excluded = options.find((o) => o.includes('cab chassis'));
+  await page.selectOption('#vehicleVariant', { label: excluded! });
+
+  await expect(page.locator('#trayMassField')).toBeVisible();
+
+  // Everything else filled in, tray weight deliberately left blank.
+  for (const [id, v] of [['passengers', '180'], ['accessories', '80'], ['luggageGear', '50'],
+    ['camperDry', '900'], ['camperWater', '80'], ['camperGear', '60'], ['camperOptions', '1'],
+    ['trayLength', '2400'], ['trayWidth', '1800'], ['requiredTrayLength', '2100'], ['requiredTrayWidth', '1700']] as const) {
+    await page.fill(`#${id}`, v);
+  }
+
+  // A blank tray weight must not be read as zero and pass the vehicle.
+  await expect(page.locator('#statusLabel')).toContainText(/not enough information/i);
+  await expect(page.locator('#resultPanel')).toHaveAttribute('data-status', 'amber');
+
+  await page.fill('#trayMass', '120');
+  await expect(page.locator('#statusLabel')).not.toContainText(/not enough information/i);
+});
+
+test('a weighbridge weight that already includes the tray does not demand the tray again', async ({ page }) => {
+  await page.goto('/slide-on-camper-weight-calculator/');
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
+  await expect(page.locator('#trayMassField')).toBeVisible();
+
+  // The page tells people to use a weighbridge figure; that figure includes
+  // the tray already bolted on.
+  await page.fill('#currentWeight', '2350');
+  for (const [id, v] of [['gvm', '5000'], ['passengers', '1'], ['accessories', '1'], ['luggageGear', '1'],
+    ['camperDry', '1'], ['camperWater', '1'], ['camperGear', '1'], ['camperOptions', '1'],
+    ['trayLength', '2000'], ['trayWidth', '1800'], ['requiredTrayLength', '1900'], ['requiredTrayWidth', '1700']] as const) {
+    await page.fill(`#${id}`, v);
+  }
+
+  // Blank tray weight still blocks, because nothing has said the figure includes it.
+  await expect(page.locator('#statusLabel')).toContainText(/not enough information/i);
+
+  await page.check('#trayIncluded');
+
+  // Now it calculates, and the tray is counted once: 2350 + 7 = 2357kg.
+  await expect(page.locator('#statusLabel')).not.toContainText(/not enough information/i);
+  await expect(page.locator('#loadedWeight')).toHaveText(/2,?357 kg/);
+
+  // The tray field is gone, so it cannot be entered twice.
+  await expect(page.locator('#trayMassRow')).toBeHidden();
+});
+
+test('overriding a prefilled figure is disclosed in the provenance panel straight away', async ({ page }) => {
+  await page.goto('/slide-on-camper-weight-calculator/');
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
+
+  const provenance = page.locator('#vehicleProvenance');
+  await expect(provenance).toContainText('Published by');
+  await expect(provenance).not.toContainText('You supplied');
+
+  // Override the manufacturer GVM. The panel must stop implying that figure
+  // came from the manufacturer document.
+  await page.fill('#gvm', '3500');
+
+  await expect(provenance).toContainText('You supplied GVM');
+  await expect(provenance).toContainText('not from the manufacturer document');
+});
+
+test('the provenance panel names every figure the customer has overridden', async ({ page }) => {
+  await page.goto('/slide-on-camper-weight-calculator/');
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
+
+  await page.fill('#gvm', '3500');
+  await page.fill('#currentWeight', '2350');
+
+  const provenance = page.locator('#vehicleProvenance');
+  await expect(provenance).toContainText('You supplied GVM');
+  await expect(provenance).toContainText('the current vehicle weight');
 });
