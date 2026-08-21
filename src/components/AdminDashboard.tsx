@@ -399,7 +399,13 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
   }
 
   function saveInsight(insight: { title: string; recommendation: string; evidence: string; priority: string }) {
-    return writeIdea(insight, insight.title, 'Could not save marketing idea');
+    // Send the stored record's own id when one exists. The server derives an id
+    // from the title otherwise, and that derivation has changed, so an idea
+    // saved under the old format would be stranded and a second record created
+    // beside it.
+    const saved = savedIdeaFor(insight.title);
+    const payload = saved ? { ...insight, id: saved.id } : insight;
+    return writeIdea(payload, insight.title, 'Could not save marketing idea');
   }
 
   function changeIdeaStatus(idea: MarketingIdea, status: string) {
@@ -857,7 +863,11 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
                         <button
                           type="button"
                           onClick={() => saveInsight(insight)}
-                          disabled={ideaSavingId === insight.title}
+                          // Saving before the stored ideas are known would derive a
+                          // fresh id and strand an already-reviewed record, so the
+                          // action waits until the lookup has actually succeeded.
+                          disabled={ideasLoading || Boolean(ideasError) || ideaSavingId === insight.title}
+                          title={ideasLoading ? 'Loading your saved ideas…' : ideasError ? 'Saved ideas could not be loaded, so saving is unavailable.' : undefined}
                           style={{
                             justifySelf: 'start',
                             marginTop: '0.15rem',
@@ -871,7 +881,11 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
                             fontSize: '0.7rem',
                           }}
                         >
-                          {ideaSavingId === insight.title ? 'Saving…' : saved ? 'Update saved idea' : 'Save idea'}
+                          {ideasLoading
+                            ? 'Loading saved ideas…'
+                            : ideaSavingId === insight.title
+                              ? 'Saving…'
+                              : saved ? 'Update saved idea' : 'Save idea'}
                         </button>
                       );
                     })()}
