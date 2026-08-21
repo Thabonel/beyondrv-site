@@ -82,8 +82,20 @@ visitors who never search never pay for it.
 without a DOM or a network.
 
 Normalise both query and fields to lowercase, stripping punctuation. Split the
-query into terms. A record matches when **every** term appears in at least one
-of its fields, so extra words narrow rather than widen the result set.
+query into terms, drop duplicates, and drop stop words. A record matches when
+**at least one** term matches one of its fields.
+
+A term matches a field when a word in it starts with the term, so "adv" finds
+"Advent" and type-ahead works. Terms of one or two characters must match a
+whole word instead: plain substring matching let "on" match "expedition",
+"additional", and "one", which dragged every expedition vehicle and two
+caravans into a search for a slide-on.
+
+An earlier version required every term to match. That emptied the results for
+any question containing a word the index has never seen — "slide on for my ford
+ranger" returned nothing, because no record names a vehicle, even though nine
+records matched "slide". Ranking partial matches is what a customer expects:
+more words should sharpen the order, not delete the answer.
 
 Field weights:
 
@@ -96,9 +108,10 @@ Field weights:
 
 A record whose `title` contains the whole query as a phrase gets a bonus, so
 "advent 2450" ranks the Advent 2450 above a record that merely contains both
-words separately. Results sort by score descending, then title ascending, so
-ordering is stable for equal scores. An empty query returns no results rather
-than everything.
+words separately. Results sort by the number of terms matched, then by score,
+then by title, so a record answering more of the question comes first and
+ordering stays stable. An empty query, or one made only of stop words, returns
+no results rather than everything.
 
 ### Results page
 
@@ -114,6 +127,10 @@ than everything.
 - No query: prompt, plus links to the main category pages.
 - No matches: say so, and link the enquiry form. A customer who cannot find
   something should be one click from asking about it.
+- Some terms matched, others matched nothing: name the ignored words above the
+  results and link the Vehicle Suitability Checker. The index holds no vehicle
+  makes or models, so a question naming a vehicle is answered only in part; the
+  page has to say so rather than look like a complete answer.
 
 ### Header
 

@@ -19,8 +19,10 @@ test('a question about weights finds the guide, not a product', async ({ page })
 test('an archived product is not reachable through search', async ({ page }) => {
   await page.goto('/search/?q=sunpatch%2012c');
 
-  await expect(page.getByTestId('search-empty')).toBeVisible();
-  await expect(page.getByTestId('search-result')).toHaveCount(0);
+  // The other Sunpatch vans are a good answer to this query; the archived
+  // 12C must not be among them.
+  await expect(page.getByTestId('search-result').first()).toBeVisible();
+  await expect(page.getByTestId('search-result').filter({ hasText: 'Sunpatch 12C' })).toHaveCount(0);
 });
 
 test('a query that matches nothing offers the enquiry form', async ({ page }) => {
@@ -144,6 +146,38 @@ test('the homepage advertises a search endpoint that exists', async ({ page }) =
 
   expect(website).toBeTruthy();
   expect(website.potentialAction.target.urlTemplate).toBe('https://beyondrv.com.au/search/?q={search_term_string}');
+});
+
+test('a natural-language question with an unknown vehicle still returns slide-ons', async ({ page }) => {
+  await page.goto('/search/?q=slide%20on%20for%20for%20ford%20ranger');
+
+  await expect(page.getByTestId('search-empty')).toHaveCount(0);
+  const results = page.getByTestId('search-result');
+  await expect(results.first()).toBeVisible();
+  await expect(results.filter({ hasText: 'Slide-On' }).first()).toBeVisible();
+});
+
+test('a vehicle the site knows nothing about is called out, not silently ignored', async ({ page }) => {
+  await page.goto('/search/?q=slide%20on%20for%20my%20ford%20ranger');
+
+  const notice = page.getByTestId('search-unmatched');
+  await expect(notice).toBeVisible();
+  await expect(notice).toContainText('ford ranger');
+  await expect(notice.getByRole('link', { name: /suitability/i })).toHaveAttribute('href', '/vehicle-suitability-checker/');
+});
+
+test('a query of only unknown vehicle words says so plainly', async ({ page }) => {
+  await page.goto('/search/?q=toyota%20super%20duty');
+
+  await expect(page.getByTestId('search-empty')).toBeVisible();
+  await expect(page.getByTestId('search-result')).toHaveCount(0);
+});
+
+test('an expedition vehicle is not dragged into a search for on', async ({ page }) => {
+  await page.goto('/search/?q=slide%20on');
+
+  await expect(page.getByTestId('search-result').filter({ hasText: 'Mercedes Sprinter' })).toHaveCount(0);
+  await expect(page.getByTestId('search-result').filter({ hasText: 'Sunpatch' })).toHaveCount(0);
 });
 
 test('the mobile dropdown sits in flow and is bounded, so the keyboard cannot cover it', async ({ page }) => {
