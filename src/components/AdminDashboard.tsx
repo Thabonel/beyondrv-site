@@ -399,7 +399,13 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
   }
 
   function saveInsight(insight: { title: string; recommendation: string; evidence: string; priority: string }) {
-    return writeIdea(insight, insight.title, 'Could not save marketing idea');
+    // Send the stored record's own id when one exists. The server derives an id
+    // from the title otherwise, and that derivation has changed, so an idea
+    // saved under the old format would be stranded and a second record created
+    // beside it.
+    const saved = savedIdeaFor(insight.title);
+    const payload = saved ? { ...insight, id: saved.id } : insight;
+    return writeIdea(payload, insight.title, 'Could not save marketing idea');
   }
 
   function changeIdeaStatus(idea: MarketingIdea, status: string) {
