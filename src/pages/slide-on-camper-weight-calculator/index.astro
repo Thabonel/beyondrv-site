@@ -419,7 +419,10 @@ const schema = [
   function clearTrayMass() {
     const trayInput = inputById('trayMass');
     if (trayInput) trayInput.value = '';
-    customerEdited.delete('trayMass');
+    const wasEdited = customerEdited.delete('trayMass');
+    // Clearing fires no input event, so nothing else would redraw the panel and
+    // it would go on claiming a figure the customer supplied and no longer has.
+    if (wasEdited && selectedVariant) renderProvenance(selectedVariant);
   }
 
   function resetVehicleSelection() {
@@ -459,6 +462,11 @@ const schema = [
     const trayHelp = byId('trayMassHelp');
     const showTray = variant.trayState === 'excluded' || variant.trayState === 'unknown';
     trayState = variant.trayState;
+    // The inclusion claim is about one vehicle's tray, and this call can
+    // replace the very weight it referred to. Carrying it over lets a published
+    // kerb mass that excludes a tray pass as though it included one.
+    const includedBox = inputById('trayIncluded');
+    if (includedBox) includedBox.checked = false;
     if (trayField) (trayField as HTMLElement).hidden = !showTray;
     if (!showTray) clearTrayMass();
     syncTrayRequirement();
