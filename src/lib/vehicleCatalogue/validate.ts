@@ -9,12 +9,18 @@ export function validateVehicleCatalogue(catalogue: VehicleCatalogue) {
   if (!catalogue.generatedAt) errors.push('Catalogue generatedAt is required.');
 
   const ids = new Set<string>();
+  const labels = new Set<string>();
   const modelKeys = new Set(catalogue.models.map((m) => `${m.make}|${m.model}`));
 
   for (const v of catalogue.variants) {
     if (!v.id) errors.push('Every variant requires an id.');
     if (ids.has(v.id)) errors.push(`Duplicate variant id: ${v.id}.`);
     ids.add(v.id);
+
+    // The label is all a customer has to choose by. Two rows sharing one means
+    // they can pick the wrong ratings without any way of noticing.
+    if (labels.has(v.label)) errors.push(`Duplicate variant label: ${v.label}.`);
+    labels.add(v.label);
 
     // The whole dataset exists so this number is right. Guard it here too.
     if (v.gvmKg - v.kerbKg !== v.payloadKg) {

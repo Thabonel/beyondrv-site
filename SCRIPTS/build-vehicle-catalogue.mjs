@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { deriveTrayState, isPromoted } from '../src/lib/vehicleCatalogue/derive.ts';
+import { buildVariantLabels } from '../src/lib/vehicleCatalogue/label.ts';
 import { validateVehicleCatalogue } from '../src/lib/vehicleCatalogue/validate.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -13,7 +14,8 @@ const overridesPath = resolve(root, 'src/data/vehicle-selector/overrides.json');
 
 const QUERY = `
 SELECT v.id, v.make, v.model, v.model_year_start, v.grade, v.cab_type, v.body_type,
-       v.drivetrain, v.gvm_kg, v.kerb_mass_kg, v.kerb_mass_basis, v.published_payload_kg,
+       v.drivetrain, v.engine, v.transmission, v.wheelbase_mm,
+       v.gvm_kg, v.kerb_mass_kg, v.kerb_mass_basis, v.published_payload_kg,
        v.front_gawr_kg, v.rear_gawr_kg, v.usable_load_length_mm, v.usable_load_width_mm,
        v.verification_status,
        s.manufacturer, s.title, s.url, s.accessed_date
@@ -36,8 +38,10 @@ const variants = rows
     cabType: r.cab_type,
     bodyType: r.body_type,
     drivetrain: r.drivetrain ?? null,
-    label: [r.make, r.model, r.grade, r.cab_type.replace(/_/g, ' '), r.drivetrain, `(${r.model_year_start})`]
-      .filter(Boolean).join(' '),
+    engine: r.engine ?? null,
+    transmission: r.transmission ?? null,
+    wheelbaseMm: r.wheelbase_mm ?? null,
+    label: '',
     gvmKg: r.gvm_kg,
     kerbKg: r.kerb_mass_kg,
     kerbBasis: r.kerb_mass_basis ?? '',
@@ -51,6 +55,11 @@ const variants = rows
     promotedByOverride: overrides.show.includes(r.id) && r.verification_status !== 'source_verified',
     source: { manufacturer: r.manufacturer, title: r.title, url: r.url, accessedDate: r.accessed_date },
   }));
+
+// Labels are assigned across the whole set, because whether a variant needs its
+// engine or wheelbase spelled out depends on the other variants beside it.
+const labels = buildVariantLabels(variants);
+variants.forEach((v, i) => { v.label = labels[i]; });
 
 const modelMap = new Map();
 for (const v of variants) {

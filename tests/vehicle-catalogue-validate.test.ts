@@ -71,3 +71,18 @@ test('a variant with an empty source accessedDate is an error mentioning the var
   assert.equal(result.valid, false);
   assert.ok(result.errors.some((e) => e.includes(variant.id) && e.includes('accessedDate')));
 });
+
+test('two variants sharing a label is an error, because the picker cannot tell them apart', () => {
+  const bad: VehicleCatalogue = {
+    ...catalogue,
+    variants: [
+      { ...variant, id: 'a', label: 'Same Label' },
+      { ...variant, id: 'b', label: 'Same Label' },
+    ],
+  };
+
+  const result = validateVehicleCatalogue(bad);
+
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((e) => e.includes('Same Label')), result.errors.join(' | '));
+});
