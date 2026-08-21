@@ -83,7 +83,13 @@ without a DOM or a network.
 
 Normalise both query and fields to lowercase, stripping punctuation. Split the
 query into terms, drop duplicates, and drop stop words. A record matches when
-**at least one** term appears in one of its fields.
+**at least one** term matches one of its fields.
+
+A term matches a field when a word in it starts with the term, so "adv" finds
+"Advent" and type-ahead works. Terms of one or two characters must match a
+whole word instead: plain substring matching let "on" match "expedition",
+"additional", and "one", which dragged every expedition vehicle and two
+caravans into a search for a slide-on.
 
 An earlier version required every term to match. That emptied the results for
 any question containing a word the index has never seen — "slide on for my ford
@@ -121,6 +127,10 @@ no results rather than everything.
 - No query: prompt, plus links to the main category pages.
 - No matches: say so, and link the enquiry form. A customer who cannot find
   something should be one click from asking about it.
+- Some terms matched, others matched nothing: name the ignored words above the
+  results and link the Vehicle Suitability Checker. The index holds no vehicle
+  makes or models, so a question naming a vehicle is answered only in part; the
+  page has to say so rather than look like a complete answer.
 
 ### Header
 

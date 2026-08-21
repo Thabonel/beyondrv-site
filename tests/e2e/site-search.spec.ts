@@ -156,3 +156,26 @@ test('a natural-language question with an unknown vehicle still returns slide-on
   await expect(results.first()).toBeVisible();
   await expect(results.filter({ hasText: 'Slide-On' }).first()).toBeVisible();
 });
+
+test('a vehicle the site knows nothing about is called out, not silently ignored', async ({ page }) => {
+  await page.goto('/search/?q=slide%20on%20for%20my%20ford%20ranger');
+
+  const notice = page.getByTestId('search-unmatched');
+  await expect(notice).toBeVisible();
+  await expect(notice).toContainText('ford ranger');
+  await expect(notice.getByRole('link', { name: /suitability/i })).toHaveAttribute('href', '/vehicle-suitability-checker/');
+});
+
+test('a query of only unknown vehicle words says so plainly', async ({ page }) => {
+  await page.goto('/search/?q=toyota%20super%20duty');
+
+  await expect(page.getByTestId('search-empty')).toBeVisible();
+  await expect(page.getByTestId('search-result')).toHaveCount(0);
+});
+
+test('an expedition vehicle is not dragged into a search for on', async ({ page }) => {
+  await page.goto('/search/?q=slide%20on');
+
+  await expect(page.getByTestId('search-result').filter({ hasText: 'Mercedes Sprinter' })).toHaveCount(0);
+  await expect(page.getByTestId('search-result').filter({ hasText: 'Sunpatch' })).toHaveCount(0);
+});
