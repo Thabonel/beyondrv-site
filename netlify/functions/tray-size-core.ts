@@ -126,3 +126,62 @@ export function removeTraySize(record: TraySizeRecord, lengthMm: number, widthMm
     updatedAt: now,
   };
 }
+
+/** Enough attempts to survive ordinary contention without spinning. */
+export const MAX_WRITE_ATTEMPTS = 5;
+
+/**
+ * The request rules, kept here rather than in the handler so they can be tested
+ * without constructing a Netlify event. Every tested module in this directory
+ * is self-contained for the same reason.
+ */
+export function acceptTraySizeSubmission(
+  body: Record<string, unknown>,
+  isCabChassis: (id: string) => boolean,
+): { ok: true; variantId: string; lengthMm: number; widthMm: number } | { ok: false; error: string } {
+  const variantId = typeof body.variantId === 'string' ? body.variantId.trim() : '';
+  if (!variantId) return { ok: false, error: 'Choose your vehicle before reporting a tray size.' };
+  if (!isCabChassis(variantId)) {
+    return { ok: false, error: 'Tray sizes are only collected for cab chassis vehicles.' };
+  }
+
+  const size = validateTraySize(body.lengthMm, body.widthMm);
+  if (!size.ok) return { ok: false, error: size.error };
+
+  return { ok: true, variantId, lengthMm: size.lengthMm, widthMm: size.widthMm };
+}
+
+export interface ConditionalStore {
+  getWithMetadata(key: string, options?: unknown): Promise<{ data: unknown; etag?: string } | null>;
+  setJSON(key: string, data: unknown, options?: { onlyIfMatch?: string; onlyIfNew?: boolean }): Promise<{ modified?: boolean }>;
+}
+
+/**
+ * A plain read-modify-write loses a report whenever two customers submit for
+ * the same vehicle at once, and these counts decide what the next customer is
+ * shown. Write conditionally on the etag we read, and retry on a lost race.
+ */
+export async function recordTraySizeWithRetry(
+  store: ConditionalStore,
+  variantId: string,
+  lengthMm: number,
+  widthMm: number,
+  now: () => string,
+): Promise<{ ok: true; record: TraySizeRecord } | { ok: false }> {
+  const key = traySizeKey(variantId);
+
+  for (let attempt = 0; attempt < MAX_WRITE_ATTEMPTS; attempt += 1) {
+    const current = await store.getWithMetadata(key, { type: 'json' });
+    const existing = (current?.data ?? null) as TraySizeRecord | null;
+    const updated = addTraySizeReport(existing, variantId, lengthMm, widthMm, now());
+
+    const condition = existing && current?.etag
+      ? { onlyIfMatch: current.etag }
+      : { onlyIfNew: true };
+
+    const result = await store.setJSON(key, updated, condition);
+    if (result.modified) return { ok: true, record: updated };
+  }
+
+  return { ok: false };
+}

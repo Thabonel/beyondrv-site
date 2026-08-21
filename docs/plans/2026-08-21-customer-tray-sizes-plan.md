@@ -400,7 +400,7 @@ git commit -m "feat: emit a slim variant index for the netlify functions"
 - Produces:
   - `GET /.netlify/functions/tray-sizes` → `{ sizes: { [variantId]: { lengthMm, widthMm, reports } } }`
   - `POST` with `{ variantId, lengthMm, widthMm }` → `{ ok: true, size: { lengthMm, widthMm, reports } }`
-  - `function acceptTraySizeSubmission(body: Record<string, unknown>, isCabChassis: (id: string) => boolean): { ok: true; variantId: string; lengthMm: number; widthMm: number } | { ok: false; error: string }` — exported so the request rules are testable without a Netlify event.
+  - `acceptTraySizeSubmission` and `recordTraySizeWithRetry` live in **`tray-size-core.ts`**, not here. Every tested module in `netlify/functions/` is self-contained — `admin-auth.ts` and `contract-core.ts` have no relative imports at all — because Node's type stripping cannot resolve extensionless relative imports the way esbuild does. A test that imports the handler fails on `./blob-store`.
 
 - [ ] **Step 1: Write the failing test**
 
