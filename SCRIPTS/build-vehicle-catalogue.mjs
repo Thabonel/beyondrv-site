@@ -94,7 +94,7 @@ writeFileSync(outPath, `${JSON.stringify(catalogue, null, 2)}\n`);
 
 // Netlify functions import JSON only from beside themselves, so the tray-size
 // endpoint gets a slim copy of just the fields it validates against.
-const variantIndex = { variants: variants.map((v) => ({ id: v.id, bodyType: v.bodyType })) };
+const variantIndex = { variants: variants.map((v) => ({ id: v.id, bodyType: v.bodyType, label: v.label })) };
 writeFileSync(variantIndexPath, `${JSON.stringify(variantIndex, null, 2)}\n`);
 console.log(`Wrote ${variantIndexPath}`);
 console.log(`Wrote ${outPath}`);

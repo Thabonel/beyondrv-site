@@ -18,8 +18,17 @@ test('the index carries the body type, which decides whether a tray applies', ()
   }
 });
 
+test('the index carries the label, so moderation shows a vehicle not an id', () => {
+  const byId = new Map(catalogue.variants.map((v: { id: string; label: string }) => [v.id, v.label]));
+
+  for (const entry of index.variants as Array<{ id: string; label: string }>) {
+    assert.equal(entry.label, byId.get(entry.id), `${entry.id} has the wrong label`);
+    assert.ok(entry.label.length > 0);
+  }
+});
+
 test('the index carries nothing beyond what the endpoint needs', () => {
   for (const entry of index.variants as Array<Record<string, unknown>>) {
-    assert.deepEqual(Object.keys(entry).sort(), ['bodyType', 'id']);
+    assert.deepEqual(Object.keys(entry).sort(), ['bodyType', 'id', 'label']);
   }
 });
