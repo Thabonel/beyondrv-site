@@ -300,6 +300,9 @@ const schema = [
   // isTrayMassRequired and resolveCurrentVehicleWeight.
   let trayState = 'not_applicable';
   let trayRequired = false;
+  // The provenance panel has to be redrawn whenever what it claims stops being
+  // true, which means keeping hold of the variant it is describing.
+  let selectedVariant: any = null;
 
   function syncTrayRequirement() {
     const includedBox = inputById('trayIncluded');
@@ -351,7 +354,12 @@ const schema = [
   }
 
   PREFILLABLE_FIELDS.forEach((id) => {
-    inputById(id)?.addEventListener('input', () => customerEdited.add(id));
+    inputById(id)?.addEventListener('input', () => {
+      const alreadyEdited = customerEdited.has(id);
+      customerEdited.add(id);
+      // Redraw only on the first edit of a field; the note is the same after.
+      if (!alreadyEdited && selectedVariant) renderProvenance(selectedVariant);
+    });
   });
 
   function formatAccessedDate(iso: string) {
@@ -427,6 +435,7 @@ const schema = [
     if (includedBox) includedBox.checked = false;
     clearTrayMass();
     syncTrayRequirement();
+    selectedVariant = null;
     const panel = byId('vehicleProvenance');
     if (panel) {
       panel.replaceChildren();
@@ -458,6 +467,7 @@ const schema = [
         ? 'The published kerb weight for this vehicle excludes the tray. Enter your tray weight here and it will be added to the vehicle weight — do not count it again under accessories.'
         : 'The manufacturer does not state whether the published kerb weight includes a tray. If your vehicle has one, enter its weight here and it will be added to the vehicle weight — do not count it again under accessories.';
     }
+    selectedVariant = variant;
     renderProvenance(variant);
     calculateSlideOn();
   }

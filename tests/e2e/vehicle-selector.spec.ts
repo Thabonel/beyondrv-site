@@ -249,3 +249,35 @@ test('a weighbridge weight that already includes the tray does not demand the tr
   // The tray field is gone, so it cannot be entered twice.
   await expect(page.locator('#trayMassRow')).toBeHidden();
 });
+
+test('overriding a prefilled figure is disclosed in the provenance panel straight away', async ({ page }) => {
+  await page.goto('/slide-on-camper-weight-calculator/');
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
+
+  const provenance = page.locator('#vehicleProvenance');
+  await expect(provenance).toContainText('Published by');
+  await expect(provenance).not.toContainText('You supplied');
+
+  // Override the manufacturer GVM. The panel must stop implying that figure
+  // came from the manufacturer document.
+  await page.fill('#gvm', '3500');
+
+  await expect(provenance).toContainText('You supplied GVM');
+  await expect(provenance).toContainText('not from the manufacturer document');
+});
+
+test('the provenance panel names every figure the customer has overridden', async ({ page }) => {
+  await page.goto('/slide-on-camper-weight-calculator/');
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
+
+  await page.fill('#gvm', '3500');
+  await page.fill('#currentWeight', '2350');
+
+  const provenance = page.locator('#vehicleProvenance');
+  await expect(provenance).toContainText('You supplied GVM');
+  await expect(provenance).toContainText('the current vehicle weight');
+});
