@@ -270,10 +270,15 @@ function StatCard({ label, value, sub, tone = 'ready' }: { label: string; value:
   );
 }
 
-function Panel({ title, children }: { title: string; children: React.ReactNode }) {
+function Panel({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
   return (
     <section style={{ background: '#111', border: '1px solid #303030', borderRadius: '8px', padding: '0.9rem', display: 'grid', gap: '0.75rem' }}>
-      <h3 style={{ color: '#fff', fontSize: '0.9rem', margin: 0, fontWeight: 800 }}>{title}</h3>
+      <div style={{ display: 'grid', gap: '0.18rem' }}>
+        <h3 style={{ color: '#fff', fontSize: '0.9rem', margin: 0, fontWeight: 800 }}>{title}</h3>
+        {description && (
+          <p style={{ color: '#888', fontSize: '0.72rem', lineHeight: 1.4, margin: 0 }}>{description}</p>
+        )}
+      </div>
       {children}
     </section>
   );
@@ -534,7 +539,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             <StatCard label="Open Tasks" value={data.tasks.open} sub={`${data.tasks.overdue} overdue · ${pendingCount} pending changes`} tone={data.tasks.overdue ? 'blocker' : data.tasks.dueToday ? 'warning' : pendingCount ? 'warning' : 'ready'} />
           </div>
 
-          <Panel title="Unified Lifecycle">
+          <Panel title="Unified Lifecycle" description={"Every paid order, enquiry, availability request, and quote request in one list."}>
             {lifecycleSummary && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.45rem' }}>
                 <StatCard label="Total" value={lifecycleSummary.total} />
@@ -608,7 +613,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
           </Panel>
 
-          <Panel title="Today's Owner Priorities">
+          <Panel title="Today's Owner Priorities" description={"The leads scored most urgent right now, with the next action for each."}>
             {data.leads.priorityQueue.length === 0 ? (
               <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No high-priority lead actions detected.</p>
             ) : (
@@ -648,7 +653,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
           </Panel>
 
-          <Panel title="Owner Copilot Tasks">
+          <Panel title="Owner Copilot Tasks" description={"Open follow-up tasks the Copilot is tracking, with due dates and priority."}>
             {data.tasks.recent.length === 0 ? (
               <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No open Copilot tasks yet.</p>
             ) : (
@@ -666,7 +671,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
           </Panel>
 
-          <Panel title="Lead Follow-Up Queue">
+          <Panel title="Lead Follow-Up Queue" description={"Leads with a follow-up date set, ordered by when they fall due."}>
             {data.leads.followUpQueue.length === 0 ? (
               <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No due or overdue follow-ups.</p>
             ) : (
@@ -689,7 +694,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
           </Panel>
 
-          <Panel title="Lead Status">
+          <Panel title="Lead Status" description={"How many leads sit at each stage, from new through to won or lost."}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.45rem' }}>
               {data.leads.byStatus.map((row) => (
                 <div key={row.status} style={{ border: '1px solid #303030', borderRadius: '6px', padding: '0.55rem', background: '#161616' }}>
@@ -700,7 +705,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             </div>
           </Panel>
 
-          <Panel title="Inventory">
+          <Panel title="Inventory" description={"Product counts by availability and category, and the listed value of current stock."}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.45rem' }}>
               <StatCard label="Available" value={data.inventory.available} />
               <StatCard label="On Sale" value={data.inventory.onSale} tone="warning" />
@@ -716,7 +721,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             </div>
           </Panel>
 
-          <Panel title="Container Planning">
+          <Panel title="Container Planning" description={"Products awaiting a container, with ETAs, stock estimates, and reorder quantities."}>
             {data.inventory.planning.length === 0 ? (
               <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No products currently have planning fields set.</p>
             ) : (
@@ -755,7 +760,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
           </Panel>
 
-          <Panel title="Products Needing Attention">
+          <Panel title="Products Needing Attention" description={"Listings with stock or quality problems, each with an AI analysis button."}>
             {attentionProducts.length === 0 ? (
               <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No obvious stock issues in this range.</p>
             ) : (
@@ -809,7 +814,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
           </Panel>
 
-          <Panel title="Product Interest">
+          <Panel title="Product Interest" description={"Which products enquiries are about, and how many matched no product at all."}>
             {data.productInterest.topProducts.length === 0 ? (
               <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No product-specific enquiries yet.</p>
             ) : (
@@ -830,7 +835,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
           </Panel>
 
-          <Panel title="Marketing Insights">
+          <Panel title="Marketing Insights" description={"Campaign recommendations generated from your analytics, rebuilt on every page load."}>
             {data.marketingInsights.items.length === 0 ? (
               <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No marketing insights available yet.</p>
             ) : (
@@ -881,7 +886,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
           </Panel>
 
-          <Panel title="Saved Marketing Ideas">
+          <Panel title="Saved Marketing Ideas" description={"Insights you kept, tracked from idea through drafted, approved, and published."}>
             <MarketingIdeas
               ideas={savedIdeas}
               loading={ideasLoading}
@@ -891,7 +896,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             />
           </Panel>
 
-          <Panel title="Chatbot Questions">
+          <Panel title="Chatbot Questions" description={"What visitors asked the site chat, grouped by topic. Needs analytics configured."}>
             {data.analytics.status !== 'ready' ? (
               <p style={{ margin: 0, color: '#888', fontSize: '0.78rem' }}>{data.analytics.message}</p>
             ) : chat.recent.length === 0 ? (
@@ -921,7 +926,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
           </Panel>
 
-          <Panel title="Funnel">
+          <Panel title="Funnel" description={"Where visitors drop off between landing on the site and sending an enquiry."}>
             {data.analytics.status !== 'ready' ? (
               <p style={{ margin: 0, color: '#888', fontSize: '0.78rem' }}>{data.analytics.message}</p>
             ) : (
@@ -936,7 +941,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
           </Panel>
 
-          <Panel title="Traffic Quality">
+          <Panel title="Traffic Quality" description={"Which sources bring visitors, and which of them convert into enquiries."}>
             {data.traffic.length === 0 ? (
               <p style={{ margin: 0, color: '#888', fontSize: '0.78rem' }}>Traffic quality appears here once PostHog server analytics are configured.</p>
             ) : (
@@ -951,7 +956,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
           </Panel>
 
-          <Panel title="Launch Readiness">
+          <Panel title="Launch Readiness" description={"Configuration checks for email, login, analytics, and images, and what's missing."}>
             <div style={{ display: 'grid', gap: '0.45rem' }}>
               {data.readiness.map((item) => (
                 <div key={item.label} style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '0.55rem', alignItems: 'start' }}>
@@ -965,7 +970,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             </div>
           </Panel>
 
-          <Panel title="Build Decisions">
+          <Panel title="Build Decisions" description={"Standing decisions about how this admin behaves, recorded so they stay settled."}>
             <ul style={{ margin: 0, paddingLeft: '1rem', color: '#aaa', fontSize: '0.72rem', lineHeight: 1.45 }}>
               {data.decisions.map((decision) => <li key={decision}>{decision}</li>)}
             </ul>
