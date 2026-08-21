@@ -81,11 +81,26 @@ interface TraySizeRecord {
 }
 ```
 
-Counts are aggregated per distinct size rather than stored per submission. A
-variant accumulates a handful of real tray sizes, not a row per visitor, so the
-record stays small and bounded however popular the page becomes. It is also
-exactly what "most commonly reported, with a count" needs, and it holds nothing
-that could identify anyone.
+Counts are aggregated per distinct size rather than stored per submission, so a
+variant holds a handful of real tray sizes rather than a row per visitor. It
+holds nothing that could identify anyone.
+
+Two things keep it genuinely bounded, because aggregation alone does not:
+
+- **Dimensions are rounded to the nearest 10 mm before counting.** Nobody
+  measures a tray to the millimetre, and without this 2100 and 2103 are
+  different sizes. The accepted ranges span 3.64 million distinct millimetre
+  pairs; rounding cuts that to 36,400 and, more usefully, makes agreement
+  between owners actually register.
+- **A variant keeps at most 20 distinct sizes**, evicting the least reported.
+  A vehicle with more than twenty genuinely different tray sizes is noise, and
+  without a cap a determined submitter could grow one record without limit.
+
+**Writes are conditional.** A read-modify-write would lose a report whenever two
+customers submitted for the same vehicle at once, and these counts decide what
+the next customer is shown. Each write uses the etag from the read
+(`onlyIfMatch`, or `onlyIfNew` when the record does not exist yet) and retries
+on a losing race.
 
 ### Choosing what to show
 
@@ -110,17 +125,18 @@ and a confirmation control with two actions:
 
 - **That is my tray** — records a confirmation for the shown size and leaves
   the fields filled.
-- **Mine is different** — clears both fields for the customer to type. Their
-  size is posted once they finish editing it, on the field's `change` event,
-  and only when both dimensions are present and plausible.
+- **Mine is different** — clears both fields for the customer to type, and
+  replaces itself with **Report my tray size**, which posts what they typed.
 
-There is no Calculate button to hang this on: the calculator recalculates live
-on every keystroke. Posting on `input` would report a size per character, so
-`change` — which fires on blur or Enter, once the value has actually settled —
-is the signal that the customer is done.
+If no reported size exists, the fields stay empty and the panel shows the same
+**Report my tray size** button, disabled until both dimensions are filled in
+and plausible.
 
-If no reported size exists, the fields stay empty and the panel invites a
-contribution, reported the same way.
+There is no Calculate button to hang this on — the calculator recalculates on
+every keystroke — and posting on blur instead was considered and rejected. It
+would report a size for every customer who merely filled the fields to run a
+calculation, including someone exploring numbers, and none of them ever asked
+to contribute. Only an explicit press reports anything.
 
 Each control posts at most once per variant selection. Confirming disables the
 confirm button, so a customer clicking it repeatedly cannot inflate a count,
@@ -187,6 +203,9 @@ Unit, against a pure aggregation module, written first:
 - Equal counts break on the most recent report.
 - A length or width outside the bounds is rejected.
 - A non-integer is rejected.
+- Dimensions are rounded to the nearest 10 mm, so near-identical measurements
+  count as agreement.
+- A variant never exceeds 20 distinct sizes; the least reported is evicted.
 - An unknown `variantId` is rejected.
 - A tub variant is rejected.
 
@@ -199,8 +218,9 @@ E2E:
 - Confirming posts the shown size.
 - Choosing "mine is different" clears the fields and posts the typed size.
 - Nothing is posted merely by selecting a variant.
+- Nothing is posted by filling the tray fields for an ordinary calculation.
 - Confirming twice posts once.
-- Editing the same size twice posts once.
+- A submission that fails can be retried.
 
 ## Files
 
