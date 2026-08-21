@@ -1,0 +1,532 @@
+{
+  "variants": [
+    {
+      "id": "chevrolet-silverado-1500-ltz-premium",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "chevrolet-silverado-1500-zr2",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "chevrolet-silverado-2500hd-ltz-nb1",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "chevrolet-silverado-2500hd-ltz-nb2",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ford-f-150-2024-lariat-5-5-ft-tub-swb",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ford-f-150-2024-lariat-6-5-ft-tub-lwb",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ford-f-150-2024-platinum-5-5-ft-tub-swb",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ford-f-150-2024-platinum-6-5-ft-tub-lwb",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ford-f-150-2024-xlt-5-5-ft-tub-swb",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ford-f-150-2024-xlt-6-5-ft-tub-lwb",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-raptor-double-pickup-ecoboost",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-sport-double-pickup-biturbo",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-sport-double-pickup-v6",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-wildtrak-double-pickup-biturbo",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-wildtrak-double-pickup-v6",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-cc-singleturbo",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-cc-biturbo",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-pickup-singleturbo",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-pickup-biturbo",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-single-cc-biturbo",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-super-cc-biturbo",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-super-pickup-biturbo",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xls-double-pickup-biturbo",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-double-cc-v6",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-double-pickup-biturbo",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-double-pickup-v6",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-super-pickup-biturbo",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ford-ranger-super-duty-my26-single-cab",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "gwm-cannon-2026-lux-dual-cab-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "gwm-cannon-2026-lux-dual-cab-chassis-factory-alloy-tray",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "gwm-cannon-2026-premium-dual-cab-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "gwm-cannon-2026-premium-single-cab-4x2-factory-alloy-tray",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "gwm-cannon-2026-ultra-dual-cab-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "gwm-cannon-2026-vanta-dual-cab-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "gwm-cannon-2026-xsr-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-lux-phev-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-lux-turbo-diesel-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-ultra-hev-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-ultra-phev-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-ultra-turbo-diesel-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-lsu-crew-3-0",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-crew-2-2",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-crew-3-0",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-sx-crew-2-2",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-sx-crew-3-0",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-single-2-2",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-single-3-0",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-sx-single-3-0",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-space-3-0",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-sx-space-3-0",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "kgm-musso-my26-advance-double-cab-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "kgm-musso-my26-elx-double-cab-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "kgm-musso-my26-ultimate-double-cab-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "kgm-musso-xlv-my26-advance-double-cab-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "kgm-musso-xlv-my26-elx-double-cab-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "kgm-musso-xlv-my26-ultimate-double-cab-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "kia-tasman-2026-dual-cab-s-4x4-cab-chassis-optional-tray",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "kia-tasman-2026-dual-cab-sx-4x4-cab-chassis-optional-tray",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "kia-tasman-my26-s-4x2",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "kia-tasman-my26-s-4x4",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "kia-tasman-my26-sx-4x4",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "kia-tasman-my26-sxplus-4x4",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "kia-tasman-2026-single-cab-s-4x2-cab-chassis-optional-tray",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "kia-tasman-2026-single-cab-s-4x4-cab-chassis-optional-tray",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "kia-tasman-2026-single-cab-sx-4x4-cab-chassis-optional-tray",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "kia-tasman-my26-xline-4x4",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "kia-tasman-my26-xpro-4x4",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-gt-cc",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-gt-pickup",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-sp-pickup",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-thunder-pickup",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xs-cc",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xs-pickup",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x2-xs-pickup",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "mazda-bt50-my25-single-4x2-xs-cc",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xt-cc",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x2-xt-cc",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xt-pickup",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x2-xt-pickup",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "mazda-bt50-my25-freestyle-4x2-xt-cc",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "mazda-bt50-my25-freestyle-4x4-xt-cc",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "mazda-bt50-my25-single-4x2-xt-cc",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "mazda-bt50-my25-single-4x4-xt-cc",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xtr-cc",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xtr-pickup",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x2-xtr-pickup",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "mitsubishi-triton-26my-gls-double-cc-4x4",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "mitsubishi-triton-26my-gls-double-pickup-4x4-1t",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "mitsubishi-triton-26my-gls-double-pickup-4x4-0-9t",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-club-cc-4x4",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-double-pickup-4x2",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-double-cc-4x4-manual",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-double-cc-4x4-auto",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-double-pickup-4x4",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glxplus-club-pickup-4x4",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glxplus-double-cc-4x4",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glxplus-double-pickup-4x4",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glxr-double-pickup-4x4",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "mitsubishi-triton-26my-gsr-double-cc-4x4",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "mitsubishi-triton-26my-gsr-double-pickup-4x4-1t",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "mitsubishi-triton-26my-gsr-double-pickup-4x4-0-9t",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "nissan-navara-2026-pro-4x-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "nissan-navara-2026-sl-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "nissan-navara-2026-st-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "nissan-navara-2026-st-x-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-express-black-edition-hurricane-crew-cab-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-laramie-sport-hurricane-crew-cab-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-rebel-hurricane-crew-cab-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ram-2500-2025-laramie-cummins-high-output-6-4-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ram-3500-2025-laramie-cummins-ho-4-495-kg-gvm-derate-6-4-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "ram-3500-2025-laramie-cummins-high-output-6-4-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-sr-double-manual",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-sr-double-auto",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-sr-extra-auto",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-workmate-double-auto",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "toyota-hilux-my26-4x2-workmate-single-manual",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "toyota-hilux-my26-4x2-workmate-single-auto",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-workmate-single-auto",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "toyota-lc70-my25-gx-single-auto",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "toyota-lc70-my25-gxl-double-auto",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "toyota-lc70-my25-gxl-single-auto",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "toyota-lc70-my25-workmate-double-auto",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "toyota-lc70-my25-workmate-single-auto",
+      "bodyType": "cab_chassis"
+    },
+    {
+      "id": "toyota-tundra-my26-limited",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "toyota-tundra-my26-platinum",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "volkswagen-amarok-2025-aventura-tdi-v6-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "volkswagen-amarok-2025-aventura-tsi-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "volkswagen-amarok-2025-core-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "volkswagen-amarok-2025-life-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "volkswagen-amarok-2025-panamericana-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "volkswagen-amarok-2025-style-2-0-tdi-pick-up-tub",
+      "bodyType": "pickup_tub"
+    },
+    {
+      "id": "volkswagen-amarok-2025-style-3-0-tdi-v6-pick-up-tub",
+      "bodyType": "pickup_tub"
+    }
+  ]
+}
