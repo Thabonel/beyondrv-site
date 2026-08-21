@@ -145,3 +145,20 @@ test('the homepage advertises a search endpoint that exists', async ({ page }) =
   expect(website).toBeTruthy();
   expect(website.potentialAction.target.urlTemplate).toBe('https://beyondrv.com.au/search/?q={search_term_string}');
 });
+
+test.describe('with JavaScript disabled', () => {
+  test.use({ javaScriptEnabled: false });
+
+  test('the search page says it needs JavaScript instead of rendering blank', async ({ page }) => {
+    await page.goto('/search/?q=advent');
+
+    const notice = page.getByTestId('search-noscript');
+    await expect(notice).toBeVisible();
+    await expect(notice).toContainText(/javascript/i);
+    // A dead end is worse than no search, so offer somewhere to go.
+    await expect(notice.getByRole('link', { name: /slide-on campers/i })).toBeVisible();
+    await expect(notice.getByRole('link', { name: /enquiry/i })).toBeVisible();
+    // The compiler strips spaces around an inline <a>, so the links are a list.
+    await expect(notice.getByRole('listitem')).toHaveCount(5);
+  });
+});
