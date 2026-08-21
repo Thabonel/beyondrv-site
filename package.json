@@ -19,7 +19,8 @@
     "audit:cls": "node SCRIPTS/audit-cls.mjs",
     "authority:indexnow": "node SCRIPTS/submit-indexnow.mjs",
     "images:optimize": "node SCRIPTS/optimize-product-images.mjs --write",
-    "configurator:prepare-glb": "node SCRIPTS/prepare-configurator-glb.mjs"
+    "configurator:prepare-glb": "node SCRIPTS/prepare-configurator-glb.mjs",
+    "catalogue:build": "node --experimental-strip-types SCRIPTS/build-vehicle-catalogue.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.2",

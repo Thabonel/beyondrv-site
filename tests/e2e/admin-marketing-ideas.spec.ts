@@ -125,3 +125,86 @@ test('a dashboard marketing insight can be saved and moved through its review st
   expect(writes[2].payload).toEqual({ id: IDEA_ID, status: 'approved' });
   await expect(ideaRow.getByRole('combobox')).toHaveValue('approved');
 });
+
+test('refreshing an idea saved under the old id format updates it rather than duplicating it', async ({ page }) => {
+  // An idea stored before the id format changed: slug only, no fingerprint.
+  const LEGACY_ID = 'marketing_idea_promote-the-advent-2450-to-towing-families';
+  const writes: Array<Record<string, unknown>> = [];
+
+  await page.route('**/.netlify/functions/admin-dashboard?range=30', route => route.fulfill({
+    status: 200, contentType: 'application/json', body: JSON.stringify(dashboard),
+  }));
+
+  await page.route('**/.netlify/functions/admin-marketing-ideas', async route => {
+    const request = route.request();
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200, contentType: 'application/json',
+        body: JSON.stringify({ ideas: [{ ...savedIdea('approved'), id: LEGACY_ID }] }),
+      });
+      return;
+    }
+    const payload = request.postDataJSON() as Record<string, unknown>;
+    writes.push(payload);
+    await route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify({ ok: true, idea: { ...savedIdea('approved'), id: LEGACY_ID } }),
+    });
+  });
+
+  await page.goto('/admin/');
+
+  const insightCard = page.getByTestId('marketing-insight').filter({ hasText: insight.title });
+  const button = insightCard.getByRole('button');
+  await expect(button).toHaveText('Update saved idea');
+
+  await button.click();
+  await expect.poll(() => writes.length).toBe(1);
+
+  // Without the stored id the server derives the new format and strands the
+  // reviewed record under its old key.
+  expect(writes[0].id).toBe(LEGACY_ID);
+});
+
+test('saving before the stored ideas have loaded cannot duplicate a reviewed record', async ({ page }) => {
+  const LEGACY_ID = 'marketing_idea_promote-the-advent-2450-to-towing-families';
+  const writes: Array<Record<string, unknown>> = [];
+
+  await page.route('**/.netlify/functions/admin-dashboard?range=30', route => route.fulfill({
+    status: 200, contentType: 'application/json', body: JSON.stringify(dashboard),
+  }));
+
+  await page.route('**/.netlify/functions/admin-marketing-ideas', async route => {
+    const request = route.request();
+    if (request.method() === 'GET') {
+      // The dashboard wins the race; the stored ideas arrive well after the
+      // Save button is on screen.
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await route.fulfill({
+        status: 200, contentType: 'application/json',
+        body: JSON.stringify({ ideas: [{ ...savedIdea('approved'), id: LEGACY_ID }] }),
+      });
+      return;
+    }
+    writes.push(request.postDataJSON() as Record<string, unknown>);
+    await route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify({ ok: true, idea: { ...savedIdea('approved'), id: LEGACY_ID } }),
+    });
+  });
+
+  await page.goto('/admin/');
+
+  const insightCard = page.getByTestId('marketing-insight').filter({ hasText: insight.title });
+  const button = insightCard.getByRole('button');
+  await expect(button).toBeVisible();
+
+  // Until the stored ideas are known, saving would derive a fresh id and
+  // strand the reviewed record, so the action must not be available yet.
+  await expect(button).toBeDisabled();
+
+  await expect(button).toHaveText('Update saved idea', { timeout: 5000 });
+  await button.click();
+  await expect.poll(() => writes.length).toBe(1);
+  expect(writes[0].id).toBe(LEGACY_ID);
+});

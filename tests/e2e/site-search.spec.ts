@@ -179,3 +179,29 @@ test('an expedition vehicle is not dragged into a search for on', async ({ page 
   await expect(page.getByTestId('search-result').filter({ hasText: 'Mercedes Sprinter' })).toHaveCount(0);
   await expect(page.getByTestId('search-result').filter({ hasText: 'Sunpatch' })).toHaveCount(0);
 });
+
+test('the mobile dropdown sits in flow and is bounded, so the keyboard cannot cover it', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 780 });
+  await page.goto('/');
+  await page.getByTestId('header-search-toggle').click();
+  await page.getByTestId('header-search-input').fill('adv');
+  await expect(page.getByTestId('header-search-option').first()).toBeVisible();
+
+  const style = await page.evaluate(() => {
+    const listbox = document.querySelector('.nav-search-listbox') as HTMLElement;
+    const toggle = document.querySelector('.nav-search-toggle') as HTMLElement;
+    return {
+      position: getComputedStyle(listbox).position,
+      maxHeight: getComputedStyle(listbox).maxHeight,
+      togglePaddingLeft: getComputedStyle(toggle).paddingLeft,
+      fortyVh: `${window.innerHeight * 0.4}px`,
+    };
+  });
+
+  // Inside the fixed search panel the list must sit in normal flow; floating it
+  // puts it behind the on-screen keyboard.
+  expect(style.position).toBe('static');
+  expect(style.maxHeight).toBe(style.fortyVh);
+  // The toggle shrinks to its icon on mobile so the nav row keeps its budget.
+  expect(style.togglePaddingLeft).toBe('8px');
+});
