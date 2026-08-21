@@ -1,7 +1,7 @@
 import type { Handler } from '@netlify/functions';
 import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
-import { removeTraySize, TRAY_SIZE_STORE, traySizeKey, type TraySizeRecord } from './tray-size-core';
+import { mapWithConcurrency, removeTraySize, TRAY_SIZE_STORE, traySizeKey, type TraySizeRecord } from './tray-size-core';
 import variantIndex from './vehicle-variant-index.json';
 
 // Moderating by variant id means decoding strings like
@@ -32,23 +32,28 @@ export const handler: Handler = async (event) => {
 
     if (event.httpMethod === 'GET') {
       const { blobs } = await store.list();
-      const records: TraySizeRecord[] = [];
-      for (const blob of blobs) {
-        const record = await store.get(blob.key, { type: 'json' }) as TraySizeRecord | null;
-        if (record?.variantId) records.push(record);
-      }
+      const loaded = await mapWithConcurrency(
+        blobs, 8,
+        (blob) => store.get(blob.key, { type: 'json' }) as Promise<TraySizeRecord | null>,
+      );
+      const records = loaded.filter((record): record is TraySizeRecord => Boolean(record?.variantId));
       records.sort((a, b) => b.totalReports - a.totalReports || a.variantId.localeCompare(b.variantId));
       return json(200, {
         records: records.map((record) => ({ ...record, label: LABELS.get(record.variantId) ?? record.variantId })),
       });
     }
 
-    let body: Record<string, unknown>;
+    let parsed: unknown;
     try {
-      body = JSON.parse(event.body ?? '{}') as Record<string, unknown>;
+      parsed = JSON.parse(event.body ?? '{}');
     } catch {
       return json(400, { error: 'Invalid request' });
     }
+    // JSON.parse('null') succeeds, so guard the shape before reading fields.
+    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+      return json(400, { error: 'Invalid request' });
+    }
+    const body = parsed as Record<string, unknown>;
 
     const variantId = typeof body.variantId === 'string' ? body.variantId : '';
     const lengthMm = Number(body.lengthMm);

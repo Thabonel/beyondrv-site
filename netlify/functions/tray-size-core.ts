@@ -136,16 +136,23 @@ export const MAX_WRITE_ATTEMPTS = 5;
  * is self-contained for the same reason.
  */
 export function acceptTraySizeSubmission(
-  body: Record<string, unknown>,
+  body: unknown,
   isCabChassis: (id: string) => boolean,
 ): { ok: true; variantId: string; lengthMm: number; widthMm: number } | { ok: false; error: string } {
-  const variantId = typeof body.variantId === 'string' ? body.variantId.trim() : '';
+  // JSON.parse('null') succeeds, so a try/catch around the parse does not make
+  // the value safe to read. Anything that is not a plain object is a client
+  // error, and must not surface as a server fault.
+  if (typeof body !== 'object' || body === null || Array.isArray(body)) {
+    return { ok: false, error: 'Invalid request' };
+  }
+  const fields = body as Record<string, unknown>;
+  const variantId = typeof fields.variantId === 'string' ? fields.variantId.trim() : '';
   if (!variantId) return { ok: false, error: 'Choose your vehicle before reporting a tray size.' };
   if (!isCabChassis(variantId)) {
     return { ok: false, error: 'Tray sizes are only collected for cab chassis vehicles.' };
   }
 
-  const size = validateTraySize(body.lengthMm, body.widthMm);
+  const size = validateTraySize(fields.lengthMm, fields.widthMm);
   if (!size.ok) return { ok: false, error: size.error };
 
   return { ok: true, variantId, lengthMm: size.lengthMm, widthMm: size.widthMm };
@@ -184,4 +191,29 @@ export async function recordTraySizeWithRetry(
   }
 
   return { ok: false };
+}
+
+/**
+ * Reads every listed record without firing them all at once. The public GET
+ * fans out over one blob per vehicle, and doing that serially makes latency the
+ * sum of every round trip.
+ */
+export async function mapWithConcurrency<T, R>(
+  items: T[],
+  limit: number,
+  worker: (item: T, index: number) => Promise<R>,
+): Promise<R[]> {
+  const results = new Array<R>(items.length);
+  let next = 0;
+
+  async function run() {
+    while (next < items.length) {
+      const index = next;
+      next += 1;
+      results[index] = await worker(items[index], index);
+    }
+  }
+
+  await Promise.all(Array.from({ length: Math.min(Math.max(1, limit), items.length) }, run));
+  return results;
 }

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { acceptTraySizeSubmission, recordTraySizeWithRetry } from '../netlify/functions/tray-size-core.ts';
+import { acceptTraySizeSubmission, mapWithConcurrency, recordTraySizeWithRetry } from '../netlify/functions/tray-size-core.ts';
 
 const isCabChassis = (id: string) => id === 'ford-ranger-cc';
 
@@ -90,4 +90,34 @@ test('a write that keeps losing gives up rather than looping forever', async () 
   const result = await recordTraySizeWithRetry(store as any, 'ford-ranger-cc', 2100, 1800, alwaysSteal);
 
   assert.equal(result.ok, false);
+});
+
+test('a JSON body that is not an object is rejected, not crashed on', () => {
+  // JSON.parse('null') succeeds, so the try/catch around it does not help.
+  for (const body of [null, undefined, 'a string', 42, [1, 2, 3]]) {
+    const result = acceptTraySizeSubmission(body, isCabChassis);
+    assert.equal(result.ok, false, `${JSON.stringify(body)} should be rejected`);
+  }
+});
+
+test('reads run concurrently but never more than the limit at once', async () => {
+  let inFlight = 0;
+  let peak = 0;
+  const read = async (n: number) => {
+    inFlight += 1;
+    peak = Math.max(peak, inFlight);
+    await new Promise((r) => setTimeout(r, 5));
+    inFlight -= 1;
+    return n * 2;
+  };
+
+  const results = await mapWithConcurrency([1, 2, 3, 4, 5, 6, 7], 3, read);
+
+  assert.deepEqual(results, [2, 4, 6, 8, 10, 12, 14], 'order is preserved');
+  assert.ok(peak > 1, 'reads must overlap, or this is still serial');
+  assert.ok(peak <= 3, `peak concurrency was ${peak}, above the limit of 3`);
+});
+
+test('mapping an empty list does no work', async () => {
+  assert.deepEqual(await mapWithConcurrency([], 3, async () => 1), []);
 });

@@ -4,6 +4,7 @@ import { isRateLimited, rateLimitResponse } from './security-utils';
 import variantIndex from './vehicle-variant-index.json';
 import {
   acceptTraySizeSubmission,
+  mapWithConcurrency,
   recordTraySizeWithRetry,
   TRAY_SIZE_STORE,
   winningTraySize,
@@ -16,6 +17,9 @@ const CAB_CHASSIS = new Set(
     .filter((variant) => variant.bodyType === 'cab_chassis')
     .map((variant) => variant.id),
 );
+
+/** One blob per vehicle, so this fans out; serial reads make latency their sum. */
+const READ_CONCURRENCY = 8;
 
 function json(statusCode: number, body: Record<string, unknown>) {
   return {
@@ -34,9 +38,12 @@ export const handler: Handler = async (event) => {
 
     if (event.httpMethod === 'GET') {
       const { blobs } = await store.list();
+      const records = await mapWithConcurrency(
+        blobs, READ_CONCURRENCY,
+        (blob) => store.get(blob.key, { type: 'json' }) as Promise<TraySizeRecord | null>,
+      );
       const sizes: Record<string, { lengthMm: number; widthMm: number; reports: number }> = {};
-      for (const blob of blobs) {
-        const record = await store.get(blob.key, { type: 'json' }) as TraySizeRecord | null;
+      for (const record of records) {
         const winner = winningTraySize(record);
         if (record?.variantId && winner) sizes[record.variantId] = winner;
       }
@@ -45,9 +52,9 @@ export const handler: Handler = async (event) => {
 
     if (await isRateLimited(event, 'tray-sizes', 10, 60 * 60)) return rateLimitResponse();
 
-    let body: Record<string, unknown>;
+    let body: unknown;
     try {
-      body = JSON.parse(event.body ?? '{}') as Record<string, unknown>;
+      body = JSON.parse(event.body ?? '{}');
     } catch {
       return json(400, { error: 'Invalid request' });
     }
