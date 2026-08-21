@@ -66,3 +66,66 @@ test('the header search form works as a plain GET form', async ({ page }) => {
   await expect(form).toHaveAttribute('method', 'get');
   await expect(page.getByTestId('header-search-input')).toHaveAttribute('name', 'q');
 });
+
+test('typing in the header opens a dropdown of matches', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('header-search-toggle').click();
+  await page.getByTestId('header-search-input').fill('adv');
+
+  const options = page.getByTestId('header-search-option');
+  await expect(options.first()).toBeVisible();
+  await expect(options.filter({ hasText: 'Advent' }).first()).toBeVisible();
+});
+
+test('a single character is too little to open the dropdown', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('header-search-toggle').click();
+  await page.getByTestId('header-search-input').fill('a');
+
+  await expect(page.getByTestId('header-search-listbox')).toBeHidden();
+});
+
+test('arrow down then enter opens the highlighted result', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('header-search-toggle').click();
+  const input = page.getByTestId('header-search-input');
+  await input.fill('unimog');
+  await expect(page.getByTestId('header-search-option').first()).toBeVisible();
+
+  await input.press('ArrowDown');
+  await input.press('Enter');
+
+  await expect(page).toHaveURL(/unimog/);
+});
+
+test('escape closes the dropdown and leaves focus in the input', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('header-search-toggle').click();
+  const input = page.getByTestId('header-search-input');
+  await input.fill('advent');
+  await expect(page.getByTestId('header-search-option').first()).toBeVisible();
+
+  await input.press('Escape');
+
+  await expect(page.getByTestId('header-search-listbox')).toBeHidden();
+  await expect(input).toBeFocused();
+});
+
+test('the dropdown offers a route to the full results page', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('header-search-toggle').click();
+  await page.getByTestId('header-search-input').fill('advent');
+  await expect(page.getByTestId('header-search-option').first()).toBeVisible();
+
+  await page.getByTestId('header-search-see-all').click();
+
+  await expect(page).toHaveURL(/\/search\/\?q=advent/);
+});
+
+test('the dropdown announces how many results it found', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('header-search-toggle').click();
+  await page.getByTestId('header-search-input').fill('unimog');
+
+  await expect(page.getByTestId('header-search-status')).toContainText(/result/i);
+});

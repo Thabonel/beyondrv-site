@@ -87,6 +87,7 @@ const navLinks = [
 
 <script>
   import { readCart, totalCount, CART_EVENT } from '../lib/cart';
+  import { attachSearchDropdown } from '../lib/searchDropdown';
 
   const navbar = document.getElementById('navbar');
   const hamburger = document.getElementById('navHamburger');
@@ -105,6 +106,11 @@ const navLinks = [
     navSearchToggle.setAttribute('aria-expanded', 'true');
     (navSearchInput as HTMLInputElement | null)?.focus();
   });
+
+  const headerSearchForm = document.getElementById('headerSearchForm');
+  if (navSearchInput instanceof HTMLInputElement && headerSearchForm instanceof HTMLFormElement) {
+    attachSearchDropdown(navSearchInput, headerSearchForm);
+  }
 
   hamburger?.addEventListener('click', () => {
     const isOpen = navLinks?.classList.toggle('open');
