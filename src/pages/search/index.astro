@@ -21,6 +21,20 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       <button type="submit">Search</button>
     </form>
 
+    <noscript>
+      <div class="search-noscript" data-testid="search-noscript">
+        <p>Search needs JavaScript, which is turned off in this browser.</p>
+        <p>You can still browse:</p>
+        <ul>
+          <li><a href="/our-slide-on-campers/">Slide-on campers</a></li>
+          <li><a href="/our-caravans/">Caravans</a></li>
+          <li><a href="/expedition/">Expedition vehicles</a></li>
+          <li><a href="/guides/">Buying guides</a></li>
+          <li><a href="/inquiry-form/">Send us an enquiry</a></li>
+        </ul>
+      </div>
+    </noscript>
+
     <div id="searchResults" data-testid="search-results" aria-live="polite"></div>
   </main>
 </BaseLayout>
@@ -54,6 +68,20 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   }
   .search-page :global(.search-unmatched strong) { color: var(--white); }
   .search-page :global(.search-unmatched a) { color: var(--orange2); }
+  .search-noscript {
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--orange2);
+    border-radius: 8px;
+    color: var(--cream);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .search-noscript p { margin: 0 0 0.5rem; }
+  .search-noscript p:last-child { margin-bottom: 0; }
+  .search-noscript a { color: var(--orange2); }
+  .search-noscript ul { margin: 0; padding-left: 1.1rem; }
+  .search-noscript li { margin: 0.15rem 0; }
 </style>
 
 <script>

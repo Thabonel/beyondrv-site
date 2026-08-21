@@ -142,8 +142,13 @@ It is a real form:
 <form action="/search/" method="get" role="search">
 ```
 
-so it works with JavaScript disabled and crawlers see an honest endpoint. On
-desktop the input expands on click, because the nav already carries nine
+A real form is the right markup for a search box regardless, and it keeps the
+URL contract explicit. It does **not** make search work without JavaScript: an
+earlier version of this document claimed it did, and that was wrong. The
+navigation works, but `/search/` renders its results client-side, so a browser
+without JavaScript lands on an empty page. See "JavaScript is required" below.
+
+On desktop the input expands on click, because the nav already carries nine
 links, the cart, and the Enquire CTA, and an always-visible input crowds them.
 On mobile it renders as a full-width input at the top of the open hamburger
 menu.
@@ -190,6 +195,27 @@ Two known traps, called out because they are the usual defects:
 The results page remains the primary surface. The dropdown serves customers
 who already know a model name; the page serves customers still deciding, which
 is why it keeps the images, taglines, and prices.
+
+### JavaScript is required
+
+`/search/` fetches the index and renders its results in the browser. Without
+JavaScript the page arrives with an empty search box and an empty results
+area — the query is not even placed back into the input.
+
+This is not being fixed, and the decision is recorded rather than left as an
+implied capability:
+
+- The site is statically built, so results for an arbitrary query cannot be
+  pre-rendered. A fallback would mean a Netlify function rendering the results
+  page server-side: a new server-rendered surface, a new failure mode, and a
+  slower page for everyone.
+- The results page is `noindex, nofollow` by design, following Google's own
+  guidance on search results, so no crawler reads it.
+- The configurator, cart and admin already require JavaScript. Search is not
+  more essential than those.
+
+A `<noscript>` message on the page says so, rather than showing a blank page
+that looks broken.
 
 ### Structured data and redirects
 
