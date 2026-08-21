@@ -129,3 +129,19 @@ test('the dropdown announces how many results it found', async ({ page }) => {
 
   await expect(page.getByTestId('header-search-status')).toContainText(/result/i);
 });
+
+test('the homepage advertises a search endpoint that exists', async ({ page }) => {
+  await page.goto('/');
+
+  const blocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+  // A block may hold a single schema object or an array of them.
+  const website = blocks
+    .flatMap((raw) => {
+      const parsed = JSON.parse(raw) as Record<string, any> | Record<string, any>[];
+      return Array.isArray(parsed) ? parsed : [parsed];
+    })
+    .find((schema) => schema['@type'] === 'WebSite');
+
+  expect(website).toBeTruthy();
+  expect(website.potentialAction.target.urlTemplate).toBe('https://beyondrv.com.au/search/?q={search_term_string}');
+});

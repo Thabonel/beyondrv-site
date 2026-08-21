@@ -25,9 +25,10 @@
   to     = "/our-caravans/"
   status = 301
 
+# Legacy WordPress search URLs (/?s=term) reach the current search page.
 [[redirects]]
   from   = "/"
-  to     = "/our-slide-on-campers/?q=:search"
+  to     = "/search/?q=:search"
   status = 301
   query  = {s = ":search"}
 
