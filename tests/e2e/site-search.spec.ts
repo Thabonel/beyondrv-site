@@ -145,3 +145,29 @@ test('the homepage advertises a search endpoint that exists', async ({ page }) =
   expect(website).toBeTruthy();
   expect(website.potentialAction.target.urlTemplate).toBe('https://beyondrv.com.au/search/?q={search_term_string}');
 });
+
+test('the mobile dropdown sits in flow and is bounded, so the keyboard cannot cover it', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 780 });
+  await page.goto('/');
+  await page.getByTestId('header-search-toggle').click();
+  await page.getByTestId('header-search-input').fill('adv');
+  await expect(page.getByTestId('header-search-option').first()).toBeVisible();
+
+  const style = await page.evaluate(() => {
+    const listbox = document.querySelector('.nav-search-listbox') as HTMLElement;
+    const toggle = document.querySelector('.nav-search-toggle') as HTMLElement;
+    return {
+      position: getComputedStyle(listbox).position,
+      maxHeight: getComputedStyle(listbox).maxHeight,
+      togglePaddingLeft: getComputedStyle(toggle).paddingLeft,
+      fortyVh: `${window.innerHeight * 0.4}px`,
+    };
+  });
+
+  // Inside the fixed search panel the list must sit in normal flow; floating it
+  // puts it behind the on-screen keyboard.
+  expect(style.position).toBe('static');
+  expect(style.maxHeight).toBe(style.fortyVh);
+  // The toggle shrinks to its icon on mobile so the nav row keeps its budget.
+  expect(style.togglePaddingLeft).toBe('8px');
+});
