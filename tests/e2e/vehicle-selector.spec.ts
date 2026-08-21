@@ -220,3 +220,32 @@ test('a vehicle whose kerb mass excludes the tray will not calculate until the t
   await page.fill('#trayMass', '120');
   await expect(page.locator('#statusLabel')).not.toContainText(/not enough information/i);
 });
+
+test('a weighbridge weight that already includes the tray does not demand the tray again', async ({ page }) => {
+  await page.goto('/slide-on-camper-weight-calculator/');
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
+  await expect(page.locator('#trayMassField')).toBeVisible();
+
+  // The page tells people to use a weighbridge figure; that figure includes
+  // the tray already bolted on.
+  await page.fill('#currentWeight', '2350');
+  for (const [id, v] of [['gvm', '5000'], ['passengers', '1'], ['accessories', '1'], ['luggageGear', '1'],
+    ['camperDry', '1'], ['camperWater', '1'], ['camperGear', '1'], ['camperOptions', '1'],
+    ['trayLength', '2000'], ['trayWidth', '1800'], ['requiredTrayLength', '1900'], ['requiredTrayWidth', '1700']] as const) {
+    await page.fill(`#${id}`, v);
+  }
+
+  // Blank tray weight still blocks, because nothing has said the figure includes it.
+  await expect(page.locator('#statusLabel')).toContainText(/not enough information/i);
+
+  await page.check('#trayIncluded');
+
+  // Now it calculates, and the tray is counted once: 2350 + 7 = 2357kg.
+  await expect(page.locator('#statusLabel')).not.toContainText(/not enough information/i);
+  await expect(page.locator('#loadedWeight')).toHaveText(/2,?357 kg/);
+
+  // The tray field is gone, so it cannot be entered twice.
+  await expect(page.locator('#trayMassRow')).toBeHidden();
+});

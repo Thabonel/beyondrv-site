@@ -35,3 +35,26 @@ export function resolveCurrentVehicleWeight({
   // anything left in the field so it cannot be counted twice.
   return String(currentWeight);
 }
+
+export interface TrayMassRequirement {
+  /** The catalogue's view of whether the published kerb mass includes a tray. */
+  trayState: string;
+  /**
+   * Whether the current vehicle weight on screen already accounts for the
+   * tray. The page asks people for a weighbridge figure, and a weighbridge
+   * figure includes whatever tray is bolted on, so the catalogue alone cannot
+   * answer this — only the customer knows which number they typed.
+   */
+  currentWeightIncludesTray: boolean;
+}
+
+/**
+ * Guessing this from whether the weight was edited is not safe: someone can
+ * replace the published kerb mass with a different kerb mass that still
+ * excludes the tray, and silently dropping the requirement would understate
+ * the vehicle again. Asking costs a checkbox; guessing costs payload.
+ */
+export function isTrayMassRequired({ trayState, currentWeightIncludesTray }: TrayMassRequirement): boolean {
+  if (currentWeightIncludesTray) return false;
+  return trayState === 'excluded' || trayState === 'unknown';
+}
