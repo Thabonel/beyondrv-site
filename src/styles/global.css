@@ -2317,10 +2317,21 @@ footer {
   }
   .nav-links.open li a { display: block; padding: 0.75rem var(--gutter); }
   .nav-hamburger { display: flex; }
-  .nav-search { width: 100%; order: -1; }
-  .nav-search-toggle { display: none; }
-  .nav-search-form { display: block; }
-  .nav-search-form input { width: 100%; }
+  .nav-search-label { display: none; }
+  .nav-search-toggle { padding: 0.35rem 0.5rem; }
+  /* Keep the nav row intact: the opened input drops below the bar instead of
+     widening a flex child, which previously forced the row to wrap. */
+  .nav-search.open .nav-search-form {
+    position: fixed;
+    top: var(--nav-height);
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(10,10,10,0.98);
+    border-top: 1px solid var(--border);
+    padding: 0.75rem var(--gutter);
+  }
+  .nav-search.open .nav-search-form input { width: 100%; }
 }
 @media (max-width: 768px) {
   .checker-form { grid-template-columns: 1fr; }
@@ -2583,6 +2594,9 @@ footer {
 .nav-search.open .nav-search-form { display: block; }
 .nav-search.open .nav-search-toggle { display: none; }
 .nav-search-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   background: transparent;
   border: 1px solid var(--border);
   color: var(--cream);
