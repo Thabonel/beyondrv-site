@@ -852,7 +852,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
                         <button
                           type="button"
                           onClick={() => saveInsight(insight)}
-                          disabled={Boolean(saved) || ideaSavingId === insight.title}
+                          disabled={ideaSavingId === insight.title}
                           style={{
                             justifySelf: 'start',
                             marginTop: '0.15rem',
@@ -861,15 +861,20 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
                             color: saved ? '#777' : '#fff',
                             borderRadius: '6px',
                             padding: '0.28rem 0.55rem',
-                            cursor: saved || ideaSavingId === insight.title ? 'default' : 'pointer',
+                            cursor: ideaSavingId === insight.title ? 'wait' : 'pointer',
                             fontWeight: 700,
                             fontSize: '0.7rem',
                           }}
                         >
-                          {saved ? `Saved · ${saved.status}` : ideaSavingId === insight.title ? 'Saving…' : 'Save idea'}
+                          {ideaSavingId === insight.title ? 'Saving…' : saved ? 'Update saved idea' : 'Save idea'}
                         </button>
                       );
                     })()}
+                    {savedIdeaFor(insight.title) && (
+                      <div style={{ color: '#777', fontSize: '0.66rem' }}>
+                        Saved · {savedIdeaFor(insight.title)?.status}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
