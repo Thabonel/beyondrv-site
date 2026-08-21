@@ -35,11 +35,11 @@ fire: `/?s=camper` returns 200 with no redirect.
 
 ## Scope
 
-23 records:
+21 records:
 
 | Kind | Count | Source |
 |---|---|---|
-| `product` | 17 | `src/content/products/`: 11 top-level, 1 under `accessories/`, 5 under `expedition/` |
+| `product` | 15 | `src/content/products/`: 17 files less the 2 archived, which `isPublicProduct` excludes |
 | `guide` | 3 | The two articles under `src/pages/guides/` plus the guides index, so a search for "guides" reaches the hub |
 | `tool` | 3 | Towing calculator, slide-on weight calculator, vehicle suitability checker |
 

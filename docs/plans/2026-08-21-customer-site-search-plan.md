@@ -448,7 +448,7 @@ Run:
 npm run build >/dev/null && node -e "const d=require('./dist/search-index.json');console.log('records',d.records.length);console.log('kinds',JSON.stringify(d.records.reduce((a,r)=>{a[r.kind]=(a[r.kind]||0)+1;return a},{})));console.log('sample',JSON.stringify(d.records[0]))"
 ```
 
-Expected: `records 23`, and `kinds {"product":17,"guide":3,"tool":3}`. If the product count differs, a product is archived or a new one was added — confirm against `ls src/content/products` before changing anything.
+Expected: `records 21`, and `kinds {"product":15,"guide":3,"tool":3}`. There are 17 product files, two of which are archived (`3-5m-poptop-truck-camper`, `sunpatch-12c-couples-caravan`) and correctly excluded by `isPublicProduct`. If the count differs, a product was added or archived — confirm against `grep -l "^archived: true" src/content/products/*.md src/content/products/*/*.md` before changing anything.
 
 - [ ] **Step 6: Commit**
 
