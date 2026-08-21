@@ -46,3 +46,23 @@ test('typing on the results page updates both the results and the url', async ({
   await expect(page.getByTestId('search-result').filter({ hasText: 'Unimog' }).first()).toBeVisible();
   await expect(page).toHaveURL(/\/search\/\?q=unimog$/);
 });
+
+test('the header search submits to the results page', async ({ page }) => {
+  await page.goto('/');
+
+  await page.getByTestId('header-search-toggle').click();
+  await page.getByTestId('header-search-input').fill('unimog');
+  await page.getByTestId('header-search-input').press('Enter');
+
+  await expect(page).toHaveURL(/\/search\/\?q=unimog/);
+  await expect(page.getByTestId('search-result').first()).toBeVisible();
+});
+
+test('the header search form works as a plain GET form', async ({ page }) => {
+  await page.goto('/');
+
+  const form = page.getByTestId('header-search-form');
+  await expect(form).toHaveAttribute('action', '/search/');
+  await expect(form).toHaveAttribute('method', 'get');
+  await expect(page.getByTestId('header-search-input')).toHaveAttribute('name', 'q');
+});

@@ -41,6 +41,38 @@ const navLinks = [
     ))}
   </ul>
 
+  <div class="nav-search" data-nav-search>
+    <button
+      type="button"
+      class="nav-search-toggle"
+      data-testid="header-search-toggle"
+      data-nav-search-toggle
+      aria-label="Open search"
+      aria-expanded="false"
+      aria-controls="headerSearchForm"
+    >
+      Search
+    </button>
+    <form
+      id="headerSearchForm"
+      class="nav-search-form"
+      data-testid="header-search-form"
+      action="/search/"
+      method="get"
+      role="search"
+    >
+      <label class="visually-hidden" for="headerSearchInput">Search Beyond RV</label>
+      <input
+        id="headerSearchInput"
+        data-testid="header-search-input"
+        type="search"
+        name="q"
+        autocomplete="off"
+        placeholder="Search campers, guides, tools"
+      />
+    </form>
+  </div>
+
   <a href="/cart/" class="nav-cart" aria-label="View cart">
     Cart
     <span class="nav-cart-count" data-cart-count hidden>0</span>
@@ -59,6 +91,16 @@ const navLinks = [
   window.addEventListener('scroll', () => {
     navbar?.classList.toggle('scrolled', window.scrollY > 40);
   }, { passive: true });
+
+  const navSearch = document.querySelector('[data-nav-search]');
+  const navSearchToggle = document.querySelector('[data-nav-search-toggle]');
+  const navSearchInput = document.getElementById('headerSearchInput');
+
+  navSearchToggle?.addEventListener('click', () => {
+    navSearch?.classList.add('open');
+    navSearchToggle.setAttribute('aria-expanded', 'true');
+    (navSearchInput as HTMLInputElement | null)?.focus();
+  });
 
   hamburger?.addEventListener('click', () => {
     const isOpen = navLinks?.classList.toggle('open');
