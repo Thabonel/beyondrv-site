@@ -266,6 +266,7 @@ const schema = [
 
 <script>
   import { calculateSlideOnSuitability } from '../../lib/vehicleSuitabilityCalculator.js';
+  import { resolveCurrentVehicleWeight } from '../../lib/slideOnVehicleWeight';
 
   const form = document.getElementById('slideCalculator');
   const resultPanel = document.getElementById('resultPanel');
@@ -289,6 +290,11 @@ const schema = [
   }
   const catalogue = parseCatalogue();
   const customerEdited = new Set<string>();
+  // trayRequired mirrors whether the tray weight field is on screen: shown when
+  // the published kerb mass excludes a tray, or does not say. See
+  // resolveCurrentVehicleWeight for why a blank one cannot be treated as zero.
+  let trayRequired = false;
+
   const PREFILLABLE_FIELDS = ['vehicleName', 'gvm', 'currentWeight', 'trayLength', 'trayWidth', 'trayMass'];
   const FIELD_LABELS: Record<string, string> = {
     vehicleName: 'the vehicle name',
@@ -396,6 +402,9 @@ const schema = [
     });
     const trayField = byId('trayMassField');
     if (trayField) (trayField as HTMLElement).hidden = true;
+    trayRequired = false;
+    const trayInput = inputById('trayMass');
+    if (trayInput) trayInput.required = false;
     clearTrayMass();
     const panel = byId('vehicleProvenance');
     if (panel) {
@@ -419,7 +428,10 @@ const schema = [
     const trayField = byId('trayMassField');
     const trayHelp = byId('trayMassHelp');
     const showTray = variant.trayState === 'excluded' || variant.trayState === 'unknown';
+    trayRequired = showTray;
     if (trayField) (trayField as HTMLElement).hidden = !showTray;
+    const trayInput = inputById('trayMass');
+    if (trayInput) trayInput.required = showTray;
     if (!showTray) clearTrayMass();
     if (trayHelp) {
       trayHelp.textContent = variant.trayState === 'excluded'
@@ -498,22 +510,12 @@ const schema = [
     });
   }
 
-  // The tray is part of the vehicle's mass before the listed additions, so it
-  // is folded into currentVehicleWeight rather than passed separately. Only a
-  // finite, positive current weight is summed — mirroring parseRequired's own
-  // `> 0` gate inside the calculator — so a blank, zero or negative value
-  // passes straight through and still hits the existing missing-field path
-  // unchanged. Only a finite, non-negative tray mass is added; a blank,
-  // non-numeric or negative tray mass counts as 0kg rather than being summed
-  // in, so a negative tray entry can never understate the vehicle's weight.
   function currentVehicleWeightWithTray() {
-    const currentWeightRaw = value('currentWeight');
-    const currentWeightNumber = Number(currentWeightRaw);
-    if (!Number.isFinite(currentWeightNumber) || currentWeightNumber <= 0) return currentWeightRaw;
-    const trayMassRaw = value('trayMass');
-    const trayMassNumber = Number(trayMassRaw);
-    const trayMass = trayMassRaw !== '' && Number.isFinite(trayMassNumber) && trayMassNumber >= 0 ? trayMassNumber : 0;
-    return String(currentWeightNumber + trayMass);
+    return resolveCurrentVehicleWeight({
+      currentWeightRaw: value('currentWeight'),
+      trayMassRaw: value('trayMass'),
+      trayRequired,
+    });
   }
 
   function calculateSlideOn() {
