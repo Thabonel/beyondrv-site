@@ -539,7 +539,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             <StatCard label="Open Tasks" value={data.tasks.open} sub={`${data.tasks.overdue} overdue · ${pendingCount} pending changes`} tone={data.tasks.overdue ? 'blocker' : data.tasks.dueToday ? 'warning' : pendingCount ? 'warning' : 'ready'} />
           </div>
 
-          <Panel title="Unified Lifecycle" description={"Every paid order, enquiry, availability request, and quote request in one list."}>
+          <Panel title="Unified Lifecycle" description={"The 20 most recent paid orders, enquiries, availability requests and quote requests, merged into one list."}>
             {lifecycleSummary && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.45rem' }}>
                 <StatCard label="Total" value={lifecycleSummary.total} />
@@ -613,7 +613,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
           </Panel>
 
-          <Panel title="Today's Owner Priorities" description={"The leads scored most urgent right now, with the next action for each."}>
+          <Panel title="Today's Owner Priorities" description={"The ten most urgent leads right now, with the next action for each."}>
             {data.leads.priorityQueue.length === 0 ? (
               <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No high-priority lead actions detected.</p>
             ) : (
@@ -653,7 +653,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
           </Panel>
 
-          <Panel title="Owner Copilot Tasks" description={"Open follow-up tasks the Copilot is tracking, with due dates and priority."}>
+          <Panel title="Owner Copilot Tasks" description={"The six open Copilot tasks falling due soonest. Open Tasks above counts them all."}>
             {data.tasks.recent.length === 0 ? (
               <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No open Copilot tasks yet.</p>
             ) : (
@@ -671,7 +671,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
           </Panel>
 
-          <Panel title="Lead Follow-Up Queue" description={"Leads with a follow-up date set, ordered by when they fall due."}>
+          <Panel title="Lead Follow-Up Queue" description={"Leads whose follow-up is due or overdue today. A follow-up scheduled for a future date is not listed here."}>
             {data.leads.followUpQueue.length === 0 ? (
               <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No due or overdue follow-ups.</p>
             ) : (
@@ -721,7 +721,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             </div>
           </Panel>
 
-          <Panel title="Container Planning" description={"Products awaiting a container, with ETAs, stock estimates, and reorder quantities."}>
+          <Panel title="Container Planning" description={"Up to twelve products awaiting a container, with ETAs, stock estimates and reorder quantities."}>
             {data.inventory.planning.length === 0 ? (
               <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No products currently have planning fields set.</p>
             ) : (
@@ -760,7 +760,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
           </Panel>
 
-          <Panel title="Products Needing Attention" description={"Listings with stock or quality problems, each with an AI analysis button."}>
+          <Panel title="Products Needing Attention" description={"Up to eight listings with no recent enquiries or a thin gallery, each with an AI analysis button."}>
             {attentionProducts.length === 0 ? (
               <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No obvious stock issues in this range.</p>
             ) : (
@@ -814,7 +814,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
           </Panel>
 
-          <Panel title="Product Interest" description={"Which products enquiries are about, and how many matched no product at all."}>
+          <Panel title="Product Interest" description={"The eight most enquired-about products, and how many enquiries matched no product at all."}>
             {data.productInterest.topProducts.length === 0 ? (
               <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No product-specific enquiries yet.</p>
             ) : (
@@ -926,7 +926,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
           </Panel>
 
-          <Panel title="Funnel" description={"Where visitors drop off between landing on the site and sending an enquiry."}>
+          <Panel title="Funnel" description={"Product page views, enquiry form views and submitted enquiries for this range. The percentages compare those totals, not the same visitors followed through."}>
             {data.analytics.status !== 'ready' ? (
               <p style={{ margin: 0, color: '#888', fontSize: '0.78rem' }}>{data.analytics.message}</p>
             ) : (
@@ -941,7 +941,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
           </Panel>
 
-          <Panel title="Traffic Quality" description={"Which sources bring visitors, and which of them convert into enquiries."}>
+          <Panel title="Traffic Quality" description={"The six largest traffic sources, and how many enquiries each converts."}>
             {data.traffic.length === 0 ? (
               <p style={{ margin: 0, color: '#888', fontSize: '0.78rem' }}>Traffic quality appears here once PostHog server analytics are configured.</p>
             ) : (
