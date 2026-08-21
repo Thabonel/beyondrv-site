@@ -2317,6 +2317,24 @@ footer {
   }
   .nav-links.open li a { display: block; padding: 0.75rem var(--gutter); }
   .nav-hamburger { display: flex; }
+  .nav-search-label { display: none; }
+  .nav-search-toggle { padding: 0.35rem 0.5rem; }
+  /* Keep the nav row intact: the opened input drops below the bar instead of
+     widening a flex child, which previously forced the row to wrap. */
+  .nav-search.open .nav-search-form {
+    position: fixed;
+    top: var(--nav-height);
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(10,10,10,0.98);
+    border-top: 1px solid var(--border);
+    padding: 0.75rem var(--gutter);
+  }
+  .nav-search.open .nav-search-form input { width: 100%; }
+  /* Inside the fixed panel the list sits in normal flow, so the on-screen
+     keyboard cannot cover a floating layer. */
+  .nav-search-listbox { position: static; max-height: 40vh; }
 }
 @media (max-width: 768px) {
   .checker-form { grid-template-columns: 1fr; }
@@ -2572,6 +2590,72 @@ footer {
   line-height: 1;
 }
 .nav-cart-count[hidden] { display: none; }
+
+/* ─── HEADER SEARCH ─── */
+.nav-search { position: relative; display: flex; align-items: center; }
+.nav-search-form { display: none; }
+.nav-search.open .nav-search-form { display: block; }
+.nav-search.open .nav-search-toggle { display: none; }
+.nav-search-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--cream);
+  border-radius: 6px;
+  padding: 0.35rem 0.65rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.nav-search-toggle:hover { color: var(--orange2); }
+.nav-search-form input {
+  width: 14rem;
+  padding: 0.4rem 0.6rem;
+  font: inherit;
+  font-size: 0.85rem;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--white);
+}
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; margin: -1px;
+  padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.nav-search-listbox {
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding: 0.25rem 0;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 101;
+  background: rgba(10,10,10,0.98);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.nav-search-listbox[hidden] { display: none; }
+.nav-search-row a {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.5rem 0.65rem;
+  color: var(--cream);
+  text-decoration: none;
+  font-size: 0.82rem;
+}
+.nav-search-row[aria-selected='true'] a,
+.nav-search-row a:hover { background: rgba(255,255,255,0.08); color: var(--white); }
+.nav-search-kind { color: #8c8c8c; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; }
 
 .shop-cart-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem; margin: 1.75rem 0 0.5rem; }
 .shop-add-to-cart { border: none; cursor: pointer; font-family: inherit; }
