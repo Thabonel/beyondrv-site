@@ -863,7 +863,11 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
                         <button
                           type="button"
                           onClick={() => saveInsight(insight)}
-                          disabled={ideaSavingId === insight.title}
+                          // Saving before the stored ideas are known would derive a
+                          // fresh id and strand an already-reviewed record, so the
+                          // action waits until the lookup has actually succeeded.
+                          disabled={ideasLoading || Boolean(ideasError) || ideaSavingId === insight.title}
+                          title={ideasLoading ? 'Loading your saved ideas…' : ideasError ? 'Saved ideas could not be loaded, so saving is unavailable.' : undefined}
                           style={{
                             justifySelf: 'start',
                             marginTop: '0.15rem',
@@ -877,7 +881,11 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
                             fontSize: '0.7rem',
                           }}
                         >
-                          {ideaSavingId === insight.title ? 'Saving…' : saved ? 'Update saved idea' : 'Save idea'}
+                          {ideasLoading
+                            ? 'Loading saved ideas…'
+                            : ideaSavingId === insight.title
+                              ? 'Saving…'
+                              : saved ? 'Update saved idea' : 'Save idea'}
                         </button>
                       );
                     })()}
