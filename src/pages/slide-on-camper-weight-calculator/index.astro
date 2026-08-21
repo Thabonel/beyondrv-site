@@ -125,9 +125,14 @@ const schema = [
           <span class="form-help">Use a current weighbridge weight if possible. If it already includes passengers or accessories, enter 0 for those items below.</span>
         </div>
         <div class="form-field" id="trayMassField" hidden>
-          <label class="form-label" for="trayMass">Tray weight (kg)</label>
-          <input class="form-input" id="trayMass" type="number" min="0" placeholder="120" />
-          <span class="form-help" id="trayMassHelp"></span>
+          <label class="form-label" for="trayIncluded">The weight I entered above already includes my tray</label>
+          <input id="trayIncluded" type="checkbox" />
+          <span class="form-help">Tick this if you used a weighbridge figure taken with the tray fitted.</span>
+          <div id="trayMassRow">
+            <label class="form-label" for="trayMass">Tray weight (kg)</label>
+            <input class="form-input" id="trayMass" type="number" min="0" placeholder="120" />
+            <span class="form-help" id="trayMassHelp"></span>
+          </div>
         </div>
         <div class="form-field">
           <label class="form-label" for="passengers">Passengers (kg)</label>
@@ -266,7 +271,7 @@ const schema = [
 
 <script>
   import { calculateSlideOnSuitability } from '../../lib/vehicleSuitabilityCalculator.js';
-  import { resolveCurrentVehicleWeight } from '../../lib/slideOnVehicleWeight';
+  import { isTrayMassRequired, resolveCurrentVehicleWeight } from '../../lib/slideOnVehicleWeight';
 
   const form = document.getElementById('slideCalculator');
   const resultPanel = document.getElementById('resultPanel');
@@ -290,10 +295,28 @@ const schema = [
   }
   const catalogue = parseCatalogue();
   const customerEdited = new Set<string>();
-  // trayRequired mirrors whether the tray weight field is on screen: shown when
-  // the published kerb mass excludes a tray, or does not say. See
-  // resolveCurrentVehicleWeight for why a blank one cannot be treated as zero.
+  // The catalogue says whether the published kerb mass includes a tray; only
+  // the customer knows whether the weight they actually typed does. See
+  // isTrayMassRequired and resolveCurrentVehicleWeight.
+  let trayState = 'not_applicable';
   let trayRequired = false;
+  // The provenance panel has to be redrawn whenever what it claims stops being
+  // true, which means keeping hold of the variant it is describing.
+  let selectedVariant: any = null;
+
+  function syncTrayRequirement() {
+    const includedBox = inputById('trayIncluded');
+    const currentWeightIncludesTray = includedBox?.checked ?? false;
+    trayRequired = isTrayMassRequired({ trayState, currentWeightIncludesTray });
+
+    // Asking for a weight that is already counted would double it, so the
+    // field goes away rather than sitting there inviting the mistake.
+    const trayInput = inputById('trayMass');
+    const trayRow = byId('trayMassRow');
+    if (trayRow) (trayRow as HTMLElement).hidden = currentWeightIncludesTray;
+    if (currentWeightIncludesTray) clearTrayMass();
+    if (trayInput) trayInput.required = trayRequired;
+  }
 
   const PREFILLABLE_FIELDS = ['vehicleName', 'gvm', 'currentWeight', 'trayLength', 'trayWidth', 'trayMass'];
   const FIELD_LABELS: Record<string, string> = {
@@ -331,7 +354,12 @@ const schema = [
   }
 
   PREFILLABLE_FIELDS.forEach((id) => {
-    inputById(id)?.addEventListener('input', () => customerEdited.add(id));
+    inputById(id)?.addEventListener('input', () => {
+      const alreadyEdited = customerEdited.has(id);
+      customerEdited.add(id);
+      // Redraw only on the first edit of a field; the note is the same after.
+      if (!alreadyEdited && selectedVariant) renderProvenance(selectedVariant);
+    });
   });
 
   function formatAccessedDate(iso: string) {
@@ -402,10 +430,12 @@ const schema = [
     });
     const trayField = byId('trayMassField');
     if (trayField) (trayField as HTMLElement).hidden = true;
-    trayRequired = false;
-    const trayInput = inputById('trayMass');
-    if (trayInput) trayInput.required = false;
+    trayState = 'not_applicable';
+    const includedBox = inputById('trayIncluded');
+    if (includedBox) includedBox.checked = false;
     clearTrayMass();
+    syncTrayRequirement();
+    selectedVariant = null;
     const panel = byId('vehicleProvenance');
     if (panel) {
       panel.replaceChildren();
@@ -428,19 +458,24 @@ const schema = [
     const trayField = byId('trayMassField');
     const trayHelp = byId('trayMassHelp');
     const showTray = variant.trayState === 'excluded' || variant.trayState === 'unknown';
-    trayRequired = showTray;
+    trayState = variant.trayState;
     if (trayField) (trayField as HTMLElement).hidden = !showTray;
-    const trayInput = inputById('trayMass');
-    if (trayInput) trayInput.required = showTray;
     if (!showTray) clearTrayMass();
+    syncTrayRequirement();
     if (trayHelp) {
       trayHelp.textContent = variant.trayState === 'excluded'
         ? 'The published kerb weight for this vehicle excludes the tray. Enter your tray weight here and it will be added to the vehicle weight — do not count it again under accessories.'
         : 'The manufacturer does not state whether the published kerb weight includes a tray. If your vehicle has one, enter its weight here and it will be added to the vehicle weight — do not count it again under accessories.';
     }
+    selectedVariant = variant;
     renderProvenance(variant);
     calculateSlideOn();
   }
+
+  inputById('trayIncluded')?.addEventListener('change', () => {
+    syncTrayRequirement();
+    calculateSlideOn();
+  });
 
   selectById('vehicleMake')?.addEventListener('change', (event) => {
     const make = (event.target as HTMLSelectElement).value;
