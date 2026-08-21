@@ -217,9 +217,11 @@ New:
 - `src/pages/search-index.json.ts`
 - `src/pages/search/index.astro`
 - `src/lib/search.ts`
+- `src/lib/searchIndex.ts`
 - `src/lib/searchDropdown.ts`
 - `src/data/searchPages.ts`
 - `tests/search.test.ts`
+- `tests/search-index.test.ts`
 - `tests/e2e/site-search.spec.ts`
 
 Edited:
