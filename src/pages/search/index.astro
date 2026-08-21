@@ -53,8 +53,21 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: inherit;
   }
   .search-page :global(.search-result-title) { font-weight: 700; }
-  .search-page :global(.search-result-summary) { font-size: 0.85rem; color: #555; }
+  .search-page :global(.search-result-summary) { font-size: 0.85rem; color: var(--cream); }
   .search-page :global(.search-result-price) { font-size: 0.85rem; font-weight: 700; }
+  .search-page :global(.search-unmatched) {
+    margin: 0 0 1.5rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--orange2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--cream);
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  .search-page :global(.search-unmatched strong) { color: var(--white); }
+  .search-page :global(.search-unmatched a) { color: var(--orange2); }
   .search-noscript {
     padding: 0.9rem 1rem;
     border: 1px solid var(--border);
@@ -72,7 +85,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 </style>
 
 <script>
-  import { searchRecords, type SearchRecord } from '../../lib/search';
+  import { searchWithDiagnostics, type SearchRecord } from '../../lib/search';
 
   const GROUPS: Array<{ kind: SearchRecord['kind']; label: string }> = [
     { kind: 'product', label: 'Products' },
@@ -108,16 +121,24 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       return;
     }
 
-    const matches = searchRecords(records, query);
+    const { results: matches, unmatched } = searchWithDiagnostics(records, query);
     if (matches.length === 0) {
       output.innerHTML = `<div data-testid="search-empty">
         <p>Nothing matched &ldquo;${escapeHtml(query)}&rdquo;.</p>
+        <p>If that is a vehicle, the <a href="/vehicle-suitability-checker/">Vehicle Suitability Checker</a> will tell you what fits it.</p>
         <p><a href="/inquiry-form/">Send us an enquiry</a> and we will help you find it.</p>
       </div>`;
       return;
     }
 
-    output.innerHTML = GROUPS.map(({ kind, label }) => {
+    // Say plainly which words were ignored. Without this the page looks like
+    // an answer to the whole question when it only answered part of it.
+    const notice = unmatched.length === 0 ? '' : `<p class="search-unmatched" data-testid="search-unmatched">
+      We have nothing matching <strong>${escapeHtml(unmatched.join(' '))}</strong>, so these results ignore it.
+      If that is your vehicle, the <a href="/vehicle-suitability-checker/">Vehicle Suitability Checker</a> will tell you what fits.
+    </p>`;
+
+    output.innerHTML = notice + GROUPS.map(({ kind, label }) => {
       const group = matches.filter((record) => record.kind === kind);
       if (group.length === 0) return '';
       return `<section data-testid="search-group-${kind}">

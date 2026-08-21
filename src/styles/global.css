@@ -1579,6 +1579,37 @@ nav.scrolled {
   font-size: 0.78rem;
   line-height: 1.5;
 }
+.vehicle-picker {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+.vehicle-picker .form-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.vehicle-provenance {
+  margin-top: 0.75rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+}
+.vehicle-provenance p {
+  margin: 0;
+  color: rgba(240,235,227,0.76);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+.vehicle-provenance p + p {
+  margin-top: 0.5rem;
+}
+.vehicle-provenance a {
+  color: var(--orange);
+}
+.vehicle-provenance-note {
+  color: var(--muted);
+  font-style: italic;
+}
 .calculator-disclaimer {
   margin-top: 1.5rem;
   padding: 1rem;
@@ -2317,27 +2348,10 @@ footer {
   }
   .nav-links.open li a { display: block; padding: 0.75rem var(--gutter); }
   .nav-hamburger { display: flex; }
-  .nav-search-label { display: none; }
-  .nav-search-toggle { padding: 0.35rem 0.5rem; }
-  /* Keep the nav row intact: the opened input drops below the bar instead of
-     widening a flex child, which previously forced the row to wrap. */
-  .nav-search.open .nav-search-form {
-    position: fixed;
-    top: var(--nav-height);
-    left: 0;
-    right: 0;
-    z-index: 100;
-    background: rgba(10,10,10,0.98);
-    border-top: 1px solid var(--border);
-    padding: 0.75rem var(--gutter);
-  }
-  .nav-search.open .nav-search-form input { width: 100%; }
-  /* Inside the fixed panel the list sits in normal flow, so the on-screen
-     keyboard cannot cover a floating layer. */
-  .nav-search-listbox { position: static; max-height: 40vh; }
 }
 @media (max-width: 768px) {
   .checker-form { grid-template-columns: 1fr; }
+  .vehicle-picker { grid-template-columns: 1fr; }
   .checker-panel,
   .result-panel,
   .authority-card { padding: 1.4rem; }
@@ -2656,6 +2670,30 @@ footer {
 .nav-search-row[aria-selected='true'] a,
 .nav-search-row a:hover { background: rgba(255,255,255,0.08); color: var(--white); }
 .nav-search-kind { color: #8c8c8c; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* Must follow the base rules above: these selectors have the same specificity,
+   so whichever is declared last wins. Sitting inside the shared 1180px block
+   earlier in this file, the listbox and toggle overrides never applied. */
+@media (max-width: 1180px) {
+  .nav-search-label { display: none; }
+  .nav-search-toggle { padding: 0.35rem 0.5rem; }
+  /* Keep the nav row intact: the opened input drops below the bar instead of
+     widening a flex child, which would force the row to wrap. */
+  .nav-search.open .nav-search-form {
+    position: fixed;
+    top: var(--nav-height);
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(10,10,10,0.98);
+    border-top: 1px solid var(--border);
+    padding: 0.75rem var(--gutter);
+  }
+  .nav-search.open .nav-search-form input { width: 100%; }
+  /* Inside the fixed panel the list sits in normal flow, so the on-screen
+     keyboard cannot cover a floating layer. */
+  .nav-search-listbox { position: static; max-height: 40vh; }
+}
 
 .shop-cart-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem; margin: 1.75rem 0 0.5rem; }
 .shop-add-to-cart { border: none; cursor: pointer; font-family: inherit; }
