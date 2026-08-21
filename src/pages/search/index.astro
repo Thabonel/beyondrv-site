@@ -1,0 +1,125 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="Search | Beyond RV"
+  description="Search Beyond RV campers, caravans, buying guides and weight calculators."
+  noIndex={true}
+>
+  <main class="search-page">
+    <h1>Search</h1>
+    <form class="search-page-form" action="/search/" method="get" role="search">
+      <label for="searchPageInput">Search Beyond RV</label>
+      <input
+        id="searchPageInput"
+        data-testid="search-page-input"
+        type="search"
+        name="q"
+        autocomplete="off"
+        placeholder="Try a model name, or a question like payload"
+      />
+      <button type="submit">Search</button>
+    </form>
+
+    <div id="searchResults" data-testid="search-results" aria-live="polite"></div>
+  </main>
+</BaseLayout>
+
+<style>
+  .search-page { max-width: 60rem; margin: 0 auto; padding: 6rem 1rem 4rem; }
+  .search-page h1 { margin: 0 0 1rem; }
+  .search-page-form { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .search-page-form label { flex-basis: 100%; font-size: 0.8rem; color: #666; }
+  .search-page-form input { flex: 1 1 18rem; padding: 0.6rem 0.75rem; font-size: 1rem; }
+  .search-page-form button { padding: 0.6rem 1rem; font-weight: 700; cursor: pointer; }
+  .search-page :global(section) { margin-bottom: 2rem; }
+  .search-page :global(ul) { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
+  .search-page :global(li a) {
+    display: grid; gap: 0.2rem; padding: 0.75rem;
+    border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: inherit;
+  }
+  .search-page :global(.search-result-title) { font-weight: 700; }
+  .search-page :global(.search-result-summary) { font-size: 0.85rem; color: #555; }
+  .search-page :global(.search-result-price) { font-size: 0.85rem; font-weight: 700; }
+</style>
+
+<script>
+  import { searchRecords, type SearchRecord } from '../../lib/search';
+
+  const GROUPS: Array<{ kind: SearchRecord['kind']; label: string }> = [
+    { kind: 'product', label: 'Products' },
+    { kind: 'guide', label: 'Guides' },
+    { kind: 'tool', label: 'Tools' },
+  ];
+
+  const input = document.getElementById('searchPageInput') as HTMLInputElement | null;
+  const output = document.getElementById('searchResults');
+  let records: SearchRecord[] = [];
+
+  function escapeHtml(value: string) {
+    return value.replace(/[&<>"']/g, (char) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    }[char] as string));
+  }
+
+  function resultHtml(record: SearchRecord) {
+    const price = record.price ? `<span class="search-result-price">${escapeHtml(record.price)}</span>` : '';
+    return `<li data-testid="search-result">
+      <a href="${escapeHtml(record.url)}">
+        <span class="search-result-title">${escapeHtml(record.title)}</span>
+        <span class="search-result-summary">${escapeHtml(record.summary)}</span>
+        ${price}
+      </a>
+    </li>`;
+  }
+
+  function render(query: string) {
+    if (!output) return;
+    if (!query.trim()) {
+      output.innerHTML = `<p data-testid="search-no-query">Type above to search campers, caravans, guides and calculators.</p>`;
+      return;
+    }
+
+    const matches = searchRecords(records, query);
+    if (matches.length === 0) {
+      output.innerHTML = `<div data-testid="search-empty">
+        <p>Nothing matched &ldquo;${escapeHtml(query)}&rdquo;.</p>
+        <p><a href="/inquiry-form/">Send us an enquiry</a> and we will help you find it.</p>
+      </div>`;
+      return;
+    }
+
+    output.innerHTML = GROUPS.map(({ kind, label }) => {
+      const group = matches.filter((record) => record.kind === kind);
+      if (group.length === 0) return '';
+      return `<section data-testid="search-group-${kind}">
+        <h2>${label}</h2>
+        <ul>${group.map(resultHtml).join('')}</ul>
+      </section>`;
+    }).join('');
+  }
+
+  function currentQuery() {
+    return new URLSearchParams(window.location.search).get('q') ?? '';
+  }
+
+  async function start() {
+    const query = currentQuery();
+    if (input) input.value = query;
+
+    const response = await fetch('/search-index.json');
+    records = ((await response.json()) as { records: SearchRecord[] }).records;
+    render(query);
+
+    input?.addEventListener('input', () => {
+      const next = input.value;
+      const url = new URL(window.location.href);
+      if (next) url.searchParams.set('q', next);
+      else url.searchParams.delete('q');
+      history.replaceState({}, '', url);
+      render(next);
+    });
+  }
+
+  void start();
+</script>
