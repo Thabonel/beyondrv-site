@@ -26,10 +26,14 @@
   status = 301
 
 # Legacy WordPress search URLs (/?s=term) reach the current search page.
+# force is required: Netlify skips a redirect when a static file already serves
+# the path, and "/" resolves to index.html. The query condition keeps this
+# scoped to /?s=<term>, so a plain "/" still serves the homepage.
 [[redirects]]
   from   = "/"
   to     = "/search/?q=:search"
   status = 301
+  force  = true
   query  = {s = ":search"}
 
 [[redirects]]
