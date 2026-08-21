@@ -766,7 +766,7 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
             )}
           </Panel>
 
-          <Panel title="Products Needing Attention" description={"Up to eight listings with no recent enquiries or a thin gallery, each with an AI analysis button."}>
+          <Panel title="Products Needing Attention" description={"Up to eight listings with no enquiries in 30 days, no hero image, or fewer than three gallery images, each with an AI analysis button."}>
             {attentionProducts.length === 0 ? (
               <p style={{ margin: 0, color: '#777', fontSize: '0.78rem' }}>No obvious stock issues in this range.</p>
             ) : (
