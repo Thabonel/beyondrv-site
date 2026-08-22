@@ -99,14 +99,18 @@ const schema = [
   <section class="container checker-layout">
     <div class="checker-panel">
       <form class="checker-form" id="slideCalculator">
-        <div class="form-field form-field--full">
+        <div class="form-field form-field--full" id="vehiclePickerField">
           <label class="form-label" for="vehicleMake">Find your vehicle (optional)</label>
+          <p class="form-help" id="vehiclePickerUnavailable" data-testid="vehicle-picker-unavailable" hidden>
+            Vehicle lookup is unavailable while these specifications are being reviewed.
+            Enter your own figures from your compliance plate below.
+          </p>
           <div class="vehicle-picker">
             <select class="form-input" id="vehicleMake"><option value="">Select a make</option></select>
             <select class="form-input" id="vehicleModel" disabled><option value="">Select a model</option></select>
             <select class="form-input" id="vehicleVariant" disabled><option value="">Select a variant</option></select>
           </div>
-          <span class="form-help">
+          <span class="form-help" id="vehiclePickerHelp">
             Picking a vehicle fills the published figures below. You can change any of them,
             and a weighbridge figure for your own vehicle is always better than a published one.
           </span>
@@ -534,6 +538,17 @@ const schema = [
     }
     applyVariant(variantId);
   });
+
+  // With nothing published, three dead dropdowns read as a broken page. Say
+  // what is happening and leave the manual path exactly as it was.
+  const pickerAvailable = catalogue.variants.length > 0;
+  const pickerRow = document.querySelector('.vehicle-picker');
+  const pickerNotice = byId('vehiclePickerUnavailable');
+  if (pickerRow) (pickerRow as HTMLElement).hidden = !pickerAvailable;
+  if (pickerNotice) (pickerNotice as HTMLElement).hidden = pickerAvailable;
+  // This explains how to use a control that is not on screen.
+  const pickerHelp = byId('vehiclePickerHelp');
+  if (pickerHelp) (pickerHelp as HTMLElement).hidden = !pickerAvailable;
 
   fillSelect(selectById('vehicleMake'), catalogueMakes(catalogue), 'Select a make');
   type SlideOnResultValues = {

@@ -380,3 +380,28 @@ test('the provenance panel stops crediting a tray weight once it is cleared', as
   await expect(page.locator('#trayMass')).toHaveValue('');
   await expect(provenance).not.toContainText('the tray weight');
 });
+
+test('an empty catalogue hides the picker and explains why', async ({ page }) => {
+  await rewriteCalculatorCatalogue(page, JSON.stringify({
+    ...catalogue, sourceDatabaseRowCount: 0, models: [], variants: [],
+  }));
+  await page.goto(calculatorPath);
+
+  // Three dead dropdowns read as a broken page; say what is happening instead.
+  await expect(page.locator('.vehicle-picker')).toBeHidden();
+  const notice = page.getByTestId('vehicle-picker-unavailable');
+  await expect(notice).toBeVisible();
+  await expect(notice).toContainText(/review/i);
+  // Advice for a control that is not on screen is worse than none.
+  await expect(page.locator('#vehiclePickerHelp')).toBeHidden();
+
+  // The manual path must still work exactly as before.
+  await completeManualCalculation(page);
+});
+
+test('a populated catalogue shows the picker and no notice', async ({ page }) => {
+  await openCalculatorWithFixture(page);
+
+  await expect(page.locator('.vehicle-picker')).toBeVisible();
+  await expect(page.getByTestId('vehicle-picker-unavailable')).toBeHidden();
+});

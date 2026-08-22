@@ -2878,3 +2878,6 @@ footer {
   .cart-shipping-field { max-width: none; }
   .cart-shipping-submit { width: 100%; }
 }
+.vehicle-picker[hidden] { display: none; }
+#vehiclePickerUnavailable[hidden] { display: none; }
+#vehiclePickerHelp[hidden] { display: none; }
