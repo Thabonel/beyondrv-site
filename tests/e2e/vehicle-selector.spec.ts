@@ -321,20 +321,27 @@ test('the provenance panel names every figure the customer has overridden', asyn
   await expect(provenance).toContainText('the current vehicle weight');
 });
 
-test('switching variant re-asks whether the weight includes the tray', async ({ page }) => {
-  await page.goto('/slide-on-camper-weight-calculator/');
+const RANGER_CC_A = 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo';
+const RANGER_CC_B = 'ford-ranger-2022my-4x4-xl-double-cc-biturbo';
+
+async function pickRanger(page: Page, variantId: string) {
   await page.selectOption('#vehicleMake', 'Ford');
   await page.selectOption('#vehicleModel', 'Ranger');
-  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
+  await page.selectOption('#vehicleVariant', variantId);
+}
+
+test('switching variant re-asks whether the weight includes the tray', async ({ page }) => {
+  await openCalculatorWithFixture(page);
+  await pickRanger(page, RANGER_CC_A);
 
   // Both variants publish a kerb mass that excludes the tray.
   await expect(page.locator('#trayMassField')).toBeVisible();
   await page.check('#trayIncluded');
   await expect(page.locator('#trayMassRow')).toBeHidden();
 
-  // Switching variant replaces the weight with the new vehicle's published
-  // kerb, which excludes its tray. The earlier claim cannot carry over.
-  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-biturbo');
+  // Switching replaces the weight with the new vehicle's published kerb, which
+  // excludes its tray, so the earlier claim cannot carry over.
+  await page.selectOption('#vehicleVariant', RANGER_CC_B);
 
   await expect(page.locator('#currentWeight')).toHaveValue('2072');
   await expect(page.locator('#trayIncluded')).not.toBeChecked();
@@ -342,10 +349,8 @@ test('switching variant re-asks whether the weight includes the tray', async ({ 
 });
 
 test('a carried-over inclusion claim cannot produce a green result on a fresh variant', async ({ page }) => {
-  await page.goto('/slide-on-camper-weight-calculator/');
-  await page.selectOption('#vehicleMake', 'Ford');
-  await page.selectOption('#vehicleModel', 'Ranger');
-  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
+  await openCalculatorWithFixture(page);
+  await pickRanger(page, RANGER_CC_A);
   await page.check('#trayIncluded');
 
   for (const [id, v] of [['gvm', '5000'], ['passengers', '1'], ['accessories', '1'], ['luggageGear', '1'],
@@ -354,18 +359,16 @@ test('a carried-over inclusion claim cannot produce a green result on a fresh va
     await page.fill(`#${id}`, v);
   }
 
-  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-biturbo');
+  await page.selectOption('#vehicleVariant', RANGER_CC_B);
 
-  // The published kerb excludes the tray and nobody has said otherwise for
-  // this vehicle, so the result must not pass on a bare-chassis weight.
+  // The published kerb excludes the tray and nobody has said otherwise for this
+  // vehicle, so the result must not pass on a bare-chassis weight.
   await expect(page.locator('#statusLabel')).toContainText(/not enough information/i);
 });
 
 test('the provenance panel stops crediting a tray weight once it is cleared', async ({ page }) => {
-  await page.goto('/slide-on-camper-weight-calculator/');
-  await page.selectOption('#vehicleMake', 'Ford');
-  await page.selectOption('#vehicleModel', 'Ranger');
-  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
+  await openCalculatorWithFixture(page);
+  await pickRanger(page, RANGER_CC_A);
 
   await page.fill('#trayMass', '120');
   const provenance = page.locator('#vehicleProvenance');
