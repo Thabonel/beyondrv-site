@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { deriveTrayState, isPromoted } from '../src/lib/vehicleCatalogue/derive.ts';
+import { deriveTrayState, isPromoted, validateCatalogueOverrides } from '../src/lib/vehicleCatalogue/derive.ts';
+
+const approved = { id: 'a', customer_selectable: 1, latest_review_id: 7, latest_review_decision: 'approved' };
+const unapproved = { id: 'b', customer_selectable: 0, latest_review_id: null, latest_review_decision: null };
+const empty = { show: [], hide: [] };
+const override = { id: 'b', reason: 'Owner-approved emergency correction', reviewer: 'Jane Reviewer', approvedAt: '2026-08-22' };
 
 test('a tub vehicle has no tray regardless of how kerb is described', () => {
   assert.equal(deriveTrayState('Published kerb weight', 'pickup_tub'), 'not_applicable');
@@ -29,17 +34,45 @@ test('silence about the tray is unknown, never assumed', () => {
   assert.equal(deriveTrayState(null, 'cab_chassis'), 'unknown');
 });
 
-test('verified rows promote and flagged rows do not', () => {
-  const empty = { show: [], hide: [] };
-  assert.equal(isPromoted({ id: 'a', verification_status: 'source_verified' }, empty), true);
-  assert.equal(isPromoted({ id: 'b', verification_status: 'needs_secondary_review' }, empty), false);
+test('only a selectable row with a latest approved review is promoted', () => {
+  assert.equal(isPromoted(approved, empty), true);
+  assert.equal(isPromoted(unapproved, empty), false);
+  assert.equal(isPromoted({ ...approved, customer_selectable: 0 }, empty), false);
+  assert.equal(isPromoted({ ...approved, latest_review_decision: 'changes_requested' }, empty), false);
 });
 
-test('hide wins over a verified status, and show wins over a flagged one', () => {
-  assert.equal(isPromoted({ id: 'a', verification_status: 'source_verified' }, { show: [], hide: ['a'] }), false);
-  assert.equal(isPromoted({ id: 'b', verification_status: 'needs_secondary_review' }, { show: ['b'], hide: [] }), true);
+test('hide wins over approval, and an attributable override can promote', () => {
+  assert.equal(isPromoted(approved, { show: [], hide: ['a'] }), false);
+  assert.equal(isPromoted(unapproved, { show: [override], hide: [] }), true);
 });
 
-test('an id in both lists is hidden, because withholding is the safe direction', () => {
-  assert.equal(isPromoted({ id: 'a', verification_status: 'source_verified' }, { show: ['a'], hide: ['a'] }), false);
+test('conflicting overrides fail validation instead of choosing silently', () => {
+  const result = validateCatalogueOverrides({ show: [override], hide: ['b'] });
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((error) => error.includes('both show and hide')));
+});
+
+test('legacy string show overrides fail because they have no audit evidence', () => {
+  const result = validateCatalogueOverrides({ show: ['b'], hide: [] });
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((error) => error.includes('reason')));
+});
+
+test('a complete publication override validates', () => {
+  const result = validateCatalogueOverrides({ show: [override], hide: [] });
+  assert.equal(result.valid, true);
+});
+
+test('override dates and audit fields are bounded', () => {
+  const invalidDate = validateCatalogueOverrides({
+    show: [{ id: 'variant-a', reason: 'Reviewed exception', reviewer: 'Alex', approvedAt: '2026-02-31' }],
+    hide: [],
+  });
+  assert.equal(invalidDate.valid, false);
+
+  const unboundedReason = validateCatalogueOverrides({
+    show: [{ id: 'variant-a', reason: 'x'.repeat(501), reviewer: 'Alex', approvedAt: '2026-08-22' }],
+    hide: [],
+  });
+  assert.equal(unboundedReason.valid, false);
 });

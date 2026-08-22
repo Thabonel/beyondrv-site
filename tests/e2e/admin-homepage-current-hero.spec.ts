@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
+import { mockOwnerAdminSession } from './helpers/admin-session';
 
 test('recent builds refreshes products before using a product hero image', async ({ page }) => {
+  await mockOwnerAdminSession(page);
   let productRequests = 0;
 
   await page.route('**/.netlify/functions/admin-products', route => {

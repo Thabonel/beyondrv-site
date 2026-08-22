@@ -2,7 +2,9 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { displayImageUrl } from '../../lib/media';
 import { getVehicleCatalogue } from '../../lib/vehicleCatalogue.ts';
+import { serializeJsonForHtml } from '../../lib/safeJson.ts';
 const vehicleCatalogue = getVehicleCatalogue();
+const vehicleCatalogueJson = serializeJsonForHtml(vehicleCatalogue);
 
 const pageUrl = 'https://beyondrv.com.au/slide-on-camper-weight-calculator/';
 const heroImage = '/images/site/homepage-slide-on-campers.webp';
@@ -110,7 +112,7 @@ const schema = [
           </span>
           <div id="vehicleProvenance" class="vehicle-provenance" hidden></div>
         </div>
-        <script type="application/json" id="vehicleCatalogueData" set:html={JSON.stringify(vehicleCatalogue)}></script>
+        <script type="application/json" id="vehicleCatalogueData" set:html={vehicleCatalogueJson}></script>
         <div class="form-field form-field--full">
           <label class="form-label" for="vehicleName">Vehicle</label>
           <input class="form-input" id="vehicleName" type="text" placeholder="Example: Ford Ranger dual cab" />
@@ -272,6 +274,14 @@ const schema = [
 <script>
   import { calculateSlideOnSuitability } from '../../lib/vehicleSuitabilityCalculator.js';
   import { isTrayMassRequired, resolveCurrentVehicleWeight } from '../../lib/slideOnVehicleWeight';
+  import { emptyVehicleCatalogue, validateVehicleCatalogue } from '../../lib/vehicleCatalogue/validate';
+  import {
+    catalogueMakes,
+    catalogueModelsForMake,
+    catalogueVariantById,
+    catalogueVariantsForModel,
+  } from '../../lib/vehicleCatalogue/picker';
+  import type { CatalogueVariant, VehicleCatalogue } from '../../lib/vehicleCatalogue/types';
 
   const form = document.getElementById('slideCalculator');
   const resultPanel = document.getElementById('resultPanel');
@@ -284,14 +294,16 @@ const schema = [
   const fmtMm = (value: number) => `${Math.round(value).toLocaleString()} mm`;
 
   const catalogueEl = document.getElementById('vehicleCatalogueData');
-  function parseCatalogue() {
-    if (!catalogueEl) return { models: [], variants: [] };
+  function parseCatalogue(): VehicleCatalogue {
+    if (!catalogueEl) return emptyVehicleCatalogue();
     try {
-      return JSON.parse(catalogueEl.textContent || '{"models":[],"variants":[]}');
+      const validation = validateVehicleCatalogue(JSON.parse(catalogueEl.textContent || 'null'));
+      if (validation.valid) return validation.catalogue;
+      console.warn('Vehicle catalogue data is invalid; the vehicle picker will be unavailable.', validation.errors);
     } catch (err) {
       console.warn('Vehicle catalogue data could not be parsed; the vehicle picker will be unavailable.', err);
-      return { models: [], variants: [] };
     }
+    return emptyVehicleCatalogue();
   }
   const catalogue = parseCatalogue();
   const customerEdited = new Set<string>();
@@ -302,7 +314,7 @@ const schema = [
   let trayRequired = false;
   // The provenance panel has to be redrawn whenever what it claims stops being
   // true, which means keeping hold of the variant it is describing.
-  let selectedVariant: any = null;
+  let selectedVariant: CatalogueVariant | null = null;
 
   function syncTrayRequirement() {
     const includedBox = inputById('trayIncluded');
@@ -376,7 +388,7 @@ const schema = [
     return 'The manufacturer does not state whether kerb mass includes a tray.';
   }
 
-  function renderProvenance(variant: any) {
+  function renderProvenance(variant: CatalogueVariant) {
     const panel = byId('vehicleProvenance');
     if (!panel) return;
     panel.replaceChildren();
@@ -448,7 +460,7 @@ const schema = [
   }
 
   function applyVariant(variantId: string) {
-    const variant = catalogue.variants.find((v: any) => v.id === variantId);
+    const variant = catalogueVariantById(catalogue, variantId);
     if (!variant) return;
     setIfNotEdited('gvm', variant.gvmKg);
     setIfNotEdited('currentWeight', variant.kerbKg);
@@ -487,7 +499,7 @@ const schema = [
 
   selectById('vehicleMake')?.addEventListener('change', (event) => {
     const make = (event.target as HTMLSelectElement).value;
-    const models = catalogue.models.filter((m: any) => m.make === make).map((m: any) => m.model);
+    const models = catalogueModelsForMake(catalogue, make);
     fillSelect(selectById('vehicleModel'), models, 'Select a model');
     fillSelect(selectById('vehicleVariant'), [], 'Select a variant');
     resetVehicleSelection();
@@ -496,7 +508,7 @@ const schema = [
   selectById('vehicleModel')?.addEventListener('change', (event) => {
     const make = selectById('vehicleMake')?.value;
     const model = (event.target as HTMLSelectElement).value;
-    const variants = catalogue.variants.filter((v: any) => v.make === make && v.model === model);
+    const variants = catalogueVariantsForModel(catalogue, make ?? '', model);
     const select = selectById('vehicleVariant');
     if (!select) return;
     select.replaceChildren();
@@ -523,7 +535,7 @@ const schema = [
     applyVariant(variantId);
   });
 
-  fillSelect(selectById('vehicleMake'), [...new Set<string>(catalogue.models.map((m: any) => m.make))].sort(), 'Select a make');
+  fillSelect(selectById('vehicleMake'), catalogueMakes(catalogue), 'Select a make');
   type SlideOnResultValues = {
     availablePayloadBeforeCamper?: number;
     estimatedLoadedVehicleWeight?: number;
