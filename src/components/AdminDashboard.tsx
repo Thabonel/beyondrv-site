@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { adminFetch, adminJson, clearAdminToken } from '../lib/adminApi';
 import { activeReminders } from '../lib/adminReminders';
 import MarketingIdeas, { type MarketingIdea } from './MarketingIdeas';
+import TraySizes, { traySizeKeyFor, type TraySizeBucket, type TraySizeRecord } from './TraySizes';
 
 type HealthStatus = 'ready' | 'warning' | 'blocker' | 'unavailable' | 'error';
 
@@ -315,6 +316,10 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
   const [ideasLoading, setIdeasLoading] = useState(true);
   const [ideasError, setIdeasError] = useState('');
   const [ideaSavingId, setIdeaSavingId] = useState<string | null>(null);
+  const [traySizeRecords, setTraySizeRecords] = useState<TraySizeRecord[]>([]);
+  const [traySizesLoading, setTraySizesLoading] = useState(true);
+  const [traySizesError, setTraySizesError] = useState('');
+  const [traySizeDeleting, setTraySizeDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -363,6 +368,58 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
   useEffect(() => {
     void loadSavedIdeas();
   }, []);
+
+  async function loadTraySizes() {
+    setTraySizesError('');
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-tray-sizes');
+      if (res.status === 401) {
+        clearAdminToken();
+        window.location.href = '/.netlify/functions/admin-login';
+        return;
+      }
+      const body = await adminJson<{ records?: TraySizeRecord[] }>(res, 'Could not load reported tray sizes');
+      if (!res.ok) throw new Error(body.error ?? 'Could not load reported tray sizes');
+      setTraySizeRecords(body.records ?? []);
+    } catch (err) {
+      setTraySizesError(err instanceof Error ? err.message : 'Could not load reported tray sizes.');
+    } finally {
+      setTraySizesLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void loadTraySizes();
+  }, []);
+
+  async function deleteTraySize(variantId: string, size: TraySizeBucket) {
+    setTraySizeDeleting(traySizeKeyFor(variantId, size));
+    setTraySizesError('');
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-tray-sizes', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ variantId, lengthMm: size.lengthMm, widthMm: size.widthMm }),
+      });
+      if (res.status === 401) {
+        clearAdminToken();
+        window.location.href = '/.netlify/functions/admin-login';
+        return;
+      }
+      const body = await adminJson<{ ok?: boolean }>(res, 'Could not delete that tray size');
+      if (!res.ok) throw new Error(body.error ?? 'Could not delete that tray size');
+      // Drop the one size, and the vehicle too once nothing is left for it.
+      setTraySizeRecords((prev) => prev
+        .map((record) => (record.variantId === variantId
+          ? { ...record, sizes: record.sizes.filter((s) => !(s.lengthMm === size.lengthMm && s.widthMm === size.widthMm)) }
+          : record))
+        .filter((record) => record.sizes.length > 0));
+    } catch (err) {
+      setTraySizesError(err instanceof Error ? err.message : 'Could not delete that tray size.');
+    } finally {
+      setTraySizeDeleting(null);
+    }
+  }
 
   // The server derives the record id from the title, so matching on title is
   // enough to tell whether an insight has already been saved.
@@ -907,6 +964,19 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
               error={ideasError}
               savingId={ideaSavingId}
               onStatusChange={changeIdeaStatus}
+            />
+          </Panel>
+
+          <Panel
+            title="Reported Tray Sizes"
+            description={"Tray dimensions customers reported for their own vehicle, and how many reported each. Delete an entry that is obviously wrong; the others keep their counts."}
+          >
+            <TraySizes
+              records={traySizeRecords}
+              loading={traySizesLoading}
+              error={traySizesError}
+              deletingKey={traySizeDeleting}
+              onDelete={deleteTraySize}
             />
           </Panel>
 
