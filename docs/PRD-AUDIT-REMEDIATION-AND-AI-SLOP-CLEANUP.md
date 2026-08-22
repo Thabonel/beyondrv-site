@@ -1,6 +1,6 @@
 # Product Requirements Document: Audit Remediation and AI-Slop Cleanup
 
-**Status:** Proposed
+**Status:** Implemented; public vehicle data remains gated pending human approvals
 
 **Date:** 22 August 2026
 

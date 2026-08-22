@@ -6,16 +6,18 @@ import type { VehicleCatalogue, CatalogueVariant } from '../src/lib/vehicleCatal
 const variant: CatalogueVariant = {
   id: 'x', make: 'Mazda', model: 'BT-50', modelYear: 2025, grade: 'XT',
   cabType: 'single_cab', bodyType: 'cab_chassis', drivetrain: '4x4',
+  engine: '3.0L diesel', transmission: '6-speed automatic', wheelbaseMm: 3125,
   label: 'Mazda BT-50 XT single cab 4x4 (2025)',
   gvmKg: 3100, kerbKg: 1914, kerbBasis: 'Kerb weight with Mazda standard tray fitted',
   payloadKg: 1186, frontGawrKg: 1450, rearGawrKg: 1910,
   trayLengthMm: null, trayWidthMm: null, trayState: 'included', trayMassKg: null,
   promotedByOverride: false,
-  source: { manufacturer: 'Mazda Australia', title: 'Payload Calculator', url: 'https://example.test', accessedDate: '2026-08-18' },
+  publication: { approvalId: 'review:7', approvedAt: '2026-08-22T00:00:00.000Z', method: 'review' },
+  source: { manufacturer: 'Mazda Australia', title: 'Payload Calculator', url: 'https://www.mazda.com.au/payload-calculator/', accessedDate: '2026-08-18' },
 };
 
 const catalogue: VehicleCatalogue = {
-  schemaVersion: '1.0', catalogueVersion: 'test', generatedAt: '2026-08-18T00:00:00.000Z',
+  schemaVersion: '1.1', catalogueVersion: 'test', generatedAt: '2026-08-18T00:00:00.000Z',
   sourceDatabaseRowCount: 159, models: [{ make: 'Mazda', model: 'BT-50', modelYears: [2025] }],
   variants: [variant],
 };
@@ -53,11 +55,11 @@ test('an empty catalogue is valid but warns', () => {
   assert.ok(result.warnings.length > 0);
 });
 
-test('a variant with an empty source url is an error mentioning the variant id', () => {
+test('a variant with an empty source url is an error with its exact path', () => {
   const bad = { ...catalogue, variants: [{ ...variant, source: { ...variant.source, url: '' } }] };
   const result = validateVehicleCatalogue(bad);
   assert.equal(result.valid, false);
-  assert.ok(result.errors.some((e) => e.includes(variant.id) && e.includes('source url')));
+  assert.ok(result.errors.some((e) => e.includes('variants[0].source.url')));
 });
 
 test('a variant with an empty id is an error', () => {
@@ -65,11 +67,68 @@ test('a variant with an empty id is an error', () => {
   assert.equal(validateVehicleCatalogue(bad).valid, false);
 });
 
-test('a variant with an empty source accessedDate is an error mentioning the variant id', () => {
+test('a variant with an empty source accessedDate is an error with its exact path', () => {
   const bad = { ...catalogue, variants: [{ ...variant, source: { ...variant.source, accessedDate: '' } }] };
   const result = validateVehicleCatalogue(bad);
   assert.equal(result.valid, false);
-  assert.ok(result.errors.some((e) => e.includes(variant.id) && e.includes('accessedDate')));
+  assert.ok(result.errors.some((e) => e.includes('variants[0].source.accessedDate')));
+});
+
+test('missing model and variant arrays return validation errors instead of throwing', () => {
+  const result = validateVehicleCatalogue({ schemaVersion: '1.1', catalogueVersion: 'bad', generatedAt: catalogue.generatedAt, sourceDatabaseRowCount: 1 });
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((error) => error.includes('models must be an array')));
+  assert.ok(result.errors.some((error) => error.includes('variants must be an array')));
+});
+
+test('numeric strings are rejected at the runtime boundary', () => {
+  const bad = { ...catalogue, variants: [{ ...variant, gvmKg: '3100' }] };
+  const result = validateVehicleCatalogue(bad);
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((error) => error.includes('gvmKg must be an integer')));
+});
+
+test('unapproved source hosts and non-HTTPS URLs are rejected', () => {
+  for (const url of ['https://evil.example/vehicle', 'javascript:alert(1)', 'http://www.mazda.com.au/']) {
+    const result = validateVehicleCatalogue({ ...catalogue, variants: [{ ...variant, source: { ...variant.source, url } }] });
+    assert.equal(result.valid, false, url);
+  }
+});
+
+test('publication evidence is required and must agree with override state', () => {
+  const missing = validateVehicleCatalogue({ ...catalogue, variants: [{ ...variant, publication: undefined }] });
+  assert.equal(missing.valid, false);
+  const inconsistent = validateVehicleCatalogue({ ...catalogue, variants: [{ ...variant, promotedByOverride: true }] });
+  assert.equal(inconsistent.valid, false);
+});
+
+test('unsupported schema versions are rejected', () => {
+  const result = validateVehicleCatalogue({ ...catalogue, schemaVersion: '1.0' });
+  assert.equal(result.valid, false);
+});
+
+test('publication references must agree with their method', () => {
+  const candidate = structuredClone(catalogue);
+  candidate.variants[0].publication.approvalId = 'override:manual';
+  const result = validateVehicleCatalogue(candidate);
+  assert.equal(result.valid, false);
+  assert.match(result.errors.join('\n'), /must identify a review/);
+});
+
+test('future source access dates are rejected', () => {
+  const candidate = structuredClone(catalogue);
+  candidate.variants[0].source.accessedDate = '2100-01-01';
+  const result = validateVehicleCatalogue(candidate);
+  assert.equal(result.valid, false);
+  assert.match(result.errors.join('\n'), /cannot be in the future/);
+});
+
+test('the model index must exactly describe published model years', () => {
+  const candidate = structuredClone(catalogue);
+  candidate.models[0].modelYears = [2024, 2023];
+  const result = validateVehicleCatalogue(candidate);
+  assert.equal(result.valid, false);
+  assert.match(result.errors.join('\n'), /does not match its published model years/);
 });
 
 test('two variants sharing a label is an error, because the picker cannot tell them apart', () => {

@@ -13,6 +13,10 @@ This directory contains a conservative, source-backed seed database for the prop
 - `model-coverage.csv` — generated Australian platform scope and research backlog.
 - `build-database.sh` — deterministic rebuild and export script.
 
+`schema.sql` and `seed.sql` are the canonical source files. The SQLite database,
+CSV exports, and public JSON catalogue are generated artifacts. Do not edit a
+generated copy to make a review pass.
+
 ## Safety and interpretation
 
 The database is a research seed, not a legal fitment certificate. Every row is deliberately `customer_selectable = 0`. A row should become customer-selectable only after:
@@ -31,7 +35,20 @@ Heavy expedition vehicles are stored separately in `heavy_overland_chassis`. The
 
 ```sh
 ./data/vehicle-selector/build-database.sh
+npm run catalogue:build
 ```
+
+The catalogue command validates the complete runtime schema and exits non-zero
+if a `customer_selectable = 1` row has no latest `approved` entry in
+`data_review_log`. With no human approvals, the correct output is an empty
+catalogue and the manual calculator remains available.
+
+To publish a reviewed row, add an attributable `data_review_log` decision and
+set `customer_selectable = 1` in the canonical SQL source, then rebuild both
+the database and catalogue. A temporary force-show entry in
+`src/data/vehicle-selector/overrides.json` must contain `id`, `reason`,
+`reviewer`, and `approvedAt`; hide overrides always win. Never bulk-approve
+rows solely because automated research or a build completed successfully.
 
 Useful checks:
 

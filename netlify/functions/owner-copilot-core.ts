@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 export const OWNER_COPILOT_TASK_STORE = 'owner-copilot-tasks';
 export const OWNER_COPILOT_TIMELINE_STORE = 'owner-copilot-timeline-events';
 export const OWNER_COPILOT_AI_ACTION_STORE = 'owner-copilot-ai-actions';
@@ -301,17 +303,16 @@ export interface MarketingIdeaRecord {
  * same insight an update rather than a duplicate.
  */
 function titleFingerprint(title: string) {
-  let hash = 0;
-  for (let index = 0; index < title.length; index += 1) {
-    hash = (hash * 31 + title.charCodeAt(index)) | 0;
-  }
-  return (hash >>> 0).toString(36);
+  return createHash('sha256').update(title, 'utf8').digest('hex').slice(0, 16);
+}
+
+function normalizedMarketingIdeaTitle(value: unknown) {
+  return clean(value, 180).normalize('NFKC').replace(/\s+/g, ' ').toLocaleLowerCase('en-AU');
 }
 
 export function marketingIdeaId(title: string) {
-  const trimmed = clean(title, 200);
-  const slug = trimmed
-    .toLowerCase()
+  const normalized = normalizedMarketingIdeaTitle(title);
+  const slug = normalized
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .slice(0, 80)
@@ -320,8 +321,49 @@ export function marketingIdeaId(title: string) {
   // different titles can reduce to the same one. Always append a fingerprint of the
   // full title so distinct titles never share a key, and keep the slug in front so
   // the stored key stays readable.
-  const fingerprint = titleFingerprint(trimmed);
+  const fingerprint = titleFingerprint(normalized);
   return slug ? `marketing_idea_${slug}_${fingerprint}` : `marketing_idea_${fingerprint}`;
+}
+
+export function resolveMarketingIdeaTarget(
+  body: Record<string, unknown>,
+  records: Record<string, unknown>[],
+): { id: string; existing: Record<string, unknown> | null } | { error: string; statusCode: 400 | 409 } {
+  const requestedId = clean(body.id, 240);
+  const requestedTitle = clean(body.title, 180);
+  const requestedTitleIdentity = normalizedMarketingIdeaTitle(requestedTitle);
+  const byId = new Map(records.map((record) => [clean(record.id, 240), record]));
+
+  if (requestedId) {
+    const existing = byId.get(requestedId) ?? null;
+    if (existing && requestedTitle && normalizedMarketingIdeaTitle(existing.title) !== requestedTitleIdentity) {
+      return { error: 'The requested marketing idea id belongs to a different title.', statusCode: 409 };
+    }
+    if (!existing && requestedTitle && records.some((record) => normalizedMarketingIdeaTitle(record.title) === requestedTitleIdentity)) {
+      return { error: 'This marketing idea already exists under a different id.', statusCode: 409 };
+    }
+    if (!existing) {
+      return { error: 'New marketing idea ids are assigned by the server.', statusCode: 409 };
+    }
+    return { id: requestedId, existing };
+  }
+
+  if (!requestedTitle) return { error: 'Missing marketing idea title.', statusCode: 400 };
+  const titleMatches = records.filter((record) => normalizedMarketingIdeaTitle(record.title) === requestedTitleIdentity);
+  if (titleMatches.length > 1) {
+    return { error: 'Multiple legacy marketing ideas share this title and require manual reconciliation.', statusCode: 409 };
+  }
+  if (titleMatches.length === 1) {
+    const id = clean(titleMatches[0].id, 240);
+    return id ? { id, existing: titleMatches[0] } : { error: 'The existing marketing idea has no valid id.', statusCode: 409 };
+  }
+
+  const id = marketingIdeaId(requestedTitle);
+  const collision = byId.get(id);
+  if (collision && normalizedMarketingIdeaTitle(collision.title) !== requestedTitleIdentity) {
+    return { error: 'The canonical marketing idea id is already in use.', statusCode: 409 };
+  }
+  return { id, existing: collision ?? null };
 }
 
 export function buildMarketingIdea(

@@ -3,10 +3,9 @@ import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedRespo
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 import {
   buildMarketingIdea,
-  clean,
-  marketingIdeaId,
   marketingIdeaKey,
   OWNER_COPILOT_MARKETING_IDEA_STORE,
+  resolveMarketingIdeaTarget,
 } from './owner-copilot-core';
 import { appendOwnerAudit, listJsonStore } from './owner-copilot-store-utils';
 
@@ -34,8 +33,11 @@ export const handler: Handler = async (event) => {
     }
 
     const now = new Date().toISOString();
-    const id = clean(body.id, 240) || marketingIdeaId(clean(body.title, 180));
-    const existing = await store.get(marketingIdeaKey(id), { type: 'json' }) as Record<string, unknown> | null;
+    const target = resolveMarketingIdeaTarget(body, await listJsonStore(OWNER_COPILOT_MARKETING_IDEA_STORE));
+    if ('error' in target) {
+      return { statusCode: target.statusCode, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: target.error }) };
+    }
+    const { id, existing } = target;
     const result = buildMarketingIdea({ ...body, id }, existing, now);
     if ('error' in result) {
       return { statusCode: 400, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: result.error }) };

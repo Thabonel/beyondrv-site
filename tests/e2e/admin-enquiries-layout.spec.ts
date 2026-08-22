@@ -1,4 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { mockOwnerAdminSession } from './helpers/admin-session';
+
+test.beforeEach(async ({ page }) => {
+  await mockOwnerAdminSession(page);
+});
 
 async function openEnquiries(page: import('@playwright/test').Page) {
   await page.getByRole('button', { name: /Menu Dashboard/i }).click();

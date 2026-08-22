@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
+import { mockOwnerAdminSession } from './helpers/admin-session';
 
 test('admin chat message box grows as a multiline message is entered', async ({ page }) => {
+  await mockOwnerAdminSession(page);
   await page.route('**/.netlify/functions/admin-products', route => route.fulfill({
     status: 200,
     contentType: 'application/json',
