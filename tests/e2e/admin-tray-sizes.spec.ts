@@ -1,4 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { mockOwnerAdminSession } from './helpers/admin-session';
+
+test.beforeEach(async ({ page }) => {
+  await mockOwnerAdminSession(page);
+});
 
 // The dashboard renders its panels behind `data &&` and they dereference
 // data.inventory.byCategory and friends, so an empty payload crashes the page.

@@ -1,6 +1,29 @@
 import { expect, test, type Page, type Route } from '@playwright/test';
+import { vehicleCatalogueFixture } from '../fixtures/vehicle-catalogue';
 
 const RANGER_CC = 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo';
+const calculatorPath = '/slide-on-camper-weight-calculator/';
+const catalogueTag = /(<script[^>]*id="vehicleCatalogueData"[^>]*>)[\s\S]*?(<\/script>)/;
+
+/**
+ * The published catalogue is gated on a review decision and is currently empty,
+ * so these tests inject a known one rather than depending on what is published.
+ */
+async function openCalculator(page: Page) {
+  await page.route(`**${calculatorPath}`, async (route) => {
+    const response = await route.fetch();
+    const headers = response.headers();
+    delete headers['content-encoding'];
+    delete headers['content-length'];
+    const html = await response.text();
+    await route.fulfill({
+      status: response.status(),
+      headers,
+      body: html.replace(catalogueTag, `$1${JSON.stringify(vehicleCatalogueFixture)}$2`),
+    });
+  });
+  await page.goto(calculatorPath);
+}
 
 async function selectRanger(page: Page) {
   await page.selectOption('#vehicleMake', 'Ford');
@@ -33,7 +56,7 @@ const REPORTED = { [RANGER_CC]: { lengthMm: 2100, widthMm: 1800, reports: 7 } };
 
 test('a vehicle nobody has reported offers no size, and nothing is posted', async ({ page }) => {
   const writes = stubTraySizes(page);
-  await page.goto('/slide-on-camper-weight-calculator/');
+  await openCalculator(page);
   await selectRanger(page);
 
   await expect(page.getByTestId('tray-reported')).toBeHidden();
@@ -47,7 +70,7 @@ test('a vehicle nobody has reported offers no size, and nothing is posted', asyn
 
 test('a reported size is offered with its count and prefills the fields', async ({ page }) => {
   const writes = stubTraySizes(page, { reported: REPORTED });
-  await page.goto('/slide-on-camper-weight-calculator/');
+  await openCalculator(page);
   await selectRanger(page);
 
   const reported = page.getByTestId('tray-reported');
@@ -64,7 +87,7 @@ test('a reported size is offered with its count and prefills the fields', async 
 
 test('the result is recalculated once the reported size arrives', async ({ page }) => {
   stubTraySizes(page, { reported: REPORTED, delayMs: 600 });
-  await page.goto('/slide-on-camper-weight-calculator/');
+  await openCalculator(page);
 
   // Every required field must be present or the calculator short-circuits to
   // its missing-field path and reports no fit at all.
@@ -85,7 +108,7 @@ test('the result is recalculated once the reported size arrives', async ({ page 
 
 test('confirming reports the shown size, once', async ({ page }) => {
   const writes = stubTraySizes(page, { reported: REPORTED });
-  await page.goto('/slide-on-camper-weight-calculator/');
+  await openCalculator(page);
   await selectRanger(page);
 
   await page.getByTestId('tray-confirm').click();
@@ -97,7 +120,7 @@ test('confirming reports the shown size, once', async ({ page }) => {
 
 test('correcting the size clears the fields and reports only on an explicit press', async ({ page }) => {
   const writes = stubTraySizes(page, { reported: REPORTED });
-  await page.goto('/slide-on-camper-weight-calculator/');
+  await openCalculator(page);
   await selectRanger(page);
 
   await page.getByTestId('tray-correct').click();
@@ -118,7 +141,7 @@ test('correcting the size clears the fields and reports only on an explicit pres
 
 test('filling the tray fields for an ordinary calculation reports nothing', async ({ page }) => {
   const writes = stubTraySizes(page);
-  await page.goto('/slide-on-camper-weight-calculator/');
+  await openCalculator(page);
   await selectRanger(page);
 
   await page.fill('#trayLength', '2400');
@@ -132,7 +155,7 @@ test('filling the tray fields for an ordinary calculation reports nothing', asyn
 
 test('a submission that fails can be retried', async ({ page }) => {
   const writes = stubTraySizes(page, { reported: REPORTED, postStatus: 503 });
-  await page.goto('/slide-on-camper-weight-calculator/');
+  await openCalculator(page);
   await selectRanger(page);
 
   await page.getByTestId('tray-confirm').click();
@@ -148,7 +171,7 @@ test('a reporting outage leaves the calculator working', async ({ page }) => {
   await page.route('**/.netlify/functions/tray-sizes', route =>
     route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: 'unavailable' }) }));
 
-  await page.goto('/slide-on-camper-weight-calculator/');
+  await openCalculator(page);
   await selectRanger(page);
 
   await expect(page.getByTestId('tray-reported')).toBeHidden();
