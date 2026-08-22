@@ -10,7 +10,7 @@ export const vehicleCatalogueFixture: VehicleCatalogue = {
   schemaVersion: '1.1',
   catalogueVersion: 'e2e-fixture-2026-08-22',
   generatedAt: '2026-08-22T00:00:00.000Z',
-  sourceDatabaseRowCount: 4,
+  sourceDatabaseRowCount: 5,
   models: [
     { make: 'Ford', model: 'Ranger', modelYears: [2022] },
     { make: 'Mazda', model: 'BT-50', modelYears: [2025] },
@@ -24,6 +24,21 @@ export const vehicleCatalogueFixture: VehicleCatalogue = {
       label: 'Ford Ranger XL double cab cab chassis 4x4 part-time (2022) 2.0L single-turbo diesel',
       gvmKg: 3250, kerbKg: 2046, kerbBasis: 'Kerb weight with heaviest factory optional equipment; excludes tray body',
       payloadKg: 1204, frontGawrKg: 1450, rearGawrKg: 1959,
+      trayLengthMm: null, trayWidthMm: null, trayState: 'excluded', trayMassKg: null,
+      promotedByOverride: false, publication: reviewedPublication,
+      source: {
+        manufacturer: 'Ford Australia', title: 'Next-Generation Ranger 2022MY Specifications',
+        url: 'https://www.ford.com.au/ranger/specifications', accessedDate: '2026-08-17',
+      },
+    },
+    {
+      id: 'ford-ranger-2022my-4x4-xl-double-cc-biturbo',
+      make: 'Ford', model: 'Ranger', modelYear: 2022, grade: 'XL',
+      cabType: 'double_cab', bodyType: 'cab_chassis', drivetrain: '4x4 part-time',
+      engine: '2.0L bi-turbo diesel; 154 kW / 500 Nm', transmission: '6-speed automatic', wheelbaseMm: null,
+      label: 'Ford Ranger XL double cab cab chassis 4x4 part-time (2022) 2.0L bi-turbo diesel',
+      gvmKg: 3250, kerbKg: 2072, kerbBasis: 'Kerb weight with heaviest factory optional equipment; excludes tray body',
+      payloadKg: 1178, frontGawrKg: 1450, rearGawrKg: 1959,
       trayLengthMm: null, trayWidthMm: null, trayState: 'excluded', trayMassKg: null,
       promotedByOverride: false, publication: reviewedPublication,
       source: {
