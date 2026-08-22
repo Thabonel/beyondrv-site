@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
+import { mockOwnerAdminSession } from './helpers/admin-session';
 
 test('shop item queue button shows validation and queues a draft card', async ({ page }) => {
+  await mockOwnerAdminSession(page);
   let queuedPrompt = '';
 
   await page.route('**/.netlify/functions/admin-products', route => route.fulfill({

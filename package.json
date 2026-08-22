@@ -17,6 +17,7 @@
     "audit:authority": "node SCRIPTS/audit-authority.mjs",
     "audit:performance": "node SCRIPTS/audit-performance.mjs",
     "audit:cls": "node SCRIPTS/audit-cls.mjs",
+    "audit:repository": "node SCRIPTS/audit-repository-hygiene.mjs",
     "authority:indexnow": "node SCRIPTS/submit-indexnow.mjs",
     "images:optimize": "node SCRIPTS/optimize-product-images.mjs --write",
     "configurator:prepare-glb": "node SCRIPTS/prepare-configurator-glb.mjs",

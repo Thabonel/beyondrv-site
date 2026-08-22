@@ -28,6 +28,13 @@ netlify/functions/manifest.json
 
 # Local Playwright/MCP screenshots and logs
 .playwright-mcp/
+playwright-report/
+test-results/
+
+# Local document-generation and agent working artifacts
+work/
+outputs/
+.claude/
 
 # Old WordPress/source working assets kept locally, not part of the Astro site
 docs/byondrv-owner-copilot-prd.md

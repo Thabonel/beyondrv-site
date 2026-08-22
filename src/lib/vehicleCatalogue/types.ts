@@ -7,6 +7,12 @@ export type CatalogueSource = {
   accessedDate: string;
 };
 
+export type CataloguePublication = {
+  approvalId: string;
+  approvedAt: string;
+  method: 'review' | 'override';
+};
+
 export type CatalogueVariant = {
   id: string;
   make: string;
@@ -16,6 +22,9 @@ export type CatalogueVariant = {
   cabType: string;
   bodyType: string;
   drivetrain: string | null;
+  engine: string | null;
+  transmission: string | null;
+  wheelbaseMm: number | null;
   label: string;
   gvmKg: number;
   kerbKg: number;
@@ -28,13 +37,14 @@ export type CatalogueVariant = {
   trayState: TrayState;
   trayMassKg: number | null;
   promotedByOverride: boolean;
+  publication: CataloguePublication;
   source: CatalogueSource;
 };
 
 export type CatalogueModel = { make: string; model: string; modelYears: number[] };
 
 export type VehicleCatalogue = {
-  schemaVersion: string;
+  schemaVersion: '1.1';
   catalogueVersion: string;
   generatedAt: string;
   sourceDatabaseRowCount: number;

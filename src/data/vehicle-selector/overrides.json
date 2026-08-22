@@ -1,5 +1,5 @@
 {
   "show": [],
   "hide": [],
-  "note": "show forces a variant into the picker even when flagged. hide removes one. An id in both is hidden. Record why in the commit message."
+  "note": "show entries require id, reason, reviewer and approvedAt. hide removes a variant. Conflicting entries fail the build."
 }

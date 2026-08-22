@@ -1,17 +1,50 @@
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { vehicleCatalogueFixture } from '../fixtures/vehicle-catalogue';
 
-const catalogue = JSON.parse(
-  readFileSync(fileURLToPath(new URL('../../src/data/vehicle-selector/catalogue.json', import.meta.url)), 'utf8')
-);
+const catalogue = vehicleCatalogueFixture;
+const calculatorPath = '/slide-on-camper-weight-calculator/';
+const catalogueTag = /<script[^>]*id="vehicleCatalogueData"[^>]*>[\s\S]*?<\/script>/;
+const catalogueTagOpenClose = /(<script[^>]*id="vehicleCatalogueData"[^>]*>)[\s\S]*?(<\/script>)/;
 
-test.beforeEach(async ({ page }) => {
-  await page.goto('/slide-on-camper-weight-calculator/');
-});
+async function rewriteCalculatorCatalogue(page: Page, replacement: string) {
+  await page.route(`**${calculatorPath}`, async (route) => {
+    const response = await route.fetch();
+    const headers = response.headers();
+    delete headers['content-encoding'];
+    delete headers['content-length'];
+    const html = await response.text();
+    await route.fulfill({
+      status: response.status(),
+      headers,
+      body: html.replace(catalogueTagOpenClose, `$1${replacement}$2`),
+    });
+  });
+}
+
+async function openCalculatorWithFixture(page: Page) {
+  await rewriteCalculatorCatalogue(page, JSON.stringify(catalogue));
+  await page.goto(calculatorPath);
+}
+
+async function completeManualCalculation(page: Page) {
+  for (const [id, value] of [
+    ['gvm', '5000'], ['currentWeight', '2200'], ['passengers', '1'], ['accessories', '1'],
+    ['luggageGear', '1'], ['camperDry', '1'], ['camperWater', '1'], ['camperGear', '1'],
+    ['camperOptions', '1'], ['trayLength', '2000'], ['trayWidth', '1800'],
+    ['requiredTrayLength', '1900'], ['requiredTrayWidth', '1700'],
+  ] as const) {
+    await page.fill(`#${id}`, value);
+  }
+  for (const id of ['rearAxleChecked', 'tyreRatingsChecked', 'centreOfGravityChecked']) {
+    await page.locator(`#${id}`).press('Space');
+  }
+  await expect(page.locator('#loadedWeight')).toHaveText(/2,?207 kg/);
+}
 
 test('picking a vehicle fills the published figures', async ({ page }) => {
-  const variant = catalogue.variants.find((v: any) => v.make === 'Mazda' && v.model === 'BT-50');
+  await openCalculatorWithFixture(page);
+  const variant = catalogue.variants.find((v) => v.make === 'Mazda' && v.model === 'BT-50');
   if (!variant) throw new Error('Expected a Mazda BT-50 variant in the catalogue used by this test.');
 
   await page.selectOption('#vehicleMake', 'Mazda');
@@ -24,6 +57,7 @@ test('picking a vehicle fills the published figures', async ({ page }) => {
 });
 
 test('a figure the customer typed survives re-picking a vehicle', async ({ page }) => {
+  await openCalculatorWithFixture(page);
   await page.selectOption('#vehicleMake', 'Mazda');
   await page.selectOption('#vehicleModel', 'BT-50');
   const options = page.locator('#vehicleVariant option');
@@ -44,16 +78,16 @@ test('the form still works if the catalogue fails to load', async ({ page, conte
   // catalogue by then. To genuinely exercise catalogue failure, the markup
   // itself must be broken before the browser ever parses it — so we rewrite
   // the HTML response in flight with page.route.
-  const catalogueTag = /<script[^>]*id="vehicleCatalogueData"[^>]*>[\s\S]*?<\/script>/;
-  const catalogueTagOpenClose = /(<script[^>]*id="vehicleCatalogueData"[^>]*>)[\s\S]*?(<\/script>)/;
-
   // Case 1: the catalogue element is absent entirely from the markup.
   const pageErrors: Error[] = [];
   page.on('pageerror', (err) => pageErrors.push(err));
   await page.route('**/slide-on-camper-weight-calculator/', async (route) => {
     const response = await route.fetch();
     const html = await response.text();
-    await route.fulfill({ response, body: html.replace(catalogueTag, '') });
+    const headers = response.headers();
+    delete headers['content-encoding'];
+    delete headers['content-length'];
+    await route.fulfill({ status: response.status(), headers, body: html.replace(catalogueTag, '') });
   });
   await page.goto('/slide-on-camper-weight-calculator/');
 
@@ -65,9 +99,7 @@ test('the form still works if the catalogue fails to load', async ({ page, conte
   await expect(page.locator('#vehicleMake option')).toHaveCount(1);
   expect(pageErrors).toEqual([]);
 
-  await page.fill('#gvm', '3350');
-  await page.fill('#currentWeight', '2200');
-  await expect(page.locator('#gvm')).toHaveValue('3350');
+  await completeManualCalculation(page);
 
   // Case 2: the catalogue element is present in the markup but its JSON is
   // malformed. This used to throw at top-level script scope and kill the
@@ -79,8 +111,15 @@ test('the form still works if the catalogue fails to load', async ({ page, conte
   });
   await malformedPage.route('**/slide-on-camper-weight-calculator/', async (route) => {
     const response = await route.fetch();
+    const headers = response.headers();
+    delete headers['content-encoding'];
+    delete headers['content-length'];
     const html = await response.text();
-    await route.fulfill({ response, body: html.replace(catalogueTagOpenClose, '$1{not valid json$2') });
+    await route.fulfill({
+      status: response.status(),
+      headers,
+      body: html.replace(catalogueTagOpenClose, '$1{not valid json$2'),
+    });
   });
   await malformedPage.goto('/slide-on-camper-weight-calculator/');
 
@@ -90,20 +129,18 @@ test('the form still works if the catalogue fails to load', async ({ page, conte
   await expect(malformedPage.locator('#vehicleMake option')).toHaveCount(1);
   expect(consoleWarnings.some((text) => text.includes('Vehicle catalogue data could not be parsed'))).toBe(true);
 
-  await malformedPage.fill('#gvm', '3350');
-  await malformedPage.fill('#currentWeight', '2200');
-  await expect(malformedPage.locator('#gvm')).toHaveValue('3350');
+  await completeManualCalculation(malformedPage);
   await malformedPage.close();
 });
 
 test('the form still works when no vehicle is picked', async ({ page }) => {
-  await page.fill('#gvm', '3350');
-  await page.fill('#currentWeight', '2200');
-  await expect(page.locator('#gvm')).toHaveValue('3350');
+  await page.goto(calculatorPath);
+  await completeManualCalculation(page);
   await expect(page.locator('#trayMassField')).toBeHidden();
 });
 
 test('tray weight sums into the vehicle weight, but a negative entry cannot reduce it', async ({ page }) => {
+  await openCalculatorWithFixture(page);
   // Ford Ranger XL double cab (single turbo): kerb mass excludes the tray,
   // so the tray field is shown and published kerb mass pre-fills at 2046kg.
   await page.selectOption('#vehicleMake', 'Ford');
@@ -145,6 +182,7 @@ test('tray weight sums into the vehicle weight, but a negative entry cannot redu
 });
 
 test('a zero current vehicle weight still needs review even with a tray entered', async ({ page }) => {
+  await openCalculatorWithFixture(page);
   await page.selectOption('#vehicleMake', 'Ford');
   await page.selectOption('#vehicleModel', 'Ranger');
   await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
@@ -159,6 +197,7 @@ test('a zero current vehicle weight still needs review even with a tray entered'
 });
 
 test('an invisible tray value from a previous vehicle cannot leak into the calculation', async ({ page }) => {
+  await openCalculatorWithFixture(page);
   await page.selectOption('#vehicleMake', 'Ford');
   await page.selectOption('#vehicleModel', 'Ranger');
   await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
@@ -195,7 +234,7 @@ test('an invisible tray value from a previous vehicle cannot leak into the calcu
 });
 
 test('a vehicle whose kerb mass excludes the tray will not calculate until the tray weight is entered', async ({ page }) => {
-  await page.goto('/slide-on-camper-weight-calculator/');
+  await openCalculatorWithFixture(page);
 
   // Ford Ranger XL cab chassis: published kerb mass excludes the tray.
   await page.selectOption('#vehicleMake', 'Ford');
@@ -222,7 +261,7 @@ test('a vehicle whose kerb mass excludes the tray will not calculate until the t
 });
 
 test('a weighbridge weight that already includes the tray does not demand the tray again', async ({ page }) => {
-  await page.goto('/slide-on-camper-weight-calculator/');
+  await openCalculatorWithFixture(page);
   await page.selectOption('#vehicleMake', 'Ford');
   await page.selectOption('#vehicleModel', 'Ranger');
   await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
@@ -251,7 +290,7 @@ test('a weighbridge weight that already includes the tray does not demand the tr
 });
 
 test('overriding a prefilled figure is disclosed in the provenance panel straight away', async ({ page }) => {
-  await page.goto('/slide-on-camper-weight-calculator/');
+  await openCalculatorWithFixture(page);
   await page.selectOption('#vehicleMake', 'Ford');
   await page.selectOption('#vehicleModel', 'Ranger');
   await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
@@ -269,7 +308,7 @@ test('overriding a prefilled figure is disclosed in the provenance panel straigh
 });
 
 test('the provenance panel names every figure the customer has overridden', async ({ page }) => {
-  await page.goto('/slide-on-camper-weight-calculator/');
+  await openCalculatorWithFixture(page);
   await page.selectOption('#vehicleMake', 'Ford');
   await page.selectOption('#vehicleModel', 'Ranger');
   await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
@@ -280,4 +319,64 @@ test('the provenance panel names every figure the customer has overridden', asyn
   const provenance = page.locator('#vehicleProvenance');
   await expect(provenance).toContainText('You supplied GVM');
   await expect(provenance).toContainText('the current vehicle weight');
+});
+
+const RANGER_CC_A = 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo';
+const RANGER_CC_B = 'ford-ranger-2022my-4x4-xl-double-cc-biturbo';
+
+async function pickRanger(page: Page, variantId: string) {
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', variantId);
+}
+
+test('switching variant re-asks whether the weight includes the tray', async ({ page }) => {
+  await openCalculatorWithFixture(page);
+  await pickRanger(page, RANGER_CC_A);
+
+  // Both variants publish a kerb mass that excludes the tray.
+  await expect(page.locator('#trayMassField')).toBeVisible();
+  await page.check('#trayIncluded');
+  await expect(page.locator('#trayMassRow')).toBeHidden();
+
+  // Switching replaces the weight with the new vehicle's published kerb, which
+  // excludes its tray, so the earlier claim cannot carry over.
+  await page.selectOption('#vehicleVariant', RANGER_CC_B);
+
+  await expect(page.locator('#currentWeight')).toHaveValue('2072');
+  await expect(page.locator('#trayIncluded')).not.toBeChecked();
+  await expect(page.locator('#trayMassRow')).toBeVisible();
+});
+
+test('a carried-over inclusion claim cannot produce a green result on a fresh variant', async ({ page }) => {
+  await openCalculatorWithFixture(page);
+  await pickRanger(page, RANGER_CC_A);
+  await page.check('#trayIncluded');
+
+  for (const [id, v] of [['gvm', '5000'], ['passengers', '1'], ['accessories', '1'], ['luggageGear', '1'],
+    ['camperDry', '1'], ['camperWater', '1'], ['camperGear', '1'], ['camperOptions', '1'],
+    ['trayLength', '2000'], ['trayWidth', '1800'], ['requiredTrayLength', '1900'], ['requiredTrayWidth', '1700']] as const) {
+    await page.fill(`#${id}`, v);
+  }
+
+  await page.selectOption('#vehicleVariant', RANGER_CC_B);
+
+  // The published kerb excludes the tray and nobody has said otherwise for this
+  // vehicle, so the result must not pass on a bare-chassis weight.
+  await expect(page.locator('#statusLabel')).toContainText(/not enough information/i);
+});
+
+test('the provenance panel stops crediting a tray weight once it is cleared', async ({ page }) => {
+  await openCalculatorWithFixture(page);
+  await pickRanger(page, RANGER_CC_A);
+
+  await page.fill('#trayMass', '120');
+  const provenance = page.locator('#vehicleProvenance');
+  await expect(provenance).toContainText('the tray weight');
+
+  // Ticking this clears the tray weight without firing an input event.
+  await page.check('#trayIncluded');
+
+  await expect(page.locator('#trayMass')).toHaveValue('');
+  await expect(provenance).not.toContainText('the tray weight');
 });

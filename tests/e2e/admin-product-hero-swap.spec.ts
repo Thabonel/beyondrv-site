@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
+import { mockOwnerAdminSession } from './helpers/admin-session';
 
 test('setting a gallery photo as hero preserves the previous hero in that gallery position', async ({ page }) => {
+  await mockOwnerAdminSession(page);
   await page.route('**/.netlify/functions/admin-products*', route => route.fulfill({
     status: 200,
     contentType: 'application/json',

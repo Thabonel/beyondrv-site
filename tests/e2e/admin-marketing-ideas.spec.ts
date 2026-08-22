@@ -1,4 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { mockOwnerAdminSession } from './helpers/admin-session';
+
+test.beforeEach(async ({ page }) => {
+  await mockOwnerAdminSession(page);
+});
 
 const insight = {
   title: 'Promote the Advent 2450 to towing families',

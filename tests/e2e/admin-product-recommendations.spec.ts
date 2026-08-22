@@ -1,4 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { mockOwnerAdminSession } from './helpers/admin-session';
+
+test.beforeEach(async ({ page }) => {
+  await mockOwnerAdminSession(page);
+});
 
 const product = {
   slug: 'advent-2150-hardtop-slide-on',
