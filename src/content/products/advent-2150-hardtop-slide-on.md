@@ -7,7 +7,7 @@ priceBadge: BUILD TO ORDER
 status: available
 onlinePurchaseEnabled: true
 onSale: false
-featured: true
+featured: false
 heroImage: /images/optimized/products/advent-2150-hardtop-slide-on/01-advent-2150-hardtop-slide-on-hero.webp
 gallery:
   - /images/optimized/products/advent-2150-hardtop-slide-on/02-20250801-114510.webp
@@ -146,7 +146,7 @@ availability: made_to_order
 purchasableOnline: true
 depositEnabled: true
 fullPaymentEnabled: true
-sourceType: china_container
+sourceType: other
 leadTimeText: Made to order. Once the deposit is paid, production starts in China. The camper is then shipped to our Mutdapilly factory for local finishing, certification and handover preparation.
 containerEligible: true
 suitabilityData:
