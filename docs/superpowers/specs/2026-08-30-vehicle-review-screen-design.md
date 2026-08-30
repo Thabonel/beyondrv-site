@@ -99,6 +99,11 @@ A correction outside its range fails validation at the endpoint and again at
 build time. `kerbKg` greater than or equal to `gvmKg` fails, whether one figure
 was corrected or both.
 
+`payloadKg` is deliberately absent from that list. The catalogue validator
+enforces `gvmKg - kerbKg === payloadKg`, so payload is derived rather than
+independent. Correcting either mass recomputes payload and discloses it as
+corrected alongside the field that caused it. A reviewer never types it.
+
 ### 4.3 Drafts
 
 One blob per variant in `vehicle-review-drafts`, keyed
@@ -162,9 +167,10 @@ Netlify rebuilds on the commit. The picker appears roughly a minute later.
 2. Apply corrections over the SQLite row values.
 3. Treat a variant listed in `reviews` as approved for promotion.
 
-An overlay approval carries `approvalId` of `overlay:<variantId>`, distinct from
-the `review:<id>` and `override:<id>` forms already emitted, so the built
-catalogue still says how each variant reached publication.
+An overlay approval carries `approvalId` of `review:overlay:<variantId>`. The
+`review:` prefix is required: the catalogue validator rejects a publication whose
+method is `review` without it. The `overlay:` segment keeps the route
+distinguishable from a `data_review_log` approval.
 
 `isPromoted` gains one clause, checked after `hide` and before the
 `customer_selectable` path:

@@ -6,11 +6,13 @@ import { fileURLToPath } from 'node:url';
 import { deriveTrayState, isPromoted, validateCatalogueOverrides } from '../src/lib/vehicleCatalogue/derive.ts';
 import { buildVariantLabels } from '../src/lib/vehicleCatalogue/label.ts';
 import { validateVehicleCatalogue } from '../src/lib/vehicleCatalogue/validate.ts';
+import { applyCorrections, validateReviewsFile } from '../netlify/functions/vehicle-review-core.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dbPath = resolve(root, 'data/vehicle-selector/australian-slide-on-vehicles.sqlite');
 const outPath = resolve(root, 'src/data/vehicle-selector/catalogue.json');
 const overridesPath = resolve(root, 'src/data/vehicle-selector/overrides.json');
+const reviewsPath = resolve(root, 'data/vehicle-selector/reviews.json');
 
 const QUERY = `
 SELECT v.id, v.make, v.model, v.model_year_start, v.grade, v.cab_type, v.body_type,
@@ -58,7 +60,19 @@ if (reviewsWithUnboundedNotes.length) {
   throw new Error(`Refusing to publish: approval notes exceed 1000 characters for ${reviewsWithUnboundedNotes.map((row) => row.id).join(', ')}.`);
 }
 
+const reviewValidation = validateReviewsFile(JSON.parse(readFileSync(reviewsPath, 'utf8')));
+if (!reviewValidation.valid || !reviewValidation.reviews) {
+  console.error('Vehicle reviews are invalid:');
+  for (const error of reviewValidation.errors) console.error(`  ${error}`);
+  process.exit(1);
+}
+const reviewsById = new Map(reviewValidation.reviews.map((entry) => [entry.id, entry]));
+const reviewedIds = new Set(reviewsById.keys());
+
 const rowIds = new Set(rows.map((row) => row.id));
+for (const id of reviewedIds) {
+  if (!rowIds.has(id)) throw new Error(`Review refers to missing variant ${id}.`);
+}
 for (const entry of overrides.show) {
   if (!rowIds.has(entry.id)) throw new Error(`Show override refers to missing variant ${entry.id}.`);
 }
@@ -67,9 +81,29 @@ for (const id of overrides.hide) {
 }
 
 const variants = rows
-  .filter((r) => isPromoted(r, overrides))
+  .filter((r) => isPromoted(r, overrides, reviewedIds))
   .map((r) => {
     const publicationOverride = overrides.show.find((entry) => entry.id === r.id);
+    const reviewEntry = reviewsById.get(r.id);
+    const { row: corrected, correctedFields } = applyCorrections(
+      {
+        gvmKg: r.gvm_kg,
+        kerbKg: r.kerb_mass_kg,
+        trayLengthMm: r.usable_load_length_mm ?? null,
+        trayWidthMm: r.usable_load_width_mm ?? null,
+      },
+      reviewEntry,
+    );
+    // A corrected pair that inverts would publish a vehicle with no payload.
+    if (corrected.kerbKg >= corrected.gvmKg) {
+      throw new Error(`Refusing to publish ${r.id}: kerb mass ${corrected.kerbKg} is not below GVM ${corrected.gvmKg}.`);
+    }
+    // Payload is GVM minus kerb, and the catalogue validator enforces that.
+    // Correcting either mass therefore carries the payload with it, and the
+    // derived figure is disclosed as corrected rather than as published.
+    const massCorrected = correctedFields.includes('gvmKg') || correctedFields.includes('kerbKg');
+    const payloadKg = massCorrected ? corrected.gvmKg - corrected.kerbKg : r.published_payload_kg;
+    const disclosedCorrections = massCorrected ? [...correctedFields, 'payloadKg'].sort() : correctedFields;
     return {
       id: r.id,
       make: r.make,
@@ -83,20 +117,23 @@ const variants = rows
       transmission: r.transmission ?? null,
       wheelbaseMm: r.wheelbase_mm ?? null,
       label: '',
-      gvmKg: r.gvm_kg,
-      kerbKg: r.kerb_mass_kg,
+      gvmKg: corrected.gvmKg,
+      kerbKg: corrected.kerbKg,
       kerbBasis: r.kerb_mass_basis ?? '',
-      payloadKg: r.published_payload_kg,
+      payloadKg,
       frontGawrKg: r.front_gawr_kg ?? null,
       rearGawrKg: r.rear_gawr_kg ?? null,
-      trayLengthMm: r.usable_load_length_mm ?? null,
-      trayWidthMm: r.usable_load_width_mm ?? null,
+      trayLengthMm: corrected.trayLengthMm,
+      trayWidthMm: corrected.trayWidthMm,
+      correctedFields: disclosedCorrections,
       trayState: deriveTrayState(r.kerb_mass_basis, r.body_type),
       trayMassKg: null,
       promotedByOverride: Boolean(publicationOverride),
       publication: publicationOverride
         ? { approvalId: `override:${r.id}`, approvedAt: publicationOverride.approvedAt, method: 'override' }
-        : { approvalId: `review:${r.latest_review_id}`, approvedAt: r.latest_reviewed_at, method: 'review' },
+        : reviewEntry
+          ? { approvalId: `review:overlay:${r.id}`, approvedAt: reviewEntry.reviewedAt, method: 'review', reviewer: reviewEntry.reviewer }
+          : { approvalId: `review:${r.latest_review_id}`, approvedAt: r.latest_reviewed_at, method: 'review' },
       source: { manufacturer: r.manufacturer, title: r.title, url: r.url, accessedDate: r.accessed_date },
     };
   });

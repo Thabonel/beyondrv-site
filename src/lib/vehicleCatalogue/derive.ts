@@ -93,9 +93,13 @@ export function deriveTrayState(kerbMassBasis: string | null, bodyType: string):
 export function isPromoted(
   row: CataloguePromotionRow,
   overrides: CatalogueOverrides,
+  reviewedIds: ReadonlySet<string> = new Set(),
 ): boolean {
   if (overrides.hide.includes(row.id)) return false;
   if (overrides.show.some((entry) => entry.id === row.id)) return true;
+  // An approval recorded in reviews.json is a real review, unlike a show
+  // override, which is the escape hatch that skips every check above.
+  if (reviewedIds.has(row.id)) return true;
   return row.customer_selectable === 1
     && row.latest_review_id !== null
     && row.latest_review_decision === 'approved';

@@ -665,7 +665,7 @@ And extend the publication branch so an overlay approval is distinguishable:
       publication: publicationOverride
         ? { approvalId: `override:${r.id}`, approvedAt: publicationOverride.approvedAt, method: 'override' }
         : reviewEntry
-          ? { approvalId: `overlay:${r.id}`, approvedAt: reviewEntry.reviewedAt, method: 'review', reviewer: reviewEntry.reviewer }
+          ? { approvalId: `review:overlay:${r.id}`, approvedAt: reviewEntry.reviewedAt, method: 'review', reviewer: reviewEntry.reviewer }
           : { approvalId: `review:${r.latest_review_id}`, approvedAt: r.latest_reviewed_at, method: 'review' },
 ```
 
@@ -675,6 +675,10 @@ Finally, add a guard after corrections are applied so a corrected pair cannot in
     if (corrected.kerbKg >= corrected.gvmKg) {
       throw new Error(`Refusing to publish ${r.id}: kerb mass ${corrected.kerbKg} is not below GVM ${corrected.gvmKg}.`);
     }
+    // Payload is GVM minus kerb, and the catalogue validator enforces that.
+    const massCorrected = correctedFields.includes('gvmKg') || correctedFields.includes('kerbKg');
+    const payloadKg = massCorrected ? corrected.gvmKg - corrected.kerbKg : r.published_payload_kg;
+    const disclosedCorrections = massCorrected ? [...correctedFields, 'payloadKg'].sort() : correctedFields;
 ```
 
 - [ ] **Step 7: Verify the build still runs and publishes nothing new**

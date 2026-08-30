@@ -76,3 +76,21 @@ test('override dates and audit fields are bounded', () => {
   });
   assert.equal(unboundedReason.valid, false);
 });
+
+test('a variant listed in reviews is promoted', () => {
+  assert.equal(isPromoted(unapproved, empty, new Set(['b'])), true);
+});
+
+test('a variant not listed anywhere is still not promoted', () => {
+  assert.equal(isPromoted(unapproved, empty, new Set(['other'])), false);
+});
+
+// Hiding is a safety control and must beat every route to publication.
+test('a hidden variant stays hidden even when reviewed', () => {
+  assert.equal(isPromoted(unapproved, { show: [], hide: ['b'] }, new Set(['b'])), false);
+});
+
+test('omitting the reviewed set leaves existing behaviour unchanged', () => {
+  assert.equal(isPromoted(unapproved, empty), false);
+  assert.equal(isPromoted(approved, empty), true);
+});
