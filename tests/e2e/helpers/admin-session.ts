@@ -4,7 +4,7 @@ const ownerCapabilities = [
   'sales:read', 'sales:write', 'agreements:read', 'agreements:write', 'agreements:approve',
   'agreements:send', 'agreements:record_acceptance', 'configurations:read', 'configurations:write',
   'configurations:approve', 'deposits:verify', 'builds:read', 'builds:release', 'site:read',
-  'site:write', 'integrations:manage', 'audit:read',
+  'site:write', 'vehicles:review', 'integrations:manage', 'audit:read',
 ];
 
 export async function mockOwnerAdminSession(page: Page) {
