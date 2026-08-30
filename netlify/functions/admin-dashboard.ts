@@ -7,6 +7,7 @@ import {
   hasAdminCapability,
   unauthorizedResponse,
 } from './admin-auth';
+import { mapWithConcurrency, selectExistingKeys } from './blob-batch';
 import { connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 import {
   buildLeadIntelligence,
@@ -33,6 +34,9 @@ const INSIGHTS_MODEL = process.env.OPENAI_MARKETING_INSIGHTS_MODEL ?? process.en
 // have fallbacks, so they get budgets that leave room for the blob reads the
 // dashboard cannot render without.
 const RESPONSE_BUDGET_MS = Number(process.env.ADMIN_DASHBOARD_BUDGET_MS) || 8000;
+// Blobs are one network call per record. Enough parallelism to stay fast,
+// bounded so a large store does not saturate connections and get throttled.
+const BLOB_READ_CONCURRENCY = Number(process.env.ADMIN_DASHBOARD_BLOB_CONCURRENCY) || 12;
 const ANALYTICS_BUDGET_MS = Number(process.env.ADMIN_DASHBOARD_ANALYTICS_BUDGET_MS) || 4000;
 const INSIGHTS_BUDGET_MS = Number(process.env.ADMIN_DASHBOARD_INSIGHTS_BUDGET_MS) || 4000;
 
@@ -229,15 +233,13 @@ async function getAllJson<T>(storeName: string) {
   try {
     const store = getBlobStore(storeName);
     const { blobs } = await store.list();
-    const records = await Promise.all(
-      blobs.map(async (blob) => {
-        try {
-          return await store.get(blob.key, { type: 'json' }) as T | null;
-        } catch {
-          return null;
-        }
-      })
-    );
+    const records = await mapWithConcurrency(blobs, BLOB_READ_CONCURRENCY, async (blob) => {
+      try {
+        return await store.get(blob.key, { type: 'json' }) as T | null;
+      } catch {
+        return null;
+      }
+    });
     return records.filter(Boolean) as T[];
   } catch (error) {
     console.warn(`admin-dashboard: ${storeName} unavailable`, {
@@ -252,16 +254,18 @@ async function getLeadStatuses(enquiries: EnquiryRecord[]) {
   if (enquiries.length === 0) return new Map<string, LeadStatusRecord | null>();
   try {
     const store = getBlobStore(LEAD_STATUS_STORE);
-    const entries = await Promise.all(
-      enquiries.map(async (enquiry) => {
-        try {
-          const status = await store.get(leadKey(enquiry.id), { type: 'json' }) as LeadStatusRecord | null;
-          return [enquiry.id, status] as const;
-        } catch {
-          return [enquiry.id, null] as const;
-        }
-      })
-    );
+    // A status blob exists only once someone sets a status, so most enquiries
+    // have none. One list call is cheaper than a miss per enquiry.
+    const { blobs } = await store.list();
+    const stored = selectExistingKeys(enquiries, (enquiry) => leadKey(enquiry.id), blobs.map((blob) => blob.key));
+    const entries = await mapWithConcurrency(stored, BLOB_READ_CONCURRENCY, async (enquiry) => {
+      try {
+        const status = await store.get(leadKey(enquiry.id), { type: 'json' }) as LeadStatusRecord | null;
+        return [enquiry.id, status] as const;
+      } catch {
+        return [enquiry.id, null] as const;
+      }
+    });
     return new Map(entries);
   } catch (error) {
     console.warn('admin-dashboard: lead status store unavailable', {
@@ -276,13 +280,13 @@ async function loadTaskSummary() {
   try {
     const store = getBlobStore(OWNER_COPILOT_TASK_STORE);
     const { blobs } = await store.list();
-    const tasks = (await Promise.all(blobs.map(async (blob) => {
+    const tasks = (await mapWithConcurrency(blobs, BLOB_READ_CONCURRENCY, async (blob) => {
       try {
         return await store.get(blob.key, { type: 'json' }) as Record<string, unknown> | null;
       } catch {
         return null;
       }
-    }))).filter((task): task is Record<string, unknown> => Boolean(task?.id));
+    })).filter((task): task is Record<string, unknown> => Boolean(task?.id));
     const today = todayKey(new Date());
     return {
       open: tasks.filter(task => task.status === 'open').length,
@@ -698,6 +702,7 @@ export const handler: Handler = async (event) => {
   const sevenDaysAgo = daysAgo(7);
   const thirtyDaysAgo = daysAgo(30);
 
+  const blobsStartedAt = Date.now();
   const enquiries = (await getAllJson<EnquiryRecord>(ENQUIRY_STORE))
     .filter((enquiry) => enquiry?.id && enquiry?.submittedAt)
     .sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));
@@ -705,6 +710,14 @@ export const handler: Handler = async (event) => {
     .filter((order) => Boolean(order?.id))
     .sort((a, b) => (b.updatedAt ?? b.createdAt ?? '').localeCompare(a.updatedAt ?? a.createdAt ?? ''));
   const leadStatuses = await getLeadStatuses(enquiries);
+  // The scale of these stores decides whether bounded reads are enough or the
+  // dashboard needs a rollup record. Measure it rather than guess.
+  console.log('admin-dashboard: blob read phase', {
+    enquiries: enquiries.length,
+    orders: orders.length,
+    leadStatusesFetched: leadStatuses.size,
+    ms: Date.now() - blobsStartedAt,
+  });
   const [analytics, taskSummary] = await Promise.all([
     loadAnalytics(days, products, deadline),
     loadTaskSummary(),
