@@ -157,3 +157,14 @@ export function validateCorrectedPair(
   }
   return [];
 }
+
+export const VEHICLE_REVIEW_DRAFT_STORE = 'vehicle-review-drafts';
+
+export function draftKey(variantId: string) {
+  return `vehicle-review/${encodeURIComponent(variantId)}.json`;
+}
+
+export function buildPublishCommitMessage(reviewer: string, count: number, make: string): string {
+  const noun = count === 1 ? 'vehicle' : 'vehicles';
+  return `data: publish ${count} ${make} ${noun} reviewed by ${reviewer}`;
+}

@@ -13,6 +13,7 @@ const dbPath = resolve(root, 'data/vehicle-selector/australian-slide-on-vehicles
 const outPath = resolve(root, 'src/data/vehicle-selector/catalogue.json');
 const overridesPath = resolve(root, 'src/data/vehicle-selector/overrides.json');
 const reviewsPath = resolve(root, 'data/vehicle-selector/reviews.json');
+const candidatesPath = resolve(root, 'netlify/functions/vehicle-review-candidates.json');
 
 const QUERY = `
 SELECT v.id, v.make, v.model, v.model_year_start, v.grade, v.cab_type, v.body_type,
@@ -174,3 +175,24 @@ mkdirSync(dirname(outPath), { recursive: true });
 writeFileSync(outPath, `${JSON.stringify(catalogue, null, 2)}\n`);
 console.log(`Wrote ${outPath}`);
 console.log(`${variants.length} variants across ${models.length} models, from ${rows.length} database rows.`);
+
+// The catalogue holds only promoted variants, so the review screen needs the
+// full set to choose from, published or not.
+const candidates = rows.map((r) => ({
+  id: r.id,
+  make: r.make,
+  model: r.model,
+  modelYear: r.model_year_start,
+  grade: r.grade,
+  cabType: r.cab_type,
+  bodyType: r.body_type,
+  gvmKg: r.gvm_kg,
+  kerbKg: r.kerb_mass_kg,
+  trayLengthMm: r.usable_load_length_mm ?? null,
+  trayWidthMm: r.usable_load_width_mm ?? null,
+  verificationStatus: r.verification_status,
+  published: reviewedIds.has(r.id),
+  source: { manufacturer: r.manufacturer, title: r.title, url: r.url },
+}));
+writeFileSync(candidatesPath, `${JSON.stringify({ candidates }, null, 2)}\n`);
+console.log(`Wrote ${candidatesPath} with ${candidates.length} candidates.`);

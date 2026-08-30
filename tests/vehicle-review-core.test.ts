@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   applyCorrections,
+  buildPublishCommitMessage,
+  draftKey,
   mergeReviews,
   validateCorrectedPair,
   validateReviewEntry,
@@ -145,4 +147,21 @@ test('lowering GVM below an uncorrected kerb mass is rejected', () => {
 test('a row with no corrections is judged on its own figures', () => {
   assert.deepEqual(validateCorrectedPair('ford-a', { gvmKg: 3350, kerbKg: 2300 }, undefined), []);
   assert.notDeepEqual(validateCorrectedPair('ford-a', { gvmKg: 2300, kerbKg: 3350 }, undefined), []);
+});
+
+test('draft keys are namespaced and encoded so an odd id cannot escape the store', () => {
+  assert.equal(draftKey('ford-ranger-2023'), 'vehicle-review/ford-ranger-2023.json');
+  assert.equal(draftKey('a/b'), 'vehicle-review/a%2Fb.json');
+});
+
+test('the commit message names the reviewer, the count and the make', () => {
+  const message = buildPublishCommitMessage('j.smith', 24, 'Ford');
+
+  assert.match(message, /24/);
+  assert.match(message, /Ford/);
+  assert.match(message, /j\.smith/);
+});
+
+test('the commit message is singular for one vehicle', () => {
+  assert.match(buildPublishCommitMessage('j.smith', 1, 'Ford'), /1 Ford vehicle\b/);
 });
