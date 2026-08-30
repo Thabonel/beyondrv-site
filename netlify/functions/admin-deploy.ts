@@ -1,49 +1,11 @@
 import type { Handler } from '@netlify/functions';
 import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
-
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN!;
-const GITHUB_REPO = process.env.GITHUB_REPO!;
-const GITHUB_BRANCH = process.env.GITHUB_BRANCH ?? 'main';
-const API = 'https://api.github.com';
+import { commitFile, getFileSha } from './github-contents';
 
 interface PendingChange {
   path: string;
   content: string;
   description: string;
-}
-
-async function getFileSha(path: string): Promise<string | null> {
-  const res = await fetch(
-    `${API}/repos/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}`,
-    { headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, Accept: 'application/vnd.github+json' } }
-  );
-  if (res.status === 404) return null;
-  const data = await res.json() as { sha: string };
-  return data.sha;
-}
-
-async function commitFile(path: string, content: string, sha: string | null, message: string) {
-  const body: Record<string, unknown> = {
-    message,
-    content: Buffer.from(content).toString('base64'),
-    branch: GITHUB_BRANCH,
-  };
-  if (sha) body.sha = sha;
-
-  const res = await fetch(`${API}/repos/${GITHUB_REPO}/contents/${path}`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${GITHUB_TOKEN}`,
-      Accept: 'application/vnd.github+json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`GitHub API error for ${path}: ${err}`);
-  }
 }
 
 export const handler: Handler = async (event) => {
