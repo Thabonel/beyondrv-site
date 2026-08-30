@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { adminFetch, adminJson, clearAdminToken } from '../lib/adminApi';
 import { activeReminders } from '../lib/adminReminders';
 import MarketingIdeas, { type MarketingIdea } from './MarketingIdeas';
+import VehicleReview, { type ReviewCandidate } from './VehicleReview';
 
 type HealthStatus = 'ready' | 'warning' | 'blocker' | 'unavailable' | 'error';
 
@@ -315,6 +316,12 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
   const [ideasLoading, setIdeasLoading] = useState(true);
   const [ideasError, setIdeasError] = useState('');
   const [ideaSavingId, setIdeaSavingId] = useState<string | null>(null);
+  const [vehicleMake, setVehicleMake] = useState('');
+  const [vehicleMakes, setVehicleMakes] = useState<string[]>([]);
+  const [vehicleCandidates, setVehicleCandidates] = useState<ReviewCandidate[]>([]);
+  const [vehiclesLoading, setVehiclesLoading] = useState(true);
+  const [vehiclesError, setVehiclesError] = useState('');
+  const [vehiclesPublishing, setVehiclesPublishing] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -363,6 +370,72 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
   useEffect(() => {
     void loadSavedIdeas();
   }, []);
+
+  async function loadVehicles(make = '') {
+    setVehiclesError('');
+    try {
+      const query = make ? `?make=${encodeURIComponent(make)}` : '';
+      const res = await adminFetch(`/.netlify/functions/admin-vehicle-review${query}`);
+      if (res.status === 401) {
+        clearAdminToken();
+        window.location.href = '/.netlify/functions/admin-login';
+        return;
+      }
+      const body = await adminJson<{ make?: string; makes?: string[]; candidates?: ReviewCandidate[] }>(res, 'Could not load vehicles');
+      if (!res.ok) throw new Error(body.error ?? 'Could not load vehicles');
+      setVehicleMake(body.make ?? '');
+      setVehicleMakes(body.makes ?? []);
+      setVehicleCandidates(body.candidates ?? []);
+    } catch (err) {
+      setVehiclesError(err instanceof Error ? err.message : 'Could not load vehicles.');
+    } finally {
+      setVehiclesLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void loadVehicles();
+  }, []);
+
+  async function saveVehicleDraft(candidate: ReviewCandidate) {
+    try {
+      await adminFetch('/.netlify/functions/admin-vehicle-review', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: candidate.id, included: candidate.included, corrections: candidate.corrections }),
+      });
+    } catch {
+      // A lost draft costs a re-tick, so it must not interrupt the reviewer.
+    }
+  }
+
+  function updateCandidate(id: string, change: (candidate: ReviewCandidate) => ReviewCandidate) {
+    setVehicleCandidates((prev) => {
+      const next = prev.map((candidate) => (candidate.id === id ? change(candidate) : candidate));
+      const updated = next.find((candidate) => candidate.id === id);
+      if (updated) void saveVehicleDraft(updated);
+      return next;
+    });
+  }
+
+  async function publishVehicles() {
+    setVehiclesPublishing(true);
+    setVehiclesError('');
+    try {
+      const res = await adminFetch('/.netlify/functions/admin-vehicle-review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ make: vehicleMake }),
+      });
+      const body = await adminJson<{ published?: number }>(res, 'Could not publish vehicles');
+      if (!res.ok) throw new Error(body.error ?? 'Could not publish vehicles');
+      await loadVehicles(vehicleMake);
+    } catch (err) {
+      setVehiclesError(err instanceof Error ? err.message : 'Could not publish vehicles.');
+    } finally {
+      setVehiclesPublishing(false);
+    }
+  }
 
   // The server derives the record id from the title, so matching on title is
   // enough to tell whether an insight has already been saved.
@@ -907,6 +980,25 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
               error={ideasError}
               savingId={ideaSavingId}
               onStatusChange={changeIdeaStatus}
+            />
+          </Panel>
+
+          <Panel title="Vehicle Review" description={"Vehicles waiting to be published to the weight calculator. Ticked rows go live when you publish; correct a figure in place if it is wrong."}>
+            <VehicleReview
+              candidates={vehicleCandidates}
+              makes={vehicleMakes}
+              make={vehicleMake}
+              loading={vehiclesLoading}
+              error={vehiclesError}
+              publishing={vehiclesPublishing}
+              onMakeChange={(next) => { setVehiclesLoading(true); void loadVehicles(next); }}
+              onToggle={(id, included) => updateCandidate(id, (candidate) => ({ ...candidate, included }))}
+              onCorrect={(id, field, value) => updateCandidate(id, (candidate) => {
+                const corrections = { ...candidate.corrections };
+                if (value === null) delete corrections[field]; else corrections[field] = value;
+                return { ...candidate, corrections };
+              })}
+              onPublish={() => void publishVehicles()}
             />
           </Panel>
 

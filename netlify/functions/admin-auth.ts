@@ -24,6 +24,7 @@ export type AdminCapability =
   | 'builds:release'
   | 'site:read'
   | 'site:write'
+  | 'vehicles:review'
   | 'integrations:manage'
   | 'audit:read';
 
@@ -61,6 +62,7 @@ const ALL_CAPABILITIES: AdminCapability[] = [
   'builds:release',
   'site:read',
   'site:write',
+  'vehicles:review',
   'integrations:manage',
   'audit:read',
 ];
@@ -80,6 +82,7 @@ const ROLE_CAPABILITIES: Record<AdminRole, ReadonlySet<AdminCapability>> = {
     'deposits:verify',
     'builds:read',
     'builds:release',
+    'vehicles:review',
   ]),
   owner: new Set(ALL_CAPABILITIES),
   site_admin: new Set([

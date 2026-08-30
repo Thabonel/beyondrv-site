@@ -1,0 +1,3184 @@
+{
+  "candidates": [
+    {
+      "id": "chevrolet-silverado-1500-ltz-premium",
+      "make": "Chevrolet",
+      "model": "Silverado 1500",
+      "modelYear": 2025,
+      "grade": "LTZ Premium",
+      "cabType": "crew_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3300,
+      "kerbKg": 2552,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "GMSV",
+        "title": "Towing With Silverado",
+        "url": "https://www.gmspecialtyvehicles.com/au-en/chevrolet/trucks/trailering-and-towing"
+      }
+    },
+    {
+      "id": "chevrolet-silverado-1500-zr2",
+      "make": "Chevrolet",
+      "model": "Silverado 1500",
+      "modelYear": 2025,
+      "grade": "ZR2",
+      "cabType": "crew_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3300,
+      "kerbKg": 2587,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "GMSV",
+        "title": "Towing With Silverado",
+        "url": "https://www.gmspecialtyvehicles.com/au-en/chevrolet/trucks/trailering-and-towing"
+      }
+    },
+    {
+      "id": "chevrolet-silverado-2500hd-ltz-nb1",
+      "make": "Chevrolet",
+      "model": "Silverado 2500 HD",
+      "modelYear": 2025,
+      "grade": "LTZ Premium NB1",
+      "cabType": "crew_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 4495,
+      "kerbKg": 3762,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "GMSV",
+        "title": "Towing With Silverado",
+        "url": "https://www.gmspecialtyvehicles.com/au-en/chevrolet/trucks/trailering-and-towing"
+      }
+    },
+    {
+      "id": "chevrolet-silverado-2500hd-ltz-nb2",
+      "make": "Chevrolet",
+      "model": "Silverado 2500 HD",
+      "modelYear": 2025,
+      "grade": "LTZ Premium NB2",
+      "cabType": "crew_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 5148,
+      "kerbKg": 3762,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "GMSV",
+        "title": "Towing With Silverado",
+        "url": "https://www.gmspecialtyvehicles.com/au-en/chevrolet/trucks/trailering-and-towing"
+      }
+    },
+    {
+      "id": "ford-f-150-2024-lariat-5-5-ft-tub-swb",
+      "make": "Ford",
+      "model": "F-150",
+      "modelYear": 2024,
+      "grade": "Lariat",
+      "cabType": "crew_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3315,
+      "kerbKg": 2546,
+      "trayLengthMm": 1700,
+      "trayWidthMm": 1650,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "F-150 MY24 Specification Sheet",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/f-150/brochures/f-150-spec-sheet-my24.pdf"
+      }
+    },
+    {
+      "id": "ford-f-150-2024-lariat-6-5-ft-tub-lwb",
+      "make": "Ford",
+      "model": "F-150",
+      "modelYear": 2024,
+      "grade": "Lariat",
+      "cabType": "crew_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3360,
+      "kerbKg": 2566,
+      "trayLengthMm": 2000,
+      "trayWidthMm": 1650,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "F-150 MY24 Specification Sheet",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/f-150/brochures/f-150-spec-sheet-my24.pdf"
+      }
+    },
+    {
+      "id": "ford-f-150-2024-platinum-5-5-ft-tub-swb",
+      "make": "Ford",
+      "model": "F-150",
+      "modelYear": 2024,
+      "grade": "Platinum",
+      "cabType": "crew_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3315,
+      "kerbKg": 2611,
+      "trayLengthMm": 1700,
+      "trayWidthMm": 1650,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "F-150 MY24 Specification Sheet",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/f-150/brochures/f-150-spec-sheet-my24.pdf"
+      }
+    },
+    {
+      "id": "ford-f-150-2024-platinum-6-5-ft-tub-lwb",
+      "make": "Ford",
+      "model": "F-150",
+      "modelYear": 2024,
+      "grade": "Platinum",
+      "cabType": "crew_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3360,
+      "kerbKg": 2636,
+      "trayLengthMm": 2000,
+      "trayWidthMm": 1650,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "F-150 MY24 Specification Sheet",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/f-150/brochures/f-150-spec-sheet-my24.pdf"
+      }
+    },
+    {
+      "id": "ford-f-150-2024-xlt-5-5-ft-tub-swb",
+      "make": "Ford",
+      "model": "F-150",
+      "modelYear": 2024,
+      "grade": "XLT",
+      "cabType": "crew_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3315,
+      "kerbKg": 2462,
+      "trayLengthMm": 1700,
+      "trayWidthMm": 1650,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "F-150 MY24 Specification Sheet",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/f-150/brochures/f-150-spec-sheet-my24.pdf"
+      }
+    },
+    {
+      "id": "ford-f-150-2024-xlt-6-5-ft-tub-lwb",
+      "make": "Ford",
+      "model": "F-150",
+      "modelYear": 2024,
+      "grade": "XLT",
+      "cabType": "crew_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3360,
+      "kerbKg": 2482,
+      "trayLengthMm": 2000,
+      "trayWidthMm": 1650,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "F-150 MY24 Specification Sheet",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/f-150/brochures/f-150-spec-sheet-my24.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-raptor-double-pickup-ecoboost",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2022,
+      "grade": "Raptor",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3130,
+      "kerbKg": 2475,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Next-Generation Ranger 2022MY Specifications",
+        "url": "https://www.ford.com.au/content/dam/ecomm/Release-3/AU/landing/next-gen-ranger-ebrochure-specifications.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-sport-double-pickup-biturbo",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2022,
+      "grade": "Sport",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3230,
+      "kerbKg": 2288,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Next-Generation Ranger 2022MY Specifications",
+        "url": "https://www.ford.com.au/content/dam/ecomm/Release-3/AU/landing/next-gen-ranger-ebrochure-specifications.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-sport-double-pickup-v6",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2022,
+      "grade": "Sport",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3280,
+      "kerbKg": 2346,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Next-Generation Ranger 2022MY Specifications",
+        "url": "https://www.ford.com.au/content/dam/ecomm/Release-3/AU/landing/next-gen-ranger-ebrochure-specifications.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-wildtrak-double-pickup-biturbo",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2022,
+      "grade": "Wildtrak",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3280,
+      "kerbKg": 2341,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Next-Generation Ranger 2022MY Specifications",
+        "url": "https://www.ford.com.au/content/dam/ecomm/Release-3/AU/landing/next-gen-ranger-ebrochure-specifications.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-wildtrak-double-pickup-v6",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2022,
+      "grade": "Wildtrak",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3350,
+      "kerbKg": 2399,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Next-Generation Ranger 2022MY Specifications",
+        "url": "https://www.ford.com.au/content/dam/ecomm/Release-3/AU/landing/next-gen-ranger-ebrochure-specifications.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-cc-singleturbo",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2022,
+      "grade": "XL",
+      "cabType": "double_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3250,
+      "kerbKg": 2046,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Next-Generation Ranger 2022MY Specifications",
+        "url": "https://www.ford.com.au/content/dam/ecomm/Release-3/AU/landing/next-gen-ranger-ebrochure-specifications.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-cc-biturbo",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2022,
+      "grade": "XL",
+      "cabType": "double_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3250,
+      "kerbKg": 2072,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Next-Generation Ranger 2022MY Specifications",
+        "url": "https://www.ford.com.au/content/dam/ecomm/Release-3/AU/landing/next-gen-ranger-ebrochure-specifications.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-pickup-singleturbo",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2022,
+      "grade": "XL",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3250,
+      "kerbKg": 2201,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Next-Generation Ranger 2022MY Specifications",
+        "url": "https://www.ford.com.au/content/dam/ecomm/Release-3/AU/landing/next-gen-ranger-ebrochure-specifications.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-pickup-biturbo",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2022,
+      "grade": "XL",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3250,
+      "kerbKg": 2227,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Next-Generation Ranger 2022MY Specifications",
+        "url": "https://www.ford.com.au/content/dam/ecomm/Release-3/AU/landing/next-gen-ranger-ebrochure-specifications.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-single-cc-biturbo",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2022,
+      "grade": "XL",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3230,
+      "kerbKg": 1903,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Next-Generation Ranger 2022MY Specifications",
+        "url": "https://www.ford.com.au/content/dam/ecomm/Release-3/AU/landing/next-gen-ranger-ebrochure-specifications.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-super-cc-biturbo",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2022,
+      "grade": "XL",
+      "cabType": "super_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3230,
+      "kerbKg": 2007,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Next-Generation Ranger 2022MY Specifications",
+        "url": "https://www.ford.com.au/content/dam/ecomm/Release-3/AU/landing/next-gen-ranger-ebrochure-specifications.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-super-pickup-biturbo",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2022,
+      "grade": "XL",
+      "cabType": "super_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3230,
+      "kerbKg": 2178,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Next-Generation Ranger 2022MY Specifications",
+        "url": "https://www.ford.com.au/content/dam/ecomm/Release-3/AU/landing/next-gen-ranger-ebrochure-specifications.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xls-double-pickup-biturbo",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2022,
+      "grade": "XLS",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3230,
+      "kerbKg": 2272,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Next-Generation Ranger 2022MY Specifications",
+        "url": "https://www.ford.com.au/content/dam/ecomm/Release-3/AU/landing/next-gen-ranger-ebrochure-specifications.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-double-cc-v6",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2022,
+      "grade": "XLT",
+      "cabType": "double_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3280,
+      "kerbKg": 2129,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Next-Generation Ranger 2022MY Specifications",
+        "url": "https://www.ford.com.au/content/dam/ecomm/Release-3/AU/landing/next-gen-ranger-ebrochure-specifications.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-double-pickup-biturbo",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2022,
+      "grade": "XLT",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3230,
+      "kerbKg": 2271,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Next-Generation Ranger 2022MY Specifications",
+        "url": "https://www.ford.com.au/content/dam/ecomm/Release-3/AU/landing/next-gen-ranger-ebrochure-specifications.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-double-pickup-v6",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2022,
+      "grade": "XLT",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3280,
+      "kerbKg": 2331,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Next-Generation Ranger 2022MY Specifications",
+        "url": "https://www.ford.com.au/content/dam/ecomm/Release-3/AU/landing/next-gen-ranger-ebrochure-specifications.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-super-pickup-biturbo",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2022,
+      "grade": "XLT",
+      "cabType": "super_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3230,
+      "kerbKg": 2189,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Next-Generation Ranger 2022MY Specifications",
+        "url": "https://www.ford.com.au/content/dam/ecomm/Release-3/AU/landing/next-gen-ranger-ebrochure-specifications.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-black-edition-double-cab-tub",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "Black Edition",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3250,
+      "kerbKg": 2190,
+      "trayLengthMm": 1547,
+      "trayWidthMm": 1584,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-black-edition-double-cab-tub-2",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "Black Edition",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3350,
+      "kerbKg": 2254,
+      "trayLengthMm": 1547,
+      "trayWidthMm": 1584,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-platinum-double-cab-tub",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "Platinum",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3350,
+      "kerbKg": 2369,
+      "trayLengthMm": 1464,
+      "trayWidthMm": 1520,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-raptor-double-cab-tub",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "Raptor",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3160,
+      "kerbKg": 2407,
+      "trayLengthMm": 1541,
+      "trayWidthMm": 1578,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-tremor-double-cab-tub",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "Tremor",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3350,
+      "kerbKg": 2317,
+      "trayLengthMm": 1464,
+      "trayWidthMm": 1520,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-wildtrak-double-cab-tub",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "Wildtrak",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3350,
+      "kerbKg": 2331,
+      "trayLengthMm": 1464,
+      "trayWidthMm": 1520,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-wolftrak-double-cab-tub",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "Wolftrak",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3350,
+      "kerbKg": 2295,
+      "trayLengthMm": 1464,
+      "trayWidthMm": 1520,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-double-cab-tub",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "XL",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3200,
+      "kerbKg": 2030,
+      "trayLengthMm": 1547,
+      "trayWidthMm": 1584,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-double-cab-cc",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "XL",
+      "cabType": "double_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3250,
+      "kerbKg": 2014,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-double-cab-cc-2",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "XL",
+      "cabType": "double_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3350,
+      "kerbKg": 2103,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-double-cab-tub-2",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "XL",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3250,
+      "kerbKg": 2126,
+      "trayLengthMm": 1547,
+      "trayWidthMm": 1584,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-double-cab-tub-3",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "XL",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3350,
+      "kerbKg": 2215,
+      "trayLengthMm": 1547,
+      "trayWidthMm": 1584,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-single-cab-cc",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "XL",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3150,
+      "kerbKg": 1738,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-single-cab-cc-2",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "XL",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3150,
+      "kerbKg": 1834,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-single-cab-cc-3",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "XL",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3230,
+      "kerbKg": 1925,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-super-cab-cc",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "XL",
+      "cabType": "super_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3200,
+      "kerbKg": 1850,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-super-cab-cc-2",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "XL",
+      "cabType": "super_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3250,
+      "kerbKg": 1946,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-super-cab-cc-3",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "XL",
+      "cabType": "super_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3350,
+      "kerbKg": 2034,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-xls-double-cab-cc",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "XLS",
+      "cabType": "double_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3350,
+      "kerbKg": 2107,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-xlt-double-cab-tub",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "XLT",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3200,
+      "kerbKg": 2092,
+      "trayLengthMm": 1464,
+      "trayWidthMm": 1520,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-xlt-double-cab-cc",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "XLT",
+      "cabType": "double_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3350,
+      "kerbKg": 2124,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-xlt-double-cab-tub-2",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "XLT",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3350,
+      "kerbKg": 2251,
+      "trayLengthMm": 1464,
+      "trayWidthMm": 1520,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-2026-50my-xlt-super-cab-tub",
+      "make": "Ford",
+      "model": "Ranger",
+      "modelYear": 2026,
+      "grade": "XLT",
+      "cabType": "super_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3350,
+      "kerbKg": 2215,
+      "trayLengthMm": 1839,
+      "trayWidthMm": 1578,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger 2026.50MY Specifications Brochure",
+        "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf"
+      }
+    },
+    {
+      "id": "ford-ranger-super-duty-my26-single-cab",
+      "make": "Ford",
+      "model": "Ranger Super Duty",
+      "modelYear": 2026,
+      "grade": "Super Duty",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 4500,
+      "kerbKg": 2518,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ford Ranger Super Duty",
+        "url": "https://www.ford.com.au/showroom/trucks-and-vans/ranger/super-duty/"
+      }
+    },
+    {
+      "id": "gwm-cannon-2026-lux-dual-cab-pick-up-tub",
+      "make": "GWM",
+      "model": "Cannon",
+      "modelYear": 2026,
+      "grade": "Lux Dual Cab",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3225,
+      "kerbKg": 2230,
+      "trayLengthMm": 1520,
+      "trayWidthMm": 1520,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "GWM Australia",
+        "title": "Cannon 2026 Brochure",
+        "url": "https://assets.gwmanz.com/f/256395/x/f66059e2b4/y4rt9h-au-cannon-brochure-2026-a4-210x297mm.pdf"
+      }
+    },
+    {
+      "id": "gwm-cannon-2026-lux-dual-cab-chassis-factory-alloy-tray",
+      "make": "GWM",
+      "model": "Cannon",
+      "modelYear": 2026,
+      "grade": "Lux Dual Cab Chassis",
+      "cabType": "dual_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3225,
+      "kerbKg": 2230,
+      "trayLengthMm": 1730,
+      "trayWidthMm": 1895,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "GWM Australia",
+        "title": "Cannon 2026 Brochure",
+        "url": "https://assets.gwmanz.com/f/256395/x/f66059e2b4/y4rt9h-au-cannon-brochure-2026-a4-210x297mm.pdf"
+      }
+    },
+    {
+      "id": "gwm-cannon-2026-premium-dual-cab-pick-up-tub",
+      "make": "GWM",
+      "model": "Cannon",
+      "modelYear": 2026,
+      "grade": "Premium Dual Cab",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3135,
+      "kerbKg": 2140,
+      "trayLengthMm": 1520,
+      "trayWidthMm": 1520,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "GWM Australia",
+        "title": "Cannon 2026 Brochure",
+        "url": "https://assets.gwmanz.com/f/256395/x/f66059e2b4/y4rt9h-au-cannon-brochure-2026-a4-210x297mm.pdf"
+      }
+    },
+    {
+      "id": "gwm-cannon-2026-premium-single-cab-4x2-factory-alloy-tray",
+      "make": "GWM",
+      "model": "Cannon",
+      "modelYear": 2026,
+      "grade": "Premium Single Cab 4x2",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3050,
+      "kerbKg": 1900,
+      "trayLengthMm": 2630,
+      "trayWidthMm": 1895,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "GWM Australia",
+        "title": "Cannon 2026 Brochure",
+        "url": "https://assets.gwmanz.com/f/256395/x/f66059e2b4/y4rt9h-au-cannon-brochure-2026-a4-210x297mm.pdf"
+      }
+    },
+    {
+      "id": "gwm-cannon-2026-ultra-dual-cab-pick-up-tub",
+      "make": "GWM",
+      "model": "Cannon",
+      "modelYear": 2026,
+      "grade": "Ultra Dual Cab",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3225,
+      "kerbKg": 2230,
+      "trayLengthMm": 1520,
+      "trayWidthMm": 1520,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "GWM Australia",
+        "title": "Cannon 2026 Brochure",
+        "url": "https://assets.gwmanz.com/f/256395/x/f66059e2b4/y4rt9h-au-cannon-brochure-2026-a4-210x297mm.pdf"
+      }
+    },
+    {
+      "id": "gwm-cannon-2026-vanta-dual-cab-pick-up-tub",
+      "make": "GWM",
+      "model": "Cannon",
+      "modelYear": 2026,
+      "grade": "Vanta Dual Cab",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3225,
+      "kerbKg": 2230,
+      "trayLengthMm": 1520,
+      "trayWidthMm": 1520,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "GWM Australia",
+        "title": "Cannon 2026 Brochure",
+        "url": "https://assets.gwmanz.com/f/256395/x/f66059e2b4/y4rt9h-au-cannon-brochure-2026-a4-210x297mm.pdf"
+      }
+    },
+    {
+      "id": "gwm-cannon-2026-xsr-pick-up-tub",
+      "make": "GWM",
+      "model": "Cannon",
+      "modelYear": 2026,
+      "grade": "XSR",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3205,
+      "kerbKg": 2330,
+      "trayLengthMm": 1520,
+      "trayWidthMm": 1520,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "GWM Australia",
+        "title": "Cannon 2026 Brochure",
+        "url": "https://assets.gwmanz.com/f/256395/x/f66059e2b4/y4rt9h-au-cannon-brochure-2026-a4-210x297mm.pdf"
+      }
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-lux-phev-pick-up-tub",
+      "make": "GWM",
+      "model": "Cannon Alpha",
+      "modelYear": 2025,
+      "grade": "Lux PHEV",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3495,
+      "kerbKg": 2810,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "GWM Australia",
+        "title": "Cannon Alpha Brochure",
+        "url": "https://assets.gwmanz.com/f/256395/x/43c46a95d0/cannon-alpha-brochure-au.pdf"
+      }
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-lux-turbo-diesel-pick-up-tub",
+      "make": "GWM",
+      "model": "Cannon Alpha",
+      "modelYear": 2025,
+      "grade": "Lux Turbo Diesel",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3310,
+      "kerbKg": 2489,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "GWM Australia",
+        "title": "Cannon Alpha Brochure",
+        "url": "https://assets.gwmanz.com/f/256395/x/43c46a95d0/cannon-alpha-brochure-au.pdf"
+      }
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-ultra-hev-pick-up-tub",
+      "make": "GWM",
+      "model": "Cannon Alpha",
+      "modelYear": 2025,
+      "grade": "Ultra HEV",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3310,
+      "kerbKg": 2575,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "GWM Australia",
+        "title": "Cannon Alpha Brochure",
+        "url": "https://assets.gwmanz.com/f/256395/x/43c46a95d0/cannon-alpha-brochure-au.pdf"
+      }
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-ultra-phev-pick-up-tub",
+      "make": "GWM",
+      "model": "Cannon Alpha",
+      "modelYear": 2025,
+      "grade": "Ultra PHEV",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3495,
+      "kerbKg": 2810,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "GWM Australia",
+        "title": "Cannon Alpha Brochure",
+        "url": "https://assets.gwmanz.com/f/256395/x/43c46a95d0/cannon-alpha-brochure-au.pdf"
+      }
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-ultra-turbo-diesel-pick-up-tub",
+      "make": "GWM",
+      "model": "Cannon Alpha",
+      "modelYear": 2025,
+      "grade": "Ultra Turbo Diesel",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3310,
+      "kerbKg": 2550,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "GWM Australia",
+        "title": "Cannon Alpha Brochure",
+        "url": "https://assets.gwmanz.com/f/256395/x/43c46a95d0/cannon-alpha-brochure-au.pdf"
+      }
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-lsu-crew-3-0",
+      "make": "Isuzu",
+      "model": "D-MAX",
+      "modelYear": 2025,
+      "grade": "LS-U",
+      "cabType": "crew_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3100,
+      "kerbKg": 1960,
+      "trayLengthMm": 1800,
+      "trayWidthMm": 1777,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Isuzu UTE Australia",
+        "title": "25.5MY Isuzu D-MAX Specifications",
+        "url": "https://cdn-iua.dataweavers.io/-/media/d-max/documents/25-5my-isuzu-d-max-vehicle-specifications.pdf?rev=30680420a74d44c9af2c12f77ee2d85d"
+      }
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-crew-2-2",
+      "make": "Isuzu",
+      "model": "D-MAX",
+      "modelYear": 2025,
+      "grade": "SX",
+      "cabType": "crew_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3000,
+      "kerbKg": 1775,
+      "trayLengthMm": 1800,
+      "trayWidthMm": 1777,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Isuzu UTE Australia",
+        "title": "25.5MY Isuzu D-MAX Specifications",
+        "url": "https://cdn-iua.dataweavers.io/-/media/d-max/documents/25-5my-isuzu-d-max-vehicle-specifications.pdf?rev=30680420a74d44c9af2c12f77ee2d85d"
+      }
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-crew-3-0",
+      "make": "Isuzu",
+      "model": "D-MAX",
+      "modelYear": 2025,
+      "grade": "SX",
+      "cabType": "crew_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3000,
+      "kerbKg": 1825,
+      "trayLengthMm": 1800,
+      "trayWidthMm": 1777,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Isuzu UTE Australia",
+        "title": "25.5MY Isuzu D-MAX Specifications",
+        "url": "https://cdn-iua.dataweavers.io/-/media/d-max/documents/25-5my-isuzu-d-max-vehicle-specifications.pdf?rev=30680420a74d44c9af2c12f77ee2d85d"
+      }
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-sx-crew-2-2",
+      "make": "Isuzu",
+      "model": "D-MAX",
+      "modelYear": 2025,
+      "grade": "SX",
+      "cabType": "crew_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3100,
+      "kerbKg": 1860,
+      "trayLengthMm": 1800,
+      "trayWidthMm": 1777,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Isuzu UTE Australia",
+        "title": "25.5MY Isuzu D-MAX Specifications",
+        "url": "https://cdn-iua.dataweavers.io/-/media/d-max/documents/25-5my-isuzu-d-max-vehicle-specifications.pdf?rev=30680420a74d44c9af2c12f77ee2d85d"
+      }
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-sx-crew-3-0",
+      "make": "Isuzu",
+      "model": "D-MAX",
+      "modelYear": 2025,
+      "grade": "SX",
+      "cabType": "crew_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3100,
+      "kerbKg": 1915,
+      "trayLengthMm": 1800,
+      "trayWidthMm": 1777,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Isuzu UTE Australia",
+        "title": "25.5MY Isuzu D-MAX Specifications",
+        "url": "https://cdn-iua.dataweavers.io/-/media/d-max/documents/25-5my-isuzu-d-max-vehicle-specifications.pdf?rev=30680420a74d44c9af2c12f77ee2d85d"
+      }
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-single-2-2",
+      "make": "Isuzu",
+      "model": "D-MAX",
+      "modelYear": 2025,
+      "grade": "SX",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3000,
+      "kerbKg": 1650,
+      "trayLengthMm": 2550,
+      "trayWidthMm": 1777,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Isuzu UTE Australia",
+        "title": "25.5MY Isuzu D-MAX Specifications",
+        "url": "https://cdn-iua.dataweavers.io/-/media/d-max/documents/25-5my-isuzu-d-max-vehicle-specifications.pdf?rev=30680420a74d44c9af2c12f77ee2d85d"
+      }
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-single-3-0",
+      "make": "Isuzu",
+      "model": "D-MAX",
+      "modelYear": 2025,
+      "grade": "SX",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3000,
+      "kerbKg": 1700,
+      "trayLengthMm": 2550,
+      "trayWidthMm": 1777,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Isuzu UTE Australia",
+        "title": "25.5MY Isuzu D-MAX Specifications",
+        "url": "https://cdn-iua.dataweavers.io/-/media/d-max/documents/25-5my-isuzu-d-max-vehicle-specifications.pdf?rev=30680420a74d44c9af2c12f77ee2d85d"
+      }
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-sx-single-3-0",
+      "make": "Isuzu",
+      "model": "D-MAX",
+      "modelYear": 2025,
+      "grade": "SX",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3100,
+      "kerbKg": 1790,
+      "trayLengthMm": 2550,
+      "trayWidthMm": 1777,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Isuzu UTE Australia",
+        "title": "25.5MY Isuzu D-MAX Specifications",
+        "url": "https://cdn-iua.dataweavers.io/-/media/d-max/documents/25-5my-isuzu-d-max-vehicle-specifications.pdf?rev=30680420a74d44c9af2c12f77ee2d85d"
+      }
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-space-3-0",
+      "make": "Isuzu",
+      "model": "D-MAX",
+      "modelYear": 2025,
+      "grade": "SX",
+      "cabType": "space_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3000,
+      "kerbKg": 1775,
+      "trayLengthMm": 2100,
+      "trayWidthMm": 1777,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Isuzu UTE Australia",
+        "title": "25.5MY Isuzu D-MAX Specifications",
+        "url": "https://cdn-iua.dataweavers.io/-/media/d-max/documents/25-5my-isuzu-d-max-vehicle-specifications.pdf?rev=30680420a74d44c9af2c12f77ee2d85d"
+      }
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-sx-space-3-0",
+      "make": "Isuzu",
+      "model": "D-MAX",
+      "modelYear": 2025,
+      "grade": "SX",
+      "cabType": "space_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3100,
+      "kerbKg": 1860,
+      "trayLengthMm": 2100,
+      "trayWidthMm": 1777,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Isuzu UTE Australia",
+        "title": "25.5MY Isuzu D-MAX Specifications",
+        "url": "https://cdn-iua.dataweavers.io/-/media/d-max/documents/25-5my-isuzu-d-max-vehicle-specifications.pdf?rev=30680420a74d44c9af2c12f77ee2d85d"
+      }
+    },
+    {
+      "id": "kgm-musso-my26-advance-double-cab-tub",
+      "make": "KGM",
+      "model": "Musso",
+      "modelYear": 2026,
+      "grade": "Advance",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 2880,
+      "kerbKg": 2090,
+      "trayLengthMm": 1300,
+      "trayWidthMm": 1570,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "KGM Australia",
+        "title": "Musso and Musso XLV MY26 Specifications and Features",
+        "url": "https://payload.therefinerydesign.com/api/media/file/KGM-Musso-MY26-Specs-and-Features.pdf"
+      }
+    },
+    {
+      "id": "kgm-musso-my26-elx-double-cab-tub",
+      "make": "KGM",
+      "model": "Musso",
+      "modelYear": 2026,
+      "grade": "ELX",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 2880,
+      "kerbKg": 2090,
+      "trayLengthMm": 1300,
+      "trayWidthMm": 1570,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "KGM Australia",
+        "title": "Musso and Musso XLV MY26 Specifications and Features",
+        "url": "https://payload.therefinerydesign.com/api/media/file/KGM-Musso-MY26-Specs-and-Features.pdf"
+      }
+    },
+    {
+      "id": "kgm-musso-my26-ultimate-double-cab-tub",
+      "make": "KGM",
+      "model": "Musso",
+      "modelYear": 2026,
+      "grade": "Ultimate",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 2880,
+      "kerbKg": 2090,
+      "trayLengthMm": 1300,
+      "trayWidthMm": 1570,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "KGM Australia",
+        "title": "Musso and Musso XLV MY26 Specifications and Features",
+        "url": "https://payload.therefinerydesign.com/api/media/file/KGM-Musso-MY26-Specs-and-Features.pdf"
+      }
+    },
+    {
+      "id": "kgm-musso-xlv-my26-advance-double-cab-tub",
+      "make": "KGM",
+      "model": "Musso XLV",
+      "modelYear": 2026,
+      "grade": "Advance",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 2980,
+      "kerbKg": 2100,
+      "trayLengthMm": 1600,
+      "trayWidthMm": 1570,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "KGM Australia",
+        "title": "Musso and Musso XLV MY26 Specifications and Features",
+        "url": "https://payload.therefinerydesign.com/api/media/file/KGM-Musso-MY26-Specs-and-Features.pdf"
+      }
+    },
+    {
+      "id": "kgm-musso-xlv-my26-elx-double-cab-tub",
+      "make": "KGM",
+      "model": "Musso XLV",
+      "modelYear": 2026,
+      "grade": "ELX",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3220,
+      "kerbKg": 2210,
+      "trayLengthMm": 1600,
+      "trayWidthMm": 1570,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "KGM Australia",
+        "title": "Musso and Musso XLV MY26 Specifications and Features",
+        "url": "https://payload.therefinerydesign.com/api/media/file/KGM-Musso-MY26-Specs-and-Features.pdf"
+      }
+    },
+    {
+      "id": "kgm-musso-xlv-my26-ultimate-double-cab-tub",
+      "make": "KGM",
+      "model": "Musso XLV",
+      "modelYear": 2026,
+      "grade": "Ultimate",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 2980,
+      "kerbKg": 2100,
+      "trayLengthMm": 1600,
+      "trayWidthMm": 1570,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "KGM Australia",
+        "title": "Musso and Musso XLV MY26 Specifications and Features",
+        "url": "https://payload.therefinerydesign.com/api/media/file/KGM-Musso-MY26-Specs-and-Features.pdf"
+      }
+    },
+    {
+      "id": "kia-tasman-2026-dual-cab-s-4x4-cab-chassis-optional-tray",
+      "make": "Kia",
+      "model": "Tasman",
+      "modelYear": 2026,
+      "grade": "Dual Cab S 4x4",
+      "cabType": "dual_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3250,
+      "kerbKg": 2065,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Kia Australia",
+        "title": "Kia Tasman Cab Chassis Brochure",
+        "url": "https://www.kia.com/content/dam/kwcms/au/en/images/pdf/tasman/kia-tasman-cab-chassis-brochure.pdf"
+      }
+    },
+    {
+      "id": "kia-tasman-2026-dual-cab-sx-4x4-cab-chassis-optional-tray",
+      "make": "Kia",
+      "model": "Tasman",
+      "modelYear": 2026,
+      "grade": "Dual Cab SX 4x4",
+      "cabType": "dual_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3250,
+      "kerbKg": 2065,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Kia Australia",
+        "title": "Kia Tasman Cab Chassis Brochure",
+        "url": "https://www.kia.com/content/dam/kwcms/au/en/images/pdf/tasman/kia-tasman-cab-chassis-brochure.pdf"
+      }
+    },
+    {
+      "id": "kia-tasman-my26-s-4x2",
+      "make": "Kia",
+      "model": "Tasman",
+      "modelYear": 2026,
+      "grade": "S",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3250,
+      "kerbKg": 2126,
+      "trayLengthMm": 1573,
+      "trayWidthMm": 1600,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Kia Australia",
+        "title": "Kia Tasman Model Year 2026 Brochure",
+        "url": "https://www.kia.com/content/dam/kwcms/au/en/images/pdf/tasman/kia-tasman-brochure.pdf"
+      }
+    },
+    {
+      "id": "kia-tasman-my26-s-4x4",
+      "make": "Kia",
+      "model": "Tasman",
+      "modelYear": 2026,
+      "grade": "S",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3250,
+      "kerbKg": 2225,
+      "trayLengthMm": 1573,
+      "trayWidthMm": 1600,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Kia Australia",
+        "title": "Kia Tasman Model Year 2026 Brochure",
+        "url": "https://www.kia.com/content/dam/kwcms/au/en/images/pdf/tasman/kia-tasman-brochure.pdf"
+      }
+    },
+    {
+      "id": "kia-tasman-my26-sx-4x4",
+      "make": "Kia",
+      "model": "Tasman",
+      "modelYear": 2026,
+      "grade": "SX",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3250,
+      "kerbKg": 2225,
+      "trayLengthMm": 1573,
+      "trayWidthMm": 1600,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Kia Australia",
+        "title": "Kia Tasman Model Year 2026 Brochure",
+        "url": "https://www.kia.com/content/dam/kwcms/au/en/images/pdf/tasman/kia-tasman-brochure.pdf"
+      }
+    },
+    {
+      "id": "kia-tasman-my26-sxplus-4x4",
+      "make": "Kia",
+      "model": "Tasman",
+      "modelYear": 2026,
+      "grade": "SX+",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3250,
+      "kerbKg": 2225,
+      "trayLengthMm": 1512,
+      "trayWidthMm": 1572,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Kia Australia",
+        "title": "Kia Tasman Model Year 2026 Brochure",
+        "url": "https://www.kia.com/content/dam/kwcms/au/en/images/pdf/tasman/kia-tasman-brochure.pdf"
+      }
+    },
+    {
+      "id": "kia-tasman-2026-single-cab-s-4x2-cab-chassis-optional-tray",
+      "make": "Kia",
+      "model": "Tasman",
+      "modelYear": 2026,
+      "grade": "Single Cab S 4x2",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3160,
+      "kerbKg": 1795,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Kia Australia",
+        "title": "Kia Tasman Cab Chassis Brochure",
+        "url": "https://www.kia.com/content/dam/kwcms/au/en/images/pdf/tasman/kia-tasman-cab-chassis-brochure.pdf"
+      }
+    },
+    {
+      "id": "kia-tasman-2026-single-cab-s-4x4-cab-chassis-optional-tray",
+      "make": "Kia",
+      "model": "Tasman",
+      "modelYear": 2026,
+      "grade": "Single Cab S 4x4",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3250,
+      "kerbKg": 1905,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Kia Australia",
+        "title": "Kia Tasman Cab Chassis Brochure",
+        "url": "https://www.kia.com/content/dam/kwcms/au/en/images/pdf/tasman/kia-tasman-cab-chassis-brochure.pdf"
+      }
+    },
+    {
+      "id": "kia-tasman-2026-single-cab-sx-4x4-cab-chassis-optional-tray",
+      "make": "Kia",
+      "model": "Tasman",
+      "modelYear": 2026,
+      "grade": "Single Cab SX 4x4",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3250,
+      "kerbKg": 1905,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Kia Australia",
+        "title": "Kia Tasman Cab Chassis Brochure",
+        "url": "https://www.kia.com/content/dam/kwcms/au/en/images/pdf/tasman/kia-tasman-cab-chassis-brochure.pdf"
+      }
+    },
+    {
+      "id": "kia-tasman-my26-xline-4x4",
+      "make": "Kia",
+      "model": "Tasman",
+      "modelYear": 2026,
+      "grade": "X-Line",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3250,
+      "kerbKg": 2223,
+      "trayLengthMm": 1512,
+      "trayWidthMm": 1572,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Kia Australia",
+        "title": "Kia Tasman Model Year 2026 Brochure",
+        "url": "https://www.kia.com/content/dam/kwcms/au/en/images/pdf/tasman/kia-tasman-brochure.pdf"
+      }
+    },
+    {
+      "id": "kia-tasman-my26-xpro-4x4",
+      "make": "Kia",
+      "model": "Tasman",
+      "modelYear": 2026,
+      "grade": "X-Pro",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3250,
+      "kerbKg": 2237,
+      "trayLengthMm": 1512,
+      "trayWidthMm": 1572,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Kia Australia",
+        "title": "Kia Tasman Model Year 2026 Brochure",
+        "url": "https://www.kia.com/content/dam/kwcms/au/en/images/pdf/tasman/kia-tasman-brochure.pdf"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-boss-pickup",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "Boss",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3100,
+      "kerbKg": 2067,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-gt-cc",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "GT",
+      "cabType": "dual_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3100,
+      "kerbKg": 2073,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-gt-pickup",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "GT",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3100,
+      "kerbKg": 2102,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-sp-pickup",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "SP",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3100,
+      "kerbKg": 2176,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-thunder-pickup",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "Thunder",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3100,
+      "kerbKg": 2213,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xs-cc",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "XS",
+      "cabType": "dual_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3100,
+      "kerbKg": 1966,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xs-pickup",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "XS",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3100,
+      "kerbKg": 1961,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x2-xs-pickup",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "XS",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3000,
+      "kerbKg": 1888,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-single-4x2-xs-cc",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "XS",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3000,
+      "kerbKg": 1787,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xt-cc",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "XT",
+      "cabType": "dual_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3100,
+      "kerbKg": 2006,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x2-xt-cc",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "XT",
+      "cabType": "dual_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3000,
+      "kerbKg": 1920,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xt-pickup",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "XT",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3100,
+      "kerbKg": 2015,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x2-xt-pickup",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "XT",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3000,
+      "kerbKg": 1929,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-freestyle-4x2-xt-cc",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "XT",
+      "cabType": "freestyle_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3000,
+      "kerbKg": 1880,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-freestyle-4x4-xt-cc",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "XT",
+      "cabType": "freestyle_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3100,
+      "kerbKg": 1966,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-single-4x2-xt-cc",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "XT",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3000,
+      "kerbKg": 1828,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-single-4x4-xt-cc",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "XT",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3100,
+      "kerbKg": 1914,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xtr-cc",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "XTR",
+      "cabType": "dual_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3100,
+      "kerbKg": 2070,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xtr-pickup",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "XTR",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3100,
+      "kerbKg": 2098,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x2-xtr-pickup",
+      "make": "Mazda",
+      "model": "BT-50",
+      "modelYear": 2025,
+      "grade": "XTR",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3000,
+      "kerbKg": 2012,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mazda Australia",
+        "title": "Mazda BT-50 Payload Calculator",
+        "url": "https://www.mazda.com.au/cars/bt-50/payload/"
+      }
+    },
+    {
+      "id": "mitsubishi-triton-26my-gls-double-cc-4x4",
+      "make": "Mitsubishi",
+      "model": "Triton",
+      "modelYear": 2026,
+      "grade": "GLS",
+      "cabType": "double_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3200,
+      "kerbKg": 1990,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mitsubishi Motors Australia",
+        "title": "26MY Triton Brochure",
+        "url": "https://www.mitsubishi-motors.com.au/content/dam/mmal/pdfs/vehicle-brochures/26MY%20Triton%20Brochure.pdf"
+      }
+    },
+    {
+      "id": "mitsubishi-triton-26my-gls-double-pickup-4x4-1t",
+      "make": "Mitsubishi",
+      "model": "Triton",
+      "modelYear": 2026,
+      "grade": "GLS",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3200,
+      "kerbKg": 2129,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mitsubishi Motors Australia",
+        "title": "26MY Triton Brochure",
+        "url": "https://www.mitsubishi-motors.com.au/content/dam/mmal/pdfs/vehicle-brochures/26MY%20Triton%20Brochure.pdf"
+      }
+    },
+    {
+      "id": "mitsubishi-triton-26my-gls-double-pickup-4x4-0-9t",
+      "make": "Mitsubishi",
+      "model": "Triton",
+      "modelYear": 2026,
+      "grade": "GLS",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3080,
+      "kerbKg": 2129,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mitsubishi Motors Australia",
+        "title": "26MY Triton Brochure",
+        "url": "https://www.mitsubishi-motors.com.au/content/dam/mmal/pdfs/vehicle-brochures/26MY%20Triton%20Brochure.pdf"
+      }
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-club-cc-4x4",
+      "make": "Mitsubishi",
+      "model": "Triton",
+      "modelYear": 2026,
+      "grade": "GLX",
+      "cabType": "club_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3200,
+      "kerbKg": 1957,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mitsubishi Motors Australia",
+        "title": "26MY Triton Brochure",
+        "url": "https://www.mitsubishi-motors.com.au/content/dam/mmal/pdfs/vehicle-brochures/26MY%20Triton%20Brochure.pdf"
+      }
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-double-pickup-4x2",
+      "make": "Mitsubishi",
+      "model": "Triton",
+      "modelYear": 2026,
+      "grade": "GLX",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3070,
+      "kerbKg": 2015,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mitsubishi Motors Australia",
+        "title": "26MY Triton Brochure",
+        "url": "https://www.mitsubishi-motors.com.au/content/dam/mmal/pdfs/vehicle-brochures/26MY%20Triton%20Brochure.pdf"
+      }
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-double-cc-4x4-manual",
+      "make": "Mitsubishi",
+      "model": "Triton",
+      "modelYear": 2026,
+      "grade": "GLX",
+      "cabType": "double_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3200,
+      "kerbKg": 2003,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mitsubishi Motors Australia",
+        "title": "26MY Triton Brochure",
+        "url": "https://www.mitsubishi-motors.com.au/content/dam/mmal/pdfs/vehicle-brochures/26MY%20Triton%20Brochure.pdf"
+      }
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-double-cc-4x4-auto",
+      "make": "Mitsubishi",
+      "model": "Triton",
+      "modelYear": 2026,
+      "grade": "GLX",
+      "cabType": "double_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3200,
+      "kerbKg": 1993,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mitsubishi Motors Australia",
+        "title": "26MY Triton Brochure",
+        "url": "https://www.mitsubishi-motors.com.au/content/dam/mmal/pdfs/vehicle-brochures/26MY%20Triton%20Brochure.pdf"
+      }
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-double-pickup-4x4",
+      "make": "Mitsubishi",
+      "model": "Triton",
+      "modelYear": 2026,
+      "grade": "GLX",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3200,
+      "kerbKg": 2117,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mitsubishi Motors Australia",
+        "title": "26MY Triton Brochure",
+        "url": "https://www.mitsubishi-motors.com.au/content/dam/mmal/pdfs/vehicle-brochures/26MY%20Triton%20Brochure.pdf"
+      }
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-single-cc-4x2",
+      "make": "Mitsubishi",
+      "model": "Triton",
+      "modelYear": 2026,
+      "grade": "GLX",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3070,
+      "kerbKg": 1756,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Mitsubishi Motors Australia",
+        "title": "26MY Triton Brochure",
+        "url": "https://www.mitsubishi-motors.com.au/content/dam/mmal/pdfs/vehicle-brochures/26MY%20Triton%20Brochure.pdf"
+      }
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-single-cc-4x4",
+      "make": "Mitsubishi",
+      "model": "Triton",
+      "modelYear": 2026,
+      "grade": "GLX",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3200,
+      "kerbKg": 1865,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "Mitsubishi Motors Australia",
+        "title": "26MY Triton Brochure",
+        "url": "https://www.mitsubishi-motors.com.au/content/dam/mmal/pdfs/vehicle-brochures/26MY%20Triton%20Brochure.pdf"
+      }
+    },
+    {
+      "id": "mitsubishi-triton-26my-glxplus-club-pickup-4x4",
+      "make": "Mitsubishi",
+      "model": "Triton",
+      "modelYear": 2026,
+      "grade": "GLX+",
+      "cabType": "club_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3200,
+      "kerbKg": 2089,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mitsubishi Motors Australia",
+        "title": "26MY Triton Brochure",
+        "url": "https://www.mitsubishi-motors.com.au/content/dam/mmal/pdfs/vehicle-brochures/26MY%20Triton%20Brochure.pdf"
+      }
+    },
+    {
+      "id": "mitsubishi-triton-26my-glxplus-double-cc-4x4",
+      "make": "Mitsubishi",
+      "model": "Triton",
+      "modelYear": 2026,
+      "grade": "GLX+",
+      "cabType": "double_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3200,
+      "kerbKg": 1991,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mitsubishi Motors Australia",
+        "title": "26MY Triton Brochure",
+        "url": "https://www.mitsubishi-motors.com.au/content/dam/mmal/pdfs/vehicle-brochures/26MY%20Triton%20Brochure.pdf"
+      }
+    },
+    {
+      "id": "mitsubishi-triton-26my-glxplus-double-pickup-4x4",
+      "make": "Mitsubishi",
+      "model": "Triton",
+      "modelYear": 2026,
+      "grade": "GLX+",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3200,
+      "kerbKg": 2108,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mitsubishi Motors Australia",
+        "title": "26MY Triton Brochure",
+        "url": "https://www.mitsubishi-motors.com.au/content/dam/mmal/pdfs/vehicle-brochures/26MY%20Triton%20Brochure.pdf"
+      }
+    },
+    {
+      "id": "mitsubishi-triton-26my-glxr-double-pickup-4x4",
+      "make": "Mitsubishi",
+      "model": "Triton",
+      "modelYear": 2026,
+      "grade": "GLX-R",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3200,
+      "kerbKg": 2107,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mitsubishi Motors Australia",
+        "title": "26MY Triton Brochure",
+        "url": "https://www.mitsubishi-motors.com.au/content/dam/mmal/pdfs/vehicle-brochures/26MY%20Triton%20Brochure.pdf"
+      }
+    },
+    {
+      "id": "mitsubishi-triton-26my-gsr-double-cc-4x4",
+      "make": "Mitsubishi",
+      "model": "Triton",
+      "modelYear": 2026,
+      "grade": "GSR",
+      "cabType": "double_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3200,
+      "kerbKg": 2006,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mitsubishi Motors Australia",
+        "title": "26MY Triton Brochure",
+        "url": "https://www.mitsubishi-motors.com.au/content/dam/mmal/pdfs/vehicle-brochures/26MY%20Triton%20Brochure.pdf"
+      }
+    },
+    {
+      "id": "mitsubishi-triton-26my-gsr-double-pickup-4x4-1t",
+      "make": "Mitsubishi",
+      "model": "Triton",
+      "modelYear": 2026,
+      "grade": "GSR",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3200,
+      "kerbKg": 2170,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mitsubishi Motors Australia",
+        "title": "26MY Triton Brochure",
+        "url": "https://www.mitsubishi-motors.com.au/content/dam/mmal/pdfs/vehicle-brochures/26MY%20Triton%20Brochure.pdf"
+      }
+    },
+    {
+      "id": "mitsubishi-triton-26my-gsr-double-pickup-4x4-0-9t",
+      "make": "Mitsubishi",
+      "model": "Triton",
+      "modelYear": 2026,
+      "grade": "GSR",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3080,
+      "kerbKg": 2170,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Mitsubishi Motors Australia",
+        "title": "26MY Triton Brochure",
+        "url": "https://www.mitsubishi-motors.com.au/content/dam/mmal/pdfs/vehicle-brochures/26MY%20Triton%20Brochure.pdf"
+      }
+    },
+    {
+      "id": "nissan-navara-2026-pro-4x-pick-up-tub",
+      "make": "Nissan",
+      "model": "Navara",
+      "modelYear": 2026,
+      "grade": "PRO-4X",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3190,
+      "kerbKg": 2226,
+      "trayLengthMm": 1555,
+      "trayWidthMm": 1545,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Nissan Australia",
+        "title": "All-New Navara Specifications and Pricing",
+        "url": "https://www.nissan.com.au/vehicles/browse-range/all-new-navara/specs-and-pricing.html"
+      }
+    },
+    {
+      "id": "nissan-navara-2026-sl-pick-up-tub",
+      "make": "Nissan",
+      "model": "Navara",
+      "modelYear": 2026,
+      "grade": "SL",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3190,
+      "kerbKg": 2126,
+      "trayLengthMm": 1555,
+      "trayWidthMm": 1545,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Nissan Australia",
+        "title": "All-New Navara Specifications and Pricing",
+        "url": "https://www.nissan.com.au/vehicles/browse-range/all-new-navara/specs-and-pricing.html"
+      }
+    },
+    {
+      "id": "nissan-navara-2026-st-pick-up-tub",
+      "make": "Nissan",
+      "model": "Navara",
+      "modelYear": 2026,
+      "grade": "ST",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3190,
+      "kerbKg": 2143,
+      "trayLengthMm": 1555,
+      "trayWidthMm": 1545,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Nissan Australia",
+        "title": "All-New Navara Specifications and Pricing",
+        "url": "https://www.nissan.com.au/vehicles/browse-range/all-new-navara/specs-and-pricing.html"
+      }
+    },
+    {
+      "id": "nissan-navara-2026-st-x-pick-up-tub",
+      "make": "Nissan",
+      "model": "Navara",
+      "modelYear": 2026,
+      "grade": "ST-X",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3190,
+      "kerbKg": 2171,
+      "trayLengthMm": 1555,
+      "trayWidthMm": 1545,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Nissan Australia",
+        "title": "All-New Navara Specifications and Pricing",
+        "url": "https://www.nissan.com.au/vehicles/browse-range/all-new-navara/specs-and-pricing.html"
+      }
+    },
+    {
+      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-express-black-edition-hurricane-crew-cab-tub",
+      "make": "RAM",
+      "model": "1500",
+      "modelYear": 2026,
+      "grade": "Express Black Edition Hurricane",
+      "cabType": "crew_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3505,
+      "kerbKg": 2491,
+      "trayLengthMm": null,
+      "trayWidthMm": 1295,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "RAM Trucks Australia",
+        "title": "RAM 1500 Specification Brochure",
+        "url": "https://resource.digitaldealer.com.au/pdf/4385833746a1d25a063869361464389.pdf"
+      }
+    },
+    {
+      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-laramie-sport-hurricane-crew-cab-tub",
+      "make": "RAM",
+      "model": "1500",
+      "modelYear": 2026,
+      "grade": "Laramie Sport Hurricane",
+      "cabType": "crew_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3505,
+      "kerbKg": 2642,
+      "trayLengthMm": null,
+      "trayWidthMm": 1270,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "RAM Trucks Australia",
+        "title": "RAM 1500 Specification Brochure",
+        "url": "https://resource.digitaldealer.com.au/pdf/4385833746a1d25a063869361464389.pdf"
+      }
+    },
+    {
+      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-limited-hurricane-high-output-crew-cab-tub",
+      "make": "RAM",
+      "model": "1500",
+      "modelYear": 2026,
+      "grade": "Limited Hurricane High Output",
+      "cabType": "crew_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3505,
+      "kerbKg": 2722,
+      "trayLengthMm": null,
+      "trayWidthMm": 1270,
+      "verificationStatus": "needs_secondary_review",
+      "published": false,
+      "source": {
+        "manufacturer": "RAM Trucks Australia",
+        "title": "RAM 1500 Specification Brochure",
+        "url": "https://resource.digitaldealer.com.au/pdf/4385833746a1d25a063869361464389.pdf"
+      }
+    },
+    {
+      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-rebel-hurricane-crew-cab-tub",
+      "make": "RAM",
+      "model": "1500",
+      "modelYear": 2026,
+      "grade": "Rebel Hurricane",
+      "cabType": "crew_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3505,
+      "kerbKg": 2612,
+      "trayLengthMm": null,
+      "trayWidthMm": 1295,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "RAM Trucks Australia",
+        "title": "RAM 1500 Specification Brochure",
+        "url": "https://resource.digitaldealer.com.au/pdf/4385833746a1d25a063869361464389.pdf"
+      }
+    },
+    {
+      "id": "ram-2500-2025-laramie-cummins-high-output-6-4-tub",
+      "make": "RAM",
+      "model": "2500",
+      "modelYear": 2025,
+      "grade": "Laramie Cummins High Output",
+      "cabType": "crew_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 4495,
+      "kerbKg": 3710,
+      "trayLengthMm": 1937,
+      "trayWidthMm": 1687,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "RAM Trucks Australia",
+        "title": "RAM 2500 and 3500 Laramie Cummins High Output Specification",
+        "url": "https://resource.digitaldealer.com.au/pdf/211467751697043e181834349841250.pdf"
+      }
+    },
+    {
+      "id": "ram-3500-2025-laramie-cummins-ho-4-495-kg-gvm-derate-6-4-tub",
+      "make": "RAM",
+      "model": "3500",
+      "modelYear": 2025,
+      "grade": "Laramie Cummins HO – 4,495 kg GVM derate",
+      "cabType": "crew_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 4495,
+      "kerbKg": 3700,
+      "trayLengthMm": 1937,
+      "trayWidthMm": 1687,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "RAM Trucks Australia",
+        "title": "RAM 2500 and 3500 Laramie Cummins High Output Specification",
+        "url": "https://resource.digitaldealer.com.au/pdf/211467751697043e181834349841250.pdf"
+      }
+    },
+    {
+      "id": "ram-3500-2025-laramie-cummins-high-output-6-4-tub",
+      "make": "RAM",
+      "model": "3500",
+      "modelYear": 2025,
+      "grade": "Laramie Cummins High Output",
+      "cabType": "crew_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 5352,
+      "kerbKg": 3700,
+      "trayLengthMm": 1937,
+      "trayWidthMm": 1687,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "RAM Trucks Australia",
+        "title": "RAM 2500 and 3500 Laramie Cummins High Output Specification",
+        "url": "https://resource.digitaldealer.com.au/pdf/211467751697043e181834349841250.pdf"
+      }
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-sr-double-manual",
+      "make": "Toyota",
+      "model": "HiLux",
+      "modelYear": 2026,
+      "grade": "SR",
+      "cabType": "double_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3080,
+      "kerbKg": 2000,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Toyota Australia",
+        "title": "Toyota HiLux Spec Table June 2026",
+        "url": "https://www.toyota.com.au/-/media/toyota/main-site/vehicle-hubs/hilux/files/20260630_hilux_spec_sheet_gto010060.pdf?rev=d222769888af49519347727deb13bb73"
+      }
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-sr-double-auto",
+      "make": "Toyota",
+      "model": "HiLux",
+      "modelYear": 2026,
+      "grade": "SR",
+      "cabType": "double_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3090,
+      "kerbKg": 2025,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Toyota Australia",
+        "title": "Toyota HiLux Spec Table June 2026",
+        "url": "https://www.toyota.com.au/-/media/toyota/main-site/vehicle-hubs/hilux/files/20260630_hilux_spec_sheet_gto010060.pdf?rev=d222769888af49519347727deb13bb73"
+      }
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-sr-extra-auto",
+      "make": "Toyota",
+      "model": "HiLux",
+      "modelYear": 2026,
+      "grade": "SR",
+      "cabType": "extra_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3065,
+      "kerbKg": 1940,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Toyota Australia",
+        "title": "Toyota HiLux Spec Table June 2026",
+        "url": "https://www.toyota.com.au/-/media/toyota/main-site/vehicle-hubs/hilux/files/20260630_hilux_spec_sheet_gto010060.pdf?rev=d222769888af49519347727deb13bb73"
+      }
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-workmate-double-auto",
+      "make": "Toyota",
+      "model": "HiLux",
+      "modelYear": 2026,
+      "grade": "WorkMate",
+      "cabType": "double_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3065,
+      "kerbKg": 1975,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Toyota Australia",
+        "title": "Toyota HiLux Spec Table June 2026",
+        "url": "https://www.toyota.com.au/-/media/toyota/main-site/vehicle-hubs/hilux/files/20260630_hilux_spec_sheet_gto010060.pdf?rev=d222769888af49519347727deb13bb73"
+      }
+    },
+    {
+      "id": "toyota-hilux-my26-4x2-workmate-single-manual",
+      "make": "Toyota",
+      "model": "HiLux",
+      "modelYear": 2026,
+      "grade": "WorkMate",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 2950,
+      "kerbKg": 1690,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Toyota Australia",
+        "title": "Toyota HiLux Spec Table June 2026",
+        "url": "https://www.toyota.com.au/-/media/toyota/main-site/vehicle-hubs/hilux/files/20260630_hilux_spec_sheet_gto010060.pdf?rev=d222769888af49519347727deb13bb73"
+      }
+    },
+    {
+      "id": "toyota-hilux-my26-4x2-workmate-single-auto",
+      "make": "Toyota",
+      "model": "HiLux",
+      "modelYear": 2026,
+      "grade": "WorkMate",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 2950,
+      "kerbKg": 1700,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Toyota Australia",
+        "title": "Toyota HiLux Spec Table June 2026",
+        "url": "https://www.toyota.com.au/-/media/toyota/main-site/vehicle-hubs/hilux/files/20260630_hilux_spec_sheet_gto010060.pdf?rev=d222769888af49519347727deb13bb73"
+      }
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-workmate-single-auto",
+      "make": "Toyota",
+      "model": "HiLux",
+      "modelYear": 2026,
+      "grade": "WorkMate",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3065,
+      "kerbKg": 1830,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Toyota Australia",
+        "title": "Toyota HiLux Spec Table June 2026",
+        "url": "https://www.toyota.com.au/-/media/toyota/main-site/vehicle-hubs/hilux/files/20260630_hilux_spec_sheet_gto010060.pdf?rev=d222769888af49519347727deb13bb73"
+      }
+    },
+    {
+      "id": "toyota-lc70-my25-gx-single-auto",
+      "make": "Toyota",
+      "model": "LandCruiser 70",
+      "modelYear": 2025,
+      "grade": "GX",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3510,
+      "kerbKg": 2130,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Toyota Australia",
+        "title": "Toyota LC70 Spec Table October 2025",
+        "url": "https://www.toyota.com.au/-/media/toyota/main-site/vehicle-hubs/lc70/files/20251021_lc70_spec_table_gto009454.pdf?rev=4e4c662a09fe418c9a5a7b00509b16dd"
+      }
+    },
+    {
+      "id": "toyota-lc70-my25-gxl-double-auto",
+      "make": "Toyota",
+      "model": "LandCruiser 70",
+      "modelYear": 2025,
+      "grade": "GXL",
+      "cabType": "double_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3510,
+      "kerbKg": 2185,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Toyota Australia",
+        "title": "Toyota LC70 Spec Table October 2025",
+        "url": "https://www.toyota.com.au/-/media/toyota/main-site/vehicle-hubs/lc70/files/20251021_lc70_spec_table_gto009454.pdf?rev=4e4c662a09fe418c9a5a7b00509b16dd"
+      }
+    },
+    {
+      "id": "toyota-lc70-my25-gxl-single-auto",
+      "make": "Toyota",
+      "model": "LandCruiser 70",
+      "modelYear": 2025,
+      "grade": "GXL",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3510,
+      "kerbKg": 2130,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Toyota Australia",
+        "title": "Toyota LC70 Spec Table October 2025",
+        "url": "https://www.toyota.com.au/-/media/toyota/main-site/vehicle-hubs/lc70/files/20251021_lc70_spec_table_gto009454.pdf?rev=4e4c662a09fe418c9a5a7b00509b16dd"
+      }
+    },
+    {
+      "id": "toyota-lc70-my25-workmate-double-auto",
+      "make": "Toyota",
+      "model": "LandCruiser 70",
+      "modelYear": 2025,
+      "grade": "WorkMate",
+      "cabType": "double_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3510,
+      "kerbKg": 2200,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Toyota Australia",
+        "title": "Toyota LC70 Spec Table October 2025",
+        "url": "https://www.toyota.com.au/-/media/toyota/main-site/vehicle-hubs/lc70/files/20251021_lc70_spec_table_gto009454.pdf?rev=4e4c662a09fe418c9a5a7b00509b16dd"
+      }
+    },
+    {
+      "id": "toyota-lc70-my25-workmate-single-auto",
+      "make": "Toyota",
+      "model": "LandCruiser 70",
+      "modelYear": 2025,
+      "grade": "WorkMate",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 3510,
+      "kerbKg": 2145,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Toyota Australia",
+        "title": "Toyota LC70 Spec Table October 2025",
+        "url": "https://www.toyota.com.au/-/media/toyota/main-site/vehicle-hubs/lc70/files/20251021_lc70_spec_table_gto009454.pdf?rev=4e4c662a09fe418c9a5a7b00509b16dd"
+      }
+    },
+    {
+      "id": "toyota-tundra-my26-limited",
+      "make": "Toyota",
+      "model": "Tundra",
+      "modelYear": 2026,
+      "grade": "Limited",
+      "cabType": "crew_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3536,
+      "kerbKg": 2792,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Toyota Australia",
+        "title": "Toyota Tundra Spec Table May 2026",
+        "url": "https://www.toyota.com.au/-/media/toyota/main-site/vehicle-hubs/tundra/files/20260506-tundra_spec-table_gto009469-v1.pdf?rev=fe8c44cde59d4c339adb2c9124278b61"
+      }
+    },
+    {
+      "id": "toyota-tundra-my26-platinum",
+      "make": "Toyota",
+      "model": "Tundra",
+      "modelYear": 2026,
+      "grade": "Platinum",
+      "cabType": "crew_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3536,
+      "kerbKg": 2834,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Toyota Australia",
+        "title": "Toyota Tundra Spec Table May 2026",
+        "url": "https://www.toyota.com.au/-/media/toyota/main-site/vehicle-hubs/tundra/files/20260506-tundra_spec-table_gto009469-v1.pdf?rev=fe8c44cde59d4c339adb2c9124278b61"
+      }
+    },
+    {
+      "id": "volkswagen-amarok-2025-aventura-tdi-v6-pick-up-tub",
+      "make": "Volkswagen",
+      "model": "Amarok",
+      "modelYear": 2025,
+      "grade": "Aventura TDI V6",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3190,
+      "kerbKg": 2399,
+      "trayLengthMm": 1544,
+      "trayWidthMm": 1530,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Volkswagen Group Australia",
+        "title": "Amarok MY25 Brochure and Specifications",
+        "url": "https://www.volkswagen.com.au/idhub/content/dam/onehub_pkw/importers/au/pdfs/commercial-vehicles/VW_CV_Amarok_VWCAMAROKMY25_BrochureSpec_Sep25_FA.pdf"
+      }
+    },
+    {
+      "id": "volkswagen-amarok-2025-aventura-tsi-pick-up-tub",
+      "make": "Volkswagen",
+      "model": "Amarok",
+      "modelYear": 2025,
+      "grade": "Aventura TSI",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3100,
+      "kerbKg": 2292,
+      "trayLengthMm": 1544,
+      "trayWidthMm": 1530,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Volkswagen Group Australia",
+        "title": "Amarok MY25 Brochure and Specifications",
+        "url": "https://www.volkswagen.com.au/idhub/content/dam/onehub_pkw/importers/au/pdfs/commercial-vehicles/VW_CV_Amarok_VWCAMAROKMY25_BrochureSpec_Sep25_FA.pdf"
+      }
+    },
+    {
+      "id": "volkswagen-amarok-2025-core-pick-up-tub",
+      "make": "Volkswagen",
+      "model": "Amarok",
+      "modelYear": 2025,
+      "grade": "Core",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3250,
+      "kerbKg": 2276,
+      "trayLengthMm": 1544,
+      "trayWidthMm": 1530,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Volkswagen Group Australia",
+        "title": "Amarok MY25 Brochure and Specifications",
+        "url": "https://www.volkswagen.com.au/idhub/content/dam/onehub_pkw/importers/au/pdfs/commercial-vehicles/VW_CV_Amarok_VWCAMAROKMY25_BrochureSpec_Sep25_FA.pdf"
+      }
+    },
+    {
+      "id": "volkswagen-amarok-2025-life-pick-up-tub",
+      "make": "Volkswagen",
+      "model": "Amarok",
+      "modelYear": 2025,
+      "grade": "Life",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3230,
+      "kerbKg": 2310,
+      "trayLengthMm": 1544,
+      "trayWidthMm": 1530,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Volkswagen Group Australia",
+        "title": "Amarok MY25 Brochure and Specifications",
+        "url": "https://www.volkswagen.com.au/idhub/content/dam/onehub_pkw/importers/au/pdfs/commercial-vehicles/VW_CV_Amarok_VWCAMAROKMY25_BrochureSpec_Sep25_FA.pdf"
+      }
+    },
+    {
+      "id": "volkswagen-amarok-2025-panamericana-pick-up-tub",
+      "make": "Volkswagen",
+      "model": "Amarok",
+      "modelYear": 2025,
+      "grade": "PanAmericana",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3350,
+      "kerbKg": 2387,
+      "trayLengthMm": 1544,
+      "trayWidthMm": 1530,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Volkswagen Group Australia",
+        "title": "Amarok MY25 Brochure and Specifications",
+        "url": "https://www.volkswagen.com.au/idhub/content/dam/onehub_pkw/importers/au/pdfs/commercial-vehicles/VW_CV_Amarok_VWCAMAROKMY25_BrochureSpec_Sep25_FA.pdf"
+      }
+    },
+    {
+      "id": "volkswagen-amarok-2025-style-2-0-tdi-pick-up-tub",
+      "make": "Volkswagen",
+      "model": "Amarok",
+      "modelYear": 2025,
+      "grade": "Style 2.0 TDI",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3280,
+      "kerbKg": 2338,
+      "trayLengthMm": 1544,
+      "trayWidthMm": 1530,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Volkswagen Group Australia",
+        "title": "Amarok MY25 Brochure and Specifications",
+        "url": "https://www.volkswagen.com.au/idhub/content/dam/onehub_pkw/importers/au/pdfs/commercial-vehicles/VW_CV_Amarok_VWCAMAROKMY25_BrochureSpec_Sep25_FA.pdf"
+      }
+    },
+    {
+      "id": "volkswagen-amarok-2025-style-3-0-tdi-v6-pick-up-tub",
+      "make": "Volkswagen",
+      "model": "Amarok",
+      "modelYear": 2025,
+      "grade": "Style 3.0 TDI V6",
+      "cabType": "dual_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3350,
+      "kerbKg": 2386,
+      "trayLengthMm": 1544,
+      "trayWidthMm": 1530,
+      "verificationStatus": "source_verified",
+      "published": false,
+      "source": {
+        "manufacturer": "Volkswagen Group Australia",
+        "title": "Amarok MY25 Brochure and Specifications",
+        "url": "https://www.volkswagen.com.au/idhub/content/dam/onehub_pkw/importers/au/pdfs/commercial-vehicles/VW_CV_Amarok_VWCAMAROKMY25_BrochureSpec_Sep25_FA.pdf"
+      }
+    }
+  ]
+}

@@ -187,3 +187,20 @@ test('admin edge gate accepts actor tokens and applies the same role cutoff', as
   environmentValues.ADMIN_GM_SESSION_VALID_AFTER = new Date(Date.now() + 1_000).toISOString();
   assert.equal(await isValidAdminGateToken(token, process.env.ADMIN_COOKIE_SECRET!, environment), false);
 });
+
+test('the gm can review vehicles, and site_admin cannot', () => {
+  const gm = { id: 'g1', displayName: 'GM', role: 'gm' as const, legacy: false };
+  const siteAdmin = { id: 's1', displayName: 'Site admin', role: 'site_admin' as const, legacy: false };
+  const owner = { id: 'o1', displayName: 'Owner', role: 'owner' as const, legacy: false };
+
+  assert.equal(hasAdminCapability(gm, 'vehicles:review'), true);
+  assert.equal(hasAdminCapability(owner, 'vehicles:review'), true);
+  // Publishing vehicle specifications is not part of editing the site.
+  assert.equal(hasAdminCapability(siteAdmin, 'vehicles:review'), false);
+});
+
+test('reviewing vehicles does not grant site editing to the gm', () => {
+  const gm = { id: 'g1', displayName: 'GM', role: 'gm' as const, legacy: false };
+
+  assert.equal(hasAdminCapability(gm, 'site:write'), false);
+});
