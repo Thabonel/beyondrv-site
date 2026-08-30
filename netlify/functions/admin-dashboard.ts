@@ -13,6 +13,7 @@ import {
   OWNER_COPILOT_TASK_STORE,
   type OwnerLeadIntelligence,
 } from './owner-copilot-core';
+import { createDeadline, TimeBudgetExceededError, withTimeBudget, type Deadline } from './time-budget';
 import { buildUnifiedLifecycleRecords } from './unified-lifecycle';
 import catalogue from './product-catalogue.json';
 
@@ -27,6 +28,13 @@ const POSTHOG_BASE = POSTHOG_PROJECT_ID
 const openAiKey = process.env.OPENAI_API_KEY;
 const openAiClient = openAiKey ? new OpenAI({ apiKey: openAiKey }) : null;
 const INSIGHTS_MODEL = process.env.OPENAI_MARKETING_INSIGHTS_MODEL ?? process.env.OPENAI_ADMIN_MODEL ?? 'gpt-5.6-terra';
+// One request fans out to Netlify Blobs, PostHog, and OpenAI, and the platform
+// kills the whole response once it runs long. Analytics and AI insights both
+// have fallbacks, so they get budgets that leave room for the blob reads the
+// dashboard cannot render without.
+const RESPONSE_BUDGET_MS = Number(process.env.ADMIN_DASHBOARD_BUDGET_MS) || 8000;
+const ANALYTICS_BUDGET_MS = Number(process.env.ADMIN_DASHBOARD_ANALYTICS_BUDGET_MS) || 4000;
+const INSIGHTS_BUDGET_MS = Number(process.env.ADMIN_DASHBOARD_INSIGHTS_BUDGET_MS) || 4000;
 
 type LeadStatusValue = 'new' | 'contacted' | 'replied' | 'called' | 'qualified' | 'quoted' | 'follow-up-scheduled' | 'won' | 'lost' | 'spam';
 
@@ -294,10 +302,11 @@ async function loadTaskSummary() {
   }
 }
 
-async function hogql(query: string) {
+async function hogql(query: string, signal?: AbortSignal) {
   if (!POSTHOG_API_KEY || !POSTHOG_BASE) throw new Error('PostHog server analytics are not configured.');
   const res = await fetch(POSTHOG_BASE, {
     method: 'POST',
+    signal,
     headers: {
       Authorization: `Bearer ${POSTHOG_API_KEY}`,
       'Content-Type': 'application/json',
@@ -308,7 +317,7 @@ async function hogql(query: string) {
   return await res.json() as { results: unknown[][] };
 }
 
-async function loadAnalytics(days: number, products: ProductRecord[]) {
+async function loadAnalytics(days: number, products: ProductRecord[], deadline: Deadline) {
   const emptyChat = {
     recent: [] as { timestamp: string; question: string; answer: string; topic: string; page: string; productSlug: string }[],
     topTopics: [] as { topic: string; count: number }[],
@@ -329,65 +338,69 @@ async function loadAnalytics(days: number, products: ProductRecord[]) {
   const pathList = paths.map((path) => `'${path.replace(/'/g, "\\'")}'`).join(', ');
 
   try {
-    const [productViewsRes, funnelRes, sourcesRes, chatTopicsRes, recentChatRes] = await Promise.all([
-      hogql(`
-        SELECT properties.$pathname as path, count() as views
-        FROM events
-        WHERE event = '$pageview'
-          AND timestamp > now() - INTERVAL ${days} DAY
-          AND properties.$pathname IN (${pathList})
-        GROUP BY path
-        ORDER BY views DESC
-      `),
-      hogql(`
-        SELECT
-          countIf(event = '$pageview' AND properties.$pathname IN (${pathList})) as product_views,
-          countIf(event = '$pageview' AND properties.$pathname = '/inquiry-form/') as enquiry_form_views,
-          countIf(event = 'enquiry_submitted') as enquiries
-        FROM events
-        WHERE timestamp > now() - INTERVAL ${days} DAY
-      `),
-      hogql(`
-        SELECT
-          multiIf(
-            properties.utm_source LIKE '%youtube%' OR properties.$referring_domain LIKE '%youtube%', 'YouTube',
-            properties.utm_source LIKE '%facebook%' OR properties.$referring_domain LIKE '%facebook%', 'Facebook',
-            properties.utm_source LIKE '%instagram%' OR properties.$referring_domain LIKE '%instagram%', 'Instagram',
-            properties.$referring_domain LIKE '%google%', 'Google',
-            properties.$referring_domain IS NULL OR properties.$referring_domain = '', 'Direct',
-            'Other'
-          ) as source,
-          count(DISTINCT properties.$session_id) as sessions,
-          countIf(event = 'enquiry_submitted') as enquiries
-        FROM events
-        WHERE timestamp > now() - INTERVAL ${days} DAY
-        GROUP BY source
-        ORDER BY sessions DESC
-      `),
-      hogql(`
-        SELECT coalesce(properties.topic, 'general') as topic, count() as total
-        FROM events
-        WHERE event = 'chat_interaction'
-          AND timestamp > now() - INTERVAL ${days} DAY
-        GROUP BY topic
-        ORDER BY total DESC
-        LIMIT 8
-      `),
-      hogql(`
-        SELECT
-          timestamp,
-          properties.question as question,
-          properties.answer as answer,
-          coalesce(properties.topic, 'general') as topic,
-          coalesce(properties.page, '') as page,
-          coalesce(properties.product_slug, '') as product_slug
-        FROM events
-        WHERE event = 'chat_interaction'
-          AND timestamp > now() - INTERVAL ${days} DAY
-        ORDER BY timestamp DESC
-        LIMIT 10
-      `),
-    ]);
+    const [productViewsRes, funnelRes, sourcesRes, chatTopicsRes, recentChatRes] = await withTimeBudget(
+      'PostHog analytics',
+      Math.min(ANALYTICS_BUDGET_MS, deadline.remainingMs()),
+      (signal) => Promise.all([
+        hogql(`
+          SELECT properties.$pathname as path, count() as views
+          FROM events
+          WHERE event = '$pageview'
+            AND timestamp > now() - INTERVAL ${days} DAY
+            AND properties.$pathname IN (${pathList})
+          GROUP BY path
+          ORDER BY views DESC
+        `, signal),
+        hogql(`
+          SELECT
+            countIf(event = '$pageview' AND properties.$pathname IN (${pathList})) as product_views,
+            countIf(event = '$pageview' AND properties.$pathname = '/inquiry-form/') as enquiry_form_views,
+            countIf(event = 'enquiry_submitted') as enquiries
+          FROM events
+          WHERE timestamp > now() - INTERVAL ${days} DAY
+        `, signal),
+        hogql(`
+          SELECT
+            multiIf(
+              properties.utm_source LIKE '%youtube%' OR properties.$referring_domain LIKE '%youtube%', 'YouTube',
+              properties.utm_source LIKE '%facebook%' OR properties.$referring_domain LIKE '%facebook%', 'Facebook',
+              properties.utm_source LIKE '%instagram%' OR properties.$referring_domain LIKE '%instagram%', 'Instagram',
+              properties.$referring_domain LIKE '%google%', 'Google',
+              properties.$referring_domain IS NULL OR properties.$referring_domain = '', 'Direct',
+              'Other'
+            ) as source,
+            count(DISTINCT properties.$session_id) as sessions,
+            countIf(event = 'enquiry_submitted') as enquiries
+          FROM events
+          WHERE timestamp > now() - INTERVAL ${days} DAY
+          GROUP BY source
+          ORDER BY sessions DESC
+        `, signal),
+        hogql(`
+          SELECT coalesce(properties.topic, 'general') as topic, count() as total
+          FROM events
+          WHERE event = 'chat_interaction'
+            AND timestamp > now() - INTERVAL ${days} DAY
+          GROUP BY topic
+          ORDER BY total DESC
+          LIMIT 8
+        `, signal),
+        hogql(`
+          SELECT
+            timestamp,
+            properties.question as question,
+            properties.answer as answer,
+            coalesce(properties.topic, 'general') as topic,
+            coalesce(properties.page, '') as page,
+            coalesce(properties.product_slug, '') as product_slug
+          FROM events
+          WHERE event = 'chat_interaction'
+            AND timestamp > now() - INTERVAL ${days} DAY
+          ORDER BY timestamp DESC
+          LIMIT 10
+        `, signal),
+      ]),
+    );
 
     const productPageViews = productViewsRes.results.map(([path, views]) => {
       const product = products.find((item) => productPath(item) === path);
@@ -436,7 +449,9 @@ async function loadAnalytics(days: number, products: ProductRecord[]) {
     console.error('admin-dashboard analytics error:', error);
     return {
       status: 'error',
-      message: 'Analytics could not be loaded. Product and enquiry data are still available.',
+      message: error instanceof TimeBudgetExceededError
+        ? 'Analytics timed out. Product and enquiry data are still available.'
+        : 'Analytics could not be loaded. Product and enquiry data are still available.',
       productPageViews: [] as { slug: string; path: string; views: number }[],
       funnel: [] as { label: string; count: number; dropOff?: string }[],
       sources: [] as { source: string; sessions: number; enquiries: number; conversionRate: string }[],
@@ -556,6 +571,7 @@ async function aiMarketingInsights(input: {
   traffic: { source: string; sessions: number; enquiries: number; conversionRate: string }[];
   funnel: { label: string; count: number; dropOff?: string }[];
   chatTopics: { topic: string; count: number }[];
+  deadline: Deadline;
 }) {
   if (!openAiClient) return { status: 'unavailable', message: 'OpenAI is not configured for marketing insights.', items: input.ruleInsights };
 
@@ -581,7 +597,7 @@ async function aiMarketingInsights(input: {
   };
 
   try {
-    const response = await openAiClient.responses.create({
+    const response = await withTimeBudget('AI marketing insights', Math.min(INSIGHTS_BUDGET_MS, input.deadline.remainingMs()), (signal) => openAiClient.responses.create({
       model: INSIGHTS_MODEL,
       instructions: `You advise Beyond RV's owner on practical marketing actions.
 
@@ -636,7 +652,8 @@ Rules:
         },
       },
       max_output_tokens: 1000,
-    });
+      // Retries would spend the budget on a request that is already too slow.
+    }, { signal, maxRetries: 0 }));
     let parsed: unknown;
     try {
       parsed = JSON.parse(response.output_text);
@@ -648,11 +665,13 @@ Rules:
     return { status: 'ready', message: '', items };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown OpenAI error';
-    const fallbackReason = /model|unsupported|not found|does not exist|invalid_request_error/i.test(message)
-      ? 'AI insights fell back because the configured marketing model is unavailable.'
-      : /invalid_json|no_valid_insights/i.test(message)
-        ? 'AI insights fell back because the model returned invalid JSON.'
-        : 'AI insights fell back because the OpenAI request failed.';
+    const fallbackReason = error instanceof TimeBudgetExceededError
+      ? 'AI insights fell back because the model did not respond in time.'
+      : /model|unsupported|not found|does not exist|invalid_request_error/i.test(message)
+        ? 'AI insights fell back because the configured marketing model is unavailable.'
+        : /invalid_json|no_valid_insights/i.test(message)
+          ? 'AI insights fell back because the model returned invalid JSON.'
+          : 'AI insights fell back because the OpenAI request failed.';
     console.warn('admin-dashboard: marketing insight generation failed', {
       model: INSIGHTS_MODEL,
       reason: fallbackReason,
@@ -669,6 +688,8 @@ export const handler: Handler = async (event) => {
   if (!hasAdminCapability(actor, 'sales:read')) return forbiddenResponse('sales:read');
   connectBlobStore(event);
 
+  // Started before the blob reads so their time counts against the same budget.
+  const deadline = createDeadline(RESPONSE_BUDGET_MS);
   const range = event.queryStringParameters?.range ?? '30';
   const days = ['7', '30', '90'].includes(range) ? Number(range) : 30;
   const products = catalogue as ProductRecord[];
@@ -685,7 +706,7 @@ export const handler: Handler = async (event) => {
     .sort((a, b) => (b.updatedAt ?? b.createdAt ?? '').localeCompare(a.updatedAt ?? a.createdAt ?? ''));
   const leadStatuses = await getLeadStatuses(enquiries);
   const [analytics, taskSummary] = await Promise.all([
-    loadAnalytics(days, products),
+    loadAnalytics(days, products, deadline),
     loadTaskSummary(),
   ]);
 
@@ -778,6 +799,7 @@ export const handler: Handler = async (event) => {
     traffic: analytics.sources,
     funnel: analytics.funnel,
     chatTopics: analytics.chat.topTopics,
+    deadline,
   });
   const weakListings = products
     .filter((product) => !product.heroImage || (product.galleryCount ?? product.gallery?.length ?? 0) < 3)
