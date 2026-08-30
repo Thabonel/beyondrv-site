@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { validateReviewEntry } from '../netlify/functions/vehicle-review-core.ts';
+import {
+  applyCorrections,
+  mergeReviews,
+  validateCorrectedPair,
+  validateReviewEntry,
+  validateReviewsFile,
+} from '../netlify/functions/vehicle-review-core.ts';
 
 const VALID = { id: 'ford-ranger-2023-xlt', reviewer: 'j.smith', reviewedAt: '2026-08-30' };
 
@@ -59,4 +65,84 @@ test('a missing id is rejected', () => {
 test('a reviewedAt that is not a real date is rejected', () => {
   assert.notDeepEqual(validateReviewEntry({ ...VALID, reviewedAt: '2026-02-30' }, 0).errors, []);
   assert.notDeepEqual(validateReviewEntry({ ...VALID, reviewedAt: '30-08-2026' }, 0).errors, []);
+});
+
+test('a well formed file is accepted', () => {
+  const result = validateReviewsFile({ reviews: [VALID] });
+
+  assert.equal(result.valid, true);
+  assert.equal(result.reviews?.length, 1);
+});
+
+test('every error in a file is collected, not just the first', () => {
+  const result = validateReviewsFile({ reviews: [{ reviewer: 'a', reviewedAt: 'nope' }, { id: 'x' }] });
+
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.length >= 3, `expected several errors, got ${result.errors.length}`);
+});
+
+test('a file that is not an object is rejected without throwing', () => {
+  assert.equal(validateReviewsFile(null).valid, false);
+  assert.equal(validateReviewsFile([]).valid, false);
+  assert.equal(validateReviewsFile({ reviews: 'no' }).valid, false);
+});
+
+test('a duplicated id in one file is rejected', () => {
+  const result = validateReviewsFile({ reviews: [VALID, { ...VALID, reviewedAt: '2026-08-31' }] });
+
+  assert.equal(result.valid, false);
+  assert.match(result.errors.join(' '), /duplicate/i);
+});
+
+// Re-reviewing a vehicle must update it, never add a second entry for it.
+test('merging replaces an entry with the same id rather than duplicating it', () => {
+  const existing = [{ id: 'a', reviewer: 'old', reviewedAt: '2026-08-01' }];
+  const incoming = [{ id: 'a', reviewer: 'new', reviewedAt: '2026-08-30' }, { id: 'b', reviewer: 'new', reviewedAt: '2026-08-30' }];
+
+  const merged = mergeReviews(existing, incoming);
+
+  assert.equal(merged.length, 2);
+  assert.equal(merged.find((entry) => entry.id === 'a')?.reviewer, 'new');
+});
+
+test('merging sorts by id so the committed file has a stable diff', () => {
+  const merged = mergeReviews([], [{ id: 'b', reviewer: 'r', reviewedAt: '2026-08-30' }, { id: 'a', reviewer: 'r', reviewedAt: '2026-08-30' }]);
+
+  assert.deepEqual(merged.map((entry) => entry.id), ['a', 'b']);
+});
+
+test('corrections overwrite the row and name the fields they changed', () => {
+  const row = { gvmKg: 3200, kerbKg: 2200, trayLengthMm: null };
+
+  const result = applyCorrections(row, { id: 'a', reviewer: 'r', reviewedAt: '2026-08-30', corrections: { gvmKg: 3350 } });
+
+  assert.equal(result.row.gvmKg, 3350);
+  assert.equal(result.row.kerbKg, 2200);
+  assert.deepEqual(result.correctedFields, ['gvmKg']);
+});
+
+test('a row with no review entry is returned untouched', () => {
+  const row = { gvmKg: 3200, kerbKg: 2200 };
+
+  const result = applyCorrections(row, undefined);
+
+  assert.deepEqual(result.row, row);
+  assert.deepEqual(result.correctedFields, []);
+});
+
+test('a correction that pushes kerb mass to or above GVM is rejected', () => {
+  const row = { gvmKg: 3350, kerbKg: 2300 };
+
+  assert.notDeepEqual(validateCorrectedPair('ford-a', row, { kerbKg: 3350 }), []);
+  assert.notDeepEqual(validateCorrectedPair('ford-a', row, { kerbKg: 3400 }), []);
+  assert.deepEqual(validateCorrectedPair('ford-a', row, { kerbKg: 3349 }), []);
+});
+
+test('lowering GVM below an uncorrected kerb mass is rejected', () => {
+  assert.notDeepEqual(validateCorrectedPair('ford-a', { gvmKg: 3350, kerbKg: 2300 }, { gvmKg: 2200 }), []);
+});
+
+test('a row with no corrections is judged on its own figures', () => {
+  assert.deepEqual(validateCorrectedPair('ford-a', { gvmKg: 3350, kerbKg: 2300 }, undefined), []);
+  assert.notDeepEqual(validateCorrectedPair('ford-a', { gvmKg: 2300, kerbKg: 3350 }, undefined), []);
 });

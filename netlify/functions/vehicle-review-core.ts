@@ -85,3 +85,75 @@ export function validateReviewEntry(value: unknown, index: number): { errors: st
   if (errors.length) return { errors };
   return { errors: [], entry: corrections ? { id, reviewer, reviewedAt, corrections } : { id, reviewer, reviewedAt } };
 }
+
+export function validateReviewsFile(value: unknown): { valid: boolean; errors: string[]; reviews?: ReviewEntry[] } {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return { valid: false, errors: ['Vehicle reviews must be an object.'] };
+  }
+  const candidate = value as Record<string, unknown>;
+  if (!Array.isArray(candidate.reviews)) {
+    return { valid: false, errors: ['Vehicle reviews must include a reviews array.'] };
+  }
+
+  const errors: string[] = [];
+  const reviews: ReviewEntry[] = [];
+  const seen = new Set<string>();
+
+  for (const [index, item] of candidate.reviews.entries()) {
+    const result = validateReviewEntry(item, index);
+    errors.push(...result.errors);
+    if (!result.entry) continue;
+    if (seen.has(result.entry.id)) {
+      errors.push(`reviews[${index}].id is a duplicate of an earlier entry.`);
+      continue;
+    }
+    seen.add(result.entry.id);
+    reviews.push(result.entry);
+  }
+
+  if (errors.length) return { valid: false, errors };
+  return { valid: true, errors: [], reviews };
+}
+
+/**
+ * Later decisions win. Sorting by id keeps the committed file's diff readable,
+ * so a reviewer can see what one publish actually changed.
+ */
+export function mergeReviews(existing: ReviewEntry[], incoming: ReviewEntry[]): ReviewEntry[] {
+  const byId = new Map(existing.map((entry) => [entry.id, entry]));
+  for (const entry of incoming) byId.set(entry.id, entry);
+  return [...byId.values()].sort((a, b) => a.id.localeCompare(b.id));
+}
+
+export function applyCorrections<T extends Record<string, unknown>>(
+  row: T,
+  entry: ReviewEntry | undefined,
+): { row: T; correctedFields: CorrectableField[] } {
+  if (!entry?.corrections) return { row, correctedFields: [] };
+  const corrected = { ...row } as Record<string, unknown>;
+  const correctedFields: CorrectableField[] = [];
+  for (const [field, value] of Object.entries(entry.corrections)) {
+    corrected[field] = value;
+    correctedFields.push(field as CorrectableField);
+  }
+  correctedFields.sort();
+  return { row: corrected as T, correctedFields };
+}
+
+/**
+ * A correction can touch one mass and not the other, so the pair only makes
+ * sense judged against the row it applies to. A kerb mass at or above GVM would
+ * publish a vehicle with no payload at all.
+ */
+export function validateCorrectedPair(
+  id: string,
+  row: { gvmKg: number; kerbKg: number },
+  corrections: ReviewCorrections | undefined,
+): string[] {
+  const gvmKg = corrections?.gvmKg ?? row.gvmKg;
+  const kerbKg = corrections?.kerbKg ?? row.kerbKg;
+  if (kerbKg >= gvmKg) {
+    return [`${id}: kerb mass ${kerbKg} kg is not below GVM ${gvmKg} kg.`];
+  }
+  return [];
+}
