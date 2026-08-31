@@ -8,6 +8,7 @@ import {
   buildPublishCommitMessage,
   CORRECTABLE_FIELDS,
   draftKey,
+  dropNoOpCorrections,
   mergeReviews,
   validateCorrectedPair,
   validateReviewEntry,
@@ -120,7 +121,10 @@ export const handler: Handler = async (event) => {
         const included = draft ? draft.included : defaultIncluded(row);
         if (!included) continue;
 
-        const corrections = draft?.corrections && Object.keys(draft.corrections).length ? draft.corrections : undefined;
+        // A figure typed back to its published value is not a correction, and
+        // storing it would have the calculator disown a manufacturer figure.
+        const meaningful = dropNoOpCorrections(row as unknown as Record<string, unknown>, draft?.corrections);
+        const corrections = Object.keys(meaningful).length ? meaningful : undefined;
         const result = validateReviewEntry({ id: row.id, reviewer: actor.id, reviewedAt, ...(corrections ? { corrections } : {}) }, incoming.length);
         if (!result.entry) {
           errors.push(...result.errors);
