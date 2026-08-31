@@ -27,6 +27,10 @@ test.describe('shop fulfilment behaviour', () => {
   test('quantity can be increased and decreased, updating the subtotal', async ({ page }) => {
     await page.goto(SHIP_PRODUCT_PAGE);
     await page.locator('[data-add-to-cart]').click();
+    // The button is server-rendered but its listener is attached by a module
+    // script. Navigating before the cart count updates can carry an empty cart
+    // to the next page, which then times out looking for a row that never came.
+    await expect(page.locator('[data-cart-count]')).toHaveText('1');
     await page.goto('/cart/');
 
     await page.locator('[data-cart-inc]').click();

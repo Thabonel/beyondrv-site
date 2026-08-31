@@ -393,6 +393,17 @@ const schema = [
     return 'The manufacturer does not state whether kerb mass includes a tray.';
   }
 
+  const CORRECTED_FIELD_LABELS: Record<string, string> = {
+    gvmKg: 'the GVM',
+    kerbKg: 'the kerb mass',
+    payloadKg: 'the payload',
+    trayLengthMm: 'the tray length',
+    trayWidthMm: 'the tray width',
+  };
+  function correctedFieldLabel(field: string) {
+    return CORRECTED_FIELD_LABELS[field] ?? field;
+  }
+
   function renderProvenance(variant: CatalogueVariant) {
     const panel = byId('vehicleProvenance');
     if (!panel) return;
@@ -415,6 +426,16 @@ const schema = [
       const note = document.createElement('p');
       note.className = 'vehicle-provenance-note';
       note.textContent = 'This variant was published to the selector manually by Beyond RV.';
+      panel.appendChild(note);
+    }
+
+    // A corrected figure did not come from the manufacturer document linked
+    // above, so saying who it did come from is the whole point of recording it.
+    if (variant.correctedFields.length > 0) {
+      const note = document.createElement('p');
+      note.className = 'vehicle-provenance-note';
+      note.dataset.testid = 'vehicle-provenance-corrected';
+      note.textContent = `Beyond RV corrected ${variant.correctedFields.map(correctedFieldLabel).join(', ')}. Those figures are not from the manufacturer document.`;
       panel.appendChild(note);
     }
 

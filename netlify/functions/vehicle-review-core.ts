@@ -125,19 +125,36 @@ export function mergeReviews(existing: ReviewEntry[], incoming: ReviewEntry[]): 
   return [...byId.values()].sort((a, b) => a.id.localeCompare(b.id));
 }
 
+/**
+ * Keeps only the corrections that actually change something.
+ *
+ * A reviewer who types over a figure and puts the original back has corrected
+ * nothing, and recording it would have the provenance panel tell customers a
+ * manufacturer figure is not the manufacturer's.
+ */
+export function dropNoOpCorrections(
+  row: Record<string, unknown>,
+  corrections: ReviewCorrections | undefined,
+): ReviewCorrections {
+  if (!corrections) return {};
+  const kept: ReviewCorrections = {};
+  for (const [field, value] of Object.entries(corrections)) {
+    if (row[field] === value) continue;
+    kept[field as CorrectableField] = value;
+  }
+  return kept;
+}
+
 export function applyCorrections<T extends Record<string, unknown>>(
   row: T,
   entry: ReviewEntry | undefined,
 ): { row: T; correctedFields: CorrectableField[] } {
-  if (!entry?.corrections) return { row, correctedFields: [] };
+  const corrections = dropNoOpCorrections(row, entry?.corrections);
+  const fields = Object.keys(corrections) as CorrectableField[];
+  if (fields.length === 0) return { row, correctedFields: [] };
   const corrected = { ...row } as Record<string, unknown>;
-  const correctedFields: CorrectableField[] = [];
-  for (const [field, value] of Object.entries(entry.corrections)) {
-    corrected[field] = value;
-    correctedFields.push(field as CorrectableField);
-  }
-  correctedFields.sort();
-  return { row: corrected as T, correctedFields };
+  for (const [field, value] of Object.entries(corrections)) corrected[field] = value;
+  return { row: corrected as T, correctedFields: fields.sort() };
 }
 
 /**

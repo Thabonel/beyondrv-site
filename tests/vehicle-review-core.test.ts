@@ -4,6 +4,7 @@ import {
   applyCorrections,
   buildPublishCommitMessage,
   draftKey,
+  dropNoOpCorrections,
   mergeReviews,
   validateCorrectedPair,
   validateReviewEntry,
@@ -164,4 +165,46 @@ test('the commit message names the reviewer, the count and the make', () => {
 
 test('the commit message is singular for one vehicle', () => {
   assert.match(buildPublishCommitMessage('j.smith', 1, 'Ford'), /1 Ford vehicle\b/);
+});
+
+// A reviewer who types over a figure and then puts the original back has not
+// corrected anything. Recording it would tell customers a manufacturer figure
+// is not the manufacturer's.
+test('a correction equal to the published value is not a correction', () => {
+  const row = { gvmKg: 3350, kerbKg: 2300 };
+
+  const result = applyCorrections(row, { id: 'a', reviewer: 'r', reviewedAt: '2026-08-30', corrections: { gvmKg: 3350 } });
+
+  assert.deepEqual(result.correctedFields, []);
+  assert.equal(result.row.gvmKg, 3350);
+});
+
+test('a real change beside a restored value records only the real one', () => {
+  const row = { gvmKg: 3350, kerbKg: 2300 };
+
+  const result = applyCorrections(row, {
+    id: 'a', reviewer: 'r', reviewedAt: '2026-08-30',
+    corrections: { gvmKg: 3350, kerbKg: 2250 },
+  });
+
+  assert.deepEqual(result.correctedFields, ['kerbKg']);
+  assert.equal(result.row.kerbKg, 2250);
+});
+
+test('filling a figure the manufacturer never published is a correction', () => {
+  const row = { gvmKg: 3350, kerbKg: 2300, trayLengthMm: null };
+
+  const result = applyCorrections(row, {
+    id: 'a', reviewer: 'r', reviewedAt: '2026-08-30', corrections: { trayLengthMm: 1500 },
+  });
+
+  assert.deepEqual(result.correctedFields, ['trayLengthMm']);
+});
+
+test('no-op corrections are dropped before they are stored', () => {
+  const row = { gvmKg: 3350, kerbKg: 2300, trayLengthMm: null, trayWidthMm: null };
+
+  assert.deepEqual(dropNoOpCorrections(row, { gvmKg: 3350 }), {});
+  assert.deepEqual(dropNoOpCorrections(row, { gvmKg: 3350, kerbKg: 2250 }), { kerbKg: 2250 });
+  assert.deepEqual(dropNoOpCorrections(row, undefined), {});
 });

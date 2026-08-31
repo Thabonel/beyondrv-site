@@ -5,6 +5,7 @@ import type {
   CatalogueVariant,
   VehicleCatalogue,
 } from './types.ts';
+import { CORRECTABLE_CATALOGUE_FIELDS, type CorrectableCatalogueField } from './types.ts';
 import type { TrayState } from './derive.ts';
 
 const ALLOWED_SOURCE_HOSTS = new Set([
@@ -124,6 +125,23 @@ function parseSource(value: unknown, path: string, errors: string[]): CatalogueS
   return { manufacturer, title, url, accessedDate };
 }
 
+function parseCorrectedFields(value: unknown, path: string, errors: string[]): CorrectableCatalogueField[] {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) {
+    errors.push(`${path}.correctedFields must be an array.`);
+    return [];
+  }
+  const parsed: CorrectableCatalogueField[] = [];
+  for (const [index, name] of value.entries()) {
+    if (typeof name !== 'string' || !(CORRECTABLE_CATALOGUE_FIELDS as readonly string[]).includes(name)) {
+      errors.push(`${path}.correctedFields[${index}] is not a correctable figure.`);
+      continue;
+    }
+    parsed.push(name as CorrectableCatalogueField);
+  }
+  return parsed;
+}
+
 function parsePublication(value: unknown, path: string, errors: string[]): CataloguePublication {
   if (!isRecord(value)) {
     errors.push(`${path} must be an object.`);
@@ -199,6 +217,7 @@ function parseVariant(value: unknown, index: number, errors: string[]): Catalogu
     trayWidthMm: nullableIntegerAt(record, 'trayWidthMm', path, errors, { min: 1, max: 10000 }),
     trayState,
     trayMassKg: nullableIntegerAt(record, 'trayMassKg', path, errors, { min: 0, max: 10000 }),
+    correctedFields: parseCorrectedFields(record.correctedFields, path, errors),
     promotedByOverride,
     publication,
     source: parseSource(record.source, `${path}.source`, errors),

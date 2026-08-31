@@ -11,6 +11,7 @@ const variant: CatalogueVariant = {
   gvmKg: 3100, kerbKg: 1914, kerbBasis: 'Kerb weight with Mazda standard tray fitted',
   payloadKg: 1186, frontGawrKg: 1450, rearGawrKg: 1910,
   trayLengthMm: null, trayWidthMm: null, trayState: 'included', trayMassKg: null,
+  correctedFields: [],
   promotedByOverride: false,
   publication: { approvalId: 'review:7', approvedAt: '2026-08-22T00:00:00.000Z', method: 'review' },
   source: { manufacturer: 'Mazda Australia', title: 'Payload Calculator', url: 'https://www.mazda.com.au/payload-calculator/', accessedDate: '2026-08-18' },
@@ -144,4 +145,40 @@ test('two variants sharing a label is an error, because the picker cannot tell t
 
   assert.equal(result.valid, false);
   assert.ok(result.errors.some((e) => e.includes('Same Label')), result.errors.join(' | '));
+});
+
+// The build records which figures Beyond RV corrected. The validator rebuilds
+// every variant field by field, so a field it does not copy is silently lost,
+// and the page then credits a hand-typed number to the manufacturer.
+test('corrected field names survive validation', () => {
+  const corrected = { ...catalogue, variants: [{ ...variant, correctedFields: ['gvmKg', 'payloadKg'] }] };
+
+  const result = validateVehicleCatalogue(corrected);
+
+  assert.equal(result.valid, true, result.errors.join(' '));
+  if (!result.valid) return;
+  assert.deepEqual(result.catalogue.variants[0].correctedFields, ['gvmKg', 'payloadKg']);
+});
+
+test('a variant with no corrections reports an empty list, never undefined', () => {
+  const result = validateVehicleCatalogue(catalogue);
+
+  assert.equal(result.valid, true);
+  if (!result.valid) return;
+  assert.deepEqual(result.catalogue.variants[0].correctedFields, []);
+});
+
+test('a corrected field name outside the correctable set is an error', () => {
+  const bad = { ...catalogue, variants: [{ ...variant, correctedFields: ['engine'] }] };
+
+  const result = validateVehicleCatalogue(bad);
+
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((e) => e.includes('correctedFields')), result.errors.join(' '));
+});
+
+test('correctedFields that is not an array is an error', () => {
+  const bad = { ...catalogue, variants: [{ ...variant, correctedFields: 'gvmKg' }] };
+
+  assert.equal(validateVehicleCatalogue(bad).valid, false);
 });
