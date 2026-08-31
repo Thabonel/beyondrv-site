@@ -3,6 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { displayImageUrl } from '../../lib/media';
 import { getVehicleCatalogue } from '../../lib/vehicleCatalogue.ts';
 import { serializeJsonForHtml } from '../../lib/safeJson.ts';
+import { getCollection } from 'astro:content';
+import { isPublicProduct } from '../../lib/productVisibility';
 const vehicleCatalogue = getVehicleCatalogue();
 const vehicleCatalogueJson = serializeJsonForHtml(vehicleCatalogue);
 
@@ -25,12 +27,41 @@ const faqs = [
   }
 ];
 
-const products = [
-  { name: 'Advent 2150 Hardtop Ute Slide-On Camper', url: 'https://beyondrv.com.au/advent-2150-hardtop-slide-on/', fit: 'Compact hardtop option for suitable space cab and selected dual cab utes.', dryWeight: 'Manual entry required' },
-  { name: 'Advent 2300 Hardtop Ute Slide-On Camper', url: 'https://beyondrv.com.au/advent-2300-hardtop-slide-on/', fit: 'Mid-size hardtop slide-on for suitable ute tray platforms.', dryWeight: 'Manual entry required' },
-  { name: 'Advent 2450 Hardtop Ute Slide-On Camper', url: 'https://beyondrv.com.au/advent-2450-hardtop-slide-on/', fit: 'Larger hardtop slide-on for vehicles with more tray and payload capacity.', dryWeight: 'Manual entry required' },
-  { name: '7ft Electric Pop-Top Slide-On Camper', url: 'https://beyondrv.com.au/7ft-electric-poptop-slide-on/', fit: 'Lower travel-profile pop-top option for suitable ute platforms.', dryWeight: 'Manual entry required' }
-];
+// Campers are built to order, so the model name is the tray length it is built
+// for. The sizes live on the product entry, not in a second list here.
+const camperEntries = (await getCollection('products'))
+  .filter(isPublicProduct)
+  .filter((entry) => entry.data.category === 'slide-on');
+
+function nominalLengthMm(entry: typeof camperEntries[number]): number | null {
+  const raw = entry.data.suitabilityData?.requiredTrayLengthMm;
+  if (raw === undefined || raw === '') return null;
+  const value = Number(raw);
+  // The schema types this as a string, so an unparseable value would otherwise
+  // read as NaN, and a model with no size would suit every tray.
+  if (!Number.isInteger(value) || value <= 0) {
+    throw new Error(`${entry.id}: suitabilityData.requiredTrayLengthMm must be a positive whole number of millimetres, got ${JSON.stringify(raw)}`);
+  }
+  return value;
+}
+
+const camperModels = camperEntries
+  .map((entry) => ({
+    slug: entry.id,
+    name: entry.data.title,
+    url: `/${entry.id}/`,
+    nominalLengthMm: nominalLengthMm(entry),
+    status: entry.data.suitabilityData?.status ?? 'draft',
+  }))
+  .sort((a, b) => (b.nominalLengthMm ?? -1) - (a.nominalLengthMm ?? -1));
+
+const camperModelsJson = serializeJsonForHtml(camperModels);
+
+const products = camperModels.map((model) => ({
+  name: model.name,
+  url: model.url,
+  dryWeight: 'Manual entry required',
+}));
 
 const schema = [
   {
@@ -94,6 +125,20 @@ const schema = [
         Enter your own vehicle figures to estimate payload, loaded vehicle weight, GVM margin and which Beyond RV slide-on range may be worth discussing.
       </p>
     </div>
+  </section>
+
+  <section class="container camper-finder">
+    <h2 class="camper-finder-title">Which model suits your tray?</h2>
+    <p class="camper-finder-intro">
+      Campers are built to order, so the question is which model your tray length calls for.
+      Enter it and we will name the model.
+    </p>
+    <script type="application/json" id="camperModelData" set:html={camperModelsJson}></script>
+    <div class="form-field">
+      <label class="form-label" for="finderTrayLength">Tray length (mm)</label>
+      <input class="form-input" id="finderTrayLength" type="number" min="0" placeholder="2300" />
+    </div>
+    <div id="camperFinderResult" data-testid="camper-finder-result" hidden></div>
   </section>
 
   <section class="container checker-layout">
@@ -250,7 +295,7 @@ const schema = [
           <tbody>
             {products.map(product => (
               <tr>
-                <td><a href={new URL(product.url).pathname}>{product.name}</a></td>
+                <td><a href={product.url}>{product.name}</a></td>
                 <td>Confirm with Beyond RV</td>
                 <td>{product.dryWeight}, tray size, GVM margin, axle limits and weighbridge result.</td>
               </tr>
@@ -280,6 +325,7 @@ const schema = [
   import { calculateSlideOnSuitability } from '../../lib/vehicleSuitabilityCalculator.js';
   import { isTrayMassRequired, resolveCurrentVehicleWeight } from '../../lib/slideOnVehicleWeight';
   import { emptyVehicleCatalogue, validateVehicleCatalogue } from '../../lib/vehicleCatalogue/validate';
+  import { BUILD_TOLERANCE_MM, modelsForTray, type CamperModel } from '../../lib/camperModels';
   import {
     catalogueMakes,
     catalogueModelsForMake,
@@ -297,6 +343,132 @@ const schema = [
   const value = (id: string) => inputById(id)?.value ?? '';
   const fmt = (value: number) => `${Math.round(value).toLocaleString()} kg`;
   const fmtMm = (value: number) => `${Math.round(value).toLocaleString()} mm`;
+
+
+  // --- which model suits this tray -----------------------------------------
+  const modelDataEl = byId('camperModelData');
+  let camperModels: CamperModel[] = [];
+  try {
+    camperModels = JSON.parse(modelDataEl?.textContent || '[]') as CamperModel[];
+  } catch {
+    console.warn('Camper model data could not be parsed; the model finder will be unavailable.');
+  }
+
+  const finderInput = inputById('finderTrayLength');
+  const finderResult = byId('camperFinderResult');
+
+  function modelLink(model: CamperModel) {
+    const link = document.createElement('a');
+    link.href = model.url;
+    link.textContent = model.name;
+    return link;
+  }
+
+  function renderFinder() {
+    if (!finderResult || !finderInput) return;
+    const trayLength = Number(finderInput.value);
+    if (!Number.isFinite(trayLength) || trayLength <= 0) {
+      finderResult.hidden = true;
+      finderResult.replaceChildren();
+      return;
+    }
+
+    const results = modelsForTray(trayLength, camperModels);
+    const best = results.find((r) => r.verdict === 'best');
+    const also = results.filter((r) => r.verdict === 'also_suits');
+    const tooLong = results.filter((r) => r.verdict === 'too_long');
+    const unknown = results.filter((r) => r.verdict === 'unknown');
+
+    finderResult.replaceChildren();
+    finderResult.hidden = false;
+
+    const headline = document.createElement('p');
+    headline.className = 'camper-finder-headline';
+    if (best) {
+      const strong = document.createElement('strong');
+      strong.appendChild(modelLink(best.model));
+      headline.append(strong, document.createTextNode(` — built for a ${best.model.nominalLengthMm} mm tray.`));
+      const choose = document.createElement('button');
+      choose.type = 'button';
+      choose.className = 'btn-ghost camper-finder-choose';
+      choose.dataset.testid = 'camper-finder-choose';
+      choose.textContent = 'Check this model below';
+      choose.addEventListener('click', () => {
+        const required = inputById('requiredTrayLength');
+        const tray = inputById('trayLength');
+        if (required && best.model.nominalLengthMm) {
+          required.value = String(best.model.nominalLengthMm);
+          required.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (tray && !tray.value) {
+          tray.value = String(trayLength);
+          tray.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        byId('slideCalculator')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      finderResult.append(headline, choose);
+    } else {
+      headline.textContent = 'No standard model is built for a tray this short. Beyond RV builds to order, so talk to us about your vehicle.';
+      finderResult.append(headline);
+    }
+
+    // Two models within the build tolerance of each other are the same size
+    // decision, so say what actually differs.
+    if (best && also.length) {
+      const closeInSize = also.filter((r) =>
+        Math.abs((r.model.nominalLengthMm ?? 0) - (best.model.nominalLengthMm ?? 0)) <= BUILD_TOLERANCE_MM);
+      const line = document.createElement('p');
+      line.className = 'camper-finder-note';
+      line.dataset.testid = 'camper-finder-also';
+      line.append(document.createTextNode('Also suits your tray: '));
+      also.forEach((r, index) => {
+        if (index > 0) line.append(document.createTextNode(', '));
+        line.append(modelLink(r.model));
+      });
+      line.append(document.createTextNode('.'));
+      if (closeInSize.length) {
+        line.append(document.createTextNode(' At this length the difference is the roof, not the size.'));
+      }
+      finderResult.append(line);
+    }
+
+    if (tooLong.length) {
+      const line = document.createElement('p');
+      line.className = 'camper-finder-note';
+      line.dataset.testid = 'camper-finder-too-long';
+      line.append(document.createTextNode('Too long for this tray: '));
+      tooLong.forEach((r, index) => {
+        if (index > 0) line.append(document.createTextNode(', '));
+        line.append(modelLink(r.model));
+      });
+      line.append(document.createTextNode('.'));
+      finderResult.append(line);
+    }
+
+    if (unknown.length) {
+      const line = document.createElement('p');
+      line.className = 'camper-finder-note';
+      line.dataset.testid = 'camper-finder-unknown';
+      line.append(document.createTextNode('Made to order, talk to Beyond RV about: '));
+      unknown.forEach((r, index) => {
+        if (index > 0) line.append(document.createTextNode(', '));
+        line.append(modelLink(r.model));
+      });
+      line.append(document.createTextNode('.'));
+      finderResult.append(line);
+    }
+
+    const indicative = camperModels.some((model) => model.status !== 'confirmed');
+    if (indicative) {
+      const note = document.createElement('p');
+      note.className = 'camper-finder-note';
+      note.dataset.testid = 'camper-finder-indicative';
+      note.textContent = 'Indicative. Campers are built to order, so Beyond RV confirms the final size with you before build.';
+      finderResult.append(note);
+    }
+  }
+
+  finderInput?.addEventListener('input', renderFinder);
 
   const catalogueEl = document.getElementById('vehicleCatalogueData');
   function parseCatalogue(): VehicleCatalogue {

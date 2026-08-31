@@ -143,6 +143,9 @@ youtubeVideo:
   startSeconds: 614
 seoTitle: "Advent 2300 Hardtop Ute Slide-On Camper | Beyond RV"
 seoDesc: "The Advent 2300 hardtop ute slide-on camper gives buyers a longer 2300mm base in the Beyond RV Advent range."
+suitabilityData:
+  status: target
+  requiredTrayLengthMm: "2300"
 ---
 
 The **Advent 2300** is built to order and sits in the middle of the Advent hardtop ute slide-on range, giving buyers a longer base while staying within the ute slide-on category. Once the deposit is paid, production starts in China before the camper is shipped to our Mutdapilly factory for local finishing, certification and handover preparation.

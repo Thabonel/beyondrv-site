@@ -150,7 +150,8 @@ sourceType: other
 leadTimeText: Made to order. Once the deposit is paid, production starts in China. The camper is then shipped to our Mutdapilly factory for local finishing, certification and handover preparation.
 containerEligible: true
 suitabilityData:
-  status: draft
+  status: target
+  requiredTrayLengthMm: "2150"
 ---
 
 The **Advent 2150** is built to order for owners who want a compact hardtop slide-on camper matched to a serious 4x4 ute. Once the deposit is paid, production starts in China before the camper is shipped to our Mutdapilly factory for local finishing, certification and handover preparation.
