@@ -15,14 +15,32 @@ test('a tray length names the model built for it', async ({ page }) => {
   await expect(page.getByTestId('camper-finder-too-long')).toContainText('Advent 2450');
 });
 
-test('two models the same size are presented as a roof choice', async ({ page }) => {
+test('two models the same size are presented as a choice of camper', async ({ page }) => {
   await page.goto(page_path);
   await page.fill('#finderTrayLength', '2150');
 
   await expect(page.getByTestId(result)).toContainText('Advent 2150');
   const also = page.getByTestId('camper-finder-also');
   await expect(also).toContainText('7ft Electric Pop-Top');
-  await expect(also).toContainText('the difference is the roof, not the size');
+  await expect(also).toContainText('the difference is in the camper, not the fit');
+});
+
+// A truck tray reaches the expedition range, where the two 3.5m units are the
+// same size and differ by fitout rather than roof.
+test('a truck tray reaches the expedition campers', async ({ page }) => {
+  await page.goto(page_path);
+  await page.fill('#finderTrayLength', '4700');
+
+  await expect(page.getByTestId(result)).toContainText('4.7m Hardtop Truck Camper');
+  await expect(page.getByTestId('camper-finder-also')).toContainText('3.5m');
+});
+
+test('a ute tray is not offered a truck camper', async ({ page }) => {
+  await page.goto(page_path);
+  await page.fill('#finderTrayLength', '2300');
+
+  await expect(page.getByTestId(result)).toContainText('Advent 2300');
+  await expect(page.getByTestId('camper-finder-too-long')).toContainText('4.7m Hardtop Truck Camper');
 });
 
 // Built to order means a short tray is a conversation, never a refusal.

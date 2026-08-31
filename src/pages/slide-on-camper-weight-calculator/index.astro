@@ -29,9 +29,12 @@ const faqs = [
 
 // Campers are built to order, so the model name is the tray length it is built
 // for. The sizes live on the product entry, not in a second list here.
+// A product belongs in the finder when someone has recorded the tray length it
+// is built for. Complete vehicles never get one, so they never appear, and
+// adding a camper later is a data change rather than a code change.
 const camperEntries = (await getCollection('products'))
   .filter(isPublicProduct)
-  .filter((entry) => entry.data.category === 'slide-on');
+  .filter((entry) => Boolean(entry.data.suitabilityData?.requiredTrayLengthMm));
 
 function nominalLengthMm(entry: typeof camperEntries[number]): number | null {
   const raw = entry.data.suitabilityData?.requiredTrayLengthMm;
@@ -427,7 +430,9 @@ const schema = [
       });
       line.append(document.createTextNode('.'));
       if (closeInSize.length) {
-        line.append(document.createTextNode(' At this length the difference is the roof, not the size.'));
+        // Same size, different camper: roof on the ute models, fitout on the
+        // truck ones. Say what is true of both rather than naming the roof.
+        line.append(document.createTextNode(' These are the same size for your tray, so the difference is in the camper, not the fit.'));
       }
       finderResult.append(line);
     }

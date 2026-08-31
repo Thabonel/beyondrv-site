@@ -45,16 +45,26 @@ as fixed and computed whether they fit. That premise was wrong.
 Nominal length is the model. Width is recorded but does not discriminate: every
 model is 2000 mm to 2050 mm wide and build to order absorbs that range.
 
-| Model | Nominal length | Roof |
+| Model | Nominal length | Range |
 |---|---|---|
-| 7ft Electric Pop-Top | 2120 mm | Electric pop-top |
-| Advent 2150 | 2150 mm | Hardtop |
-| Advent 2300 | 2300 mm | Hardtop |
-| Advent 2450 | 2450 mm | Hardtop |
+| 7ft Electric Pop-Top | 2120 mm | Ute slide-on |
+| Advent 2150 | 2150 mm | Ute slide-on |
+| Advent 2300 | 2300 mm | Ute slide-on |
+| Advent 2450 | 2450 mm | Ute slide-on |
+| 3.5m DIY Camper Box | 3500 mm | Expedition |
+| 3.5m Electric Pop-Top Cabover | 3500 mm | Expedition |
+| 4.7m Hardtop Truck Camper | 4700 mm | Expedition |
 
-The 7ft and the Advent 2150 are 30 mm apart, so at that tray size both suit and
-the real choice is roof type. The interface has to make that readable rather than
-presenting a 30 mm difference as if it mattered.
+A product is in the finder when someone has recorded the tray length it is built
+for. Complete vehicles — the two Unimog overlanders and the Sprinter motorhome —
+have no such figure and never appear. Caravans are towed, so tray length does not
+apply. Adding a camper later is a data change, not a code change.
+
+Models within the tolerance of each other are the same size decision. The 7ft and
+the Advent 2150 are 30 mm apart and differ by roof; the two 3.5 m units are the
+same length and differ by fitout, one being a DIY shell. The interface says the
+difference is in the camper rather than naming a specific attribute, because what
+differs is not the same in both cases.
 
 ### 3.1 On the Advent 2450's disputed width
 
