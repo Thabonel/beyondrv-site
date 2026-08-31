@@ -405,3 +405,36 @@ test('a populated catalogue shows the picker and no notice', async ({ page }) =>
   await expect(page.locator('.vehicle-picker')).toBeVisible();
   await expect(page.getByTestId('vehicle-picker-unavailable')).toBeHidden();
 });
+
+// A figure Beyond RV corrected did not come from the manufacturer document the
+// panel links to. Crediting it to them would be a false statement about a
+// number customers use to decide whether they are over GVM.
+test('a corrected figure is disclosed as Beyond RV\'s, not the manufacturer\'s', async ({ page }) => {
+  const corrected = {
+    ...catalogue,
+    variants: catalogue.variants.map((variant, index) => (
+      index === 0 ? { ...variant, correctedFields: ['gvmKg', 'payloadKg'] } : variant
+    )),
+  };
+  await rewriteCalculatorCatalogue(page, JSON.stringify(corrected));
+  await page.goto(calculatorPath);
+
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
+
+  const note = page.getByTestId('vehicle-provenance-corrected');
+  await expect(note).toBeVisible();
+  await expect(note).toContainText('Beyond RV corrected the GVM, the payload');
+  await expect(note).toContainText('not from the manufacturer document');
+});
+
+test('an uncorrected variant shows no correction note', async ({ page }) => {
+  await openCalculatorWithFixture(page);
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
+
+  await expect(page.locator('#vehicleProvenance')).toBeVisible();
+  await expect(page.getByTestId('vehicle-provenance-corrected')).toHaveCount(0);
+});

@@ -13,6 +13,14 @@ export type CataloguePublication = {
   method: 'review' | 'override';
 };
 
+/**
+ * Figures Beyond RV corrected during review. Anything listed here did not come
+ * from the manufacturer source, so the provenance panel must not credit it to
+ * them. payloadKg appears because it is derived from GVM and kerb mass.
+ */
+export const CORRECTABLE_CATALOGUE_FIELDS = ['gvmKg', 'kerbKg', 'payloadKg', 'trayLengthMm', 'trayWidthMm'] as const;
+export type CorrectableCatalogueField = typeof CORRECTABLE_CATALOGUE_FIELDS[number];
+
 export type CatalogueVariant = {
   id: string;
   make: string;
@@ -36,6 +44,7 @@ export type CatalogueVariant = {
   trayWidthMm: number | null;
   trayState: TrayState;
   trayMassKg: number | null;
+  correctedFields: CorrectableCatalogueField[];
   promotedByOverride: boolean;
   publication: CataloguePublication;
   source: CatalogueSource;
