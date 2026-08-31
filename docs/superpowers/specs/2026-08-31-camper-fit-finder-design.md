@@ -1,212 +1,172 @@
-# Camper fit finder
+# Tray size to camper model
 
-**Status:** Approved design, ready for planning
+**Status:** Approved design, ready for implementation
 **Date:** 31 August 2026
 **Phase:** 4 of the vehicle selector work
-**Depends on:** `suitabilityData` in `src/content.config.ts`, and the existing fit arithmetic in `src/lib/vehicleSuitabilityCalculator.js`
 **Related:** [Vehicle review screen](2026-08-30-vehicle-review-screen-design.md)
 
 ## 1. Goal
 
-Let someone with a ute tray find out which Beyond RV campers fit it, before they
-know which camper they want.
+Tell someone with a ute tray which camper model suits it.
 
-The weight calculator answers "does this camper fit my ute" for a camper the
-customer has already chosen and whose weights they type in themselves. The
-question buyers actually arrive with is the other way round: *I have this tray,
-what fits it?*
+**Campers are built to order.** A camper does not have to be squeezed onto a
+tray, because it is built for that tray. So "will this camper fit?" is not the
+question — it will fit when it is delivered.
 
-Weight is not the discriminator. Every slide-on is between 700 kg and 1 tonne,
-and the loaded-weight check already covers that. **Tray size is what decides it.**
+What tray size does decide is **which model**. The model names are the sizes: an
+Advent 2150 is a 2150 mm camper. You cannot build a 2450 onto a 2100 mm tray,
+because that is a 2150. Build to order absorbs a small difference, not a model
+change.
 
-The site is a starting point. The real answer comes from a conversation between
-the customer and Beyond RV, and the interface must read that way.
+So the tool answers: *my tray is this long, which model am I looking at?*
 
-**Non-goals.** No change to the weight arithmetic or the red/amber/green ladder.
-No change to how enquiries are recorded. The finder does not replace the detailed
-check; it feeds it.
+**Non-goals.** No fit verdict, no pass or fail. No change to the weight
+calculator's arithmetic or its red/amber/green ladder. Nothing about weight:
+every slide-on is 700 kg to 1 tonne, and the loaded-weight check already covers
+that.
+
+**This supersedes an earlier draft of this spec** that treated camper footprints
+as fixed and computed whether they fit. That premise was wrong.
 
 ## 2. Decisions taken
 
 | Decision | Choice |
 |---|---|
-| Where it lives | A short step above the existing calculator |
-| What the customer supplies | Tray length and width, typed |
-| Verdict bands | Fits, close, too small |
-| Near-miss width | Short by 50 mm or less on both dimensions reads as "close" |
-| Campers with no dimensions | Listed without a verdict, as "ask us" |
-| Confidence gate | A camper appears at `target` status, worded as indicative |
-| Data source | The products content collection, not a hardcoded list |
+| The question answered | Which model suits this tray, not whether a camper fits |
+| Where it lives | A short step above the existing weight calculator |
+| What the customer supplies | Tray length in mm, typed |
+| What decides the model | The model's nominal length, which is its name |
+| Build-to-order tolerance | 50 mm, named constant |
+| Result | The largest model the tray suits, plus the smaller ones that also suit |
+| Confidence | Indicative. Beyond RV confirms before purchase |
 
-## 3. The data, and one thing that blocks it
+## 3. The models
 
-### 3.1 What exists
+Nominal length is the model. Width is recorded but does not discriminate: every
+model is 2000 mm to 2050 mm wide and build to order absorbs that range.
 
-`src/content.config.ts:30` already defines `suitabilityData`, with a
-`draft | target | confirmed` status and the two fields this needs:
-
-```ts
-requiredTrayLengthMm: z.string().optional(),
-requiredTrayWidthMm: z.string().optional(),
-```
-
-Every camper currently sits at `{ status: 'draft' }` with both fields empty.
-
-The dimensions exist as display prose in `keySpecs` under a `Base` label, and
-again in the body text of each product page.
-
-### 3.2 What to fill in
-
-| Camper | Base | Source |
+| Model | Nominal length | Roof |
 |---|---|---|
-| 7ft Electric Pop-Top | 2120 × 2020 | Body text, consistent |
-| Advent 2150 | 2150 × 2000 | keySpecs and body agree |
-| Advent 2300 | 2300 × 2000 | Body text, consistent |
-| Advent 2450 | **disputed** | See below |
+| 7ft Electric Pop-Top | 2120 mm | Electric pop-top |
+| Advent 2150 | 2150 mm | Hardtop |
+| Advent 2300 | 2300 mm | Hardtop |
+| Advent 2450 | 2450 mm | Hardtop |
 
-Transcribed at `status: target`. The owner has confirmed that for these campers
-the base dimensions **are** the tray dimensions required.
+The 7ft and the Advent 2150 are 30 mm apart, so at that tray size both suit and
+the real choice is roof type. The interface has to make that readable rather than
+presenting a 30 mm difference as if it mattered.
 
-### 3.3 Blocker: the Advent 2450 states two widths
+### 3.1 On the Advent 2450's disputed width
 
-`src/content/products/advent-2450-hardtop-slide-on.md` contains both:
-
-- `keySpecs` Base: `2450mm x 2000mm`
-- body text: `2450mm x 2000mm` **and** `2450mm x 2050mm`
-
-Two different widths for the same camper in the same file, 50 mm apart, which is
-exactly the near-miss band. A fit verdict built on the wrong one would tell a
-customer with a 2020 mm tray that the camper fits when it does not.
-
-**The 2450 must not be published to the finder until someone states which width
-is correct.** Until then it stays at `draft` and appears in the "ask us" group,
-which the design already handles. No code change is needed to hold it back.
+Its file states 2000 mm in `keySpecs` and 2050 mm in the body. Under this design
+that no longer blocks anything, because width does not select the model. Worth
+correcting in the content, but it is not on this feature's path.
 
 ## 4. Architecture
 
-Four pieces, two of them new.
-
 | Piece | Role |
 |---|---|
-| `src/lib/camperFit.ts` | New. Bucketing logic, no I/O, unit tested |
-| `src/components/CamperFitFinder` markup in the page | New. Two inputs and a grouped shortlist |
-| `src/content/products/*.md` | Extended. `suitabilityData` filled for three campers |
-| `src/pages/slide-on-camper-weight-calculator/index.astro` | Extended. Queries the collection instead of hardcoding four campers |
+| `src/lib/camperModels.ts` | New. Model selection, no I/O, unit tested |
+| `src/content/products/*.md` | Extended. `suitabilityData.requiredTrayLengthMm` filled |
+| `src/pages/slide-on-camper-weight-calculator/index.astro` | Extended. Queries the collection, renders the step |
 
-### 4.1 Why query the collection
+`suitabilityData` already exists in `src/content.config.ts:30` with a
+`draft | target | confirmed` status. `requiredTrayLengthMm` now means *the tray
+length this model is built for*. Filled at `target`, transcribed from the
+published model sizes.
 
-The page currently hardcodes its camper list, with absolute URLs and
-`dryWeight: 'Manual entry required'` for every entry.
+The page currently hardcodes its four campers. It queries the collection instead,
+filtered to `category === 'slide-on'` and not archived, so the model list and the
+sizes come from one place.
 
-That list is **not** currently stale: the fifth slide-on file is
-`category: expedition` and `archived: true`, so a correct filter returns the same
-four. The reason to query is narrower than "the list has drifted" — it is that
-`suitabilityData` lives on the collection entry, and copying dimensions into a
-second hardcoded list would create the drift that does not exist yet.
-
-Filter: `category === 'slide-on'` and not `archived`.
-
-## 5. Matching
+## 5. Selection
 
 ```ts
-export type FitBucket = 'fits' | 'close' | 'too_small' | 'unknown';
+export const BUILD_TOLERANCE_MM = 50;
 
-export function camperFit(
+export type ModelVerdict = 'best' | 'also_suits' | 'too_long' | 'unknown';
+
+export function modelsForTray(
   trayLengthMm: number,
-  trayWidthMm: number,
-  campers: FinderCamper[],
-): Array<{ camper: FinderCamper; bucket: FitBucket; shortfallMm: number }>;
+  models: CamperModel[],
+): Array<{ model: CamperModel; verdict: ModelVerdict }>;
 ```
 
-Rules, applied per camper:
+Rules:
 
-1. No `requiredTrayLengthMm` or no `requiredTrayWidthMm`, or a status of `draft` → `unknown`.
-2. Tray meets or exceeds both required dimensions → `fits`.
-3. Short by 50 mm or less on **both** dimensions → `close`. Equivalently, the
-   larger of the two shortfalls is 50 mm or less. A camper 10 mm short on width
-   and 200 mm short on length is `too_small`, not `close`.
-4. Otherwise → `too_small`.
+1. A model with no nominal length, or at `draft` status, is `unknown`.
+2. A model suits when `nominalLengthMm <= trayLengthMm + BUILD_TOLERANCE_MM`.
+   The tolerance is what build to order absorbs.
+3. The largest suiting model is `best`. The rest that suit are `also_suits`.
+4. Anything that does not suit is `too_long`.
+5. A tray length that is missing, zero, or negative makes every model `unknown`.
 
-`shortfallMm` is the larger of the two shortfalls, zero when it fits. It is what
-the interface shows, so "50 mm short on width" is stated rather than implied.
-
-`NEAR_MISS_MM = 50` is a named constant. Changing the tolerance is one line.
-
-A tray dimension that is missing, zero, or negative yields `unknown` for every
-camper rather than a confident list built on nothing.
+Ordering within the result is by nominal length, longest first, so `best` leads.
 
 ## 6. Interface
 
-Above the existing form:
+Above the existing form: one field, **Tray length (mm)**, and a result.
 
-- **Tray length (mm)** and **Tray width (mm)**, two number inputs
-- A shortlist, grouped and ordered: *Fits*, *Close*, *Too small*, *Ask us*
-- Each row: camper name linking to its product page, and the margin — "180 mm
-  clear" or "50 mm short on width"
-- Each row has a **Check this camper** action, which fills
-  `requiredTrayLength` and `requiredTrayWidth` in the detailed form below and
-  scrolls to it
+The result names the model and says why:
 
-The shortlist appears only once both dimensions are entered. Nothing is shown
-before that, because an empty verdict list reads as "nothing fits".
+> **Advent 2300** — built for a 2300 mm tray, which matches yours.
+> Also suits your tray: Advent 2150, 7ft Electric Pop-Top.
+> Too long for this tray: Advent 2450.
 
-The two finder inputs do not replace `trayLength` and `trayWidth` in the
-detailed form; choosing a camper carries the values down so nobody types them
-twice.
+Each model links to its product page. Choosing one fills `requiredTrayLength` in
+the detailed calculator below, so the finder feeds the existing check.
 
-### 6.1 What it says about confidence
+Where two models are within the tolerance of each other, they are presented as a
+choice of roof rather than a difference in size:
 
-While a camper is at `target`:
+> At this tray length the 7ft Electric Pop-Top and the Advent 2150 both suit.
+> The difference is the roof, not the size.
 
-> Indicative figures. Beyond RV confirms fit for your vehicle before purchase.
+Nothing renders until a tray length is entered. An empty result would read as
+"nothing suits you".
 
-At `confirmed`, that line drops. The `unknown` group says:
+Standing line under the result, while models are at `target`:
 
-> Made to order. Talk to Beyond RV about fitting this to your tray.
-
-The existing final warning and estimate disclaimer on the page are unchanged and
-still apply.
+> Indicative. Campers are built to order, so Beyond RV confirms the final size
+> with you before build.
 
 ## 7. Failure behaviour
 
 | Failure | Behaviour |
 |---|---|
-| No camper has dimensions | The finder renders, and every camper falls into "ask us". No empty state that implies nothing fits |
-| A dimension in frontmatter is not a number | The build fails. `suitabilityData` types these as `z.string()`, so the schema accepts `"abc"` and the page's build-time parse must throw rather than coerce it to zero. A camper silently treated as needing a 0 mm tray would fit everything |
-| Customer enters a tray smaller than every camper | All campers group under "too small", with the smallest shortfall first, and the "ask us" group still shows |
-| JavaScript unavailable | The finder inputs are inert; the detailed calculator behaves exactly as it does today |
+| No model has a nominal length | Every model is `unknown` and the step says to talk to Beyond RV. No empty result |
+| A length in frontmatter is not a number | The build fails. `suitabilityData` types it as `z.string()`, so the schema accepts `"abc"` and the page's build-time parse must throw rather than coerce to zero. A model read as 0 mm would suit every tray |
+| Tray shorter than every model | Every model is `too_long`, and the step says Beyond RV builds to order and to get in touch. This is a conversation, not a dead end |
+| JavaScript unavailable | The field is inert and the detailed calculator behaves exactly as today |
 
-The finder must never claim a fit it cannot support. When in doubt the answer is
-"ask us", not a verdict.
+The step never says a camper will not fit, because that is not true of a
+build-to-order product. The strongest negative it gives is "too long for this
+tray", pointing at a smaller model.
 
 ## 8. Testing
 
-`src/lib/camperFit.ts` is pure and unit tested under `node --test`:
+`src/lib/camperModels.ts`, unit tested under `node --test`:
 
-- a tray larger than required on both dimensions fits
-- a tray exactly equal on both dimensions fits, at the boundary
-- 50 mm short is `close`, 51 mm short is `too_small`, at both boundaries
-- short on width only, and short on length only, are both `close`
-- 10 mm short on one dimension and 200 mm short on the other is `too_small`
-- a non-numeric dimension throws rather than being read as zero
-- a camper at `draft` status is `unknown` even when it has dimensions
-- a camper missing either dimension is `unknown`
-- a zero or negative tray dimension makes every camper `unknown`
-- `shortfallMm` reports the larger of the two shortfalls
+- a tray longer than every model makes the longest model `best`
+- a tray exactly equal to a model's nominal length makes that model `best`
+- a tray 50 mm shorter than a model still suits it, at the boundary
+- a tray 51 mm shorter does not, at the boundary
+- smaller models that suit are `also_suits`, ordered longest first
+- a tray shorter than every model makes all of them `too_long`
+- a model at `draft` is `unknown` even with a nominal length
+- a zero or negative tray length makes every model `unknown`
+- a non-numeric nominal length throws rather than being read as zero
 
-End to end, extending `tests/e2e/vehicle-selector.spec.ts` or a sibling spec:
+End to end:
 
-- entering a tray shows campers grouped into the expected buckets
-- choosing a camper fills the required tray fields in the detailed form
-- a camper without dimensions appears under "ask us" with no verdict
-- the indicative wording is present for a `target` camper and absent for a
-  `confirmed` one
+- entering a tray length names a model and lists the alternatives
+- choosing a model fills the required tray length in the detailed form
+- the two models within tolerance are presented as a roof choice
 
 ## 9. Out of scope
 
-- Prefilling tray dimensions from the vehicle picker. It stays hidden until the
-  Ford reviews land, and the finder is designed so that prefill is a later
-  addition rather than a redesign
-- Tray size collection from owners, which is pull request #34
-- Any camper weight comparison. The loaded-weight check already covers it
-- Resolving the Advent 2450 width, which is a question for the owner
+- Prefilling tray length from the vehicle picker, which stays hidden until the
+  Ford reviews land. The step is designed so prefill is an addition, not a redesign
+- Tray size collection from owners, pull request #34
+- Camper width. It does not select the model
+- Correcting the Advent 2450's stated width, which is a content fix
