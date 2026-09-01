@@ -158,6 +158,9 @@ youtubeVideo:
   startSeconds: 145
 seoTitle: "3.5m Electric Pop-Top Cabover Family Camper | Beyond RV"
 seoDesc: "Beyond RV 3.5m electric pop-top cabover family truck camper with electric drop-down bed for dual cab Isuzu NPS platforms."
+suitabilityData:
+  status: target
+  requiredTrayLengthMm: "3500"
 ---
 
 The **3.5m Electric Pop-Top Cabover Family Camper** is built for families who want a compact expedition camper body on a dual cab Isuzu NPS. It can be configured as a slide-on or a permanently mounted camper.

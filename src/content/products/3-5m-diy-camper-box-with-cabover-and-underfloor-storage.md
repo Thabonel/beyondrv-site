@@ -56,6 +56,9 @@ relatedSlugs:
   - "expedition/3-5m-electric-poptop-cabover-family-camper"
 seoTitle: "3.5m DIY Camper Box with Cabover and Underfloor Storage | Beyond RV"
 seoDesc: "Beyond RV 3.5m DIY hardtop camper box with cabover and underfloor storage, sold as-is from $38,999."
+suitabilityData:
+  status: target
+  requiredTrayLengthMm: "3500"
 ---
 
 The **3.5m DIY Camper Box with Cabover and Underfloor Storage** is a waterproofed composite shell for buyers who want to complete their own truck camper fitout. It is sold as-is: what you see is what you get.

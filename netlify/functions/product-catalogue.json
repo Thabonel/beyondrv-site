@@ -38,6 +38,10 @@
       "expedition/4-7m-hardtop-truck-camper",
       "expedition/3-5m-electric-poptop-cabover-family-camper"
     ],
+    "suitabilityData": {
+      "status": "target",
+      "requiredTrayLengthMm": "3500"
+    },
     "keySpecs": [
       {
         "label": "Base",
@@ -443,6 +447,10 @@
       "description": "Video walkthrough for the Beyond RV 3.5m Isuzu NPS pop-top camper with electric drop-down bed.",
       "startSeconds": 145
     },
+    "suitabilityData": {
+      "status": "target",
+      "requiredTrayLengthMm": "3500"
+    },
     "keySpecs": [
       {
         "label": "Base",
@@ -503,7 +511,8 @@
       "startSeconds": 9
     },
     "suitabilityData": {
-      "status": "draft"
+      "status": "target",
+      "requiredTrayLengthMm": "4700"
     },
     "keySpecs": [
       {
