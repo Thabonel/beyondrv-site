@@ -11,7 +11,7 @@ const variant: CatalogueVariant = {
   gvmKg: 3100, kerbKg: 1914, kerbBasis: 'Kerb weight with Mazda standard tray fitted',
   payloadKg: 1186, frontGawrKg: 1450, rearGawrKg: 1910,
   trayLengthMm: null, trayWidthMm: null, trayState: 'included', trayMassKg: null,
-  correctedFields: [],
+  platform: 'ute' as const, maxBodyLengthMm: null, correctedFields: [],
   promotedByOverride: false,
   publication: { approvalId: 'review:7', approvedAt: '2026-08-22T00:00:00.000Z', method: 'review' },
   source: { manufacturer: 'Mazda Australia', title: 'Payload Calculator', url: 'https://www.mazda.com.au/payload-calculator/', accessedDate: '2026-08-18' },
@@ -181,4 +181,45 @@ test('correctedFields that is not an array is an error', () => {
   const bad = { ...catalogue, variants: [{ ...variant, correctedFields: 'gvmKg' }] };
 
   assert.equal(validateVehicleCatalogue(bad).valid, false);
+});
+
+// Trucks join the same catalogue as utes. Existing entries predate the field,
+// so a variant without one has to keep working.
+test('platform defaults to ute when a variant does not state one', () => {
+  const result = validateVehicleCatalogue(catalogue);
+
+  assert.equal(result.valid, true);
+  if (!result.valid) return;
+  assert.equal(result.catalogue.variants[0].platform, 'ute');
+});
+
+test('a truck variant keeps its platform and max body length', () => {
+  const truck = {
+    ...catalogue,
+    variants: [{ ...variant, platform: 'truck', maxBodyLengthMm: 4865 }],
+  };
+
+  const result = validateVehicleCatalogue(truck);
+
+  assert.equal(result.valid, true, result.errors.join(' '));
+  if (!result.valid) return;
+  assert.equal(result.catalogue.variants[0].platform, 'truck');
+  assert.equal(result.catalogue.variants[0].maxBodyLengthMm, 4865);
+});
+
+test('a variant with no max body length reports null, not undefined', () => {
+  const result = validateVehicleCatalogue(catalogue);
+
+  assert.equal(result.valid, true);
+  if (!result.valid) return;
+  assert.equal(result.catalogue.variants[0].maxBodyLengthMm, null);
+});
+
+test('an unknown platform is an error rather than a silent ute', () => {
+  const bad = { ...catalogue, variants: [{ ...variant, platform: 'spaceship' }] };
+
+  const result = validateVehicleCatalogue(bad);
+
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((e) => e.includes('platform')), result.errors.join(' '));
 });

@@ -438,3 +438,49 @@ test('an uncorrected variant shows no correction note', async ({ page }) => {
   await expect(page.locator('#vehicleProvenance')).toBeVisible();
   await expect(page.getByTestId('vehicle-provenance-corrected')).toHaveCount(0);
 });
+
+// A truck's maximum body length is what the chassis is rated for, not the tray
+// someone fitted. Prefilling it, or letting it read as a tray length, would
+// point a customer at a longer camper than their vehicle carries.
+test('a truck states its maximum body length without filling the tray fields', async ({ page }) => {
+  const withTruck = {
+    ...catalogue,
+    sourceDatabaseRowCount: catalogue.sourceDatabaseRowCount + 1,
+    models: [...catalogue.models, { make: 'Hino', model: '300 Series 817 4x4', modelYears: [2022] }],
+    variants: [...catalogue.variants, {
+      ...catalogue.variants[0],
+      id: 'hino-817-single', make: 'Hino', model: '300 Series 817 4x4', modelYear: 2022,
+      grade: '817 4x4', cabType: 'single', bodyType: 'cab_chassis',
+      label: 'Hino 300 Series 817 4x4 single cab', platform: 'truck',
+      gvmKg: 7500, kerbKg: 3160, payloadKg: 4340,
+      trayLengthMm: null, trayWidthMm: null, trayState: 'excluded',
+      maxBodyLengthMm: 4865,
+    }],
+  };
+  await rewriteCalculatorCatalogue(page, JSON.stringify(withTruck));
+  await page.goto(calculatorPath);
+
+  await page.selectOption('#vehicleMake', 'Hino');
+  await page.selectOption('#vehicleModel', '300 Series 817 4x4');
+  await page.selectOption('#vehicleVariant', 'hino-817-single');
+
+  const note = page.getByTestId('vehicle-max-body-length');
+  await expect(note).toContainText('4865 mm');
+  await expect(note).toContainText('not the tray fitted to your vehicle');
+
+  // The chassis mass fills, the tray does not.
+  await expect(page.locator('#gvm')).toHaveValue('7500');
+  await expect(page.locator('#currentWeight')).toHaveValue('3160');
+  await expect(page.locator('#trayLength')).toHaveValue('');
+  // A cab chassis carries no body, so the tray weight must be asked for.
+  await expect(page.locator('#trayMassField')).toBeVisible();
+});
+
+test('a ute shows no maximum body length note', async ({ page }) => {
+  await openCalculatorWithFixture(page);
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
+
+  await expect(page.getByTestId('vehicle-max-body-length')).toHaveCount(0);
+});

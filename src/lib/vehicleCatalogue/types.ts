@@ -21,6 +21,9 @@ export type CataloguePublication = {
 export const CORRECTABLE_CATALOGUE_FIELDS = ['gvmKg', 'kerbKg', 'payloadKg', 'trayLengthMm', 'trayWidthMm'] as const;
 export type CorrectableCatalogueField = typeof CORRECTABLE_CATALOGUE_FIELDS[number];
 
+export const CATALOGUE_PLATFORMS = ['ute', 'truck'] as const;
+export type CataloguePlatform = typeof CATALOGUE_PLATFORMS[number];
+
 export type CatalogueVariant = {
   id: string;
   make: string;
@@ -44,6 +47,9 @@ export type CatalogueVariant = {
   trayWidthMm: number | null;
   trayState: TrayState;
   trayMassKg: number | null;
+  platform: CataloguePlatform;
+  /** The longest body this chassis takes. Never the tray someone fitted. */
+  maxBodyLengthMm: number | null;
   correctedFields: CorrectableCatalogueField[];
   promotedByOverride: boolean;
   publication: CataloguePublication;
