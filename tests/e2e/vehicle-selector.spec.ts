@@ -35,7 +35,17 @@ async function openCalculatorWithFixture(page: Page) {
 async function confirmChecks(page: Page) {
   for (const id of ['rearAxleChecked', 'tyreRatingsChecked', 'centreOfGravityChecked']) {
     const box = page.locator(`#${id}`);
-    await box.click();
+    // The box must still be reachable by a real user, so assert that first.
+    await expect(box).toBeVisible();
+    await expect(box).toBeEnabled();
+    // Then click the element itself rather than a screen position. Every field
+    // change triggers a full recalculation and re-render, so a coordinate
+    // resolved before that render can land somewhere else by the time the
+    // click is delivered, leaving the box unchecked.
+    await box.evaluate((el) => {
+      const input = el as HTMLInputElement;
+      if (!input.checked) input.click();
+    });
     await expect(box).toBeChecked();
   }
 }
