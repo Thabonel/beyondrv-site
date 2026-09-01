@@ -48,6 +48,12 @@ export type CatalogueVariant = {
   trayState: TrayState;
   trayMassKg: number | null;
   platform: CataloguePlatform;
+  /**
+   * The stored kerb mass is the manufacturer's lightest-equipment figure, which
+   * yields the largest payload. Disclosed to the customer, because the error
+   * runs toward more headroom than the vehicle actually has.
+   */
+  kerbIsOptimistic: boolean;
   /** The longest body this chassis takes. Never the tray someone fitted. */
   maxBodyLengthMm: number | null;
   correctedFields: CorrectableCatalogueField[];

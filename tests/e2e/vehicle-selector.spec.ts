@@ -484,3 +484,33 @@ test('a ute shows no maximum body length note', async ({ page }) => {
 
   await expect(page.getByTestId('vehicle-max-body-length')).toHaveCount(0);
 });
+
+// A lightest-equipment kerb mass yields the largest payload, so the number
+// shown is the best case. The customer has to be told, because the error runs
+// toward more headroom than the vehicle has.
+test('an optimistic kerb mass is disclosed to the customer', async ({ page }) => {
+  const flagged = {
+    ...catalogue,
+    variants: catalogue.variants.map((v, i) => (i === 0 ? { ...v, kerbIsOptimistic: true } : v)),
+  };
+  await rewriteCalculatorCatalogue(page, JSON.stringify(flagged));
+  await page.goto(calculatorPath);
+
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
+
+  const note = page.getByTestId('vehicle-optimistic-kerb');
+  await expect(note).toContainText('lightest-equipment figure');
+  await expect(note).toContainText('best case');
+  await expect(note).toContainText('weighs your vehicle at the factory');
+});
+
+test('a variant with an ordinary kerb mass shows no such note', async ({ page }) => {
+  await openCalculatorWithFixture(page);
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
+
+  await expect(page.getByTestId('vehicle-optimistic-kerb')).toHaveCount(0);
+});
