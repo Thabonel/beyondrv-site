@@ -13,6 +13,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "GMSV",
@@ -33,6 +34,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "GMSV",
@@ -53,6 +55,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "GMSV",
@@ -73,6 +76,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "GMSV",
@@ -93,6 +97,7 @@
       "trayLengthMm": 1700,
       "trayWidthMm": 1650,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -113,6 +118,7 @@
       "trayLengthMm": 2000,
       "trayWidthMm": 1650,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -133,6 +139,7 @@
       "trayLengthMm": 1700,
       "trayWidthMm": 1650,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -153,6 +160,7 @@
       "trayLengthMm": 2000,
       "trayWidthMm": 1650,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -173,6 +181,7 @@
       "trayLengthMm": 1700,
       "trayWidthMm": 1650,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -193,6 +202,7 @@
       "trayLengthMm": 2000,
       "trayWidthMm": 1650,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -213,6 +223,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -233,6 +244,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -253,6 +265,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -273,6 +286,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -293,6 +307,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -313,6 +328,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -333,6 +349,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -353,6 +370,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -373,6 +391,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -393,6 +412,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -413,6 +433,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -433,6 +454,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -453,6 +475,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -473,6 +496,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -493,6 +517,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -513,6 +538,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -533,6 +559,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -553,6 +580,7 @@
       "trayLengthMm": 1547,
       "trayWidthMm": 1584,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -573,6 +601,7 @@
       "trayLengthMm": 1547,
       "trayWidthMm": 1584,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -593,6 +622,7 @@
       "trayLengthMm": 1464,
       "trayWidthMm": 1520,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -613,6 +643,7 @@
       "trayLengthMm": 1541,
       "trayWidthMm": 1578,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -633,6 +664,7 @@
       "trayLengthMm": 1464,
       "trayWidthMm": 1520,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -653,6 +685,7 @@
       "trayLengthMm": 1464,
       "trayWidthMm": 1520,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -673,6 +706,7 @@
       "trayLengthMm": 1464,
       "trayWidthMm": 1520,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -693,6 +727,7 @@
       "trayLengthMm": 1547,
       "trayWidthMm": 1584,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -713,6 +748,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -733,6 +769,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -753,6 +790,7 @@
       "trayLengthMm": 1547,
       "trayWidthMm": 1584,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -773,6 +811,7 @@
       "trayLengthMm": 1547,
       "trayWidthMm": 1584,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -793,6 +832,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -813,6 +853,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -833,6 +874,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -853,6 +895,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -873,6 +916,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -893,6 +937,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -913,6 +958,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -933,6 +979,7 @@
       "trayLengthMm": 1464,
       "trayWidthMm": 1520,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -953,6 +1000,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -973,6 +1021,7 @@
       "trayLengthMm": 1464,
       "trayWidthMm": 1520,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -993,6 +1042,7 @@
       "trayLengthMm": 1839,
       "trayWidthMm": 1578,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -1013,6 +1063,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Ford Australia",
@@ -1033,6 +1084,7 @@
       "trayLengthMm": 1520,
       "trayWidthMm": 1520,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "GWM Australia",
@@ -1053,6 +1105,7 @@
       "trayLengthMm": 1730,
       "trayWidthMm": 1895,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "GWM Australia",
@@ -1073,6 +1126,7 @@
       "trayLengthMm": 1520,
       "trayWidthMm": 1520,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "GWM Australia",
@@ -1093,6 +1147,7 @@
       "trayLengthMm": 2630,
       "trayWidthMm": 1895,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "GWM Australia",
@@ -1113,6 +1168,7 @@
       "trayLengthMm": 1520,
       "trayWidthMm": 1520,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "GWM Australia",
@@ -1133,6 +1189,7 @@
       "trayLengthMm": 1520,
       "trayWidthMm": 1520,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "GWM Australia",
@@ -1153,6 +1210,7 @@
       "trayLengthMm": 1520,
       "trayWidthMm": 1520,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "GWM Australia",
@@ -1173,6 +1231,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "GWM Australia",
@@ -1193,6 +1252,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "GWM Australia",
@@ -1213,6 +1273,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "GWM Australia",
@@ -1233,6 +1294,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "GWM Australia",
@@ -1253,6 +1315,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "GWM Australia",
@@ -1273,6 +1336,7 @@
       "trayLengthMm": 1800,
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
@@ -1293,6 +1357,7 @@
       "trayLengthMm": 1800,
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
@@ -1313,6 +1378,7 @@
       "trayLengthMm": 1800,
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
@@ -1333,6 +1399,7 @@
       "trayLengthMm": 1800,
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
@@ -1353,6 +1420,7 @@
       "trayLengthMm": 1800,
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
@@ -1373,6 +1441,7 @@
       "trayLengthMm": 2550,
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
@@ -1393,6 +1462,7 @@
       "trayLengthMm": 2550,
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
@@ -1413,6 +1483,7 @@
       "trayLengthMm": 2550,
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
@@ -1433,6 +1504,7 @@
       "trayLengthMm": 2100,
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
@@ -1453,6 +1525,7 @@
       "trayLengthMm": 2100,
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
@@ -1473,6 +1546,7 @@
       "trayLengthMm": 1300,
       "trayWidthMm": 1570,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "KGM Australia",
@@ -1493,6 +1567,7 @@
       "trayLengthMm": 1300,
       "trayWidthMm": 1570,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "KGM Australia",
@@ -1513,6 +1588,7 @@
       "trayLengthMm": 1300,
       "trayWidthMm": 1570,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "KGM Australia",
@@ -1533,6 +1609,7 @@
       "trayLengthMm": 1600,
       "trayWidthMm": 1570,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "KGM Australia",
@@ -1553,6 +1630,7 @@
       "trayLengthMm": 1600,
       "trayWidthMm": 1570,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "KGM Australia",
@@ -1573,6 +1651,7 @@
       "trayLengthMm": 1600,
       "trayWidthMm": 1570,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "KGM Australia",
@@ -1593,6 +1672,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Kia Australia",
@@ -1613,6 +1693,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Kia Australia",
@@ -1633,6 +1714,7 @@
       "trayLengthMm": 1573,
       "trayWidthMm": 1600,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Kia Australia",
@@ -1653,6 +1735,7 @@
       "trayLengthMm": 1573,
       "trayWidthMm": 1600,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Kia Australia",
@@ -1673,6 +1756,7 @@
       "trayLengthMm": 1573,
       "trayWidthMm": 1600,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Kia Australia",
@@ -1693,6 +1777,7 @@
       "trayLengthMm": 1512,
       "trayWidthMm": 1572,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Kia Australia",
@@ -1713,6 +1798,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Kia Australia",
@@ -1733,6 +1819,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Kia Australia",
@@ -1753,6 +1840,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Kia Australia",
@@ -1773,6 +1861,7 @@
       "trayLengthMm": 1512,
       "trayWidthMm": 1572,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Kia Australia",
@@ -1793,6 +1882,7 @@
       "trayLengthMm": 1512,
       "trayWidthMm": 1572,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Kia Australia",
@@ -1813,6 +1903,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -1833,6 +1924,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -1853,6 +1945,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -1873,6 +1966,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -1893,6 +1987,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -1913,6 +2008,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -1933,6 +2029,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -1953,6 +2050,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -1973,6 +2071,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -1993,6 +2092,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -2013,6 +2113,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -2033,6 +2134,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -2053,6 +2155,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -2073,6 +2176,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -2093,6 +2197,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -2113,6 +2218,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -2133,6 +2239,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -2153,6 +2260,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -2173,6 +2281,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -2193,6 +2302,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mazda Australia",
@@ -2213,6 +2323,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
@@ -2233,6 +2344,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
@@ -2253,6 +2365,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
@@ -2273,6 +2386,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
@@ -2293,6 +2407,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
@@ -2313,6 +2428,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
@@ -2333,6 +2449,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
@@ -2353,6 +2470,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
@@ -2373,6 +2491,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
@@ -2393,6 +2512,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
@@ -2413,6 +2533,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
@@ -2433,6 +2554,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
@@ -2453,6 +2575,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
@@ -2473,6 +2596,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
@@ -2493,6 +2617,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
@@ -2513,6 +2638,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
@@ -2533,6 +2659,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
@@ -2553,6 +2680,7 @@
       "trayLengthMm": 1555,
       "trayWidthMm": 1545,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Nissan Australia",
@@ -2573,6 +2701,7 @@
       "trayLengthMm": 1555,
       "trayWidthMm": 1545,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Nissan Australia",
@@ -2593,6 +2722,7 @@
       "trayLengthMm": 1555,
       "trayWidthMm": 1545,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Nissan Australia",
@@ -2613,6 +2743,7 @@
       "trayLengthMm": 1555,
       "trayWidthMm": 1545,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Nissan Australia",
@@ -2633,6 +2764,7 @@
       "trayLengthMm": null,
       "trayWidthMm": 1295,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "RAM Trucks Australia",
@@ -2653,6 +2785,7 @@
       "trayLengthMm": null,
       "trayWidthMm": 1270,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "RAM Trucks Australia",
@@ -2673,6 +2806,7 @@
       "trayLengthMm": null,
       "trayWidthMm": 1270,
       "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "RAM Trucks Australia",
@@ -2693,6 +2827,7 @@
       "trayLengthMm": null,
       "trayWidthMm": 1295,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "RAM Trucks Australia",
@@ -2713,6 +2848,7 @@
       "trayLengthMm": 1937,
       "trayWidthMm": 1687,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "RAM Trucks Australia",
@@ -2733,6 +2869,7 @@
       "trayLengthMm": 1937,
       "trayWidthMm": 1687,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "RAM Trucks Australia",
@@ -2753,6 +2890,7 @@
       "trayLengthMm": 1937,
       "trayWidthMm": 1687,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "RAM Trucks Australia",
@@ -2773,6 +2911,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Toyota Australia",
@@ -2793,6 +2932,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Toyota Australia",
@@ -2813,6 +2953,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Toyota Australia",
@@ -2833,6 +2974,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Toyota Australia",
@@ -2853,6 +2995,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Toyota Australia",
@@ -2873,6 +3016,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Toyota Australia",
@@ -2893,6 +3037,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Toyota Australia",
@@ -2913,6 +3058,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Toyota Australia",
@@ -2933,6 +3079,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Toyota Australia",
@@ -2953,6 +3100,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Toyota Australia",
@@ -2973,6 +3121,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Toyota Australia",
@@ -2993,6 +3142,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Toyota Australia",
@@ -3013,6 +3163,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Toyota Australia",
@@ -3033,6 +3184,7 @@
       "trayLengthMm": null,
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Toyota Australia",
@@ -3053,6 +3205,7 @@
       "trayLengthMm": 1544,
       "trayWidthMm": 1530,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Volkswagen Group Australia",
@@ -3073,6 +3226,7 @@
       "trayLengthMm": 1544,
       "trayWidthMm": 1530,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Volkswagen Group Australia",
@@ -3093,6 +3247,7 @@
       "trayLengthMm": 1544,
       "trayWidthMm": 1530,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Volkswagen Group Australia",
@@ -3113,6 +3268,7 @@
       "trayLengthMm": 1544,
       "trayWidthMm": 1530,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Volkswagen Group Australia",
@@ -3133,6 +3289,7 @@
       "trayLengthMm": 1544,
       "trayWidthMm": 1530,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Volkswagen Group Australia",
@@ -3153,6 +3310,7 @@
       "trayLengthMm": 1544,
       "trayWidthMm": 1530,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Volkswagen Group Australia",
@@ -3173,11 +3331,222 @@
       "trayLengthMm": 1544,
       "trayWidthMm": 1530,
       "verificationStatus": "source_verified",
+      "platform": "ute",
       "published": false,
       "source": {
         "manufacturer": "Volkswagen Group Australia",
         "title": "Amarok MY25 Brochure and Specifications",
         "url": "https://www.volkswagen.com.au/idhub/content/dam/onehub_pkw/importers/au/pdfs/commercial-vehicles/VW_CV_Amarok_VWCAMAROKMY25_BrochureSpec_Sep25_FA.pdf"
+      }
+    },
+    {
+      "id": "hino-300-817-4x4-single-cab",
+      "make": "Hino",
+      "model": "300 Series 817 4x4",
+      "modelYear": 2022,
+      "grade": "817 4x4",
+      "cabType": "single",
+      "bodyType": "cab_chassis",
+      "gvmKg": 7500,
+      "kerbKg": 3160,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "Hino",
+        "title": "Hino 300 Series 817 4x4 and 817 4x4 Crew specification sheet (HS3008174x4-0822)",
+        "url": "https://www.hino.com.au/uploads/pdf/specification/HS3008174x4-0822_WEB_(4).pdf"
+      }
+    },
+    {
+      "id": "hino-300-817-4x4-crew-cab",
+      "make": "Hino",
+      "model": "300 Series 817 4x4",
+      "modelYear": 2022,
+      "grade": "817 4x4 Crew",
+      "cabType": "crew",
+      "bodyType": "cab_chassis",
+      "gvmKg": 7500,
+      "kerbKg": 3405,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "Hino",
+        "title": "Hino 300 Series 817 4x4 and 817 4x4 Crew specification sheet (HS3008174x4-0822)",
+        "url": "https://www.hino.com.au/uploads/pdf/specification/HS3008174x4-0822_WEB_(4).pdf"
+      }
+    },
+    {
+      "id": "iveco-daily4x4-my24-cc-3480",
+      "make": "IVECO",
+      "model": "Daily 4x4",
+      "modelYear": 2024,
+      "grade": "Crew Cab 3480",
+      "cabType": "crew_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 7200,
+      "kerbKg": 3333,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "IVECO Australia",
+        "title": "New Daily 4x4 Specification Sheet",
+        "url": "https://www.iveco.com/au/-/media/IVECOdotcom/Australia/Products/DailyMy24/Brochures/New-Daily-4x4-Spec-Sheet---Web-Version.pdf?rev=0fa977f9dcb94b2a930710f0f71e1b36"
+      }
+    },
+    {
+      "id": "iveco-daily4x4-my24-cc-3780",
+      "make": "IVECO",
+      "model": "Daily 4x4",
+      "modelYear": 2024,
+      "grade": "Crew Cab 3780",
+      "cabType": "crew_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 7200,
+      "kerbKg": 3343,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "IVECO Australia",
+        "title": "New Daily 4x4 Specification Sheet",
+        "url": "https://www.iveco.com/au/-/media/IVECOdotcom/Australia/Products/DailyMy24/Brochures/New-Daily-4x4-Spec-Sheet---Web-Version.pdf?rev=0fa977f9dcb94b2a930710f0f71e1b36"
+      }
+    },
+    {
+      "id": "iveco-daily4x4-my24-cc-4175",
+      "make": "IVECO",
+      "model": "Daily 4x4",
+      "modelYear": 2024,
+      "grade": "Crew Cab 4175",
+      "cabType": "crew_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 7000,
+      "kerbKg": 3365,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "IVECO Australia",
+        "title": "New Daily 4x4 Specification Sheet",
+        "url": "https://www.iveco.com/au/-/media/IVECOdotcom/Australia/Products/DailyMy24/Brochures/New-Daily-4x4-Spec-Sheet---Web-Version.pdf?rev=0fa977f9dcb94b2a930710f0f71e1b36"
+      }
+    },
+    {
+      "id": "iveco-daily4x4-my24-sc-3480",
+      "make": "IVECO",
+      "model": "Daily 4x4",
+      "modelYear": 2024,
+      "grade": "Single Cab 3480",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 7200,
+      "kerbKg": 2968,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "IVECO Australia",
+        "title": "New Daily 4x4 Specification Sheet",
+        "url": "https://www.iveco.com/au/-/media/IVECOdotcom/Australia/Products/DailyMy24/Brochures/New-Daily-4x4-Spec-Sheet---Web-Version.pdf?rev=0fa977f9dcb94b2a930710f0f71e1b36"
+      }
+    },
+    {
+      "id": "iveco-daily4x4-my24-sc-3780",
+      "make": "IVECO",
+      "model": "Daily 4x4",
+      "modelYear": 2024,
+      "grade": "Single Cab 3780",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 7200,
+      "kerbKg": 2978,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "IVECO Australia",
+        "title": "New Daily 4x4 Specification Sheet",
+        "url": "https://www.iveco.com/au/-/media/IVECOdotcom/Australia/Products/DailyMy24/Brochures/New-Daily-4x4-Spec-Sheet---Web-Version.pdf?rev=0fa977f9dcb94b2a930710f0f71e1b36"
+      }
+    },
+    {
+      "id": "iveco-daily4x4-my24-sc-4175",
+      "make": "IVECO",
+      "model": "Daily 4x4",
+      "modelYear": 2024,
+      "grade": "Single Cab 4175",
+      "cabType": "single_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 7000,
+      "kerbKg": 3000,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "IVECO Australia",
+        "title": "New Daily 4x4 Specification Sheet",
+        "url": "https://www.iveco.com/au/-/media/IVECOdotcom/Australia/Products/DailyMy24/Brochures/New-Daily-4x4-Spec-Sheet---Web-Version.pdf?rev=0fa977f9dcb94b2a930710f0f71e1b36"
+      }
+    },
+    {
+      "id": "man-tgm-13-250-290-4x4-cc",
+      "make": "MAN",
+      "model": "TGM 4x4 RV",
+      "modelYear": 2025,
+      "grade": "TGM 13.250-290 4x4 BL CH RV CC",
+      "cabType": "short_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 13000,
+      "kerbKg": 5805,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "MAN Truck & Bus Australia",
+        "title": "TGM 13.250-290 4x4 BL CH RV Specification",
+        "url": "https://www.man.com.au/wp-content/uploads/2025/02/TGM-13.250-290-4X4-RV-Spec.pdf"
+      }
+    },
+    {
+      "id": "man-tgm-13-250-290-4x4-tn",
+      "make": "MAN",
+      "model": "TGM 4x4 RV",
+      "modelYear": 2025,
+      "grade": "TGM 13.250-290 4x4 BL CH RV TN",
+      "cabType": "long_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 13000,
+      "kerbKg": 6211,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "MAN Truck & Bus Australia",
+        "title": "TGM 13.250-290 4x4 BL CH RV Specification",
+        "url": "https://www.man.com.au/wp-content/uploads/2025/02/TGM-13.250-290-4X4-RV-Spec.pdf"
       }
     }
   ]

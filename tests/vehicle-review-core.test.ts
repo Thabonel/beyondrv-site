@@ -208,3 +208,34 @@ test('no-op corrections are dropped before they are stored', () => {
   assert.deepEqual(dropNoOpCorrections(row, { gvmKg: 3350, kerbKg: 2250 }), { kerbKg: 2250 });
   assert.deepEqual(dropNoOpCorrections(row, undefined), {});
 });
+
+// A MAN TGM is 13,000kg GVM with 6,211kg kerb, and an IVECO Eurocargo is
+// 15,000kg. Ute bounds make those uncorrectable through the review screen.
+test('a heavy chassis can be corrected to a real truck figure', () => {
+  const result = validateReviewEntry({ ...VALID, corrections: { gvmKg: 12900, kerbKg: 6200 } }, 0, 'truck');
+
+  assert.deepEqual(result.errors, []);
+  assert.deepEqual(result.entry?.corrections, { gvmKg: 12900, kerbKg: 6200 });
+});
+
+test('a truck tray can be corrected past the ute limit', () => {
+  // The 4.7m camper needs 4700mm, beyond the 4000mm ute cap.
+  assert.deepEqual(validateReviewEntry({ ...VALID, corrections: { trayLengthMm: 4700 } }, 0, 'truck').errors, []);
+});
+
+test('a ute keeps its own bounds, so a truck figure is still refused there', () => {
+  const result = validateReviewEntry({ ...VALID, corrections: { gvmKg: 12900 } }, 0, 'ute');
+
+  assert.equal(result.entry, undefined);
+  assert.match(result.errors[0], /gvmKg/);
+});
+
+test('the platform defaults to ute when none is given', () => {
+  assert.equal(validateReviewEntry({ ...VALID, corrections: { gvmKg: 12900 } }, 0).entry, undefined);
+});
+
+test('a figure beyond even the truck bounds is refused', () => {
+  const result = validateReviewEntry({ ...VALID, corrections: { gvmKg: 99000 } }, 0, 'truck');
+
+  assert.equal(result.entry, undefined);
+});

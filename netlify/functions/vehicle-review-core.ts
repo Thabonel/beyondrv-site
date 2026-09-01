@@ -11,7 +11,25 @@ export const CORRECTABLE_FIELDS = {
   trayWidthMm: { min: 1200, max: 2500 },
 } as const;
 
+/**
+ * A heavy chassis is a different size of thing. A MAN TGM is 13,000 kg GVM and
+ * an IVECO Eurocargo 15,000 kg, so ute bounds make a real truck figure
+ * uncorrectable. Keeping the two sets apart means widening one does not
+ * quietly let a 13 tonne GVM through on a Ranger.
+ */
+export const TRUCK_CORRECTABLE_FIELDS = {
+  gvmKg: { min: 4500, max: 30000 },
+  kerbKg: { min: 2000, max: 20000 },
+  trayLengthMm: { min: 1200, max: 9000 },
+  trayWidthMm: { min: 1200, max: 3000 },
+} as const;
+
 export type CorrectableField = keyof typeof CORRECTABLE_FIELDS;
+export type CorrectionPlatform = 'ute' | 'truck';
+
+export function boundsFor(platform: CorrectionPlatform = 'ute') {
+  return platform === 'truck' ? TRUCK_CORRECTABLE_FIELDS : CORRECTABLE_FIELDS;
+}
 export type ReviewCorrections = Partial<Record<CorrectableField, number>>;
 
 export interface ReviewEntry {
@@ -35,7 +53,8 @@ function trimmed(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-export function validateReviewEntry(value: unknown, index: number): { errors: string[]; entry?: ReviewEntry } {
+export function validateReviewEntry(value: unknown, index: number, platform: CorrectionPlatform = 'ute'): { errors: string[]; entry?: ReviewEntry } {
+  const fieldBounds = boundsFor(platform);
   const errors: string[] = [];
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return { errors: [`reviews[${index}] must be an object.`] };
@@ -59,7 +78,7 @@ export function validateReviewEntry(value: unknown, index: number): { errors: st
     } else {
       const parsed: ReviewCorrections = {};
       for (const [field, raw] of Object.entries(record.corrections as Record<string, unknown>)) {
-        const bounds = CORRECTABLE_FIELDS[field as CorrectableField];
+        const bounds = fieldBounds[field as CorrectableField];
         if (!bounds) {
           errors.push(`reviews[${index}].corrections.${field} is not a correctable field.`);
           continue;
