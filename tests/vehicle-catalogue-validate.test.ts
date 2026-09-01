@@ -223,3 +223,24 @@ test('an unknown platform is an error rather than a silent ute', () => {
   assert.equal(result.valid, false);
   assert.ok(result.errors.some((e) => e.includes('platform')), result.errors.join(' '));
 });
+
+// Hino is a manufacturer like Fuso, MAN and IVECO, all already approved.
+test('a hino.com.au specification sheet is an approved source', () => {
+  const hino = { ...catalogue, variants: [{ ...variant, source: { ...variant.source,
+    manufacturer: 'Hino',
+    url: 'https://www.hino.com.au/uploads/pdf/specification/HS3008174x4-0822_WEB_(4).pdf' } }] };
+
+  const result = validateVehicleCatalogue(hino);
+
+  assert.equal(result.valid, true, result.errors.join(' '));
+});
+
+test('a non-manufacturer host is still refused', () => {
+  const mirror = { ...catalogue, variants: [{ ...variant, source: { ...variant.source,
+    url: 'https://earthcruiser.net.au/wp-content/uploads/2023/10/hino.pdf' } }] };
+
+  const result = validateVehicleCatalogue(mirror);
+
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((e) => e.includes('approved HTTPS manufacturer source')));
+});

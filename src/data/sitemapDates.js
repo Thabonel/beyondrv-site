@@ -10,7 +10,7 @@ export const SITEMAP_LASTMOD = Object.freeze({
   '/guides/': '2026-07-29',
   '/guides/best-utes-for-slide-on-campers/': '2026-07-29',
   '/guides/gvm-gcm-atm-gtm-explained/': '2026-07-29',
-  '/expedition/': '2026-07-29',
+  '/expedition/': '2026-09-01',
   '/our-caravans/': '2026-07-29',
   '/our-slide-on-campers/': '2026-07-29',
   '/vehicle-suitability-checker/': '2026-07-29',
@@ -21,7 +21,7 @@ export const SITEMAP_LASTMOD = Object.freeze({
   '/advent-2300-hardtop-slide-on/': '2026-07-29',
   '/advent-2450-hardtop-slide-on/': '2026-07-29',
   '/expedition/3-5m-electric-poptop-cabover-family-camper/': '2026-07-29',
-  '/expedition/4-7m-hardtop-truck-camper/': '2026-07-29',
+  '/expedition/4-7m-hardtop-truck-camper/': '2026-09-01',
   '/mercedes-sprinter-motorhome/': '2026-07-29',
 });
 

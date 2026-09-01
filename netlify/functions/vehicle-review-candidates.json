@@ -3342,7 +3342,7 @@
     {
       "id": "hino-300-817-4x4-single-cab",
       "make": "Hino",
-      "model": "300 Series 817 4x4",
+      "model": "300 Series",
       "modelYear": 2022,
       "grade": "817 4x4",
       "cabType": "single",
@@ -3363,7 +3363,7 @@
     {
       "id": "hino-300-817-4x4-crew-cab",
       "make": "Hino",
-      "model": "300 Series 817 4x4",
+      "model": "300 Series",
       "modelYear": 2022,
       "grade": "817 4x4 Crew",
       "cabType": "crew",
