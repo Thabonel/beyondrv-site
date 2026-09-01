@@ -239,3 +239,34 @@ test('a figure beyond even the truck bounds is refused', () => {
 
   assert.equal(result.entry, undefined);
 });
+
+// A truck correction accepted on write must survive being read back. Without
+// the platform on the entry, re-validation falls back to ute bounds and
+// rejects a figure it just committed, breaking publishing and the build.
+test('a committed truck correction survives revalidation', () => {
+  const written = validateReviewEntry({ ...VALID, corrections: { gvmKg: 12900 } }, 0, 'truck');
+  assert.ok(written.entry, written.errors.join(' '));
+
+  const reread = validateReviewsFile({ reviews: [written.entry] });
+
+  assert.equal(reread.valid, true, reread.errors.join(' '));
+  assert.deepEqual(reread.reviews?.[0].corrections, { gvmKg: 12900 });
+});
+
+test('a truck entry records its platform so the bounds travel with it', () => {
+  const result = validateReviewEntry({ ...VALID, corrections: { gvmKg: 12900 } }, 0, 'truck');
+
+  assert.equal(result.entry?.platform, 'truck');
+});
+
+test('a ute entry does not carry a platform it does not need', () => {
+  const result = validateReviewEntry({ ...VALID, corrections: { gvmKg: 3350 } }, 0, 'ute');
+
+  assert.equal(result.entry?.platform, undefined);
+});
+
+test('a ute figure written into a file as a truck entry is still bounded', () => {
+  const reread = validateReviewsFile({ reviews: [{ ...VALID, platform: 'truck', corrections: { gvmKg: 99000 } }] });
+
+  assert.equal(reread.valid, false);
+});

@@ -36,6 +36,12 @@ export interface ReviewEntry {
   id: string;
   reviewer: string;
   reviewedAt: string;
+  /**
+   * Recorded only for a truck. The bounds a correction was accepted against
+   * have to travel with the entry, or reading the file back applies ute bounds
+   * and rejects a figure that was just committed.
+   */
+  platform?: CorrectionPlatform;
   corrections?: ReviewCorrections;
 }
 
@@ -53,8 +59,17 @@ function trimmed(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-export function validateReviewEntry(value: unknown, index: number, platform: CorrectionPlatform = 'ute'): { errors: string[]; entry?: ReviewEntry } {
-  const fieldBounds = boundsFor(platform);
+export function validateReviewEntry(
+  value: unknown,
+  index: number,
+  platform?: CorrectionPlatform,
+): { errors: string[]; entry?: ReviewEntry } {
+  const record0 = (value && typeof value === 'object' && !Array.isArray(value)) ? value as Record<string, unknown> : {};
+  // A caller that knows the platform wins. Otherwise take it from the entry,
+  // which is how a committed review carries its own bounds back.
+  const resolvedPlatform: CorrectionPlatform = platform
+    ?? (record0.platform === 'truck' ? 'truck' : 'ute');
+  const fieldBounds = boundsFor(resolvedPlatform);
   const errors: string[] = [];
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return { errors: [`reviews[${index}] must be an object.`] };
@@ -101,8 +116,15 @@ export function validateReviewEntry(value: unknown, index: number, platform: Cor
     }
   }
 
+  if (record0.platform !== undefined && record0.platform !== 'ute' && record0.platform !== 'truck') {
+    errors.push(`reviews[${index}].platform must be ute or truck.`);
+  }
+
   if (errors.length) return { errors };
-  return { errors: [], entry: corrections ? { id, reviewer, reviewedAt, corrections } : { id, reviewer, reviewedAt } };
+  const base: ReviewEntry = { id, reviewer, reviewedAt };
+  // Only a truck needs to say so; a ute is the default everywhere.
+  if (resolvedPlatform === 'truck') base.platform = 'truck';
+  return { errors: [], entry: corrections ? { ...base, corrections } : base };
 }
 
 export function validateReviewsFile(value: unknown): { valid: boolean; errors: string[]; reviews?: ReviewEntry[] } {
