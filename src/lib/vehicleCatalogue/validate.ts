@@ -5,7 +5,7 @@ import type {
   CatalogueVariant,
   VehicleCatalogue,
 } from './types.ts';
-import { CORRECTABLE_CATALOGUE_FIELDS, type CorrectableCatalogueField } from './types.ts';
+import { CATALOGUE_PLATFORMS, CORRECTABLE_CATALOGUE_FIELDS, type CataloguePlatform, type CorrectableCatalogueField } from './types.ts';
 import type { TrayState } from './derive.ts';
 
 const ALLOWED_SOURCE_HOSTS = new Set([
@@ -125,6 +125,16 @@ function parseSource(value: unknown, path: string, errors: string[]): CatalogueS
   return { manufacturer, title, url, accessedDate };
 }
 
+/** Entries written before trucks existed carry no platform and are utes. */
+function parsePlatform(value: unknown, path: string, errors: string[]): CataloguePlatform {
+  if (value === undefined) return 'ute';
+  if (typeof value !== 'string' || !(CATALOGUE_PLATFORMS as readonly string[]).includes(value)) {
+    errors.push(`${path}.platform must be one of ${CATALOGUE_PLATFORMS.join(', ')}.`);
+    return 'ute';
+  }
+  return value as CataloguePlatform;
+}
+
 function parseCorrectedFields(value: unknown, path: string, errors: string[]): CorrectableCatalogueField[] {
   if (value === undefined) return [];
   if (!Array.isArray(value)) {
@@ -217,6 +227,13 @@ function parseVariant(value: unknown, index: number, errors: string[]): Catalogu
     trayWidthMm: nullableIntegerAt(record, 'trayWidthMm', path, errors, { min: 1, max: 10000 }),
     trayState,
     trayMassKg: nullableIntegerAt(record, 'trayMassKg', path, errors, { min: 0, max: 10000 }),
+    platform: parsePlatform(record.platform, path, errors),
+    // Absent means the figure was never recorded, which is normal for a ute and
+    // for any entry written before trucks existed. nullableIntegerAt treats an
+    // absent key as an error, so only ask it about a value that is present.
+    maxBodyLengthMm: record.maxBodyLengthMm === undefined
+      ? null
+      : nullableIntegerAt(record, 'maxBodyLengthMm', path, errors, { min: 1, max: 20000 }),
     correctedFields: parseCorrectedFields(record.correctedFields, path, errors),
     promotedByOverride,
     publication,

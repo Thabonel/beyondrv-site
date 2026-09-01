@@ -35,8 +35,63 @@ LEFT JOIN data_review_log review ON review.id = (
 ORDER BY v.make, v.model, v.model_year_start, v.grade;
 `;
 
+const TRUCK_QUERY = `
+SELECT t.id, t.make, t.model, t.model_year_start, t.variant AS grade, t.cab_type, t.axle_configuration,
+       t.drivetrain, t.engine, t.transmission, t.wheelbase_mm,
+       t.gvm_kg, t.chassis_cab_total_mass_kg, t.mass_basis,
+       t.front_axle_limit_kg, t.rear_axle_limit_kg, t.max_body_length_mm,
+       t.verification_status, t.customer_selectable,
+       review.id AS latest_review_id, review.decision AS latest_review_decision,
+       review.reviewed_at AS latest_reviewed_at, review.reviewer AS latest_reviewer,
+       s.manufacturer, s.title, s.url, s.accessed_date
+FROM heavy_overland_chassis t JOIN sources s ON s.id = t.source_id
+LEFT JOIN data_review_log review ON review.id = (
+  SELECT candidate.id FROM data_review_log candidate
+  WHERE candidate.variant_id = t.id
+  ORDER BY candidate.reviewed_at DESC, candidate.id DESC
+  LIMIT 1
+)
+ORDER BY t.make, t.model, t.variant;
+`;
+
 const raw = execFileSync('sqlite3', ['-json', dbPath, QUERY.trim()], { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
 const rows = JSON.parse(raw);
+
+const truckRaw = execFileSync('sqlite3', ['-json', dbPath, TRUCK_QUERY.trim()], { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
+const allTrucks = truckRaw.trim() ? JSON.parse(truckRaw) : [];
+
+// Payload has to reconcile, and it cannot without a chassis mass. A row that
+// nobody selected is simply not ready; one that somebody selected is a mistake
+// worth stopping the build for.
+const unusableTrucks = allTrucks.filter((t) => t.chassis_cab_total_mass_kg === null);
+const selectedButUnusable = unusableTrucks.filter((t) => t.customer_selectable === 1);
+if (selectedButUnusable.length) {
+  throw new Error(
+    `Refusing to publish ${selectedButUnusable.length} selected chassis with no chassis mass, so payload cannot reconcile: `
+    + selectedButUnusable.map((t) => t.id).join(', '),
+  );
+}
+for (const t of unusableTrucks) {
+  console.warn(`Skipping ${t.id}: no chassis mass recorded, so it cannot produce a reconciling payload.`);
+}
+
+const truckRows = allTrucks.filter((t) => t.chassis_cab_total_mass_kg !== null).map((t) => {
+  return {
+    ...t,
+    body_type: 'cab_chassis',
+    kerb_mass_kg: t.chassis_cab_total_mass_kg,
+    // A cab chassis carries no body until one is fitted, whatever the mass
+    // basis wording happens to be.
+    kerb_mass_basis: `${String(t.mass_basis).replace(/[.\s]+$/, '')}. Excludes any body or tray.`,
+    published_payload_kg: t.gvm_kg - t.chassis_cab_total_mass_kg,
+    front_gawr_kg: t.front_axle_limit_kg,
+    rear_gawr_kg: t.rear_axle_limit_kg,
+    usable_load_length_mm: null,
+    usable_load_width_mm: null,
+    platform: 'truck',
+  };
+});
+rows.push(...truckRows);
 const parsedOverrides = JSON.parse(readFileSync(overridesPath, 'utf8'));
 const overrideValidation = validateCatalogueOverrides(parsedOverrides);
 if (!overrideValidation.valid || !overrideValidation.overrides) {
@@ -127,6 +182,8 @@ const variants = rows
       trayLengthMm: corrected.trayLengthMm,
       trayWidthMm: corrected.trayWidthMm,
       correctedFields: disclosedCorrections,
+      platform: r.platform ?? 'ute',
+      maxBodyLengthMm: r.max_body_length_mm ?? null,
       trayState: deriveTrayState(r.kerb_mass_basis, r.body_type),
       trayMassKg: null,
       promotedByOverride: Boolean(publicationOverride),

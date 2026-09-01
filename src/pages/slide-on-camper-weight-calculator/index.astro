@@ -635,6 +635,16 @@ const schema = [
       panel.appendChild(note);
     }
 
+    // The largest body this chassis accepts, which is not the tray anyone
+    // fitted. Saying so stops a truck owner reading it as their tray length.
+    if (variant.platform === 'truck' && variant.maxBodyLengthMm) {
+      const note = document.createElement('p');
+      note.className = 'vehicle-provenance-note';
+      note.dataset.testid = 'vehicle-max-body-length';
+      note.textContent = `This chassis takes a body up to ${variant.maxBodyLengthMm} mm. That is the maximum it is rated for, not the tray fitted to your vehicle, so measure yours.`;
+      panel.appendChild(note);
+    }
+
     // A corrected figure did not come from the manufacturer document linked
     // above, so saying who it did come from is the whole point of recording it.
     if (variant.correctedFields.length > 0) {
