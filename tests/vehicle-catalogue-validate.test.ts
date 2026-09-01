@@ -11,7 +11,7 @@ const variant: CatalogueVariant = {
   gvmKg: 3100, kerbKg: 1914, kerbBasis: 'Kerb weight with Mazda standard tray fitted',
   payloadKg: 1186, frontGawrKg: 1450, rearGawrKg: 1910,
   trayLengthMm: null, trayWidthMm: null, trayState: 'included', trayMassKg: null,
-  platform: 'ute' as const, maxBodyLengthMm: null, correctedFields: [],
+  platform: 'ute' as const, maxBodyLengthMm: null, kerbIsOptimistic: false, correctedFields: [],
   promotedByOverride: false,
   publication: { approvalId: 'review:7', approvedAt: '2026-08-22T00:00:00.000Z', method: 'review' },
   source: { manufacturer: 'Mazda Australia', title: 'Payload Calculator', url: 'https://www.mazda.com.au/payload-calculator/', accessedDate: '2026-08-18' },
@@ -243,4 +243,31 @@ test('a non-manufacturer host is still refused', () => {
 
   assert.equal(result.valid, false);
   assert.ok(result.errors.some((e) => e.includes('approved HTTPS manufacturer source')));
+});
+
+// Some stored kerb masses are the manufacturer's lightest-equipment figure,
+// which yields the largest payload. A customer has to be told, because the
+// error runs toward more headroom than the vehicle has.
+test('an optimistic kerb mass is carried through validation', () => {
+  const flagged = { ...catalogue, variants: [{ ...variant, kerbIsOptimistic: true }] };
+
+  const result = validateVehicleCatalogue(flagged);
+
+  assert.equal(result.valid, true, result.errors.join(' '));
+  if (!result.valid) return;
+  assert.equal(result.catalogue.variants[0].kerbIsOptimistic, true);
+});
+
+test('a variant that says nothing about its kerb is not treated as optimistic', () => {
+  const result = validateVehicleCatalogue(catalogue);
+
+  assert.equal(result.valid, true);
+  if (!result.valid) return;
+  assert.equal(result.catalogue.variants[0].kerbIsOptimistic, false);
+});
+
+test('a non-boolean optimistic flag is an error', () => {
+  const bad = { ...catalogue, variants: [{ ...variant, kerbIsOptimistic: 'yes' }] };
+
+  assert.equal(validateVehicleCatalogue(bad).valid, false);
 });

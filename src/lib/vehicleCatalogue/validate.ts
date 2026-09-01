@@ -126,6 +126,15 @@ function parseSource(value: unknown, path: string, errors: string[]): CatalogueS
 }
 
 /** Entries written before trucks existed carry no platform and are utes. */
+function parseOptionalBoolean(value: unknown, path: string, errors: string[]): boolean {
+  if (value === undefined) return false;
+  if (typeof value !== 'boolean') {
+    errors.push(`${path} must be true or false.`);
+    return false;
+  }
+  return value;
+}
+
 function parsePlatform(value: unknown, path: string, errors: string[]): CataloguePlatform {
   if (value === undefined) return 'ute';
   if (typeof value !== 'string' || !(CATALOGUE_PLATFORMS as readonly string[]).includes(value)) {
@@ -228,6 +237,7 @@ function parseVariant(value: unknown, index: number, errors: string[]): Catalogu
     trayState,
     trayMassKg: nullableIntegerAt(record, 'trayMassKg', path, errors, { min: 0, max: 10000 }),
     platform: parsePlatform(record.platform, path, errors),
+    kerbIsOptimistic: parseOptionalBoolean(record.kerbIsOptimistic, `${path}.kerbIsOptimistic`, errors),
     // Absent means the figure was never recorded, which is normal for a ute and
     // for any entry written before trucks existed. nullableIntegerAt treats an
     // absent key as an error, so only ask it about a value that is present.

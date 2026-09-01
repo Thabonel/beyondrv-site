@@ -1,5 +1,5 @@
 export const ESTIMATE_DISCLAIMER =
-  'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. Beyond RV must confirm final suitability before purchase.';
+  'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. Beyond RV weighs your vehicle at the factory before build, and those figures decide the final answer.';
 
 export const CARAVAN_FINAL_WARNING =
   "Final suitability still requires confirmation against your exact vehicle compliance plate, owner's manual, towbar rating, axle limits, tyre ratings and certified weighbridge results.";

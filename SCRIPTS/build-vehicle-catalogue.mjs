@@ -20,7 +20,7 @@ SELECT v.id, v.make, v.model, v.model_year_start, v.grade, v.cab_type, v.body_ty
        v.drivetrain, v.engine, v.transmission, v.wheelbase_mm,
        v.gvm_kg, v.kerb_mass_kg, v.kerb_mass_basis, v.published_payload_kg,
        v.front_gawr_kg, v.rear_gawr_kg, v.usable_load_length_mm, v.usable_load_width_mm,
-       v.verification_status, v.customer_selectable,
+       v.verification_status, v.customer_selectable, v.notes,
        review.id AS latest_review_id, review.decision AS latest_review_decision,
        review.reviewed_at AS latest_reviewed_at, review.reviewer AS latest_reviewer,
        review.notes AS latest_review_notes,
@@ -188,6 +188,9 @@ const variants = rows
       trayWidthMm: corrected.trayWidthMm,
       correctedFields: disclosedCorrections,
       platform: r.platform ?? 'ute',
+      // The research note is where an optimistic kerb was recorded. Surfacing
+      // it as a field means the page never has to read prose.
+      kerbIsOptimistic: /OPTIMISTIC KERB/i.test(r.notes ?? ''),
       maxBodyLengthMm: r.max_body_length_mm ?? null,
       trayState: deriveTrayState(r.kerb_mass_basis, r.body_type),
       trayMassKg: null,

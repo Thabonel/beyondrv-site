@@ -635,6 +635,17 @@ const schema = [
       panel.appendChild(note);
     }
 
+    // The kerb mass is the manufacturer's lightest-equipment figure, so the
+    // payload shown is the best case. Saying so is the difference between an
+    // estimate and an overstatement.
+    if (variant.kerbIsOptimistic) {
+      const note = document.createElement('p');
+      note.className = 'vehicle-provenance-note';
+      note.dataset.testid = 'vehicle-optimistic-kerb';
+      note.textContent = 'This kerb mass is the manufacturer\u2019s lightest-equipment figure, so the payload shown here is a best case. A vehicle with options fitted weighs more and carries less. Beyond RV weighs your vehicle at the factory before build.';
+      panel.appendChild(note);
+    }
+
     // The largest body this chassis accepts, which is not the tray anyone
     // fitted. Saying so stops a truck owner reading it as their tray length.
     if (variant.platform === 'truck' && variant.maxBodyLengthMm) {
