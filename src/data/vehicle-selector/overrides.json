@@ -1,5 +1,150 @@
 {
-  "show": [],
+  "show": [
+    {
+      "id": "ford-f-150-2024-lariat-5-5-ft-tub-swb",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-f-150-2024-lariat-6-5-ft-tub-lwb",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-f-150-2024-platinum-5-5-ft-tub-swb",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-f-150-2024-platinum-6-5-ft-tub-lwb",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-f-150-2024-xlt-5-5-ft-tub-swb",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-f-150-2024-xlt-6-5-ft-tub-lwb",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-raptor-double-pickup-ecoboost",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-sport-double-pickup-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-sport-double-pickup-v6",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-wildtrak-double-pickup-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-wildtrak-double-pickup-v6",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-cc-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-cc-singleturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-pickup-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-pickup-singleturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-single-cc-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-super-cc-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-super-pickup-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xls-double-pickup-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-double-cc-v6",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-double-pickup-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-double-pickup-v6",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-super-pickup-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-super-duty-my26-single-cab",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    }
+  ],
   "hide": [],
-  "note": "show entries require id, reason, reviewer and approvedAt. hide removes a variant. Conflicting entries fail the build."
+  "note": "show entries require id, reason, reviewer and approvedAt. hide removes a variant. Conflicting entries fail the build. Variants published this way are disclosed to customers as manually published by Beyond RV."
 }
