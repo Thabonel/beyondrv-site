@@ -27,6 +27,19 @@ async function openCalculatorWithFixture(page: Page) {
   await page.goto(calculatorPath);
 }
 
+// Every field change triggers a full recalculation and re-render, so the fill
+// immediately before these shifts the layout underneath them. page.check()
+// clicks and then reads the state once, throwing if it does not match rather
+// than retrying the click. Clicking and asserting separately lets the
+// assertion retry, and still fails loudly if the click really did not land.
+async function confirmChecks(page: Page) {
+  for (const id of ['rearAxleChecked', 'tyreRatingsChecked', 'centreOfGravityChecked']) {
+    const box = page.locator(`#${id}`);
+    await box.click();
+    await expect(box).toBeChecked();
+  }
+}
+
 async function completeManualCalculation(page: Page) {
   for (const [id, value] of [
     ['gvm', '5000'], ['currentWeight', '2200'], ['passengers', '1'], ['accessories', '1'],
@@ -164,9 +177,7 @@ test('tray weight sums into the vehicle weight, but a negative entry cannot redu
   await page.fill('#trayWidth', '1800');
   await page.fill('#requiredTrayLength', '1900');
   await page.fill('#requiredTrayWidth', '1700');
-  await page.check('#rearAxleChecked');
-  await page.check('#tyreRatingsChecked');
-  await page.check('#centreOfGravityChecked');
+  await confirmChecks(page);
 
   // Ordinary case: 2046kg current weight + 120kg tray + 7kg fixed additions = 2173kg.
   await page.fill('#trayMass', '120');
@@ -224,9 +235,7 @@ test('an invisible tray value from a previous vehicle cannot leak into the calcu
   await page.fill('#trayWidth', '1800');
   await page.fill('#requiredTrayLength', '1900');
   await page.fill('#requiredTrayWidth', '1700');
-  await page.check('#rearAxleChecked');
-  await page.check('#tyreRatingsChecked');
-  await page.check('#centreOfGravityChecked');
+  await confirmChecks(page);
 
   // 2201kg published kerb mass + 7kg fixed additions = 2208kg, with no 150kg
   // carried over from the previous vehicle's tray.
