@@ -17,7 +17,10 @@ test('a tray longer than every model points at the longest one', () => {
 
   assert.equal(verdictFor(results, 'Advent 2450'), 'best');
   assert.equal(verdictFor(results, 'Advent 2300'), 'also_suits');
-  assert.equal(verdictFor(results, 'Advent 2150'), 'also_suits');
+  // 2450, 2300 and 2150 are three size classes. Only the next one down is an
+  // alternative; below that the customer is being shown a smaller camper than
+  // their tray calls for.
+  assert.equal(verdictFor(results, 'Advent 2150'), 'smaller');
 });
 
 test('a tray exactly a model length picks that model', () => {
@@ -79,5 +82,42 @@ test('two models inside the tolerance of each other both suit', () => {
   const results = modelsForTray(2150, MODELS);
 
   assert.equal(verdictFor(results, 'Advent 2150'), 'best');
+  assert.equal(verdictFor(results, '7ft Electric Pop-Top'), 'also_suits');
+});
+
+const WIDE = [
+  { slug: 'truck-47', name: '4.7m Hardtop', url: '/truck-47/', nominalLengthMm: 4700, status: 'target' },
+  { slug: 'box-35', name: '3.5m DIY Box', url: '/box-35/', nominalLengthMm: 3500, status: 'target' },
+  { slug: 'cabover-35', name: '3.5m Cabover', url: '/cabover-35/', nominalLengthMm: 3500, status: 'target' },
+  ...MODELS,
+];
+
+// A 4.2m truck tray physically accommodates a 2120mm ute slide-on, with two
+// metres to spare. Offering it is true and useless.
+test('a truck tray is not offered the whole ute range as alternatives', () => {
+  const results = modelsForTray(4200, WIDE);
+
+  assert.equal(verdictFor(results, '3.5m DIY Box'), 'best');
+  assert.equal(verdictFor(results, '3.5m Cabover'), 'also_suits');
+  assert.equal(verdictFor(results, '4.7m Hardtop'), 'too_long');
+  // Two size classes below the best is a different product line, not an option.
+  assert.equal(verdictFor(results, 'Advent 2300'), 'smaller');
+  assert.equal(verdictFor(results, 'Advent 2150'), 'smaller');
+  assert.equal(verdictFor(results, '7ft Electric Pop-Top'), 'smaller');
+});
+
+test('the next size class down is still offered as an alternative', () => {
+  const results = modelsForTray(4200, WIDE);
+
+  assert.equal(verdictFor(results, 'Advent 2450'), 'also_suits');
+});
+
+// Models within the build tolerance are one size, so a 30mm gap must not push
+// the 7ft into a lower class than the Advent 2150.
+test('models within the tolerance count as one size class', () => {
+  const results = modelsForTray(2300, MODELS);
+
+  assert.equal(verdictFor(results, 'Advent 2300'), 'best');
+  assert.equal(verdictFor(results, 'Advent 2150'), 'also_suits');
   assert.equal(verdictFor(results, '7ft Electric Pop-Top'), 'also_suits');
 });

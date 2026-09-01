@@ -379,6 +379,7 @@ const schema = [
     const results = modelsForTray(trayLength, camperModels);
     const best = results.find((r) => r.verdict === 'best');
     const also = results.filter((r) => r.verdict === 'also_suits');
+    const smaller = results.filter((r) => r.verdict === 'smaller');
     const tooLong = results.filter((r) => r.verdict === 'too_long');
     const unknown = results.filter((r) => r.verdict === 'unknown');
 
@@ -434,6 +435,21 @@ const schema = [
         // truck ones. Say what is true of both rather than naming the roof.
         line.append(document.createTextNode(' These are the same size for your tray, so the difference is in the camper, not the fit.'));
       }
+      finderResult.append(line);
+    }
+
+    // Smaller campers do fit, they are just not what a tray this size calls for.
+    // Named quietly rather than offered as alternatives.
+    if (smaller.length) {
+      const line = document.createElement('p');
+      line.className = 'camper-finder-note';
+      line.dataset.testid = 'camper-finder-smaller';
+      line.append(document.createTextNode('Smaller campers fit too, if you want spare tray space: '));
+      smaller.forEach((r, index) => {
+        if (index > 0) line.append(document.createTextNode(', '));
+        line.append(modelLink(r.model));
+      });
+      line.append(document.createTextNode('.'));
       finderResult.append(line);
     }
 

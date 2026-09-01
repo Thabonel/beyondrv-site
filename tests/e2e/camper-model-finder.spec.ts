@@ -74,3 +74,17 @@ test('the figures are described as indicative while they are targets', async ({ 
 
   await expect(page.getByTestId('camper-finder-indicative')).toContainText('built to order');
 });
+
+// A 4.2m truck tray physically takes a 2120mm ute slide-on with two metres to
+// spare. Offering that as an alternative is true and useless.
+test('a truck tray is not offered the ute range as alternatives', async ({ page }) => {
+  await page.goto(page_path);
+  await page.fill('#finderTrayLength', '4200');
+
+  await expect(page.getByTestId(result)).toContainText('3.5m');
+  await expect(page.getByTestId('camper-finder-too-long')).toContainText('4.7m Hardtop Truck Camper');
+  // The ute range is named quietly, not presented as a choice.
+  const also = page.getByTestId('camper-finder-also');
+  await expect(also).not.toContainText('Advent 2150');
+  await expect(page.getByTestId('camper-finder-smaller')).toContainText('Advent 2150');
+});
