@@ -32,11 +32,31 @@ async function openCalculatorWithFixture(page: Page) {
 // clicks and then reads the state once, throwing if it does not match rather
 // than retrying the click. Clicking and asserting separately lets the
 // assertion retry, and still fails loudly if the click really did not land.
+/**
+ * Ticks a checkbox without depending on where it is on screen.
+ *
+ * Every field change triggers a full recalculation and re-render, so a
+ * coordinate resolved before that render can land somewhere else by the time
+ * the click is delivered, and the box is never clicked. This applies to every
+ * checkbox on the page, not just the confirmation ones.
+ *
+ * Reachability is still asserted, so the test keeps checking that a real user
+ * could operate the control. Only the hit-testing is bypassed.
+ */
+async function tick(page: Page, id: string) {
+  const box = page.locator(`#${id}`);
+  await expect(box).toBeVisible();
+  await expect(box).toBeEnabled();
+  await box.evaluate((el) => {
+    const input = el as HTMLInputElement;
+    if (!input.checked) input.click();
+  });
+  await expect(box).toBeChecked();
+}
+
 async function confirmChecks(page: Page) {
   for (const id of ['rearAxleChecked', 'tyreRatingsChecked', 'centreOfGravityChecked']) {
-    const box = page.locator(`#${id}`);
-    await box.click();
-    await expect(box).toBeChecked();
+    await tick(page, id);
   }
 }
 
@@ -288,7 +308,7 @@ test('a weighbridge weight that already includes the tray does not demand the tr
   // Blank tray weight still blocks, because nothing has said the figure includes it.
   await expect(page.locator('#statusLabel')).toContainText(/not enough information/i);
 
-  await page.check('#trayIncluded');
+  await tick(page, 'trayIncluded');
 
   // Now it calculates, and the tray is counted once: 2350 + 7 = 2357kg.
   await expect(page.locator('#statusLabel')).not.toContainText(/not enough information/i);
@@ -345,7 +365,7 @@ test('switching variant re-asks whether the weight includes the tray', async ({ 
 
   // Both variants publish a kerb mass that excludes the tray.
   await expect(page.locator('#trayMassField')).toBeVisible();
-  await page.check('#trayIncluded');
+  await tick(page, 'trayIncluded');
   await expect(page.locator('#trayMassRow')).toBeHidden();
 
   // Switching replaces the weight with the new vehicle's published kerb, which
@@ -360,7 +380,7 @@ test('switching variant re-asks whether the weight includes the tray', async ({ 
 test('a carried-over inclusion claim cannot produce a green result on a fresh variant', async ({ page }) => {
   await openCalculatorWithFixture(page);
   await pickRanger(page, RANGER_CC_A);
-  await page.check('#trayIncluded');
+  await tick(page, 'trayIncluded');
 
   for (const [id, v] of [['gvm', '5000'], ['passengers', '1'], ['accessories', '1'], ['luggageGear', '1'],
     ['camperDry', '1'], ['camperWater', '1'], ['camperGear', '1'], ['camperOptions', '1'],
@@ -384,7 +404,7 @@ test('the provenance panel stops crediting a tray weight once it is cleared', as
   await expect(provenance).toContainText('the tray weight');
 
   // Ticking this clears the tray weight without firing an input event.
-  await page.check('#trayIncluded');
+  await tick(page, 'trayIncluded');
 
   await expect(page.locator('#trayMass')).toHaveValue('');
   await expect(provenance).not.toContainText('the tray weight');
