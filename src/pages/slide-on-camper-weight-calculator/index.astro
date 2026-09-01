@@ -418,24 +418,37 @@ const schema = [
 
     // Two models within the build tolerance of each other are the same size
     // decision, so say what actually differs.
-    if (best && also.length) {
-      const closeInSize = also.filter((r) =>
-        Math.abs((r.model.nominalLengthMm ?? 0) - (best.model.nominalLengthMm ?? 0)) <= BUILD_TOLERANCE_MM);
+    // The early return above narrows finderResult, but that narrowing does not
+    // reach inside a nested function, so hold it in a local.
+    const panel = finderResult;
+    function listLine(testId: string, lead: string, entries: typeof also, tail = '.') {
       const line = document.createElement('p');
       line.className = 'camper-finder-note';
-      line.dataset.testid = 'camper-finder-also';
-      line.append(document.createTextNode('Also suits your tray: '));
-      also.forEach((r, index) => {
+      line.dataset.testid = testId;
+      line.append(document.createTextNode(lead));
+      entries.forEach((r, index) => {
         if (index > 0) line.append(document.createTextNode(', '));
         line.append(modelLink(r.model));
       });
-      line.append(document.createTextNode('.'));
-      if (closeInSize.length) {
-        // Same size, different camper: roof on the ute models, fitout on the
-        // truck ones. Say what is true of both rather than naming the roof.
-        line.append(document.createTextNode(' These are the same size for your tray, so the difference is in the camper, not the fit.'));
+      line.append(document.createTextNode(tail));
+      panel.append(line);
+    }
+
+    if (best) {
+      // A model the same size as the best one is a different camper, not a
+      // different fit. A model a size down genuinely is smaller. Saying both in
+      // one sentence made the "same size" claim cover something that was not.
+      const sameSize = also.filter((r) =>
+        Math.abs((r.model.nominalLengthMm ?? 0) - (best.model.nominalLengthMm ?? 0)) <= BUILD_TOLERANCE_MM);
+      const oneSizeDown = also.filter((r) => !sameSize.includes(r));
+
+      if (sameSize.length) {
+        listLine('camper-finder-same-size', 'The same size for your tray: ', sameSize,
+          '. The difference is in the camper, not the fit.');
       }
-      finderResult.append(line);
+      if (oneSizeDown.length) {
+        listLine('camper-finder-also', 'One size down, if you want more room around it: ', oneSizeDown);
+      }
     }
 
     // Smaller campers do fit, they are just not what a tray this size calls for.

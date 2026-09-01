@@ -20,9 +20,9 @@ test('two models the same size are presented as a choice of camper', async ({ pa
   await page.fill('#finderTrayLength', '2150');
 
   await expect(page.getByTestId(result)).toContainText('Advent 2150');
-  const also = page.getByTestId('camper-finder-also');
-  await expect(also).toContainText('7ft Electric Pop-Top');
-  await expect(also).toContainText('the difference is in the camper, not the fit');
+  const sameSize = page.getByTestId('camper-finder-same-size');
+  await expect(sameSize).toContainText('7ft Electric Pop-Top');
+  await expect(sameSize).toContainText('The difference is in the camper, not the fit');
 });
 
 // A truck tray reaches the expedition range, where the two 3.5m units are the
@@ -32,6 +32,9 @@ test('a truck tray reaches the expedition campers', async ({ page }) => {
   await page.fill('#finderTrayLength', '4700');
 
   await expect(page.getByTestId(result)).toContainText('4.7m Hardtop Truck Camper');
+  // Nothing else is 4700mm, so there is no same-size line; the 3.5m units are
+  // a size down from the 4.7m and belong in the alternatives.
+  await expect(page.getByTestId('camper-finder-same-size')).toHaveCount(0);
   await expect(page.getByTestId('camper-finder-also')).toContainText('3.5m');
 });
 
@@ -84,7 +87,12 @@ test('a truck tray is not offered the ute range as alternatives', async ({ page 
   await expect(page.getByTestId(result)).toContainText('3.5m');
   await expect(page.getByTestId('camper-finder-too-long')).toContainText('4.7m Hardtop Truck Camper');
   // The ute range is named quietly, not presented as a choice.
-  const also = page.getByTestId('camper-finder-also');
-  await expect(also).not.toContainText('Advent 2150');
   await expect(page.getByTestId('camper-finder-smaller')).toContainText('Advent 2150');
+
+  // The claim that these are the same size must cover only models that are.
+  // The Advent 2450 is a size down from a 3500mm camper, not the same size.
+  const sameSize = page.getByTestId('camper-finder-same-size');
+  await expect(sameSize).toContainText('3.5m Electric Pop-Top');
+  await expect(sameSize).not.toContainText('Advent 2450');
+  await expect(page.getByTestId('camper-finder-also')).toContainText('Advent 2450');
 });
