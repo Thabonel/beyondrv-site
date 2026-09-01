@@ -63,19 +63,24 @@ const allTrucks = truckRaw.trim() ? JSON.parse(truckRaw) : [];
 // Payload has to reconcile, and it cannot without a chassis mass. A row that
 // nobody selected is simply not ready; one that somebody selected is a mistake
 // worth stopping the build for.
-const unusableTrucks = allTrucks.filter((t) => t.chassis_cab_total_mass_kg === null);
+const unusableTrucks = allTrucks.filter((t) => t.chassis_cab_total_mass_kg === null || t.model_year_start === null);
 const selectedButUnusable = unusableTrucks.filter((t) => t.customer_selectable === 1);
+function unusableReason(t) {
+  if (t.chassis_cab_total_mass_kg === null) return 'no chassis mass recorded, so it cannot produce a reconciling payload';
+  return 'no model year recorded, and the catalogue requires an integer year';
+}
 if (selectedButUnusable.length) {
   throw new Error(
-    `Refusing to publish ${selectedButUnusable.length} selected chassis with no chassis mass, so payload cannot reconcile: `
-    + selectedButUnusable.map((t) => t.id).join(', '),
+    `Refusing to publish ${selectedButUnusable.length} selected chassis: `
+    + selectedButUnusable.map((t) => `${t.id} (${unusableReason(t)})`).join(', '),
   );
 }
 for (const t of unusableTrucks) {
-  console.warn(`Skipping ${t.id}: no chassis mass recorded, so it cannot produce a reconciling payload.`);
+  console.warn(`Skipping ${t.id}: ${unusableReason(t)}.`);
 }
 
-const truckRows = allTrucks.filter((t) => t.chassis_cab_total_mass_kg !== null).map((t) => {
+const unusableIds = new Set(unusableTrucks.map((t) => t.id));
+const truckRows = allTrucks.filter((t) => !unusableIds.has(t.id)).map((t) => {
   return {
     ...t,
     body_type: 'cab_chassis',
@@ -251,6 +256,7 @@ const candidates = rows.map((r) => ({
   trayLengthMm: r.usable_load_length_mm ?? null,
   trayWidthMm: r.usable_load_width_mm ?? null,
   verificationStatus: r.verification_status,
+  platform: r.platform ?? 'ute',
   published: reviewedIds.has(r.id),
   source: { manufacturer: r.manufacturer, title: r.title, url: r.url },
 }));

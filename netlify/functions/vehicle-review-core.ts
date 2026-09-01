@@ -11,13 +11,37 @@ export const CORRECTABLE_FIELDS = {
   trayWidthMm: { min: 1200, max: 2500 },
 } as const;
 
+/**
+ * A heavy chassis is a different size of thing. A MAN TGM is 13,000 kg GVM and
+ * an IVECO Eurocargo 15,000 kg, so ute bounds make a real truck figure
+ * uncorrectable. Keeping the two sets apart means widening one does not
+ * quietly let a 13 tonne GVM through on a Ranger.
+ */
+export const TRUCK_CORRECTABLE_FIELDS = {
+  gvmKg: { min: 4500, max: 30000 },
+  kerbKg: { min: 2000, max: 20000 },
+  trayLengthMm: { min: 1200, max: 9000 },
+  trayWidthMm: { min: 1200, max: 3000 },
+} as const;
+
 export type CorrectableField = keyof typeof CORRECTABLE_FIELDS;
+export type CorrectionPlatform = 'ute' | 'truck';
+
+export function boundsFor(platform: CorrectionPlatform = 'ute') {
+  return platform === 'truck' ? TRUCK_CORRECTABLE_FIELDS : CORRECTABLE_FIELDS;
+}
 export type ReviewCorrections = Partial<Record<CorrectableField, number>>;
 
 export interface ReviewEntry {
   id: string;
   reviewer: string;
   reviewedAt: string;
+  /**
+   * Recorded only for a truck. The bounds a correction was accepted against
+   * have to travel with the entry, or reading the file back applies ute bounds
+   * and rejects a figure that was just committed.
+   */
+  platform?: CorrectionPlatform;
   corrections?: ReviewCorrections;
 }
 
@@ -35,7 +59,17 @@ function trimmed(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-export function validateReviewEntry(value: unknown, index: number): { errors: string[]; entry?: ReviewEntry } {
+export function validateReviewEntry(
+  value: unknown,
+  index: number,
+  platform?: CorrectionPlatform,
+): { errors: string[]; entry?: ReviewEntry } {
+  const record0 = (value && typeof value === 'object' && !Array.isArray(value)) ? value as Record<string, unknown> : {};
+  // A caller that knows the platform wins. Otherwise take it from the entry,
+  // which is how a committed review carries its own bounds back.
+  const resolvedPlatform: CorrectionPlatform = platform
+    ?? (record0.platform === 'truck' ? 'truck' : 'ute');
+  const fieldBounds = boundsFor(resolvedPlatform);
   const errors: string[] = [];
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return { errors: [`reviews[${index}] must be an object.`] };
@@ -59,7 +93,7 @@ export function validateReviewEntry(value: unknown, index: number): { errors: st
     } else {
       const parsed: ReviewCorrections = {};
       for (const [field, raw] of Object.entries(record.corrections as Record<string, unknown>)) {
-        const bounds = CORRECTABLE_FIELDS[field as CorrectableField];
+        const bounds = fieldBounds[field as CorrectableField];
         if (!bounds) {
           errors.push(`reviews[${index}].corrections.${field} is not a correctable field.`);
           continue;
@@ -82,8 +116,15 @@ export function validateReviewEntry(value: unknown, index: number): { errors: st
     }
   }
 
+  if (record0.platform !== undefined && record0.platform !== 'ute' && record0.platform !== 'truck') {
+    errors.push(`reviews[${index}].platform must be ute or truck.`);
+  }
+
   if (errors.length) return { errors };
-  return { errors: [], entry: corrections ? { id, reviewer, reviewedAt, corrections } : { id, reviewer, reviewedAt } };
+  const base: ReviewEntry = { id, reviewer, reviewedAt };
+  // Only a truck needs to say so; a ute is the default everywhere.
+  if (resolvedPlatform === 'truck') base.platform = 'truck';
+  return { errors: [], entry: corrections ? { ...base, corrections } : base };
 }
 
 export function validateReviewsFile(value: unknown): { valid: boolean; errors: string[]; reviews?: ReviewEntry[] } {
