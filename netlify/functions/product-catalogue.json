@@ -474,7 +474,7 @@
     "price": "From $98,000",
     "status": "available",
     "category": "expedition",
-    "tagline": "Premier couples truck camper for single cab truck or Unimog platforms.",
+    "tagline": "Premier couples truck camper for single cab trucks, adaptable to a Unimog.",
     "description": "The **4.7m Hardtop Truck Camper** is the premier Beyond RV truck camper option for couples. It can be built for single cab truck platforms or adapted to suit a Unimog, with 2.2m and 2.4m wide configurations available.",
     "featured": false,
     "onSale": false,
@@ -525,7 +525,7 @@
       },
       {
         "label": "Platform",
-        "value": "Single cab truck or Unimog"
+        "value": "Single cab truck, or adapted to suit a Unimog"
       }
     ]
   },
