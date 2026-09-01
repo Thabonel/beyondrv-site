@@ -36,6 +36,7 @@ interface CandidateRow {
   trayLengthMm: number | null;
   trayWidthMm: number | null;
   verificationStatus: string;
+  platform: 'ute' | 'truck';
   published: boolean;
   source: { manufacturer: string; title: string; url: string };
 }
@@ -125,7 +126,7 @@ export const handler: Handler = async (event) => {
         // storing it would have the calculator disown a manufacturer figure.
         const meaningful = dropNoOpCorrections(row as unknown as Record<string, unknown>, draft?.corrections);
         const corrections = Object.keys(meaningful).length ? meaningful : undefined;
-        const result = validateReviewEntry({ id: row.id, reviewer: actor.id, reviewedAt, ...(corrections ? { corrections } : {}) }, incoming.length);
+        const result = validateReviewEntry({ id: row.id, reviewer: actor.id, reviewedAt, ...(corrections ? { corrections } : {}) }, incoming.length, row.platform ?? 'ute');
         if (!result.entry) {
           errors.push(...result.errors);
           continue;
