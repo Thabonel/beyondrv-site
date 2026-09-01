@@ -42,7 +42,10 @@ async function confirmChecks(page: Page) {
     // change triggers a full recalculation and re-render, so a coordinate
     // resolved before that render can land somewhere else by the time the
     // click is delivered, leaving the box unchecked.
-    await box.evaluate((el) => { if (!(el as HTMLInputElement).checked) el.click(); });
+    await box.evaluate((el) => {
+      const input = el as HTMLInputElement;
+      if (!input.checked) input.click();
+    });
     await expect(box).toBeChecked();
   }
 }
