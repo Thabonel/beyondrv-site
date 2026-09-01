@@ -24,6 +24,23 @@ LEFT JOIN data_review_log review ON review.id = (
 ORDER BY v.id;
 `;
 
+// Trucks publish from their own table through the same gate. A chassis with no
+// mass cannot produce a reconciling payload, so the build skips it and this
+// check has to skip it too, or the two disagree about what should be live.
+const truckPublicationQuery = `
+SELECT t.id, t.customer_selectable,
+       review.id AS latest_review_id, review.decision AS latest_review_decision
+FROM heavy_overland_chassis t
+LEFT JOIN data_review_log review ON review.id = (
+  SELECT candidate.id FROM data_review_log candidate
+  WHERE candidate.variant_id = t.id
+  ORDER BY candidate.reviewed_at DESC, candidate.id DESC
+  LIMIT 1
+)
+WHERE t.chassis_cab_total_mass_kg IS NOT NULL
+ORDER BY t.id;
+`;
+
 test('the committed public catalogue exactly matches attributable publication decisions', () => {
   const catalogue = parseVehicleCatalogue(JSON.parse(readFileSync(cataloguePath, 'utf8')) as unknown);
   const overrideResult = validateCatalogueOverrides(JSON.parse(readFileSync(overridesPath, 'utf8')) as unknown);
@@ -31,10 +48,11 @@ test('the committed public catalogue exactly matches attributable publication de
   assert.ok(overrideResult.overrides);
   const overrides = overrideResult.overrides;
 
-  const rows = JSON.parse(execFileSync('sqlite3', ['-json', database, publicationQuery], {
-    cwd: root,
-    encoding: 'utf8',
-  })) as Array<{
+  const readRows = (query: string) => {
+    const out = execFileSync('sqlite3', ['-json', database, query], { cwd: root, encoding: 'utf8' });
+    return out.trim() ? JSON.parse(out) : [];
+  };
+  const rows = [...readRows(publicationQuery), ...readRows(truckPublicationQuery)] as Array<{
     id: string;
     customer_selectable: number;
     latest_review_id: number | null;

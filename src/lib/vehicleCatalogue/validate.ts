@@ -11,7 +11,7 @@ import type { TrayState } from './derive.ts';
 const ALLOWED_SOURCE_HOSTS = new Set([
   'assets.gwmanz.com', 'cdn-iua.dataweavers.io', 'payload.therefinerydesign.com',
   'prd1.isuzu.com.au', 'resource.digitaldealer.com.au', 'www.ford.com.au',
-  'www.fuso.com.au', 'www.gmspecialtyvehicles.com', 'www.iveco.com', 'www.kia.com',
+  'www.fuso.com.au', 'www.gmspecialtyvehicles.com', 'www.hino.com.au', 'www.iveco.com', 'www.kia.com',
   'www.man.com.au', 'www.mazda.com.au', 'www.mercedes-benz-trucks.com',
   'www.mitsubishi-motors.com.au', 'www.nissan.com.au', 'www.ramtrucks.com.au',
   'www.toyota.com.au', 'www.volkswagen.com.au',
