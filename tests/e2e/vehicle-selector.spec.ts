@@ -181,10 +181,8 @@ test('tray weight sums into the vehicle weight, but a negative entry cannot redu
   await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
   await expect(page.locator('#trayMassField')).toBeVisible();
 
-  // Every other required field is set to 1kg (parseRequired demands > 0
-  // throughout the calculator, so 0 would itself trigger the missing-field
-  // path) so #loadedWeight reads back the combined current-weight-plus-tray
-  // figure plus a fixed, known 7kg of other additions.
+  // Use fixed, known additions so #loadedWeight reads back the combined
+  // current-weight-plus-tray figure plus exactly 7kg.
   await page.fill('#gvm', '5000');
   await page.fill('#passengers', '1');
   await page.fill('#accessories', '1');
@@ -205,11 +203,12 @@ test('tray weight sums into the vehicle weight, but a negative entry cannot redu
 
   // A negative tray entry is not a tray weight of zero. On a vehicle whose kerb
   // mass excludes the tray, silently proceeding without it under-counts the
-  // vehicle and overstates the payload, so the result goes to needs-review
-  // instead. It can still never reduce the weight below the published figure.
+  // vehicle and overstates the payload, so vehicle-weight results stay
+  // unavailable. It can still never reduce the weight below the published figure.
   await page.fill('#trayMass', '-50');
-  await expect(page.locator('#statusLabel')).toContainText(/not enough information/i);
-  await expect(page.locator('#loadedWeight')).not.toHaveText(/1,?9\d\d kg/);
+  await expect(page.locator('#statusLabel')).toContainText('Partial estimate');
+  await expect(page.locator('#dataQuality')).toContainText('current vehicle weight');
+  await expect(page.locator('#loadedWeight')).toHaveText('Not calculated');
 });
 
 test('a zero current vehicle weight still needs review even with a tray entered', async ({ page }) => {
@@ -223,8 +222,9 @@ test('a zero current vehicle weight still needs review even with a tray entered'
 
   // A zero current weight must still fall into the missing-field path, not
   // silently be replaced by the tray weight alone.
-  await expect(page.locator('#resultSummary')).toContainText('Needs review');
-  await expect(page.locator('#loadedWeight')).toHaveText('0 kg');
+  await expect(page.locator('#statusLabel')).toContainText('Partial estimate');
+  await expect(page.locator('#dataQuality')).toContainText('current vehicle weight');
+  await expect(page.locator('#loadedWeight')).toHaveText('Not calculated');
 });
 
 test('an invisible tray value from a previous vehicle cannot leak into the calculation', async ({ page }) => {
@@ -282,11 +282,14 @@ test('a vehicle whose kerb mass excludes the tray will not calculate until the t
   }
 
   // A blank tray weight must not be read as zero and pass the vehicle.
-  await expect(page.locator('#statusLabel')).toContainText(/not enough information/i);
+  await expect(page.locator('#statusLabel')).toContainText('Partial estimate');
+  await expect(page.locator('#loadedCamper')).toHaveText(/1,?041 kg/);
+  await expect(page.locator('#trayLengthFit')).toHaveText('300 mm');
+  await expect(page.locator('#loadedWeight')).toHaveText('Not calculated');
   await expect(page.locator('#resultPanel')).toHaveAttribute('data-status', 'amber');
 
   await page.fill('#trayMass', '120');
-  await expect(page.locator('#statusLabel')).not.toContainText(/not enough information/i);
+  await expect(page.locator('#statusLabel')).not.toContainText('Partial estimate');
 });
 
 test('a weighbridge weight that already includes the tray does not demand the tray again', async ({ page }) => {
@@ -306,12 +309,13 @@ test('a weighbridge weight that already includes the tray does not demand the tr
   }
 
   // Blank tray weight still blocks, because nothing has said the figure includes it.
-  await expect(page.locator('#statusLabel')).toContainText(/not enough information/i);
+  await expect(page.locator('#statusLabel')).toContainText('Partial estimate');
+  await expect(page.locator('#loadedWeight')).toHaveText('Not calculated');
 
   await tick(page, 'trayIncluded');
 
   // Now it calculates, and the tray is counted once: 2350 + 7 = 2357kg.
-  await expect(page.locator('#statusLabel')).not.toContainText(/not enough information/i);
+  await expect(page.locator('#statusLabel')).not.toContainText('Partial estimate');
   await expect(page.locator('#loadedWeight')).toHaveText(/2,?357 kg/);
 
   // The tray field is gone, so it cannot be entered twice.
@@ -392,7 +396,8 @@ test('a carried-over inclusion claim cannot produce a green result on a fresh va
 
   // The published kerb excludes the tray and nobody has said otherwise for this
   // vehicle, so the result must not pass on a bare-chassis weight.
-  await expect(page.locator('#statusLabel')).toContainText(/not enough information/i);
+  await expect(page.locator('#statusLabel')).toContainText('Partial estimate');
+  await expect(page.locator('#loadedWeight')).toHaveText('Not calculated');
 });
 
 test('the provenance panel stops crediting a tray weight once it is cleared', async ({ page }) => {

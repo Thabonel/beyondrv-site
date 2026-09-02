@@ -114,7 +114,7 @@ const schema = [
   activePath="/vehicle-suitability-checker/"
   structuredData={schema}
 >
-  <section class="page-hero page-hero--short">
+  <section class="page-hero page-hero--short page-hero--calculator">
     <div class="page-hero-bg" style={`background-image: url('${displayImageUrl(heroImage, 1600)}')`}></div>
     <div class="hero-overlay"></div>
     <div class="hero-overlay-bottom"></div>
@@ -139,7 +139,7 @@ const schema = [
     <script type="application/json" id="camperModelData" set:html={camperModelsJson}></script>
     <div class="form-field">
       <label class="form-label" for="finderTrayLength">Tray length (mm)</label>
-      <input class="form-input" id="finderTrayLength" type="number" min="0" placeholder="2300" />
+      <input class="form-input" id="finderTrayLength" type="number" min="0" placeholder="e.g. 2300" />
     </div>
     <div id="camperFinderResult" data-testid="camper-finder-result" hidden></div>
   </section>
@@ -147,6 +147,10 @@ const schema = [
   <section class="container checker-layout">
     <div class="checker-panel">
       <form class="checker-form" id="slideCalculator">
+        <div class="form-section-heading form-field--full">
+          <h2>Start with your ute</h2>
+          <p>Enter GVM and current weight for the first payload result. The vehicle finder is optional.</p>
+        </div>
         <div class="form-field form-field--full" id="vehiclePickerField">
           <label class="form-label" for="vehicleMake">Find your vehicle (optional)</label>
           <p class="form-help" id="vehiclePickerUnavailable" data-testid="vehicle-picker-unavailable" hidden>
@@ -160,8 +164,8 @@ const schema = [
             <select class="form-input" id="vehicleVariant" disabled><option value="">Select a variant</option></select>
           </div>
           <span class="form-help" id="vehiclePickerHelp">
-            Picking a vehicle fills the published figures below. You can change any of them,
-            and a weighbridge figure for your own vehicle is always better than a published one.
+            Picking a vehicle fills only the published figures available for that exact variant.
+            Check every filled value; a weighbridge figure for your own vehicle is always better.
           </span>
           <div id="vehicleProvenance" class="vehicle-provenance" hidden></div>
         </div>
@@ -172,11 +176,12 @@ const schema = [
         </div>
         <div class="form-field">
           <label class="form-label" for="gvm">Vehicle GVM (kg)</label>
-          <input class="form-input" id="gvm" type="number" min="0" placeholder="3350" />
+          <input class="form-input" id="gvm" type="number" min="0" placeholder="e.g. 3350" />
+          <span class="form-help">Find this on the vehicle compliance plate or manufacturer specification.</span>
         </div>
         <div class="form-field">
           <label class="form-label" for="currentWeight">Current vehicle weight before listed additions (kg)</label>
-          <input class="form-input" id="currentWeight" type="number" min="0" placeholder="2200" />
+          <input class="form-input" id="currentWeight" type="number" min="0" placeholder="e.g. 2200" />
           <span class="form-help">Use a current weighbridge weight if possible. If it already includes passengers or accessories, enter 0 for those items below.</span>
         </div>
         <div class="form-field" id="trayMassField" hidden>
@@ -185,54 +190,71 @@ const schema = [
           <span class="form-help">Tick this if you used a weighbridge figure taken with the tray fitted.</span>
           <div id="trayMassRow">
             <label class="form-label" for="trayMass">Tray weight (kg)</label>
-            <input class="form-input" id="trayMass" type="number" min="0" placeholder="120" />
+            <input class="form-input" id="trayMass" type="number" min="0" placeholder="e.g. 120" />
             <span class="form-help" id="trayMassHelp"></span>
           </div>
         </div>
+        <div class="form-section-heading form-field--full">
+          <h2>Your planned load</h2>
+          <p>Optional. Leave a field blank if it adds no extra weight; blank additions count as 0 kg.</p>
+        </div>
         <div class="form-field">
           <label class="form-label" for="passengers">Passengers (kg)</label>
-          <input class="form-input" id="passengers" type="number" min="0" placeholder="180" />
+          <input class="form-input" id="passengers" type="number" min="0" placeholder="e.g. 180" />
         </div>
         <div class="form-field">
           <label class="form-label" for="accessories">Accessories already fitted (kg)</label>
-          <input class="form-input" id="accessories" type="number" min="0" placeholder="80" />
+          <input class="form-input" id="accessories" type="number" min="0" placeholder="e.g. 80" />
           <span class="form-help">Only include bull bar, winch, canopy, drawers, racks or battery weight not already counted above.</span>
         </div>
         <div class="form-field">
           <label class="form-label" for="luggageGear">Vehicle luggage and gear (kg)</label>
-          <input class="form-input" id="luggageGear" type="number" min="0" placeholder="120" />
+          <input class="form-input" id="luggageGear" type="number" min="0" placeholder="e.g. 120" />
+        </div>
+        <div class="form-section-heading form-field--full">
+          <h2>Your camper</h2>
+          <p>Dry weight starts the camper estimate. Leave water, gear or options blank if none are planned.</p>
         </div>
         <div class="form-field">
           <label class="form-label" for="camperDry">Camper dry weight (kg)</label>
-          <input class="form-input" id="camperDry" type="number" min="0" placeholder="650" />
+          <input class="form-input" id="camperDry" type="number" min="0" placeholder="e.g. 650" />
+          <span class="form-help">Use the confirmed product specification or ask Beyond RV.</span>
         </div>
         <div class="form-field">
           <label class="form-label" for="camperWater">Camper water weight (kg)</label>
-          <input class="form-input" id="camperWater" type="number" min="0" placeholder="80" />
+          <input class="form-input" id="camperWater" type="number" min="0" placeholder="e.g. 80" />
         </div>
         <div class="form-field">
           <label class="form-label" for="camperGear">Camper gear weight (kg)</label>
-          <input class="form-input" id="camperGear" type="number" min="0" placeholder="100" />
+          <input class="form-input" id="camperGear" type="number" min="0" placeholder="e.g. 100" />
         </div>
         <div class="form-field">
           <label class="form-label" for="camperOptions">Camper options weight (kg)</label>
-          <input class="form-input" id="camperOptions" type="number" min="0" placeholder="50" />
+          <input class="form-input" id="camperOptions" type="number" min="0" placeholder="e.g. 50" />
+        </div>
+        <div class="form-section-heading form-field--full">
+          <h2>Tray fit</h2>
+          <p>Measure the usable flat tray or tub area. Compare it with the camper’s confirmed required dimensions.</p>
         </div>
         <div class="form-field">
           <label class="form-label" for="trayLength">Tray or tub usable length (mm)</label>
-          <input class="form-input" id="trayLength" type="number" min="0" placeholder="2150" />
+          <input class="form-input" id="trayLength" type="number" min="0" placeholder="e.g. 2150" />
         </div>
         <div class="form-field">
           <label class="form-label" for="trayWidth">Tray or tub usable width (mm)</label>
-          <input class="form-input" id="trayWidth" type="number" min="0" placeholder="1850" />
+          <input class="form-input" id="trayWidth" type="number" min="0" placeholder="e.g. 1850" />
         </div>
         <div class="form-field">
           <label class="form-label" for="requiredTrayLength">Required tray length (mm)</label>
-          <input class="form-input" id="requiredTrayLength" type="number" min="0" placeholder="2100" />
+          <input class="form-input" id="requiredTrayLength" type="number" min="0" placeholder="e.g. 2100" />
         </div>
         <div class="form-field">
           <label class="form-label" for="requiredTrayWidth">Required tray width (mm)</label>
-          <input class="form-input" id="requiredTrayWidth" type="number" min="0" placeholder="1750" />
+          <input class="form-input" id="requiredTrayWidth" type="number" min="0" placeholder="e.g. 1750" />
+        </div>
+        <div class="form-section-heading form-field--full">
+          <h2>Final safety checks</h2>
+          <p>These checks improve confidence but do not block the preliminary figures above.</p>
         </div>
         <div class="form-field">
           <label class="form-label" for="rearAxleChecked">Rear axle limits checked</label>
@@ -251,24 +273,24 @@ const schema = [
     </div>
 
     <aside class="result-panel" id="resultPanel" data-status="neutral" aria-live="polite">
-      <div class="result-status" id="statusLabel">Enter your numbers to calculate a result.</div>
-      <h2 id="resultTitle">Enter your numbers</h2>
-      <p class="result-summary" id="resultSummary">Enter your numbers to calculate a result.</p>
+      <div class="result-status" id="statusLabel">Enter GVM and current weight to start</div>
+      <h2 id="resultTitle">Start with two numbers</h2>
+      <p class="result-summary" id="resultSummary">Each result appears as soon as its own required information is available.</p>
       <div class="result-metrics">
-        <div class="result-metric"><span>Available payload before camper</span><strong id="availablePayload">0 kg</strong></div>
-        <div class="result-metric"><span>Estimated loaded vehicle weight</span><strong id="loadedWeight">0 kg</strong></div>
-        <div class="result-metric"><span>Remaining GVM margin</span><strong id="gvmMargin">0 kg</strong></div>
-        <div class="result-metric"><span>Estimated loaded camper weight</span><strong id="loadedCamper">0 kg</strong></div>
-        <div class="result-metric"><span>Tray length fit</span><strong id="trayLengthFit">0 mm</strong></div>
-        <div class="result-metric"><span>Tray width fit</span><strong id="trayWidthFit">0 mm</strong></div>
+        <div class="result-metric"><span>Available payload before camper</span><strong id="availablePayload">Not calculated</strong></div>
+        <div class="result-metric"><span>Estimated loaded vehicle weight</span><strong id="loadedWeight">Not calculated</strong></div>
+        <div class="result-metric"><span>Remaining GVM margin</span><strong id="gvmMargin">Not calculated</strong></div>
+        <div class="result-metric"><span>Estimated loaded camper weight</span><strong id="loadedCamper">Not calculated</strong></div>
+        <div class="result-metric"><span>Tray length fit</span><strong id="trayLengthFit">Not calculated</strong></div>
+        <div class="result-metric"><span>Tray width fit</span><strong id="trayWidthFit">Not calculated</strong></div>
         <div class="result-metric"><span>Data quality</span><strong id="dataQuality">Needs review</strong></div>
       </div>
       <div class="result-recommendation">
-        <strong>Beyond RV product recommendation</strong>
-        <p id="recommendation">Confirm with Beyond RV</p>
+        <strong>Next step</strong>
+        <p id="recommendation">Add your first figures, then confirm the final result with Beyond RV.</p>
       </div>
       <ul class="result-notes" id="warningNotes"></ul>
-      <a class="btn-primary" id="sendResult" href="/inquiry-form/?intent=vehicle-suitability">Send this result to Beyond RV</a>
+      <a class="btn-primary" id="sendResult" href="/inquiry-form/?intent=vehicle-suitability">Continue to Enquiry With These Results</a>
     </aside>
   </section>
 
@@ -396,7 +418,7 @@ const schema = [
       choose.type = 'button';
       choose.className = 'btn-ghost camper-finder-choose';
       choose.dataset.testid = 'camper-finder-choose';
-      choose.textContent = 'Check this model below';
+      choose.textContent = 'Use available dimensions below';
       choose.addEventListener('click', () => {
         const required = inputById('requiredTrayLength');
         const tray = inputById('trayLength');
@@ -808,8 +830,6 @@ const schema = [
     trayLengthFit?: number;
     trayWidthFit?: number;
   };
-  const kgOrZero = (value?: number) => value === undefined ? '0 kg' : fmt(value);
-  const mmOrZero = (value?: number) => value === undefined ? '0 mm' : fmtMm(value);
   const kgOrNotCalculated = (value?: number) => value === undefined ? 'Not calculated' : fmt(value);
   const mmOrNotCalculated = (value?: number) => value === undefined ? 'Not calculated' : fmtMm(value);
 
@@ -863,12 +883,12 @@ const schema = [
     setText('statusLabel', result.statusLabel);
     setText('resultTitle', result.title);
     setText('resultSummary', result.summary);
-    setText('availablePayload', kgOrZero(values.availablePayloadBeforeCamper));
-    setText('loadedWeight', kgOrZero(values.estimatedLoadedVehicleWeight));
-    setText('gvmMargin', kgOrZero(values.remainingGvmMargin));
-    setText('loadedCamper', kgOrZero(values.estimatedLoadedCamperWeight));
-    setText('trayLengthFit', mmOrZero(values.trayLengthFit));
-    setText('trayWidthFit', mmOrZero(values.trayWidthFit));
+    setText('availablePayload', kgOrNotCalculated(values.availablePayloadBeforeCamper));
+    setText('loadedWeight', kgOrNotCalculated(values.estimatedLoadedVehicleWeight));
+    setText('gvmMargin', kgOrNotCalculated(values.remainingGvmMargin));
+    setText('loadedCamper', kgOrNotCalculated(values.estimatedLoadedCamperWeight));
+    setText('trayLengthFit', mmOrNotCalculated(values.trayLengthFit));
+    setText('trayWidthFit', mmOrNotCalculated(values.trayWidthFit));
     setText('dataQuality', result.dataQuality);
     setText('recommendation', result.recommendation);
     setNotes(result.notes);

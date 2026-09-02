@@ -16,6 +16,14 @@ test('a question about weights finds the guide, not a product', async ({ page })
   await expect(guides.getByTestId('search-result').filter({ hasText: 'GVM, GCM, ATM and GTM Explained' })).toHaveCount(1);
 });
 
+test('weight calculator search finds the slide-on calculator directly', async ({ page }) => {
+  await page.goto('/search/?q=weight%20calculator');
+
+  const result = page.getByTestId('search-result').filter({ hasText: 'Slide-On Camper Weight Calculator' });
+  await expect(result).toHaveCount(1);
+  await expect(result.getByRole('link')).toHaveAttribute('href', '/slide-on-camper-weight-calculator/');
+});
+
 test('an archived product is not reachable through search', async ({ page }) => {
   await page.goto('/search/?q=sunpatch%2012c');
 
