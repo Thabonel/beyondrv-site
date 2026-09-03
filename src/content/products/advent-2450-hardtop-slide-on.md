@@ -56,7 +56,7 @@ specGroups:
       - label: Overall size
         value: 4410mm x 2050mm x 2000mm (L x W x H)
       - label: Base
-        value: 2450mm x 2050mm base with north-south cabover sleeping area
+        value: 2450mm x 2000mm base with north-south cabover sleeping area
       - label: Roof
         value: Hardtop
   - group: Build and Construction
