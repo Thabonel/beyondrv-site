@@ -68,3 +68,27 @@ test('the committed public catalogue exactly matches attributable publication de
   const published = catalogue.variants.map((variant) => variant.id).sort();
   assert.deepEqual(published, expected);
 });
+
+// The review screen filters on this flag. When it tracked reviews.json alone it
+// counted only one of the publication routes, so every variant published by
+// override reported false and the screen offered all 161 live vehicles back to
+// the reviewer.
+test('the review candidate list agrees with the catalogue about what is published', () => {
+  const candidatesPath = fileURLToPath(new URL('../netlify/functions/vehicle-review-candidates.json', import.meta.url));
+  const { candidates } = JSON.parse(readFileSync(candidatesPath, 'utf8')) as {
+    candidates: Array<{ id: string; published: boolean }>;
+  };
+  const catalogue = parseVehicleCatalogue(JSON.parse(readFileSync(cataloguePath, 'utf8')));
+  const live = new Set(catalogue.variants.map((variant) => variant.id));
+
+  const disagreements = candidates
+    .filter((candidate) => candidate.published !== live.has(candidate.id))
+    .map((candidate) => `${candidate.id}: published=${candidate.published}, live=${live.has(candidate.id)}`);
+  assert.deepEqual(disagreements, [], disagreements.join('\n'));
+
+  // A control: the flag has to discriminate. All true or all false would satisfy
+  // the comparison above only if the catalogue were empty or held every row.
+  const published = candidates.filter((candidate) => candidate.published).length;
+  assert.ok(published > 0, 'no candidate is marked published');
+  assert.ok(published < candidates.length, 'every candidate is marked published, so the flag says nothing');
+});
