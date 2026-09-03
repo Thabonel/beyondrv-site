@@ -197,7 +197,7 @@ Each of these carries a regenerated `catalogue.json`. If a merge conflicts, the
 conflict will be in a generated file: regenerate with `npm run catalogue:build`
 rather than hand-merging. See "Traps".
 
-### 2. The 23 optimistic-kerb Ford variants
+### 2. Decided: the 23 optimistic-kerb Ford variants
 
 #50 publishes 27 variants flagged `needs_secondary_review`. Four were flagged
 over a one-kilogram discrepancy in a manufacturer's own published payload, and
@@ -248,6 +248,28 @@ Do not derive these figures from the 2022MY rows. The generations differ, and a
 heaviest of 2341 kg is a coincidence of two different bases, not a relationship
 to extrapolate from.
 
+#### Decided on 4 September
+
+The owner's instruction is that these are a guide, not a life-and-death figure,
+and that every number is checked when the customer brings the vehicle to the
+factory. The research note on all 23 rows now records that decision instead of
+the instruction "Do not expose until the conservative figure is added", which the
+site had already overtaken and which made the record contradict the site.
+
+**The phrase `OPTIMISTIC KERB` was deliberately preserved in every note.** The
+build derives the customer disclosure from that literal string:
+
+```js
+kerbIsOptimistic: !correctedFields.includes('kerbKg') && /OPTIMISTIC KERB/i.test(r.notes ?? '')
+```
+
+Rewriting a note without it would silently switch the disclosure off for that
+variant, with nothing failing. If these notes are ever edited again, check the
+flag count is still 23 afterwards.
+
+The heavier figure is still worth adding when a copy of the brochure is to hand,
+and the note now says so per row. It is no longer a blocker.
+
 #### Until then
 
 Nothing is misrepresented to a customer. The calculator discloses the basis on
@@ -263,7 +285,41 @@ say whether they belong with the optimistic 23 or the conservative 17. They are
 not flagged. Establishing their basis is a smaller job than the Ranger one and
 has the same shape.
 
-### 3. Nine truck families still unresearched
+### 3. seed.sql no longer rebuilds the committed database
+
+`bash data/vehicle-selector/build-database.sh` rebuilds the sqlite from
+`schema.sql` and `seed.sql`. Running it on 4 September produced **13 heavy
+overland chassis and 28 sources where the committed database has 15 and 29**.
+
+The missing rows are `hino-300-817-4x4-single-cab`, `hino-300-817-4x4-crew-cab`
+and the source `hino-300-817-4x4-spec-0822`. The Hino research on 1 September was
+written into the binary and never back into the seed.
+
+So **running the build script silently deletes the Hino**, and the script reports
+success while doing it. Either write those rows into `seed.sql`, or stop
+treating the script as a safe rebuild. Until then, edit the committed database
+directly with `UPDATE`, as the note change on 4 September did, and keep the seed
+and the CSV in step by hand.
+
+### 4. A published variant still says "Do not expose"
+
+`ford-ranger-super-duty-my26-single-cab` is live on production and carries this
+research note:
+
+> Do not expose until Ford publishes a full delivered-variant mass table and
+> tray/body deductions are configured.
+
+Unlike the 23, it carries **no customer disclosure at all**: its kerb basis is
+`Derived from GVM minus published maximum payload; excludes tray`, so it is a
+derived figure rather than a published one, and `kerbIsOptimistic` is false
+because the note does not contain `OPTIMISTIC KERB`.
+
+That is the weaker position of the two. The 23 are optimistic and say so; this
+one is derived and says nothing. Three options: add a disclosure of its own,
+hide it until Ford publishes the mass table, or accept it as a guide like the 23
+and update the note to record that decision. Not decided.
+
+### 5. Nine truck families still unresearched
 
 Isuzu Trucks N Series, Fuso Canter, Mercedes-Benz Sprinter Cab Chassis,
 Volkswagen Crafter Cab Chassis, IVECO T-Way 4x4/6x6, MAN TGS 4x4/6x6,
@@ -277,13 +333,13 @@ fields the schema wants, including `max_body_length_mm`, which decides which
 camper a chassis can take. `hino.com.au` returned 403 to an automated fetch; the
 identical document was read from a mirror and the source row records that.
 
-### 4. Five chassis that cannot publish
+### 6. Five chassis that cannot publish
 
 Three have no `chassis_cab_total_mass_kg`, so no reconciling payload. Two Isuzu
 NPS rows have no `model_year_start`, which the catalogue requires as an integer.
 The build names each one it skips, and refuses loudly if somebody selects one.
 
-### 5. Completed: the Advent 2450's two widths
+### 7. Completed: the Advent 2450's two widths
 
 Fixed on 3 September. The contradiction was between two frontmatter entries both
 labelled "Base": `keySpecs` said `2450mm x 2000mm` and `specGroups` said
@@ -300,12 +356,12 @@ Overall width stays 2050mm. **If the GM knows the 2450's base really is 2050mm,
 the one-line change belongs in `keySpecs` instead**, and the whole range should
 be checked, because all three Advents claim a 2000mm base.
 
-### 6. Pull request #34, tray sizes
+### 8. Pull request #34, tray sizes
 
 Held since 22 August because nothing was published, so the feature was
 unreachable. That reason has gone.
 
-### 7. The review screen offers vehicles that are already published
+### 9. Completed: the review screen offered published vehicles
 
 Every one of the 161 live variants shows `published: false` in
 `vehicle-review-candidates.json`, so the review screen still lists them all as
@@ -313,7 +369,7 @@ candidates. The flag tracks `reviews.json` only, and everything live went throug
 the override path instead. Pre-existing, and confirmed against `main` rather than
 assumed.
 
-### 8. Generated files are committed
+### 10. Generated files are committed
 
 `catalogue.json` and `netlify/functions/vehicle-review-candidates.json` are
 generated and committed. Any two branches that touch vehicle data conflict in
