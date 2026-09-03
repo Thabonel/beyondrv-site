@@ -38,6 +38,14 @@ test('nothing is claimed before a tray length is entered', async ({ page }) => {
   await expect(page.getByTestId(result)).toBeHidden();
 });
 
+test('both customer tray dimensions are visible without opening advanced details', async ({ page }) => {
+  await page.goto(pagePath);
+
+  await expect(page.locator('#trayLength')).toBeVisible();
+  await expect(page.locator('#trayWidth')).toBeVisible();
+  await expect(page.locator('#camperDetails')).not.toHaveAttribute('open', '');
+});
+
 test('choosing a suggested camper fills only the camper requirement', async ({ page }) => {
   await page.goto(pagePath);
   await page.fill('#trayLength', '2300');

@@ -217,7 +217,7 @@ const schema = [
 
         <fieldset class="quick-step form-field--full">
           <legend><span>2</span> Your camper and tray</legend>
-          <p class="quick-step-intro">Choose a camper or enter your usable tray length. A length match is a shortlist, not a final suitability decision.</p>
+          <p class="quick-step-intro">Choose a camper and enter the usable length and width of your tray. These dimensions decide the preliminary physical fit; weight refines the payload check.</p>
           <div class="details-grid details-grid--quick">
             <div class="form-field">
               <label class="form-label" for="camperModel">Camper you want to check (optional)</label>
@@ -233,6 +233,11 @@ const schema = [
               <span class="form-help" id="trayLengthHelp">Measure the flat usable area, not the vehicle's overall length.</span>
             </div>
             <div class="form-field">
+              <label class="form-label" for="trayWidth">Usable tray or tub width (mm)</label>
+              <input class="form-input" id="trayWidth" name="trayWidth" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 1850" aria-describedby="trayWidthHelp" />
+              <span class="form-help" id="trayWidthHelp">Measure the narrowest flat usable width between anything that limits the camper.</span>
+            </div>
+            <div class="form-field">
               <label class="form-label" for="camperDry">Camper dry weight (kg)</label>
               <input class="form-input" id="camperDry" name="camperDry" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 650" aria-describedby="camperDryHelp" />
               <span class="form-help" id="camperDryHelp">Use the confirmed product specification. Beyond RV will verify it before build.</span>
@@ -240,7 +245,7 @@ const schema = [
           </div>
           <div id="camperFinderResult" data-testid="camper-finder-result" aria-live="polite" hidden></div>
           <details class="advanced-details" id="camperDetails">
-            <summary>Add water, gear, options and full tray dimensions</summary>
+            <summary>Add water, gear, options and camper dimensions</summary>
             <div class="details-grid">
               <div class="form-field">
                 <label class="form-label" for="camperWater">Camper water weight (kg)</label>
@@ -253,10 +258,6 @@ const schema = [
               <div class="form-field">
                 <label class="form-label" for="camperOptions">Camper options weight (kg)</label>
                 <input class="form-input" id="camperOptions" name="camperOptions" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 50" />
-              </div>
-              <div class="form-field">
-                <label class="form-label" for="trayWidth">Usable tray or tub width (mm)</label>
-                <input class="form-input" id="trayWidth" name="trayWidth" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 1850" />
               </div>
               <div class="form-field">
                 <label class="form-label" for="requiredTrayLength">Camper required tray length (mm)</label>
