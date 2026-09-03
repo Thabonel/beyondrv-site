@@ -933,7 +933,27 @@ const schema = [
       `Recommendation: ${result.recommendation}`
     ].join('\n');
     const send = byId('sendResult');
-    if (send) send.setAttribute('href', `/inquiry-form/?intent=vehicle-suitability&message=${encodeURIComponent(message)}&fit_check_summary=${encodeURIComponent(message)}`);
+    if (send) {
+      const params = new URLSearchParams({ intent: 'vehicle-suitability', message, fit_check_summary: message });
+      // The customer's own tray: the detailed field, or the finder step above it
+      // when that is all they have filled in. Never requiredTrayLength, which is
+      // the camper's requirement rather than the tray they own.
+      const customerTrayLength = value('trayLength') || value('finderTrayLength');
+      if (Number(customerTrayLength) > 0) params.set('tray_length', customerTrayLength);
+      // What the customer typed, or what the picker filled in for them. Never the
+      // 'your vehicle' fallback the summary prose uses, which would arrive as
+      // literal placeholder text in a field meant to name a vehicle.
+      const typedVehicle = value('vehicleName').trim();
+      if (typedVehicle) params.set('vehicle_make_model_year', typedVehicle);
+      // A tub is the one tray type the catalogue actually knows, from the
+      // manufacturer's body type. A tray tells us nothing about steel, alloy or
+      // canopy, so that stays for the customer to answer. Read from the selected
+      // variant rather than the module-level trayState, which starts life as
+      // 'not_applicable' and would otherwise claim a tub before anyone picked a
+      // vehicle.
+      if (selectedVariant?.trayState === 'not_applicable') params.set('tray_type', 'Tub');
+      send.setAttribute('href', `/inquiry-form/?${params}`);
+    }
   }
 
   fields.forEach(id => byId(id)?.addEventListener('input', () => {
