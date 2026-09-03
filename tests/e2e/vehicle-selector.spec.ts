@@ -27,6 +27,19 @@ async function openCalculatorWithFixture(page: Page) {
   await page.goto(calculatorPath);
 }
 
+async function ensureFieldVisible(page: Page, selector: string) {
+  const field = page.locator(selector);
+  const details = field.locator('xpath=ancestor::details[1]');
+  if (await details.count() && await details.getAttribute('open') === null) {
+    await details.locator('summary').click();
+  }
+}
+
+async function fillField(page: Page, selector: string, value: string) {
+  await ensureFieldVisible(page, selector);
+  await page.fill(selector, value);
+}
+
 // Every field change triggers a full recalculation and re-render, so the fill
 // immediately before these shifts the layout underneath them. page.check()
 // clicks and then reads the state once, throwing if it does not match rather
@@ -34,6 +47,7 @@ async function openCalculatorWithFixture(page: Page) {
 // assertion retry, and still fails loudly if the click really did not land.
 /** Retry the complete pointer interaction when recalculation shifts layout. */
 async function tick(page: Page, id: string) {
+  await ensureFieldVisible(page, `#${id}`);
   const box = page.locator(`#${id}`);
   await expect(box).toBeVisible();
   await expect(box).toBeEnabled();
@@ -56,9 +70,10 @@ async function completeManualCalculation(page: Page) {
     ['camperOptions', '1'], ['trayLength', '2000'], ['trayWidth', '1800'],
     ['requiredTrayLength', '1900'], ['requiredTrayWidth', '1700'],
   ] as const) {
-    await page.fill(`#${id}`, value);
+    await fillField(page, `#${id}`, value);
   }
   for (const id of ['rearAxleChecked', 'tyreRatingsChecked', 'centreOfGravityChecked']) {
+    await ensureFieldVisible(page, `#${id}`);
     await page.locator(`#${id}`).press('Space');
   }
   await expect(page.locator('#loadedWeight')).toHaveText(/2,?207 kg/);
@@ -75,6 +90,7 @@ test('picking a vehicle fills the published figures', async ({ page }) => {
 
   await expect(page.locator('#gvm')).toHaveValue(String(variant.gvmKg));
   await expect(page.locator('#currentWeight')).toHaveValue(String(variant.kerbKg));
+  await expect(page.locator('#availablePayload')).not.toHaveText('Not calculated');
   await expect(page.locator('#vehicleProvenance')).toContainText('Published by Mazda Australia');
 });
 
@@ -85,7 +101,7 @@ test('a figure the customer typed survives re-picking a vehicle', async ({ page 
   const options = page.locator('#vehicleVariant option');
   await page.selectOption('#vehicleVariant', await options.nth(1).getAttribute('value') ?? '');
 
-  await page.fill('#gvm', '9999');
+  await fillField(page, '#gvm', '9999');
   await page.selectOption('#vehicleVariant', await options.nth(2).getAttribute('value') ?? '');
   await expect(page.locator('#gvm')).toHaveValue('9999');
 });
@@ -172,29 +188,29 @@ test('tray weight sums into the vehicle weight, but a negative entry cannot redu
 
   // Use fixed, known additions so #loadedWeight reads back the combined
   // current-weight-plus-tray figure plus exactly 7kg.
-  await page.fill('#gvm', '5000');
-  await page.fill('#passengers', '1');
-  await page.fill('#accessories', '1');
-  await page.fill('#luggageGear', '1');
-  await page.fill('#camperDry', '1');
-  await page.fill('#camperWater', '1');
-  await page.fill('#camperGear', '1');
-  await page.fill('#camperOptions', '1');
-  await page.fill('#trayLength', '2000');
-  await page.fill('#trayWidth', '1800');
-  await page.fill('#requiredTrayLength', '1900');
-  await page.fill('#requiredTrayWidth', '1700');
+  await fillField(page, '#gvm', '5000');
+  await fillField(page, '#passengers', '1');
+  await fillField(page, '#accessories', '1');
+  await fillField(page, '#luggageGear', '1');
+  await fillField(page, '#camperDry', '1');
+  await fillField(page, '#camperWater', '1');
+  await fillField(page, '#camperGear', '1');
+  await fillField(page, '#camperOptions', '1');
+  await fillField(page, '#trayLength', '2000');
+  await fillField(page, '#trayWidth', '1800');
+  await fillField(page, '#requiredTrayLength', '1900');
+  await fillField(page, '#requiredTrayWidth', '1700');
   await confirmChecks(page);
 
   // Ordinary case: 2046kg current weight + 120kg tray + 7kg fixed additions = 2173kg.
-  await page.fill('#trayMass', '120');
+  await fillField(page, '#trayMass', '120');
   await expect(page.locator('#loadedWeight')).toHaveText(/2,?173 kg/);
 
   // A negative tray entry is not a tray weight of zero. On a vehicle whose kerb
   // mass excludes the tray, silently proceeding without it under-counts the
   // vehicle and overstates the payload, so vehicle-weight results stay
   // unavailable. It can still never reduce the weight below the published figure.
-  await page.fill('#trayMass', '-50');
+  await fillField(page, '#trayMass', '-50');
   await expect(page.locator('#statusLabel')).toContainText('Partial estimate');
   await expect(page.locator('#dataQuality')).toContainText('current vehicle weight');
   await expect(page.locator('#loadedWeight')).toHaveText('Not calculated');
@@ -206,8 +222,8 @@ test('a zero current vehicle weight still needs review even with a tray entered'
   await page.selectOption('#vehicleModel', 'Ranger');
   await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
 
-  await page.fill('#currentWeight', '0');
-  await page.fill('#trayMass', '120');
+  await fillField(page, '#currentWeight', '0');
+  await fillField(page, '#trayMass', '120');
 
   // A zero current weight must still fall into the missing-field path, not
   // silently be replaced by the tray weight alone.
@@ -222,7 +238,7 @@ test('an invisible tray value from a previous vehicle cannot leak into the calcu
   await page.selectOption('#vehicleModel', 'Ranger');
   await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
   await expect(page.locator('#trayMassField')).toBeVisible();
-  await page.fill('#trayMass', '150');
+  await fillField(page, '#trayMass', '150');
 
   // Switch to a variant whose kerb mass already includes the tray (same make
   // and model, so this exercises applyVariant's hide path, not the broader
@@ -232,18 +248,18 @@ test('an invisible tray value from a previous vehicle cannot leak into the calcu
   await expect(page.locator('#trayMassField')).toBeHidden();
   await expect(page.locator('#trayMass')).toHaveValue('');
 
-  await page.fill('#gvm', '5000');
-  await page.fill('#passengers', '1');
-  await page.fill('#accessories', '1');
-  await page.fill('#luggageGear', '1');
-  await page.fill('#camperDry', '1');
-  await page.fill('#camperWater', '1');
-  await page.fill('#camperGear', '1');
-  await page.fill('#camperOptions', '1');
-  await page.fill('#trayLength', '2000');
-  await page.fill('#trayWidth', '1800');
-  await page.fill('#requiredTrayLength', '1900');
-  await page.fill('#requiredTrayWidth', '1700');
+  await fillField(page, '#gvm', '5000');
+  await fillField(page, '#passengers', '1');
+  await fillField(page, '#accessories', '1');
+  await fillField(page, '#luggageGear', '1');
+  await fillField(page, '#camperDry', '1');
+  await fillField(page, '#camperWater', '1');
+  await fillField(page, '#camperGear', '1');
+  await fillField(page, '#camperOptions', '1');
+  await fillField(page, '#trayLength', '2000');
+  await fillField(page, '#trayWidth', '1800');
+  await fillField(page, '#requiredTrayLength', '1900');
+  await fillField(page, '#requiredTrayWidth', '1700');
   await confirmChecks(page);
 
   // 2201kg published kerb mass + 7kg fixed additions = 2208kg, with no 150kg
@@ -267,7 +283,7 @@ test('a vehicle whose kerb mass excludes the tray will not calculate until the t
   for (const [id, v] of [['passengers', '180'], ['accessories', '80'], ['luggageGear', '50'],
     ['camperDry', '900'], ['camperWater', '80'], ['camperGear', '60'], ['camperOptions', '1'],
     ['trayLength', '2400'], ['trayWidth', '1800'], ['requiredTrayLength', '2100'], ['requiredTrayWidth', '1700']] as const) {
-    await page.fill(`#${id}`, v);
+    await fillField(page, `#${id}`, v);
   }
 
   // A blank tray weight must not be read as zero and pass the vehicle.
@@ -277,7 +293,7 @@ test('a vehicle whose kerb mass excludes the tray will not calculate until the t
   await expect(page.locator('#loadedWeight')).toHaveText('Not calculated');
   await expect(page.locator('#resultPanel')).toHaveAttribute('data-status', 'amber');
 
-  await page.fill('#trayMass', '120');
+  await fillField(page, '#trayMass', '120');
   await expect(page.locator('#statusLabel')).not.toContainText('Partial estimate');
 });
 
@@ -290,11 +306,11 @@ test('a weighbridge weight that already includes the tray does not demand the tr
 
   // The page tells people to use a weighbridge figure; that figure includes
   // the tray already bolted on.
-  await page.fill('#currentWeight', '2350');
+  await fillField(page, '#currentWeight', '2350');
   for (const [id, v] of [['gvm', '5000'], ['passengers', '1'], ['accessories', '1'], ['luggageGear', '1'],
     ['camperDry', '1'], ['camperWater', '1'], ['camperGear', '1'], ['camperOptions', '1'],
     ['trayLength', '2000'], ['trayWidth', '1800'], ['requiredTrayLength', '1900'], ['requiredTrayWidth', '1700']] as const) {
-    await page.fill(`#${id}`, v);
+    await fillField(page, `#${id}`, v);
   }
 
   // Blank tray weight still blocks, because nothing has said the figure includes it.
@@ -323,7 +339,7 @@ test('overriding a prefilled figure is disclosed in the provenance panel straigh
 
   // Override the manufacturer GVM. The panel must stop implying that figure
   // came from the manufacturer document.
-  await page.fill('#gvm', '3500');
+  await fillField(page, '#gvm', '3500');
 
   await expect(provenance).toContainText('You supplied GVM');
   await expect(provenance).toContainText('not from the manufacturer document');
@@ -335,8 +351,8 @@ test('the provenance panel names every figure the customer has overridden', asyn
   await page.selectOption('#vehicleModel', 'Ranger');
   await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
 
-  await page.fill('#gvm', '3500');
-  await page.fill('#currentWeight', '2350');
+  await fillField(page, '#gvm', '3500');
+  await fillField(page, '#currentWeight', '2350');
 
   const provenance = page.locator('#vehicleProvenance');
   await expect(provenance).toContainText('You supplied GVM');
@@ -378,7 +394,7 @@ test('a carried-over inclusion claim cannot produce a green result on a fresh va
   for (const [id, v] of [['gvm', '5000'], ['passengers', '1'], ['accessories', '1'], ['luggageGear', '1'],
     ['camperDry', '1'], ['camperWater', '1'], ['camperGear', '1'], ['camperOptions', '1'],
     ['trayLength', '2000'], ['trayWidth', '1800'], ['requiredTrayLength', '1900'], ['requiredTrayWidth', '1700']] as const) {
-    await page.fill(`#${id}`, v);
+    await fillField(page, `#${id}`, v);
   }
 
   await page.selectOption('#vehicleVariant', RANGER_CC_B);
@@ -393,7 +409,7 @@ test('the provenance panel stops crediting a tray weight once it is cleared', as
   await openCalculatorWithFixture(page);
   await pickRanger(page, RANGER_CC_A);
 
-  await page.fill('#trayMass', '120');
+  await fillField(page, '#trayMass', '120');
   const provenance = page.locator('#vehicleProvenance');
   await expect(provenance).toContainText('the tray weight');
 

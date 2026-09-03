@@ -17,6 +17,8 @@ export interface CamperModel {
   name: string;
   url: string;
   nominalLengthMm: number | null;
+  dryWeightKg?: string | null;
+  requiredTrayWidthMm?: string | null;
   status: string;
 }
 
