@@ -14,7 +14,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "GMSV",
         "title": "Towing With Silverado",
@@ -35,7 +35,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "GMSV",
         "title": "Towing With Silverado",
@@ -56,7 +56,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "GMSV",
         "title": "Towing With Silverado",
@@ -77,7 +77,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "GMSV",
         "title": "Towing With Silverado",
@@ -98,7 +98,7 @@
       "trayWidthMm": 1650,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "F-150 MY24 Specification Sheet",
@@ -119,7 +119,7 @@
       "trayWidthMm": 1650,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "F-150 MY24 Specification Sheet",
@@ -140,7 +140,7 @@
       "trayWidthMm": 1650,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "F-150 MY24 Specification Sheet",
@@ -161,7 +161,7 @@
       "trayWidthMm": 1650,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "F-150 MY24 Specification Sheet",
@@ -182,7 +182,7 @@
       "trayWidthMm": 1650,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "F-150 MY24 Specification Sheet",
@@ -203,7 +203,7 @@
       "trayWidthMm": 1650,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "F-150 MY24 Specification Sheet",
@@ -224,7 +224,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Next-Generation Ranger 2022MY Specifications",
@@ -245,7 +245,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Next-Generation Ranger 2022MY Specifications",
@@ -266,7 +266,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Next-Generation Ranger 2022MY Specifications",
@@ -287,7 +287,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Next-Generation Ranger 2022MY Specifications",
@@ -308,7 +308,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Next-Generation Ranger 2022MY Specifications",
@@ -329,7 +329,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Next-Generation Ranger 2022MY Specifications",
@@ -350,7 +350,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Next-Generation Ranger 2022MY Specifications",
@@ -371,7 +371,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Next-Generation Ranger 2022MY Specifications",
@@ -392,7 +392,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Next-Generation Ranger 2022MY Specifications",
@@ -413,7 +413,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Next-Generation Ranger 2022MY Specifications",
@@ -434,7 +434,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Next-Generation Ranger 2022MY Specifications",
@@ -455,7 +455,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Next-Generation Ranger 2022MY Specifications",
@@ -476,7 +476,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Next-Generation Ranger 2022MY Specifications",
@@ -497,7 +497,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Next-Generation Ranger 2022MY Specifications",
@@ -518,7 +518,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Next-Generation Ranger 2022MY Specifications",
@@ -539,7 +539,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Next-Generation Ranger 2022MY Specifications",
@@ -560,7 +560,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Next-Generation Ranger 2022MY Specifications",
@@ -581,7 +581,7 @@
       "trayWidthMm": 1584,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -602,7 +602,7 @@
       "trayWidthMm": 1584,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -623,7 +623,7 @@
       "trayWidthMm": 1520,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -644,7 +644,7 @@
       "trayWidthMm": 1578,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -665,7 +665,7 @@
       "trayWidthMm": 1520,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -686,7 +686,7 @@
       "trayWidthMm": 1520,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -707,7 +707,7 @@
       "trayWidthMm": 1520,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -728,7 +728,7 @@
       "trayWidthMm": 1584,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -749,7 +749,7 @@
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -770,7 +770,7 @@
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -791,7 +791,7 @@
       "trayWidthMm": 1584,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -812,7 +812,7 @@
       "trayWidthMm": 1584,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -833,7 +833,7 @@
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -854,7 +854,7 @@
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -875,7 +875,7 @@
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -896,7 +896,7 @@
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -917,7 +917,7 @@
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -938,7 +938,7 @@
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -959,7 +959,7 @@
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -980,7 +980,7 @@
       "trayWidthMm": 1520,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -1001,7 +1001,7 @@
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -1022,7 +1022,7 @@
       "trayWidthMm": 1520,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -1043,7 +1043,7 @@
       "trayWidthMm": 1578,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ranger 2026.50MY Specifications Brochure",
@@ -1064,7 +1064,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Ford Australia",
         "title": "Ford Ranger Super Duty",
@@ -1085,7 +1085,7 @@
       "trayWidthMm": 1520,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "GWM Australia",
         "title": "Cannon 2026 Brochure",
@@ -1106,7 +1106,7 @@
       "trayWidthMm": 1895,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "GWM Australia",
         "title": "Cannon 2026 Brochure",
@@ -1127,7 +1127,7 @@
       "trayWidthMm": 1520,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "GWM Australia",
         "title": "Cannon 2026 Brochure",
@@ -1148,7 +1148,7 @@
       "trayWidthMm": 1895,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "GWM Australia",
         "title": "Cannon 2026 Brochure",
@@ -1169,7 +1169,7 @@
       "trayWidthMm": 1520,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "GWM Australia",
         "title": "Cannon 2026 Brochure",
@@ -1190,7 +1190,7 @@
       "trayWidthMm": 1520,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "GWM Australia",
         "title": "Cannon 2026 Brochure",
@@ -1211,7 +1211,7 @@
       "trayWidthMm": 1520,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "GWM Australia",
         "title": "Cannon 2026 Brochure",
@@ -1232,7 +1232,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "GWM Australia",
         "title": "Cannon Alpha Brochure",
@@ -1253,7 +1253,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "GWM Australia",
         "title": "Cannon Alpha Brochure",
@@ -1274,7 +1274,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "GWM Australia",
         "title": "Cannon Alpha Brochure",
@@ -1295,7 +1295,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "GWM Australia",
         "title": "Cannon Alpha Brochure",
@@ -1316,7 +1316,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "GWM Australia",
         "title": "Cannon Alpha Brochure",
@@ -1337,7 +1337,7 @@
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
         "title": "25.5MY Isuzu D-MAX Specifications",
@@ -1358,7 +1358,7 @@
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
         "title": "25.5MY Isuzu D-MAX Specifications",
@@ -1379,7 +1379,7 @@
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
         "title": "25.5MY Isuzu D-MAX Specifications",
@@ -1400,7 +1400,7 @@
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
         "title": "25.5MY Isuzu D-MAX Specifications",
@@ -1421,7 +1421,7 @@
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
         "title": "25.5MY Isuzu D-MAX Specifications",
@@ -1442,7 +1442,7 @@
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
         "title": "25.5MY Isuzu D-MAX Specifications",
@@ -1463,7 +1463,7 @@
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
         "title": "25.5MY Isuzu D-MAX Specifications",
@@ -1484,7 +1484,7 @@
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
         "title": "25.5MY Isuzu D-MAX Specifications",
@@ -1505,7 +1505,7 @@
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
         "title": "25.5MY Isuzu D-MAX Specifications",
@@ -1526,7 +1526,7 @@
       "trayWidthMm": 1777,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Isuzu UTE Australia",
         "title": "25.5MY Isuzu D-MAX Specifications",
@@ -1547,7 +1547,7 @@
       "trayWidthMm": 1570,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "KGM Australia",
         "title": "Musso and Musso XLV MY26 Specifications and Features",
@@ -1568,7 +1568,7 @@
       "trayWidthMm": 1570,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "KGM Australia",
         "title": "Musso and Musso XLV MY26 Specifications and Features",
@@ -1589,7 +1589,7 @@
       "trayWidthMm": 1570,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "KGM Australia",
         "title": "Musso and Musso XLV MY26 Specifications and Features",
@@ -1610,7 +1610,7 @@
       "trayWidthMm": 1570,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "KGM Australia",
         "title": "Musso and Musso XLV MY26 Specifications and Features",
@@ -1631,7 +1631,7 @@
       "trayWidthMm": 1570,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "KGM Australia",
         "title": "Musso and Musso XLV MY26 Specifications and Features",
@@ -1652,7 +1652,7 @@
       "trayWidthMm": 1570,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "KGM Australia",
         "title": "Musso and Musso XLV MY26 Specifications and Features",
@@ -1673,7 +1673,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Kia Australia",
         "title": "Kia Tasman Cab Chassis Brochure",
@@ -1694,7 +1694,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Kia Australia",
         "title": "Kia Tasman Cab Chassis Brochure",
@@ -1715,7 +1715,7 @@
       "trayWidthMm": 1600,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Kia Australia",
         "title": "Kia Tasman Model Year 2026 Brochure",
@@ -1736,7 +1736,7 @@
       "trayWidthMm": 1600,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Kia Australia",
         "title": "Kia Tasman Model Year 2026 Brochure",
@@ -1757,7 +1757,7 @@
       "trayWidthMm": 1600,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Kia Australia",
         "title": "Kia Tasman Model Year 2026 Brochure",
@@ -1778,7 +1778,7 @@
       "trayWidthMm": 1572,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Kia Australia",
         "title": "Kia Tasman Model Year 2026 Brochure",
@@ -1799,7 +1799,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Kia Australia",
         "title": "Kia Tasman Cab Chassis Brochure",
@@ -1820,7 +1820,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Kia Australia",
         "title": "Kia Tasman Cab Chassis Brochure",
@@ -1841,7 +1841,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Kia Australia",
         "title": "Kia Tasman Cab Chassis Brochure",
@@ -1862,7 +1862,7 @@
       "trayWidthMm": 1572,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Kia Australia",
         "title": "Kia Tasman Model Year 2026 Brochure",
@@ -1883,7 +1883,7 @@
       "trayWidthMm": 1572,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Kia Australia",
         "title": "Kia Tasman Model Year 2026 Brochure",
@@ -1904,7 +1904,7 @@
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -1925,7 +1925,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -1946,7 +1946,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -1967,7 +1967,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -1988,7 +1988,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -2009,7 +2009,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -2030,7 +2030,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -2051,7 +2051,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -2072,7 +2072,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -2093,7 +2093,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -2114,7 +2114,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -2135,7 +2135,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -2156,7 +2156,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -2177,7 +2177,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -2198,7 +2198,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -2219,7 +2219,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -2240,7 +2240,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -2261,7 +2261,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -2282,7 +2282,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -2303,7 +2303,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mazda Australia",
         "title": "Mazda BT-50 Payload Calculator",
@@ -2324,7 +2324,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
         "title": "26MY Triton Brochure",
@@ -2345,7 +2345,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
         "title": "26MY Triton Brochure",
@@ -2366,7 +2366,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
         "title": "26MY Triton Brochure",
@@ -2387,7 +2387,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
         "title": "26MY Triton Brochure",
@@ -2408,7 +2408,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
         "title": "26MY Triton Brochure",
@@ -2429,7 +2429,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
         "title": "26MY Triton Brochure",
@@ -2450,7 +2450,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
         "title": "26MY Triton Brochure",
@@ -2471,7 +2471,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
         "title": "26MY Triton Brochure",
@@ -2492,7 +2492,7 @@
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
         "title": "26MY Triton Brochure",
@@ -2513,7 +2513,7 @@
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
         "title": "26MY Triton Brochure",
@@ -2534,7 +2534,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
         "title": "26MY Triton Brochure",
@@ -2555,7 +2555,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
         "title": "26MY Triton Brochure",
@@ -2576,7 +2576,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
         "title": "26MY Triton Brochure",
@@ -2597,7 +2597,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
         "title": "26MY Triton Brochure",
@@ -2618,7 +2618,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
         "title": "26MY Triton Brochure",
@@ -2639,7 +2639,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
         "title": "26MY Triton Brochure",
@@ -2660,7 +2660,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Mitsubishi Motors Australia",
         "title": "26MY Triton Brochure",
@@ -2681,7 +2681,7 @@
       "trayWidthMm": 1545,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Nissan Australia",
         "title": "All-New Navara Specifications and Pricing",
@@ -2702,7 +2702,7 @@
       "trayWidthMm": 1545,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Nissan Australia",
         "title": "All-New Navara Specifications and Pricing",
@@ -2723,7 +2723,7 @@
       "trayWidthMm": 1545,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Nissan Australia",
         "title": "All-New Navara Specifications and Pricing",
@@ -2744,7 +2744,7 @@
       "trayWidthMm": 1545,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Nissan Australia",
         "title": "All-New Navara Specifications and Pricing",
@@ -2765,7 +2765,7 @@
       "trayWidthMm": 1295,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "RAM Trucks Australia",
         "title": "RAM 1500 Specification Brochure",
@@ -2786,7 +2786,7 @@
       "trayWidthMm": 1270,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "RAM Trucks Australia",
         "title": "RAM 1500 Specification Brochure",
@@ -2807,7 +2807,7 @@
       "trayWidthMm": 1270,
       "verificationStatus": "needs_secondary_review",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "RAM Trucks Australia",
         "title": "RAM 1500 Specification Brochure",
@@ -2828,7 +2828,7 @@
       "trayWidthMm": 1295,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "RAM Trucks Australia",
         "title": "RAM 1500 Specification Brochure",
@@ -2849,7 +2849,7 @@
       "trayWidthMm": 1687,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "RAM Trucks Australia",
         "title": "RAM 2500 and 3500 Laramie Cummins High Output Specification",
@@ -2870,7 +2870,7 @@
       "trayWidthMm": 1687,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "RAM Trucks Australia",
         "title": "RAM 2500 and 3500 Laramie Cummins High Output Specification",
@@ -2891,7 +2891,7 @@
       "trayWidthMm": 1687,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "RAM Trucks Australia",
         "title": "RAM 2500 and 3500 Laramie Cummins High Output Specification",
@@ -2912,7 +2912,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Toyota Australia",
         "title": "Toyota HiLux Spec Table June 2026",
@@ -2933,7 +2933,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Toyota Australia",
         "title": "Toyota HiLux Spec Table June 2026",
@@ -2954,7 +2954,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Toyota Australia",
         "title": "Toyota HiLux Spec Table June 2026",
@@ -2975,7 +2975,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Toyota Australia",
         "title": "Toyota HiLux Spec Table June 2026",
@@ -2996,7 +2996,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Toyota Australia",
         "title": "Toyota HiLux Spec Table June 2026",
@@ -3017,7 +3017,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Toyota Australia",
         "title": "Toyota HiLux Spec Table June 2026",
@@ -3038,7 +3038,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Toyota Australia",
         "title": "Toyota HiLux Spec Table June 2026",
@@ -3059,7 +3059,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Toyota Australia",
         "title": "Toyota LC70 Spec Table October 2025",
@@ -3080,7 +3080,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Toyota Australia",
         "title": "Toyota LC70 Spec Table October 2025",
@@ -3101,7 +3101,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Toyota Australia",
         "title": "Toyota LC70 Spec Table October 2025",
@@ -3122,7 +3122,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Toyota Australia",
         "title": "Toyota LC70 Spec Table October 2025",
@@ -3143,7 +3143,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Toyota Australia",
         "title": "Toyota LC70 Spec Table October 2025",
@@ -3164,7 +3164,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Toyota Australia",
         "title": "Toyota Tundra Spec Table May 2026",
@@ -3185,7 +3185,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Toyota Australia",
         "title": "Toyota Tundra Spec Table May 2026",
@@ -3206,7 +3206,7 @@
       "trayWidthMm": 1530,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Volkswagen Group Australia",
         "title": "Amarok MY25 Brochure and Specifications",
@@ -3227,7 +3227,7 @@
       "trayWidthMm": 1530,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Volkswagen Group Australia",
         "title": "Amarok MY25 Brochure and Specifications",
@@ -3248,7 +3248,7 @@
       "trayWidthMm": 1530,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Volkswagen Group Australia",
         "title": "Amarok MY25 Brochure and Specifications",
@@ -3269,7 +3269,7 @@
       "trayWidthMm": 1530,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Volkswagen Group Australia",
         "title": "Amarok MY25 Brochure and Specifications",
@@ -3290,7 +3290,7 @@
       "trayWidthMm": 1530,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Volkswagen Group Australia",
         "title": "Amarok MY25 Brochure and Specifications",
@@ -3311,7 +3311,7 @@
       "trayWidthMm": 1530,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Volkswagen Group Australia",
         "title": "Amarok MY25 Brochure and Specifications",
@@ -3332,7 +3332,7 @@
       "trayWidthMm": 1530,
       "verificationStatus": "source_verified",
       "platform": "ute",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Volkswagen Group Australia",
         "title": "Amarok MY25 Brochure and Specifications",
@@ -3353,7 +3353,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "truck",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Hino",
         "title": "Hino 300 Series 817 4x4 and 817 4x4 Crew specification sheet (HS3008174x4-0822)",
@@ -3374,7 +3374,7 @@
       "trayWidthMm": null,
       "verificationStatus": "source_verified",
       "platform": "truck",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Hino",
         "title": "Hino 300 Series 817 4x4 and 817 4x4 Crew specification sheet (HS3008174x4-0822)",

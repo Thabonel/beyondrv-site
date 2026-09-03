@@ -247,6 +247,13 @@ console.log(`${variants.length} variants across ${models.length} models, from ${
 
 // The catalogue holds only promoted variants, so the review screen needs the
 // full set to choose from, published or not.
+//
+// Published means live for a customer, whichever route promoted it: an override,
+// a review, or customer_selectable with an approved review. The catalogue is
+// exactly that set. Reading reviewedIds alone counted only the review route, so
+// every variant published by override reported published: false and the screen
+// offered all 161 live vehicles back to the reviewer.
+const publishedIds = new Set(variants.map((v) => v.id));
 const candidates = rows.map((r) => ({
   id: r.id,
   make: r.make,
@@ -261,7 +268,7 @@ const candidates = rows.map((r) => ({
   trayWidthMm: r.usable_load_width_mm ?? null,
   verificationStatus: r.verification_status,
   platform: r.platform ?? 'ute',
-  published: reviewedIds.has(r.id),
+  published: publishedIds.has(r.id),
   source: { manufacturer: r.manufacturer, title: r.title, url: r.url },
 }));
 writeFileSync(candidatesPath, `${JSON.stringify({ candidates }, null, 2)}\n`);
