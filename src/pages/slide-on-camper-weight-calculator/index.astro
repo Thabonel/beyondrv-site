@@ -284,6 +284,7 @@ const schema = [
         <div class="result-metric"><span>Estimated loaded camper weight</span><strong id="loadedCamper">Not calculated</strong></div>
         <div class="result-metric"><span>Tray length fit</span><strong id="trayLengthFit">Not calculated</strong></div>
         <div class="result-metric"><span>Tray width fit</span><strong id="trayWidthFit">Not calculated</strong></div>
+        <div class="result-metric"><span>Tray-size model match</span><strong id="camperModelMatch">Enter tray length</strong></div>
         <div class="result-metric"><span>Data quality</span><strong id="dataQuality">Needs review</strong></div>
       </div>
       <div class="result-recommendation">
@@ -390,6 +391,28 @@ const schema = [
     return link;
   }
 
+  function bestModelForTray(trayLength: number) {
+    return modelsForTray(trayLength, camperModels).find((result) => result.verdict === 'best');
+  }
+
+  function renderModelMatch() {
+    const output = byId('camperModelMatch');
+    const trayLength = Number(value('trayLength'));
+    if (!output) return 'Not calculated';
+    output.replaceChildren();
+    if (!Number.isFinite(trayLength) || trayLength <= 0) {
+      output.textContent = 'Enter tray length';
+      return 'Not calculated';
+    }
+    const best = bestModelForTray(trayLength);
+    if (!best) {
+      output.textContent = 'No standard model';
+      return 'No standard model';
+    }
+    output.append(modelLink(best.model));
+    return best.model.name;
+  }
+
   function renderFinder() {
     if (!finderResult || !finderInput) return;
     const trayLength = Number(finderInput.value);
@@ -400,7 +423,7 @@ const schema = [
     }
 
     const results = modelsForTray(trayLength, camperModels);
-    const best = results.find((r) => r.verdict === 'best');
+    const best = bestModelForTray(trayLength);
     const also = results.filter((r) => r.verdict === 'also_suits');
     const smaller = results.filter((r) => r.verdict === 'smaller');
     const tooLong = results.filter((r) => r.verdict === 'too_long');
@@ -890,6 +913,7 @@ const schema = [
     setText('loadedCamper', kgOrNotCalculated(values.estimatedLoadedCamperWeight));
     setText('trayLengthFit', mmOrNotCalculated(values.trayLengthFit));
     setText('trayWidthFit', mmOrNotCalculated(values.trayWidthFit));
+    const camperModelMatch = renderModelMatch();
     setText('dataQuality', result.dataQuality);
     setText('recommendation', result.recommendation);
     setNotes(result.notes);
@@ -904,6 +928,7 @@ const schema = [
       `Estimated loaded camper weight: ${kgOrNotCalculated(values.estimatedLoadedCamperWeight)}`,
       `Tray length fit: ${mmOrNotCalculated(values.trayLengthFit)}`,
       `Tray width fit: ${mmOrNotCalculated(values.trayWidthFit)}`,
+      `Tray-size model match: ${camperModelMatch}`,
       `Data quality: ${result.dataQuality}`,
       `Recommendation: ${result.recommendation}`
     ].join('\n');

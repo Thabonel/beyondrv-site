@@ -55,6 +55,16 @@ test('the calculator exposes its first input in the initial desktop viewport', a
   expect(box!.y + box!.height).toBeLessThanOrEqual(900);
 });
 
+test('the main vehicle form names a camper model as soon as tray length is known', async ({ page }) => {
+  await page.goto('/slide-on-camper-weight-calculator/');
+
+  await page.fill('#trayLength', '2300');
+
+  const match = page.locator('#camperModelMatch');
+  await expect(match).toContainText('Advent 2300');
+  await expect(match.getByRole('link')).toHaveAttribute('href', '/advent-2300-hardtop-slide-on/');
+});
+
 test('calculator purpose and FAQ are available in static page metadata', async ({ page }) => {
   await page.goto('/slide-on-camper-weight-calculator/');
 
