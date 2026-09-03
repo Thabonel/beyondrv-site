@@ -217,17 +217,9 @@ const schema = [
 
         <fieldset class="quick-step form-field--full">
           <legend><span>2</span> Your camper and tray</legend>
-          <p class="quick-step-intro">Choose a camper and enter the usable length and width of your tray. These dimensions decide the preliminary physical fit; weight refines the payload check.</p>
+          <p class="quick-step-intro">Enter the usable length and width of your tray. We will show the closest standard camper automatically; weight then refines the payload check.</p>
           <div class="tray-research" id="trayResearch" aria-live="polite" hidden></div>
           <div class="details-grid details-grid--quick">
-            <div class="form-field" id="camperModelField">
-              <label class="form-label" for="camperModel">Camper you want to check (optional)</label>
-              <select class="form-input" id="camperModel" name="camperModel" autocomplete="off">
-                <option value="">Show matches from my tray length</option>
-                {camperModels.map((model) => <option value={model.slug}>{model.name}</option>)}
-              </select>
-              <span class="form-help" id="camperModelHelp">Selecting a camper fills only the product dimensions Beyond RV has recorded.</span>
-            </div>
             <div class="form-field">
               <label class="form-label" for="trayLength">Usable tray or tub length (mm)</label>
               <input class="form-input" id="trayLength" name="trayLength" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 2300" aria-describedby="trayLengthHelp" />
@@ -440,7 +432,7 @@ const schema = [
 
   const finderInput = inputById('trayLength');
   const finderResult = byId('camperFinderResult');
-  const camperSelect = document.getElementById('camperModel') as HTMLSelectElement | null;
+  let selectedCamperSlug = '';
   const productFilled = new Set<string>();
 
   function modelLink(model: CamperModel) {
@@ -498,34 +490,20 @@ const schema = [
     productFilled.clear();
   }
 
-  function syncCamperChoices(trayLength: number) {
-    if (!camperSelect) return;
-    const previous = camperSelect.value;
-    const hasLength = Number.isFinite(trayLength) && trayLength > 0;
-    const compatible = hasLength
-      ? modelsForTray(trayLength, camperModels)
-        .filter((result) => result.verdict !== 'too_long' && result.verdict !== 'unknown')
-        .map((result) => result.model)
-      : camperModels;
+  function fillCamperFields(model: CamperModel) {
+    const setProductValue = (id: string, next: string | number | null | undefined) => {
+      const input = inputById(id);
+      if (!input || next === null || next === undefined || next === '') return;
+      input.value = String(next);
+      productFilled.add(id);
+    };
+    setProductValue('requiredTrayLength', model.nominalLengthMm);
+    setProductValue('requiredTrayWidth', model.requiredTrayWidthMm);
+    setProductValue('camperDry', model.dryWeightKg);
+  }
 
-    if (previous && !compatible.some((model) => model.slug === previous)) clearProductFields();
-    camperSelect.replaceChildren();
-    const first = document.createElement('option');
-    first.value = '';
-    first.textContent = hasLength && compatible.length === 0
-      ? `No standard camper fits ${fmtMm(trayLength)}`
-      : 'Show matches from my tray length';
-    camperSelect.appendChild(first);
-    compatible.forEach((model) => {
-      const option = document.createElement('option');
-      option.value = model.slug;
-      option.textContent = model.name;
-      camperSelect.appendChild(option);
-    });
-    camperSelect.value = compatible.some((model) => model.slug === previous) ? previous : '';
-    camperSelect.disabled = hasLength && compatible.length === 0;
-
-    const noFit = hasLength && compatible.length === 0 && !customCamperStarted();
+  function syncCamperQuestions(trayLength: number) {
+    const noFit = Boolean(automaticNoFitFor(trayLength));
     const dryField = byId('camperDryField') as HTMLElement | null;
     const details = byId('camperDetails') as HTMLDetailsElement | null;
     if (dryField) dryField.hidden = noFit;
@@ -540,7 +518,7 @@ const schema = [
     const trayLength = Number(value('trayLength'));
     if (!output) return 'Not calculated';
     output.replaceChildren();
-    const selected = camperModels.find((model) => model.slug === camperSelect?.value);
+    const selected = camperModels.find((model) => model.slug === selectedCamperSlug);
     if (selected) {
       output.append(modelLink(selected));
       return selected.name;
@@ -561,40 +539,31 @@ const schema = [
   function renderFinder() {
     if (!finderResult || !finderInput) return;
     const trayLength = Number(finderInput.value);
-    syncCamperChoices(trayLength);
+    const selectedResult = modelsForTray(trayLength, camperModels)
+      .find((result) => result.model.slug === selectedCamperSlug);
+    if (selectedCamperSlug && (!selectedResult || selectedResult.verdict === 'too_long' || selectedResult.verdict === 'unknown')) {
+      selectedCamperSlug = '';
+      clearProductFields();
+    }
+    syncCamperQuestions(trayLength);
     if (!Number.isFinite(trayLength) || trayLength <= 0) {
       finderResult.hidden = true;
       finderResult.replaceChildren();
       return;
     }
 
-    const chosen = camperModels.find((model) => model.slug === camperSelect?.value);
-    if (chosen) {
-      finderResult.replaceChildren();
-      finderResult.hidden = false;
-      const headline = document.createElement('p');
-      headline.className = 'camper-finder-headline';
-      headline.append(modelLink(chosen));
-      if (chosen.nominalLengthMm) {
-        const difference = trayLength - chosen.nominalLengthMm;
-        headline.append(document.createTextNode(difference < -BUILD_TOLERANCE_MM
-          ? ` needs about ${chosen.nominalLengthMm} mm, which is longer than the ${trayLength} mm entered.`
-          : ` is the camper you are checking against the ${trayLength} mm entered.`));
-      }
-      finderResult.append(headline);
-      if (chosen.status !== 'confirmed') {
-        const note = document.createElement('p');
-        note.className = 'camper-finder-note';
-        note.dataset.testid = 'camper-finder-indicative';
-        note.textContent = 'This is a preliminary length check. Beyond RV confirms the final dimensions before build.';
-        finderResult.append(note);
-      }
-      return;
-    }
-
     const results = modelsForTray(trayLength, camperModels);
     const best = bestModelForTray(trayLength);
     const also = results.filter((r) => r.verdict === 'also_suits');
+
+    // The tray length has already made the choice. Applying the recorded
+    // product figures here avoids asking the customer to confirm the same
+    // match in a second control before useful results can appear.
+    if (best && !customCamperStarted() && selectedCamperSlug !== best.model.slug) {
+      clearProductFields();
+      selectedCamperSlug = best.model.slug;
+      fillCamperFields(best.model);
+    }
 
     finderResult.replaceChildren();
     finderResult.hidden = false;
@@ -605,17 +574,7 @@ const schema = [
       const strong = document.createElement('strong');
       strong.appendChild(modelLink(best.model));
       headline.append(strong, document.createTextNode(` is the closest standard length match for a ${trayLength} mm tray.`));
-      const choose = document.createElement('button');
-      choose.type = 'button';
-      choose.className = 'btn-ghost camper-finder-choose';
-      choose.dataset.testid = 'camper-finder-choose';
-      choose.textContent = 'Check this camper';
-      choose.addEventListener('click', () => {
-        if (!camperSelect) return;
-        camperSelect.value = best.model.slug;
-        camperSelect.dispatchEvent(new Event('change', { bubbles: true }));
-      });
-      finderResult.append(headline, choose);
+      finderResult.append(headline);
     } else {
       const noFit = noStandardFitFor(trayLength);
       if (!noFit) return;
@@ -674,29 +633,7 @@ const schema = [
     }
   }
 
-  function applyCamper(modelId: string) {
-    clearProductFields();
-    const model = camperModels.find((candidate) => candidate.slug === modelId);
-    if (!model) {
-      calculateSlideOn();
-      return;
-    }
-    const setProductValue = (id: string, next: string | number | null | undefined) => {
-      const input = inputById(id);
-      if (!input || next === null || next === undefined || next === '') return;
-      input.value = String(next);
-      productFilled.add(id);
-    };
-    setProductValue('requiredTrayLength', model.nominalLengthMm);
-    setProductValue('requiredTrayWidth', model.requiredTrayWidthMm);
-    setProductValue('camperDry', model.dryWeightKg);
-    hasStarted = true;
-    renderFinder();
-    calculateSlideOn();
-  }
-
   finderInput?.addEventListener('input', renderFinder);
-  camperSelect?.addEventListener('change', () => applyCamper(camperSelect.value));
 
   const catalogueEl = document.getElementById('vehicleCatalogueData');
   function parseCatalogue(): VehicleCatalogue {
