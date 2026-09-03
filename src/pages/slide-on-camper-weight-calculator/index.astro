@@ -810,6 +810,10 @@ const schema = [
     }
     selectedVariant = variant;
     renderProvenance(variant);
+    // Picking a vehicle fills GVM and the current weight, which is exactly what
+    // the page asks for to produce the first payload result. Without this the
+    // customer saw their own figures in the form beside "Not calculated".
+    hasStarted = true;
     calculateSlideOn();
   }
 

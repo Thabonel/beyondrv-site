@@ -208,3 +208,16 @@ test('neither new answer is sent until the customer gives one', async ({ page })
   expect(url.searchParams.has('tray_type')).toBe(false);
   expect(url.searchParams.has('gvm_upgrade_status')).toBe(false);
 });
+
+test('picking a vehicle produces the first payload result', async ({ page }) => {
+  await openWithFixture(page);
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-pickup-singleturbo');
+
+  // The picker fills GVM and current weight, which is what the page says it
+  // needs for the first payload result. Showing "Not calculated" beside the
+  // customer's own figures made the picker look broken.
+  await expect(page.locator('#availablePayload')).not.toHaveText('Not calculated');
+  await expect(page.locator('#statusLabel')).not.toHaveText('Enter your numbers to calculate a result.');
+});
