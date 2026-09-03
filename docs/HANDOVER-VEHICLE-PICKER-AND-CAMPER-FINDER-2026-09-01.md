@@ -236,11 +236,22 @@ Three have no `chassis_cab_total_mass_kg`, so no reconciling payload. Two Isuzu
 NPS rows have no `model_year_start`, which the catalogue requires as an integer.
 The build names each one it skips, and refuses loudly if somebody selects one.
 
-### 5. The Advent 2450 states two widths
+### 5. Completed: the Advent 2450's two widths
 
-`keySpecs` says `2450mm x 2000mm`; the body text says both that and
-`2450mm x 2050mm`. It does not block the finder, because width does not select
-the model, but it is wrong on a live product page.
+Fixed on 3 September. The contradiction was between two frontmatter entries both
+labelled "Base": `keySpecs` said `2450mm x 2000mm` and `specGroups` said
+`2450mm x 2050mm`. The prose body never mentions a width at all, so the earlier
+description of this item was wrong about where the conflict lived.
+
+`specGroups` was the outlier and now reads 2000mm. Three things support that:
+every Advent model lists a 2000mm base width in `keySpecs`, the 2450's overall
+size is `4410 x 2050 x 2000 (L x W x H)` so 2050 is the overall width rather than
+the base, and 2050 sits directly above the base line, which is how a figure gets
+copied to the wrong row.
+
+Overall width stays 2050mm. **If the GM knows the 2450's base really is 2050mm,
+the one-line change belongs in `keySpecs` instead**, and the whole range should
+be checked, because all three Advents claim a 2000mm base.
 
 ### 6. Pull request #34, tray sizes
 
