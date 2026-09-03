@@ -71,6 +71,16 @@ test('choosing the model fills the detailed check below', async ({ page }) => {
   await expect(page.locator('#trayLength')).toHaveValue('2300');
 });
 
+test('the dimension button stays readable and turns orange on hover', async ({ page }) => {
+  await page.goto(page_path);
+  await page.fill('#finderTrayLength', '2300');
+
+  const button = page.getByTestId('camper-finder-choose');
+  await expect(button).toHaveCSS('color', 'rgb(17, 17, 17)');
+  await button.hover();
+  await expect(button).toHaveCSS('color', 'rgb(232, 84, 10)');
+});
+
 test('the figures are described as indicative while they are targets', async ({ page }) => {
   await page.goto(page_path);
   await page.fill('#finderTrayLength', '2300');

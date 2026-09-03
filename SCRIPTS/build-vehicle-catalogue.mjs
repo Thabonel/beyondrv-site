@@ -164,7 +164,11 @@ const variants = rows
     // derived figure is disclosed as corrected rather than as published.
     const massCorrected = correctedFields.includes('gvmKg') || correctedFields.includes('kerbKg');
     const payloadKg = massCorrected ? corrected.gvmKg - corrected.kerbKg : r.published_payload_kg;
-    const disclosedCorrections = massCorrected ? [...correctedFields, 'payloadKg'].sort() : correctedFields;
+    const disclosedCorrections = [...new Set([
+      ...correctedFields,
+      ...(massCorrected ? ['payloadKg'] : []),
+      ...(publicationOverride?.correctedFields ?? []),
+    ])].sort();
     return {
       id: r.id,
       make: r.make,
@@ -190,7 +194,7 @@ const variants = rows
       platform: r.platform ?? 'ute',
       // The research note is where an optimistic kerb was recorded. Surfacing
       // it as a field means the page never has to read prose.
-      kerbIsOptimistic: /OPTIMISTIC KERB/i.test(r.notes ?? ''),
+      kerbIsOptimistic: !correctedFields.includes('kerbKg') && /OPTIMISTIC KERB/i.test(r.notes ?? ''),
       maxBodyLengthMm: r.max_body_length_mm ?? null,
       trayState: deriveTrayState(r.kerb_mass_basis, r.body_type),
       trayMassKg: null,

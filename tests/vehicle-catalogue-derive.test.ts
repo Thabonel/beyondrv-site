@@ -63,6 +63,21 @@ test('a complete publication override validates', () => {
   assert.equal(result.valid, true);
 });
 
+test('a publication override can disclose a derived payload only', () => {
+  const disclosed = validateCatalogueOverrides({
+    show: [{ ...override, correctedFields: ['payloadKg'] }],
+    hide: [],
+  });
+  assert.equal(disclosed.valid, true, disclosed.errors.join('\n'));
+  assert.deepEqual(disclosed.overrides?.show[0].correctedFields, ['payloadKg']);
+
+  const unsupported = validateCatalogueOverrides({
+    show: [{ ...override, correctedFields: ['gvmKg'] }],
+    hide: [],
+  });
+  assert.equal(unsupported.valid, false);
+});
+
 test('override dates and audit fields are bounded', () => {
   const invalidDate = validateCatalogueOverrides({
     show: [{ id: 'variant-a', reason: 'Reviewed exception', reviewer: 'Alex', approvedAt: '2026-02-31' }],

@@ -180,13 +180,13 @@ export function calculateSlideOnSuitability(input = {}, options = {}) {
 
   const vehicleGvm = parseRequired(input.vehicleGvm);
   const currentVehicleWeight = parseRequired(input.currentVehicleWeight);
-  const passengerWeight = parseRequired(input.passengerWeight);
-  const accessoryWeight = parseRequired(input.accessoryWeight);
-  const luggageOrGearWeight = parseRequired(input.luggageOrGearWeight);
+  const passengerWeight = parseOptional(input.passengerWeight);
+  const accessoryWeight = parseOptional(input.accessoryWeight);
+  const luggageOrGearWeight = parseOptional(input.luggageOrGearWeight);
   const camperDryWeight = parseRequired(input.camperDryWeight);
-  const camperWaterWeight = parseRequired(input.camperWaterWeight);
-  const camperGearWeight = parseRequired(input.camperGearWeight);
-  const camperOptionsWeight = parseRequired(input.camperOptionsWeight);
+  const camperWaterWeight = parseOptional(input.camperWaterWeight);
+  const camperGearWeight = parseOptional(input.camperGearWeight);
+  const camperOptionsWeight = parseOptional(input.camperOptionsWeight);
   const trayLength = parseRequired(input.trayLength);
   const trayWidth = parseRequired(input.trayWidth);
   const requiredTrayLength = parseRequired(input.requiredTrayLength);
@@ -195,59 +195,79 @@ export function calculateSlideOnSuitability(input = {}, options = {}) {
   const tyreRatingsChecked = input.tyreRatingsChecked === true || input.tyreRatingsChecked === 'true';
   const centreOfGravityChecked = input.centreOfGravityChecked === true || input.centreOfGravityChecked === 'true';
 
-  if (hasMissing([
-    vehicleGvm,
-    currentVehicleWeight,
-    passengerWeight,
-    accessoryWeight,
-    luggageOrGearWeight,
-    camperDryWeight,
-    camperWaterWeight,
-    camperGearWeight,
-    camperOptionsWeight,
-    trayLength,
-    trayWidth,
-    requiredTrayLength,
-    requiredTrayWidth
-  ])) {
-    return missingResult(SLIDE_ON_FINAL_WARNING);
-  }
+  const fields = [
+    ['vehicle GVM', vehicleGvm],
+    ['current vehicle weight', currentVehicleWeight],
+    ['passenger weight', passengerWeight],
+    ['accessory weight', accessoryWeight],
+    ['vehicle luggage and gear', luggageOrGearWeight],
+    ['camper dry weight', camperDryWeight],
+    ['camper water weight', camperWaterWeight],
+    ['camper gear weight', camperGearWeight],
+    ['camper options weight', camperOptionsWeight],
+    ['tray or tub usable length', trayLength],
+    ['tray or tub usable width', trayWidth],
+    ['required tray length', requiredTrayLength],
+    ['required tray width', requiredTrayWidth]
+  ];
+  const missingFields = fields.filter(([, value]) => value === null).map(([label]) => label);
+  const hasVehicleWeights = !hasMissing([
+    vehicleGvm, currentVehicleWeight, passengerWeight, accessoryWeight, luggageOrGearWeight
+  ]);
+  const hasCamperWeights = !hasMissing([
+    camperDryWeight, camperWaterWeight, camperGearWeight, camperOptionsWeight
+  ]);
 
-  const availablePayloadBeforeCamper =
-    vehicleGvm - currentVehicleWeight - passengerWeight - accessoryWeight - luggageOrGearWeight;
-  const estimatedLoadedCamperWeight =
-    camperDryWeight + camperWaterWeight + camperGearWeight + camperOptionsWeight;
-  const estimatedLoadedVehicleWeight =
-    currentVehicleWeight + passengerWeight + accessoryWeight + luggageOrGearWeight + estimatedLoadedCamperWeight;
-  const remainingGvmMargin = vehicleGvm - estimatedLoadedVehicleWeight;
-  const trayLengthFit = trayLength - requiredTrayLength;
-  const trayWidthFit = trayWidth - requiredTrayWidth;
+  const availablePayloadBeforeCamper = hasVehicleWeights
+    ? vehicleGvm - currentVehicleWeight - passengerWeight - accessoryWeight - luggageOrGearWeight
+    : undefined;
+  const estimatedLoadedCamperWeight = hasCamperWeights
+    ? camperDryWeight + camperWaterWeight + camperGearWeight + camperOptionsWeight
+    : undefined;
+  const estimatedLoadedVehicleWeight = hasVehicleWeights && estimatedLoadedCamperWeight !== undefined
+    ? currentVehicleWeight + passengerWeight + accessoryWeight + luggageOrGearWeight + estimatedLoadedCamperWeight
+    : undefined;
+  const remainingGvmMargin = estimatedLoadedVehicleWeight !== undefined
+    ? vehicleGvm - estimatedLoadedVehicleWeight
+    : undefined;
+  const trayLengthFit = trayLength !== null && requiredTrayLength !== null
+    ? trayLength - requiredTrayLength
+    : undefined;
+  const trayWidthFit = trayWidth !== null && requiredTrayWidth !== null
+    ? trayWidth - requiredTrayWidth
+    : undefined;
 
   const exceeded =
-    estimatedLoadedVehicleWeight > vehicleGvm ||
-    estimatedLoadedCamperWeight > availablePayloadBeforeCamper ||
-    trayLength < requiredTrayLength ||
-    trayWidth < requiredTrayWidth;
+    (remainingGvmMargin !== undefined && remainingGvmMargin < 0) ||
+    (estimatedLoadedCamperWeight !== undefined && availablePayloadBeforeCamper !== undefined && estimatedLoadedCamperWeight > availablePayloadBeforeCamper) ||
+    (trayLengthFit !== undefined && trayLengthFit < 0) ||
+    (trayWidthFit !== undefined && trayWidthFit < 0);
 
-  const tight = remainingGvmMargin < 150;
+  const partial = missingFields.length > 0;
+  const tight = remainingGvmMargin !== undefined && remainingGvmMargin < 150;
   const uncheckedCriticalItems = !rearAxleChecked || !tyreRatingsChecked || !centreOfGravityChecked;
-  const status = exceeded ? 'red' : tight || uncheckedCriticalItems ? 'amber' : 'green';
+  const status = exceeded ? 'red' : partial || tight || uncheckedCriticalItems ? 'amber' : 'green';
   const statusLabel = status === 'red'
     ? 'Not recommended'
+    : partial
+      ? 'Partial estimate'
     : status === 'amber'
       ? 'Needs review'
       : 'Looks suitable';
   const title = status === 'red'
-    ? 'Not recommended on this estimate'
+    ? `Not recommended on this ${partial ? 'partial ' : ''}estimate`
+    : partial
+      ? 'Results available — add the missing details'
     : status === 'amber'
       ? 'Needs review on this estimate'
       : 'Appears suitable based on the information entered';
 
   const notes = [];
-  if (remainingGvmMargin < 0) notes.push(`Estimated loaded vehicle weight is ${kg(Math.abs(remainingGvmMargin))} over GVM.`);
-  if (estimatedLoadedCamperWeight > availablePayloadBeforeCamper) notes.push(`Estimated loaded camper weight is ${kg(estimatedLoadedCamperWeight - availablePayloadBeforeCamper)} over available payload before camper.`);
-  if (trayLength < requiredTrayLength) notes.push(`Tray length is ${trayLength} mm, below the required ${requiredTrayLength} mm entered.`);
-  if (trayWidth < requiredTrayWidth) notes.push(`Tray width is ${trayWidth} mm, below the required ${requiredTrayWidth} mm entered.`);
+  if (partial) notes.push(`Add ${missingFields.join(', ')} to complete the estimate.`);
+  if (remainingGvmMargin !== undefined && remainingGvmMargin < 0) notes.push(`Estimated loaded vehicle weight is ${kg(Math.abs(remainingGvmMargin))} over GVM.`);
+  if (estimatedLoadedCamperWeight !== undefined && availablePayloadBeforeCamper !== undefined && estimatedLoadedCamperWeight > availablePayloadBeforeCamper) notes.push(`Estimated loaded camper weight is ${kg(estimatedLoadedCamperWeight - availablePayloadBeforeCamper)} over available payload before camper.`);
+  if (trayLengthFit !== undefined && trayLengthFit < 0) notes.push(`Tray length is ${trayLength} mm, below the required ${requiredTrayLength} mm entered.`);
+  if (trayWidthFit !== undefined && trayWidthFit < 0) notes.push(`Tray width is ${trayWidth} mm, below the required ${requiredTrayWidth} mm entered.`);
   if (!exceeded && tight) notes.push('Remaining GVM margin is tight. Small additions may change the result.');
   if (!rearAxleChecked) notes.push('Rear axle limits have not been confirmed.');
   if (!tyreRatingsChecked) notes.push('Tyre ratings have not been confirmed.');
@@ -259,9 +279,15 @@ export function calculateSlideOnSuitability(input = {}, options = {}) {
     status,
     statusLabel,
     title,
-    summary: `Estimated loaded vehicle weight is ${kg(estimatedLoadedVehicleWeight)} against a ${kg(vehicleGvm)} GVM.`,
-    recommendation: 'Confirm with Beyond RV',
-    dataQuality: 'Complete estimate; Product data incomplete: Beyond RV must confirm product weights; Weighbridge required: actual loaded weights needed',
+    summary: estimatedLoadedVehicleWeight !== undefined
+      ? `Estimated loaded vehicle weight is ${kg(estimatedLoadedVehicleWeight)} against a ${kg(vehicleGvm)} GVM.`
+      : 'The results below update as soon as each calculation has enough information.',
+    recommendation: partial
+      ? 'Add the missing details, then confirm the final result with Beyond RV.'
+      : 'Confirm the final result with Beyond RV.',
+    dataQuality: partial
+      ? `Partial estimate: add ${missingFields.join(', ')}`
+      : 'Complete estimate; Product data incomplete: Beyond RV must confirm product weights; Weighbridge required: actual loaded weights needed',
     notes,
     values: {
       availablePayloadBeforeCamper,

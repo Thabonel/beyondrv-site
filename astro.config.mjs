@@ -10,15 +10,16 @@ export default defineConfig({
   integrations: [
     sitemap({
       filter: (page) => {
+        const pathname = new URL(page).pathname;
         const excludedPaths = [
-          '/admin/',
-          '/admin/analytics/',
+          '/configuration-review/',
           '/inquiry-form/success/',
           '/cart/',
           '/checkout/success/',
+          '/search/',
           '/404.html',
         ];
-        return !excludedPaths.some((path) => page.endsWith(path));
+        return !pathname.startsWith('/admin/') && !excludedPaths.includes(pathname);
       },
       serialize(item) {
         const lastmod = sitemapLastmodFor(item.url);

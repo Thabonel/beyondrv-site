@@ -1,9 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { ESTIMATE_DISCLAIMER } from '../../lib/vehicleSuitabilityCalculator.js';
 
 const pageUrl = 'https://beyondrv.com.au/vehicle-suitability-checker/';
 const heroImage = '/images/site/vehicle-suitability-hero.jpg';
-const disclaimer = 'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. Beyond RV must confirm final suitability before purchase.';
+const disclaimer = ESTIMATE_DISCLAIMER;
 
 const faqs = [
   {
