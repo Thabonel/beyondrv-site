@@ -220,7 +220,7 @@ const schema = [
           <p class="quick-step-intro">Choose a camper and enter the usable length and width of your tray. These dimensions decide the preliminary physical fit; weight refines the payload check.</p>
           <div class="tray-research" id="trayResearch" aria-live="polite" hidden></div>
           <div class="details-grid details-grid--quick">
-            <div class="form-field">
+            <div class="form-field" id="camperModelField">
               <label class="form-label" for="camperModel">Camper you want to check (optional)</label>
               <select class="form-input" id="camperModel" name="camperModel" autocomplete="off">
                 <option value="">Show matches from my tray length</option>
@@ -238,7 +238,7 @@ const schema = [
               <input class="form-input" id="trayWidth" name="trayWidth" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 1850" aria-describedby="trayWidthHelp" />
               <span class="form-help" id="trayWidthHelp">Measure the narrowest flat usable width between anything that limits the camper.</span>
             </div>
-            <div class="form-field">
+            <div class="form-field" id="camperDryField">
               <label class="form-label" for="camperDry">Camper dry weight (kg)</label>
               <input class="form-input" id="camperDry" name="camperDry" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 650" aria-describedby="camperDryHelp" />
               <span class="form-help" id="camperDryHelp">Use the confirmed product specification. Beyond RV will verify it before build.</span>
@@ -454,6 +454,87 @@ const schema = [
     return modelsForTray(trayLength, camperModels).find((result) => result.verdict === 'best');
   }
 
+  function shortestStandardModel() {
+    return camperModels
+      .filter((model) => Number.isFinite(model.nominalLengthMm) && Number(model.nominalLengthMm) > 0)
+      .sort((a, b) => Number(a.nominalLengthMm) - Number(b.nominalLengthMm))[0];
+  }
+
+  function noStandardFitFor(trayLength: number) {
+    if (!Number.isFinite(trayLength) || trayLength <= 0 || bestModelForTray(trayLength)) return null;
+    const shortest = shortestStandardModel();
+    if (!shortest?.nominalLengthMm) return null;
+    return {
+      shortest,
+      shortfallMm: Math.max(0, shortest.nominalLengthMm - trayLength),
+    };
+  }
+
+  function customCamperStarted() {
+    return ['camperDry', 'camperWater', 'camperGear', 'camperOptions', 'requiredTrayLength', 'requiredTrayWidth']
+      .some((id) => Number(value(id)) > 0);
+  }
+
+  function automaticNoFitFor(trayLength: number) {
+    return customCamperStarted() ? null : noStandardFitFor(trayLength);
+  }
+
+  function customSolutionUrl(trayLength: number) {
+    const vehicleName = inputById('vehicleName')?.value || 'my vehicle';
+    const trayWidth = Number(value('trayWidth'));
+    const fit = noStandardFitFor(trayLength);
+    const dimensions = `${fmtMm(trayLength)} usable length${Number.isFinite(trayWidth) && trayWidth > 0 ? ` × ${fmtMm(trayWidth)} usable width` : ''}`;
+    const message = fit
+      ? `I would like help with a custom slide-on solution for ${vehicleName}. Its tub or tray has ${dimensions}. The shortest standard camper needs about ${fmtMm(fit.shortest.nominalLengthMm!)} (${fmtMm(fit.shortfallMm)} longer).`
+      : `I would like help finding a slide-on camper for ${vehicleName}.`;
+    return `/inquiry-form/?intent=vehicle-suitability&message=${encodeURIComponent(message)}&fit_check_summary=${encodeURIComponent(message)}`;
+  }
+
+  function clearProductFields() {
+    productFilled.forEach((id) => {
+      const input = inputById(id);
+      if (input) input.value = '';
+    });
+    productFilled.clear();
+  }
+
+  function syncCamperChoices(trayLength: number) {
+    if (!camperSelect) return;
+    const previous = camperSelect.value;
+    const hasLength = Number.isFinite(trayLength) && trayLength > 0;
+    const compatible = hasLength
+      ? modelsForTray(trayLength, camperModels)
+        .filter((result) => result.verdict !== 'too_long' && result.verdict !== 'unknown')
+        .map((result) => result.model)
+      : camperModels;
+
+    if (previous && !compatible.some((model) => model.slug === previous)) clearProductFields();
+    camperSelect.replaceChildren();
+    const first = document.createElement('option');
+    first.value = '';
+    first.textContent = hasLength && compatible.length === 0
+      ? `No standard camper fits ${fmtMm(trayLength)}`
+      : 'Show matches from my tray length';
+    camperSelect.appendChild(first);
+    compatible.forEach((model) => {
+      const option = document.createElement('option');
+      option.value = model.slug;
+      option.textContent = model.name;
+      camperSelect.appendChild(option);
+    });
+    camperSelect.value = compatible.some((model) => model.slug === previous) ? previous : '';
+    camperSelect.disabled = hasLength && compatible.length === 0;
+
+    const noFit = hasLength && compatible.length === 0 && !customCamperStarted();
+    const dryField = byId('camperDryField') as HTMLElement | null;
+    const details = byId('camperDetails') as HTMLDetailsElement | null;
+    if (dryField) dryField.hidden = noFit;
+    if (details) {
+      details.hidden = noFit;
+      if (noFit) details.open = false;
+    }
+  }
+
   function renderModelMatch() {
     const output = byId('camperModelMatch');
     const trayLength = Number(value('trayLength'));
@@ -480,6 +561,7 @@ const schema = [
   function renderFinder() {
     if (!finderResult || !finderInput) return;
     const trayLength = Number(finderInput.value);
+    syncCamperChoices(trayLength);
     if (!Number.isFinite(trayLength) || trayLength <= 0) {
       finderResult.hidden = true;
       finderResult.replaceChildren();
@@ -535,8 +617,18 @@ const schema = [
       });
       finderResult.append(headline, choose);
     } else {
-      headline.textContent = 'No standard model is built for a tray this short. Beyond RV builds to order, so talk to us about your vehicle.';
-      finderResult.append(headline);
+      const noFit = noStandardFitFor(trayLength);
+      if (!noFit) return;
+      headline.textContent = `No standard Beyond RV slide-on fits this ${fmtMm(trayLength)} tub or tray. Our shortest standard model, ${noFit.shortest.name}, needs about ${fmtMm(noFit.shortest.nominalLengthMm!)} — ${fmtMm(noFit.shortfallMm)} more.`;
+      const explanation = document.createElement('p');
+      explanation.className = 'camper-finder-note';
+      explanation.textContent = 'A custom build or a suitable replacement tray may be possible. Beyond RV needs to confirm it with you.';
+      const enquiry = document.createElement('a');
+      enquiry.className = 'btn-primary camper-finder-custom';
+      enquiry.dataset.testid = 'camper-finder-custom';
+      enquiry.href = customSolutionUrl(trayLength);
+      enquiry.textContent = 'Ask Beyond RV about a custom solution';
+      finderResult.append(headline, explanation, enquiry);
     }
 
     // Keep the shortlist short. A visitor checking a ute does not need a list
@@ -583,11 +675,7 @@ const schema = [
   }
 
   function applyCamper(modelId: string) {
-    productFilled.forEach((id) => {
-      const input = inputById(id);
-      if (input) input.value = '';
-    });
-    productFilled.clear();
+    clearProductFields();
     const model = camperModels.find((candidate) => candidate.slug === modelId);
     if (!model) {
       calculateSlideOn();
@@ -1153,17 +1241,37 @@ const schema = [
       centreOfGravityChecked: inputById('centreOfGravityChecked')?.checked ?? false
     }, { started: hasStarted });
     const values: SlideOnResultValues = 'values' in result ? result.values : {};
+    const trayLength = Number(value('trayLength'));
+    const noFit = automaticNoFitFor(trayLength);
+    const displayedStatus = noFit ? 'red' : result.status;
+    const displayedStatusLabel = noFit ? 'No standard camper match' : result.statusLabel;
+    const displayedTitle = noFit ? 'No standard camper fits this tub or tray' : result.title;
+    const displayedSummary = noFit
+      ? `${fmtMm(trayLength)} usable length is ${fmtMm(noFit.shortfallMm)} shorter than our shortest standard camper, ${noFit.shortest.name}, which needs about ${fmtMm(noFit.shortest.nominalLengthMm!)}.`
+      : result.summary;
+    const displayedRecommendation = noFit
+      ? 'Ask Beyond RV about a custom solution or a suitable replacement tray.'
+      : result.recommendation;
+    const displayedDataQuality = noFit
+      ? `Tray is ${fmtMm(noFit.shortfallMm)} shorter than the shortest standard model`
+      : result.dataQuality;
+    const displayedNotes = noFit
+      ? [
+          `The shortest standard camper requires about ${fmtMm(noFit.shortest.nominalLengthMm!)}; this tub or tray is ${fmtMm(trayLength)}.`,
+          'A replacement tray or custom build needs Beyond RV confirmation.',
+        ]
+      : result.notes;
 
-    resultPanel?.setAttribute('data-status', result.status);
-    setText('statusLabel', result.statusLabel);
-    setText('resultTitle', result.title);
-    setText('resultSummary', result.summary);
+    resultPanel?.setAttribute('data-status', displayedStatus);
+    setText('statusLabel', displayedStatusLabel);
+    setText('resultTitle', displayedTitle);
+    setText('resultSummary', displayedSummary);
     setText('availablePayload', kgOrNotCalculated(values.availablePayloadBeforeCamper));
     setText('loadedWeight', kgOrNotCalculated(values.estimatedLoadedVehicleWeight));
     setText('gvmMargin', kgOrNotCalculated(values.remainingGvmMargin));
     setText('loadedCamper', kgOrNotCalculated(values.estimatedLoadedCamperWeight));
-    setText('trayLengthFit', clearance(values.trayLengthFit, 'length'));
-    setText('trayWidthFit', clearance(values.trayWidthFit, 'width'));
+    setText('trayLengthFit', noFit ? `${fmtMm(noFit.shortfallMm)} short of shortest model` : clearance(values.trayLengthFit, 'length'));
+    setText('trayWidthFit', noFit ? 'Not needed — length does not fit' : clearance(values.trayWidthFit, 'width'));
     setBreakdown('payloadBreakdown', values.vehiclePayloadBeforeAdditions !== undefined
       && values.additionalVehicleLoad !== undefined
       && values.availablePayloadBeforeCamper !== undefined
@@ -1175,21 +1283,26 @@ const schema = [
     const widthBreakdown = values.trayWidth !== undefined && values.requiredTrayWidth !== undefined
       ? `${fmtMm(values.trayWidth)} usable − ${fmtMm(values.requiredTrayWidth)} required = ${clearance(values.trayWidthFit, 'width').toLowerCase()}.`
       : null;
-    setBreakdown('dimensionBreakdown', lengthBreakdown || widthBreakdown
-      ? `Tray fit: ${[lengthBreakdown, widthBreakdown].filter(Boolean).join(' Width: ')}`
-      : null);
+    setBreakdown('dimensionBreakdown', noFit
+      ? `Standard camper fit: ${fmtMm(trayLength)} usable length; shortest standard model needs about ${fmtMm(noFit.shortest.nominalLengthMm!)}.`
+      : lengthBreakdown || widthBreakdown
+        ? `Tray fit: ${[lengthBreakdown, widthBreakdown].filter(Boolean).join(' Width: ')}`
+        : null);
     const resultBreakdown = byId('resultBreakdown') as HTMLElement | null;
-    if (resultBreakdown) resultBreakdown.hidden = !(lengthBreakdown || widthBreakdown || values.vehiclePayloadBeforeAdditions !== undefined);
-    const camperModelMatch = renderModelMatch();
-    setText('dataQuality', result.dataQuality);
-    setText('recommendation', result.recommendation);
-    setNotes(result.notes);
+    if (resultBreakdown) resultBreakdown.hidden = !(noFit || lengthBreakdown || widthBreakdown || values.vehiclePayloadBeforeAdditions !== undefined);
+    const camperModelMatch = noFit
+      ? `None — shortest needs ${fmtMm(noFit.shortest.nominalLengthMm!)}`
+      : renderModelMatch();
+    if (noFit) setText('camperModelMatch', camperModelMatch);
+    setText('dataQuality', displayedDataQuality);
+    setText('recommendation', displayedRecommendation);
+    setNotes(displayedNotes);
 
     const announcement = byId('resultAnnouncement');
-    if (announcement) announcement.textContent = `${result.statusLabel}. ${result.summary}`;
+    if (announcement) announcement.textContent = `${displayedStatusLabel}. ${displayedSummary}`;
     const mobilePeek = byId('mobileResultPeek');
     if (mobilePeek) (mobilePeek as HTMLElement).hidden = !hasStarted;
-    setText('mobileResultTitle', result.statusLabel);
+    setText('mobileResultTitle', displayedStatusLabel);
     const firstUsefulValue = values.remainingGvmMargin !== undefined
       ? `${fmt(values.remainingGvmMargin)} GVM margin`
       : values.availablePayloadBeforeCamper !== undefined
@@ -1202,7 +1315,7 @@ const schema = [
     const message = [
       'Vehicle Suitability Checker result - slide-on camper',
       `Vehicle: ${vehicleName}`,
-      `Status: ${result.statusLabel}`,
+      `Status: ${displayedStatusLabel}`,
       `Payload remaining for camper: ${kgOrNotCalculated(values.availablePayloadBeforeCamper)}`,
       `Estimated loaded vehicle weight: ${kgOrNotCalculated(values.estimatedLoadedVehicleWeight)}`,
       `Remaining GVM margin: ${kgOrNotCalculated(values.remainingGvmMargin)}`,
@@ -1210,15 +1323,19 @@ const schema = [
       `Length clearance: ${clearance(values.trayLengthFit, 'length')}`,
       `Width clearance: ${clearance(values.trayWidthFit, 'width')}`,
       `Tray-size model match: ${camperModelMatch}`,
-      `Data quality: ${result.dataQuality}`,
-      `Recommendation: ${result.recommendation}`
+      `Data quality: ${displayedDataQuality}`,
+      `Recommendation: ${displayedRecommendation}`
     ].join('\n');
     const send = byId('sendResult');
     if (send) {
-      send.textContent = hasStarted ? 'Continue to Enquiry With These Results' : 'Ask Beyond RV for Help';
-      send.setAttribute('href', hasStarted
-        ? `/inquiry-form/?intent=vehicle-suitability&message=${encodeURIComponent(message)}&fit_check_summary=${encodeURIComponent(message)}`
-        : '/inquiry-form/?intent=vehicle-suitability');
+      send.textContent = noFit
+        ? 'Ask Beyond RV About a Custom Solution'
+        : hasStarted ? 'Continue to Enquiry With These Results' : 'Ask Beyond RV for Help';
+      send.setAttribute('href', noFit
+        ? customSolutionUrl(trayLength)
+        : hasStarted
+          ? `/inquiry-form/?intent=vehicle-suitability&message=${encodeURIComponent(message)}&fit_check_summary=${encodeURIComponent(message)}`
+          : '/inquiry-form/?intent=vehicle-suitability');
     }
   }
 
