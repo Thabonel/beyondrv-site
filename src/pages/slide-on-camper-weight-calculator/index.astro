@@ -181,6 +181,16 @@ const schema = [
           <span class="form-help">Find this on the vehicle compliance plate or manufacturer specification.</span>
         </div>
         <div class="form-field">
+          <label class="form-label" for="gvmUpgrade">Has this vehicle had a GVM upgrade?</label>
+          <select class="form-input" id="gvmUpgrade">
+            <option value="">— Select —</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Unsure">Unsure</option>
+          </select>
+          <span class="form-help">An upgrade raises the GVM above the figure on the plate. If you have had one, enter the upgraded GVM above.</span>
+        </div>
+        <div class="form-field">
           <label class="form-label" for="currentWeight">Current vehicle weight before listed additions (kg)</label>
           <input class="form-input" id="currentWeight" type="number" min="0" placeholder="e.g. 2200" />
           <span class="form-help">Use a current weighbridge weight if possible. If it already includes passengers or accessories, enter 0 for those items below.</span>
@@ -244,6 +254,18 @@ const schema = [
         <div class="form-field">
           <label class="form-label" for="trayWidth">Tray or tub usable width (mm)</label>
           <input class="form-input" id="trayWidth" type="number" min="0" placeholder="e.g. 1850" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="trayType">Tray or tub type</label>
+          <select class="form-input" id="trayType">
+            <option value="">— Select —</option>
+            <option value="Steel tray">Steel tray</option>
+            <option value="Alloy tray">Alloy tray</option>
+            <option value="Tub">Tub</option>
+            <option value="Tray with canopy">Tray with canopy</option>
+            <option value="Unsure">Unsure</option>
+          </select>
+          <span class="form-help">Only a tub is known from the vehicle specification, so tell us if yours is a tray.</span>
         </div>
         <div class="form-field">
           <label class="form-label" for="requiredTrayLength">Required tray length (mm)</label>
@@ -951,11 +973,20 @@ const schema = [
       // variant rather than the module-level trayState, which starts life as
       // 'not_applicable' and would otherwise claim a tub before anyone picked a
       // vehicle.
-      if (selectedVariant?.trayState === 'not_applicable') params.set('tray_type', 'Tub');
+      // What the customer answered wins. The catalogue only ever knows a tub, so
+      // it fills in when they have not answered rather than overriding them.
+      const trayType = value('trayType') || (selectedVariant?.trayState === 'not_applicable' ? 'Tub' : '');
+      if (trayType) params.set('tray_type', trayType);
+      const gvmUpgrade = value('gvmUpgrade');
+      if (gvmUpgrade) params.set('gvm_upgrade_status', gvmUpgrade);
       send.setAttribute('href', `/inquiry-form/?${params}`);
     }
   }
 
+  // Rebuild the enquiry link when either answer changes. Deliberately not in
+  // `fields`: neither affects the arithmetic, and answering one should not count
+  // as having started the estimate.
+  ['trayType', 'gvmUpgrade'].forEach(id => byId(id)?.addEventListener('change', () => calculateSlideOn()));
   fields.forEach(id => byId(id)?.addEventListener('input', () => {
     hasStarted = true;
     calculateSlideOn();
