@@ -280,6 +280,8 @@ nav.scrolled {
   transition: all 0.25s;
 }
 .btn-ghost:hover { border-color: var(--orange); color: var(--orange); }
+.camper-finder-choose { background: var(--cream); color: var(--dark); }
+.camper-finder-choose:hover { color: var(--orange); }
 
 /* ─── BADGES ─── */
 .badge {
