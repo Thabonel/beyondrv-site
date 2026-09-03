@@ -321,7 +321,18 @@ const schema = [
       `Recommendation: ${result.recommendation}`
     ].join('\n');
     const send = byId('sendResult');
-    if (send) send.setAttribute('href', `/inquiry-form/?intent=vehicle-suitability&message=${encodeURIComponent(message)}&fit_check_summary=${encodeURIComponent(message)}`);
+    if (send) {
+      const params = new URLSearchParams({ intent: 'vehicle-suitability', message, fit_check_summary: message });
+      // What the customer typed. Never the 'your vehicle' fallback the summary
+      // prose uses, which reads fine in a sentence and would be nonsense in a
+      // field meant to name a vehicle.
+      const typedVehicle = value('vehicleName').trim();
+      if (typedVehicle) params.set('vehicle_make_model_year', typedVehicle);
+      // No tray_type and no gvm_upgrade_status: this page asks for neither, and
+      // a caravan is towed rather than carried on a tray. Sending a guess would
+      // put an answer in front of Beyond RV that the customer never gave.
+      send.setAttribute('href', `/inquiry-form/?${params}`);
+    }
   }
 
   fields.forEach(id => byId(id)?.addEventListener('input', () => {

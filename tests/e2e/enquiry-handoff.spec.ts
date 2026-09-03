@@ -128,3 +128,39 @@ test('no vehicle chosen means no tray type, despite the default state', async ({
   // who has not picked a vehicle at all.
   expect(url.searchParams.has('tray_type')).toBe(false);
 });
+
+const towingPath = '/caravan-towing-calculator/';
+
+test('the towing calculator sends the vehicle the customer named', async ({ page }) => {
+  await page.goto(towingPath);
+  await page.fill('#gvm', '3350');
+  await page.fill('#vehicleName', '2023 Toyota LandCruiser 300 GXL');
+
+  const href = await page.getAttribute('#sendResult', 'href');
+  const url = new URL(href ?? '', 'https://example.test');
+  expect(url.searchParams.get('vehicle_make_model_year')).toBe('2023 Toyota LandCruiser 300 GXL');
+  expect(url.searchParams.get('fit_check_summary')).toContain('caravan towing');
+});
+
+test('the towing calculator sends no tray type or GVM upgrade, having neither', async ({ page }) => {
+  await page.goto(towingPath);
+  await page.fill('#gvm', '3350');
+  await page.fill('#vehicleName', '2023 Toyota LandCruiser 300 GXL');
+
+  const href = await page.getAttribute('#sendResult', 'href');
+  const url = new URL(href ?? '', 'https://example.test');
+  // The page asks for neither, and a caravan is towed rather than carried on a
+  // tray. A guess would reach Beyond RV as the customer's own answer.
+  expect(url.searchParams.has('tray_type')).toBe(false);
+  expect(url.searchParams.has('gvm_upgrade_status')).toBe(false);
+});
+
+test('the towing calculator never sends its prose placeholder as the vehicle', async ({ page }) => {
+  await page.goto(towingPath);
+  await page.fill('#gvm', '3350');
+
+  const href = await page.getAttribute('#sendResult', 'href');
+  const url = new URL(href ?? '', 'https://example.test');
+  expect(url.searchParams.get('fit_check_summary')).toContain('your vehicle');
+  expect(url.searchParams.has('vehicle_make_model_year')).toBe(false);
+});
