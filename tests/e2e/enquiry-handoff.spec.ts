@@ -128,3 +128,96 @@ test('no vehicle chosen means no tray type, despite the default state', async ({
   // who has not picked a vehicle at all.
   expect(url.searchParams.has('tray_type')).toBe(false);
 });
+
+const towingPath = '/caravan-towing-calculator/';
+
+test('the towing calculator sends the vehicle the customer named', async ({ page }) => {
+  await page.goto(towingPath);
+  await page.fill('#gvm', '3350');
+  await page.fill('#vehicleName', '2023 Toyota LandCruiser 300 GXL');
+
+  const href = await page.getAttribute('#sendResult', 'href');
+  const url = new URL(href ?? '', 'https://example.test');
+  expect(url.searchParams.get('vehicle_make_model_year')).toBe('2023 Toyota LandCruiser 300 GXL');
+  expect(url.searchParams.get('fit_check_summary')).toContain('caravan towing');
+});
+
+test('the towing calculator sends no tray type, and no GVM answer until given', async ({ page }) => {
+  await page.goto(towingPath);
+  await page.fill('#gvm', '3350');
+  await page.fill('#vehicleName', '2023 Toyota LandCruiser 300 GXL');
+
+  const href = await page.getAttribute('#sendResult', 'href');
+  const url = new URL(href ?? '', 'https://example.test');
+  // A caravan is towed rather than carried on a tray, so this page never asks.
+  expect(url.searchParams.has('tray_type')).toBe(false);
+  // Unanswered means unsent, rather than an assumed answer.
+  expect(url.searchParams.has('gvm_upgrade_status')).toBe(false);
+});
+
+test('the towing calculator sends the GVM upgrade answer once given', async ({ page }) => {
+  await page.goto(towingPath);
+  await page.fill('#gvm', '3350');
+  await page.selectOption('#gvmUpgrade', 'Yes');
+
+  const href = await page.getAttribute('#sendResult', 'href');
+  const url = new URL(href ?? '', 'https://example.test');
+  expect(url.searchParams.get('gvm_upgrade_status')).toBe('Yes');
+});
+
+test('the towing calculator never sends its prose placeholder as the vehicle', async ({ page }) => {
+  await page.goto(towingPath);
+  await page.fill('#gvm', '3350');
+
+  const href = await page.getAttribute('#sendResult', 'href');
+  const url = new URL(href ?? '', 'https://example.test');
+  expect(url.searchParams.get('fit_check_summary')).toContain('your vehicle');
+  expect(url.searchParams.has('vehicle_make_model_year')).toBe(false);
+});
+
+test('the answers to the two new questions travel from the slide-on calculator', async ({ page }) => {
+  await page.goto(calculatorPath);
+  await page.fill('#gvm', '3500');
+  await page.selectOption('#trayType', 'Alloy tray');
+  await page.selectOption('#gvmUpgrade', 'Yes');
+
+  const url = await sendHref(page);
+  expect(url.searchParams.get('tray_type')).toBe('Alloy tray');
+  expect(url.searchParams.get('gvm_upgrade_status')).toBe('Yes');
+});
+
+test('the customer answer beats the catalogue guess about the tray', async ({ page }) => {
+  await openWithFixture(page);
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  // A tub by the manufacturer's body type, which alone would send 'Tub'.
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-pickup-singleturbo');
+  await expect.poll(async () => (await sendHref(page)).searchParams.get('tray_type')).toBe('Tub');
+
+  // The person who owns the vehicle outranks the specification sheet.
+  await page.selectOption('#trayType', 'Tray with canopy');
+  const url = await sendHref(page);
+  expect(url.searchParams.get('tray_type')).toBe('Tray with canopy');
+});
+
+test('neither new answer is sent until the customer gives one', async ({ page }) => {
+  await page.goto(calculatorPath);
+  await page.fill('#gvm', '3500');
+
+  const url = await sendHref(page);
+  expect(url.searchParams.has('tray_type')).toBe(false);
+  expect(url.searchParams.has('gvm_upgrade_status')).toBe(false);
+});
+
+test('picking a vehicle produces the first payload result', async ({ page }) => {
+  await openWithFixture(page);
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-pickup-singleturbo');
+
+  // The picker fills GVM and current weight, which is what the page says it
+  // needs for the first payload result. Showing "Not calculated" beside the
+  // customer's own figures made the picker look broken.
+  await expect(page.locator('#availablePayload')).not.toHaveText('Not calculated');
+  await expect(page.locator('#statusLabel')).not.toHaveText('Enter your numbers to calculate a result.');
+});

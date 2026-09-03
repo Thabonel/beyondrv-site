@@ -105,6 +105,16 @@ const schema = [
           <input class="form-input" id="gvm" type="number" min="0" placeholder="3280" />
         </div>
         <div class="form-field">
+          <label class="form-label" for="gvmUpgrade">Has this vehicle had a GVM upgrade?</label>
+          <select class="form-input" id="gvmUpgrade">
+            <option value="">— Select —</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Unsure">Unsure</option>
+          </select>
+          <span class="form-help">An upgrade raises the GVM above the figure on the plate. If you have had one, enter the upgraded GVM above.</span>
+        </div>
+        <div class="form-field">
           <label class="form-label" for="gcm">Vehicle GCM (kg)</label>
           <input class="form-input" id="gcm" type="number" min="0" placeholder="6750" />
         </div>
@@ -321,9 +331,26 @@ const schema = [
       `Recommendation: ${result.recommendation}`
     ].join('\n');
     const send = byId('sendResult');
-    if (send) send.setAttribute('href', `/inquiry-form/?intent=vehicle-suitability&message=${encodeURIComponent(message)}&fit_check_summary=${encodeURIComponent(message)}`);
+    if (send) {
+      const params = new URLSearchParams({ intent: 'vehicle-suitability', message, fit_check_summary: message });
+      // What the customer typed. Never the 'your vehicle' fallback the summary
+      // prose uses, which reads fine in a sentence and would be nonsense in a
+      // field meant to name a vehicle.
+      const typedVehicle = value('vehicleName').trim();
+      if (typedVehicle) params.set('vehicle_make_model_year', typedVehicle);
+      const gvmUpgrade = value('gvmUpgrade');
+      if (gvmUpgrade) params.set('gvm_upgrade_status', gvmUpgrade);
+      // Still no tray_type. A caravan is towed rather than carried on a tray, so
+      // this page does not ask, and a guess would reach Beyond RV as the
+      // customer's own answer.
+      send.setAttribute('href', `/inquiry-form/?${params}`);
+    }
   }
 
+  // Rebuild the enquiry link when the answer changes. Deliberately not in
+  // `fields`: it does not affect the arithmetic, and answering it should not
+  // count as having started the estimate.
+  byId('gvmUpgrade')?.addEventListener('change', () => calculateTow());
   fields.forEach(id => byId(id)?.addEventListener('input', () => {
     hasStarted = true;
     calculateTow();
