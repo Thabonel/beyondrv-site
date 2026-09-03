@@ -22,6 +22,9 @@ test('a comfortable combination with all confirmations ticked is green', () => {
   if (!('values' in result)) {
     assert.fail('expected calculateSlideOnSuitability to return values for a green result');
   }
+  assert.equal(result.values.vehiclePayloadBeforeAdditions, 1150);
+  assert.equal(result.values.additionalVehicleLoad, 340);
+  assert.equal(result.values.availablePayloadBeforeCamper, 810);
   assert.equal(result.values.remainingGvmMargin, 3350 - 3170);
 });
 
@@ -69,6 +72,8 @@ test('blank optional additions count as zero once the core figures exist', () =>
   assert.equal(result.status, 'green');
   if (!('values' in result)) assert.fail('expected calculated values');
   assert.equal(result.values.availablePayloadBeforeCamper, 1150);
+  assert.equal(result.values.vehiclePayloadBeforeAdditions, 1150);
+  assert.equal(result.values.additionalVehicleLoad, 0);
   assert.equal(result.values.estimatedLoadedCamperWeight, 500);
   assert.equal(result.values.estimatedLoadedVehicleWeight, 2700);
 });

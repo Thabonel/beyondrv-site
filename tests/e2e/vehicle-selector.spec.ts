@@ -94,6 +94,24 @@ test('picking a vehicle fills the published figures', async ({ page }) => {
   await expect(page.locator('#vehicleProvenance')).toContainText('Published by Mazda Australia');
 });
 
+test('the result explains how entered loads and tray dimensions become its numbers', async ({ page }) => {
+  await page.goto(calculatorPath);
+  for (const [id, value] of [
+    ['gvm', '3350'], ['currentWeight', '2400'], ['passengers', '180'],
+    ['accessories', '80'], ['luggageGear', '120'], ['trayLength', '2300'],
+    ['trayWidth', '1850'], ['requiredTrayLength', '2300'], ['requiredTrayWidth', '1750'],
+  ] as const) {
+    await fillField(page, `#${id}`, value);
+  }
+
+  await expect(page.locator('#payloadBreakdown')).toHaveText(
+    '950 kg vehicle payload − 380 kg people, accessories and vehicle gear = 570 kg remaining for the camper.',
+  );
+  await expect(page.locator('#dimensionBreakdown')).toContainText('2,300 mm usable − 2,300 mm required = exact length match');
+  await expect(page.locator('#trayLengthFit')).toHaveText('Exact length match');
+  await expect(page.locator('#trayWidthFit')).toHaveText('100 mm spare');
+});
+
 test('a figure the customer typed survives re-picking a vehicle', async ({ page }) => {
   await openCalculatorWithFixture(page);
   await page.selectOption('#vehicleMake', 'Mazda');
@@ -289,7 +307,7 @@ test('a vehicle whose kerb mass excludes the tray will not calculate until the t
   // A blank tray weight must not be read as zero and pass the vehicle.
   await expect(page.locator('#statusLabel')).toContainText('Partial estimate');
   await expect(page.locator('#loadedCamper')).toHaveText(/1,?041 kg/);
-  await expect(page.locator('#trayLengthFit')).toHaveText('300 mm');
+  await expect(page.locator('#trayLengthFit')).toHaveText('300 mm spare');
   await expect(page.locator('#loadedWeight')).toHaveText('Not calculated');
   await expect(page.locator('#resultPanel')).toHaveAttribute('data-status', 'amber');
 

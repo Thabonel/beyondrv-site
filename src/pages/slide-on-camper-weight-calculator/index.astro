@@ -312,13 +312,17 @@ const schema = [
       <div class="result-status" id="statusLabel">Enter GVM and current weight to start</div>
       <h2 id="resultTitle">Start with two numbers</h2>
       <p class="result-summary" id="resultSummary">Each result appears as soon as its own required information is available.</p>
+      <div class="result-breakdown" id="resultBreakdown" hidden>
+        <p id="payloadBreakdown" hidden></p>
+        <p id="dimensionBreakdown" hidden></p>
+      </div>
       <div class="result-metrics">
-        <div class="result-metric"><span>Available payload before camper</span><strong id="availablePayload">Not calculated</strong></div>
+        <div class="result-metric"><span>Payload remaining for camper</span><strong id="availablePayload">Not calculated</strong></div>
         <div class="result-metric"><span>Estimated loaded vehicle weight</span><strong id="loadedWeight">Not calculated</strong></div>
         <div class="result-metric"><span>Remaining GVM margin</span><strong id="gvmMargin">Not calculated</strong></div>
         <div class="result-metric"><span>Estimated loaded camper weight</span><strong id="loadedCamper">Not calculated</strong></div>
-        <div class="result-metric"><span>Tray length fit</span><strong id="trayLengthFit">Not calculated</strong></div>
-        <div class="result-metric"><span>Tray width fit</span><strong id="trayWidthFit">Not calculated</strong></div>
+        <div class="result-metric"><span>Length clearance</span><strong id="trayLengthFit">Not calculated</strong></div>
+        <div class="result-metric"><span>Width clearance</span><strong id="trayWidthFit">Not calculated</strong></div>
         <div class="result-metric"><span>Tray-size model match</span><strong id="camperModelMatch">Enter tray length</strong></div>
         <div class="result-metric"><span>Estimate status</span><strong id="dataQuality">Not started</strong></div>
       </div>
@@ -891,19 +895,36 @@ const schema = [
 
   fillSelect(selectById('vehicleMake'), catalogueMakes(catalogue), 'Select a make');
   type SlideOnResultValues = {
+    vehiclePayloadBeforeAdditions?: number;
+    additionalVehicleLoad?: number;
     availablePayloadBeforeCamper?: number;
     estimatedLoadedVehicleWeight?: number;
     remainingGvmMargin?: number;
     estimatedLoadedCamperWeight?: number;
     trayLengthFit?: number;
     trayWidthFit?: number;
+    trayLength?: number;
+    trayWidth?: number;
+    requiredTrayLength?: number;
+    requiredTrayWidth?: number;
   };
   const kgOrNotCalculated = (value?: number) => value === undefined ? 'Not calculated' : fmt(value);
-  const mmOrNotCalculated = (value?: number) => value === undefined ? 'Not calculated' : fmtMm(value);
+  const clearance = (value: number | undefined, dimension: string) => {
+    if (value === undefined) return 'Not calculated';
+    if (value === 0) return `Exact ${dimension} match`;
+    return value > 0 ? `${fmtMm(value)} spare` : `${fmtMm(Math.abs(value))} too short`;
+  };
 
   function setText(id: string, value: string) {
     const el = byId(id);
     if (el) el.textContent = value;
+  }
+
+  function setBreakdown(id: string, text: string | null) {
+    const el = byId(id) as HTMLElement | null;
+    if (!el) return;
+    el.hidden = !text;
+    el.textContent = text ?? '';
   }
 
   function setNotes(notes: string[]) {
@@ -955,8 +976,24 @@ const schema = [
     setText('loadedWeight', kgOrNotCalculated(values.estimatedLoadedVehicleWeight));
     setText('gvmMargin', kgOrNotCalculated(values.remainingGvmMargin));
     setText('loadedCamper', kgOrNotCalculated(values.estimatedLoadedCamperWeight));
-    setText('trayLengthFit', mmOrNotCalculated(values.trayLengthFit));
-    setText('trayWidthFit', mmOrNotCalculated(values.trayWidthFit));
+    setText('trayLengthFit', clearance(values.trayLengthFit, 'length'));
+    setText('trayWidthFit', clearance(values.trayWidthFit, 'width'));
+    setBreakdown('payloadBreakdown', values.vehiclePayloadBeforeAdditions !== undefined
+      && values.additionalVehicleLoad !== undefined
+      && values.availablePayloadBeforeCamper !== undefined
+      ? `${fmt(values.vehiclePayloadBeforeAdditions)} vehicle payload − ${fmt(values.additionalVehicleLoad)} people, accessories and vehicle gear = ${fmt(values.availablePayloadBeforeCamper)} remaining for the camper.`
+      : null);
+    const lengthBreakdown = values.trayLength !== undefined && values.requiredTrayLength !== undefined
+      ? `${fmtMm(values.trayLength)} usable − ${fmtMm(values.requiredTrayLength)} required = ${clearance(values.trayLengthFit, 'length').toLowerCase()}.`
+      : null;
+    const widthBreakdown = values.trayWidth !== undefined && values.requiredTrayWidth !== undefined
+      ? `${fmtMm(values.trayWidth)} usable − ${fmtMm(values.requiredTrayWidth)} required = ${clearance(values.trayWidthFit, 'width').toLowerCase()}.`
+      : null;
+    setBreakdown('dimensionBreakdown', lengthBreakdown || widthBreakdown
+      ? `Tray fit: ${[lengthBreakdown, widthBreakdown].filter(Boolean).join(' Width: ')}`
+      : null);
+    const resultBreakdown = byId('resultBreakdown') as HTMLElement | null;
+    if (resultBreakdown) resultBreakdown.hidden = !(lengthBreakdown || widthBreakdown || values.vehiclePayloadBeforeAdditions !== undefined);
     const camperModelMatch = renderModelMatch();
     setText('dataQuality', result.dataQuality);
     setText('recommendation', result.recommendation);
@@ -980,12 +1017,12 @@ const schema = [
       'Vehicle Suitability Checker result - slide-on camper',
       `Vehicle: ${vehicleName}`,
       `Status: ${result.statusLabel}`,
-      `Available payload before camper: ${kgOrNotCalculated(values.availablePayloadBeforeCamper)}`,
+      `Payload remaining for camper: ${kgOrNotCalculated(values.availablePayloadBeforeCamper)}`,
       `Estimated loaded vehicle weight: ${kgOrNotCalculated(values.estimatedLoadedVehicleWeight)}`,
       `Remaining GVM margin: ${kgOrNotCalculated(values.remainingGvmMargin)}`,
       `Estimated loaded camper weight: ${kgOrNotCalculated(values.estimatedLoadedCamperWeight)}`,
-      `Tray length fit: ${mmOrNotCalculated(values.trayLengthFit)}`,
-      `Tray width fit: ${mmOrNotCalculated(values.trayWidthFit)}`,
+      `Length clearance: ${clearance(values.trayLengthFit, 'length')}`,
+      `Width clearance: ${clearance(values.trayWidthFit, 'width')}`,
       `Tray-size model match: ${camperModelMatch}`,
       `Data quality: ${result.dataQuality}`,
       `Recommendation: ${result.recommendation}`

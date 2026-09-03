@@ -218,8 +218,14 @@ export function calculateSlideOnSuitability(input = {}, options = {}) {
     camperDryWeight, camperWaterWeight, camperGearWeight, camperOptionsWeight
   ]);
 
+  const vehiclePayloadBeforeAdditions = !hasMissing([vehicleGvm, currentVehicleWeight])
+    ? vehicleGvm - currentVehicleWeight
+    : undefined;
+  const additionalVehicleLoad = !hasMissing([passengerWeight, accessoryWeight, luggageOrGearWeight])
+    ? passengerWeight + accessoryWeight + luggageOrGearWeight
+    : undefined;
   const availablePayloadBeforeCamper = hasVehicleWeights
-    ? vehicleGvm - currentVehicleWeight - passengerWeight - accessoryWeight - luggageOrGearWeight
+    ? vehiclePayloadBeforeAdditions - additionalVehicleLoad
     : undefined;
   const estimatedLoadedCamperWeight = hasCamperWeights
     ? camperDryWeight + camperWaterWeight + camperGearWeight + camperOptionsWeight
@@ -290,12 +296,18 @@ export function calculateSlideOnSuitability(input = {}, options = {}) {
       : 'Complete estimate; Product data incomplete: Beyond RV must confirm product weights; Weighbridge required: actual loaded weights needed',
     notes,
     values: {
+      vehiclePayloadBeforeAdditions,
+      additionalVehicleLoad,
       availablePayloadBeforeCamper,
       estimatedLoadedCamperWeight,
       estimatedLoadedVehicleWeight,
       remainingGvmMargin,
       trayLengthFit,
-      trayWidthFit
+      trayWidthFit,
+      trayLength: trayLength ?? undefined,
+      trayWidth: trayWidth ?? undefined,
+      requiredTrayLength: requiredTrayLength ?? undefined,
+      requiredTrayWidth: requiredTrayWidth ?? undefined
     }
   };
 }
