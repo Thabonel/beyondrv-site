@@ -580,7 +580,8 @@
       "id": "mazda-bt50-my25-dual-4x4-boss-pickup",
       "reason": "Published on the owner instruction. Flagged for secondary review over a discrepancy in the manufacturer published payload; the stored figures reconcile.",
       "reviewer": "Thabo Nel",
-      "approvedAt": "2026-09-01"
+      "approvedAt": "2026-09-01",
+      "correctedFields": ["payloadKg"]
     },
     {
       "id": "mazda-bt50-my25-dual-4x4-gt-cc",
@@ -724,13 +725,15 @@
       "id": "mitsubishi-triton-26my-glx-single-cc-4x2",
       "reason": "Published on the owner instruction. Flagged for secondary review over a discrepancy in the manufacturer published payload; the stored figures reconcile.",
       "reviewer": "Thabo Nel",
-      "approvedAt": "2026-09-01"
+      "approvedAt": "2026-09-01",
+      "correctedFields": ["payloadKg"]
     },
     {
       "id": "mitsubishi-triton-26my-glx-single-cc-4x4",
       "reason": "Published on the owner instruction. Flagged for secondary review over a discrepancy in the manufacturer published payload; the stored figures reconcile.",
       "reviewer": "Thabo Nel",
-      "approvedAt": "2026-09-01"
+      "approvedAt": "2026-09-01",
+      "correctedFields": ["payloadKg"]
     },
     {
       "id": "mitsubishi-triton-26my-glxplus-club-pickup-4x4",
@@ -794,30 +797,6 @@
     },
     {
       "id": "nissan-navara-2026-st-x-pick-up-tub",
-      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
-      "reviewer": "Thabo Nel",
-      "approvedAt": "2026-09-01"
-    },
-    {
-      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-express-black-edition-hurricane-crew-cab-tub",
-      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
-      "reviewer": "Thabo Nel",
-      "approvedAt": "2026-09-01"
-    },
-    {
-      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-laramie-sport-hurricane-crew-cab-tub",
-      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
-      "reviewer": "Thabo Nel",
-      "approvedAt": "2026-09-01"
-    },
-    {
-      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-limited-hurricane-high-output-crew-cab-tub",
-      "reason": "Published on the owner instruction. Flagged for secondary review over a discrepancy in the manufacturer published payload; the stored figures reconcile.",
-      "reviewer": "Thabo Nel",
-      "approvedAt": "2026-09-01"
-    },
-    {
-      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-rebel-hurricane-crew-cab-tub",
       "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
       "reviewer": "Thabo Nel",
       "approvedAt": "2026-09-01"
@@ -967,6 +946,11 @@
       "approvedAt": "2026-09-01"
     }
   ],
-  "hide": [],
+  "hide": [
+    "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-express-black-edition-hurricane-crew-cab-tub",
+    "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-laramie-sport-hurricane-crew-cab-tub",
+    "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-limited-hurricane-high-output-crew-cab-tub",
+    "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-rebel-hurricane-crew-cab-tub"
+  ],
   "note": "show entries require id, reason, reviewer and approvedAt. hide removes a variant. Conflicting entries fail the build. Variants published this way are disclosed to customers as manually published by Beyond RV."
 }

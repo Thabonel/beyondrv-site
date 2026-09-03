@@ -10,6 +10,33 @@ test('the homepage and navigation name the vehicle tools plainly', async ({ page
   await expect(page.getByRole('link', { name: 'Caravan Towing Calculator', exact: true })).toHaveAttribute('href', '/caravan-towing-calculator/');
 });
 
+test('the homepage offers camper-fit checks on the relevant ranges', async ({ page }) => {
+  await page.goto('/');
+
+  const fitLinks = page.getByRole('link', { name: 'Which camper will fit your vehicle', exact: true });
+  await expect(fitLinks).toHaveCount(2);
+  await expect(fitLinks.first()).toHaveAttribute('href', '/slide-on-camper-weight-calculator/');
+  await expect(fitLinks.last()).toHaveAttribute('href', '/slide-on-camper-weight-calculator/');
+});
+
+test('each homepage category photo links to its section', async ({ page }) => {
+  await page.goto('/');
+
+  const categories = [
+    ['Explore Expedition Vehicles', '/expedition/'],
+    ['Explore Slide-On Campers', '/our-slide-on-campers/'],
+    ['Explore Our Caravans', '/our-caravans/'],
+    ['Explore Custom Builds', '/custom/'],
+  ] as const;
+
+  for (const [name, href] of categories) {
+    await expect(page.getByRole('link', { name, exact: true })).toHaveAttribute('href', href);
+  }
+
+  await page.getByRole('link', { name: 'Explore Expedition Vehicles', exact: true }).click();
+  await expect(page).toHaveURL(/\/expedition\/$/);
+});
+
 test('a slide-on product links directly to the payload calculator', async ({ page }) => {
   await page.goto('/advent-2150-hardtop-slide-on/');
 

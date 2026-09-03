@@ -1,7 +1,7 @@
 // Change these dates only when the page's primary content, structured data,
 // or important internal links materially change. Unknown dates are omitted.
 export const SITEMAP_LASTMOD = Object.freeze({
-  '/': '2026-09-02',
+  '/': '2026-09-03',
   '/about-us/': '2026-07-29',
   '/custom/': '2026-07-29',
   '/careers/': '2026-08-19',

@@ -12,13 +12,13 @@ vehicle catalogue, the publication gate, or the end-to-end tests.
 | Item | Value |
 |---|---|
 | Live on production | 26 variants: 24 Ford, 2 Hino |
-| Merged | #37 to #48, #52, #53, #54 |
-| Open | #49, #50, #51 (a chain), and #34 (tray sizes, from August) |
+| Merged | #37 to #54, including the #49, #50, #51 chain |
+| Open | #34 (tray sizes, from August) |
 | Utes in the database | 159, of which 132 are `source_verified` and 27 `needs_secondary_review` |
 | Truck chassis | 15, of which 5 cannot publish |
 | Truck families still unresearched | 9 |
 
-Once #49, #50 and #51 land, the picker carries **161 variants across 12 makes
+After #49, #50 and #51 landed, the picker carried **161 variants across 12 makes
 plus Hino**, and the optimistic-kerb disclosure goes live with them.
 
 ## What shipped
@@ -89,9 +89,9 @@ summaries now match the detail.
 
 ## Open items
 
-### 1. Merge the chain: #49, #50, #51
+### 1. Completed: merge the chain #49, #50, #51
 
-They must merge in that order. #50 is stacked on #49, and #51 touches the same
+They merged in that order. #50 was stacked on #49, and #51 touched the same
 catalogue output.
 
 Each carries a regenerated `catalogue.json`. If a merge conflicts, the conflict

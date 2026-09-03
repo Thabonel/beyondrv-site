@@ -5,11 +5,13 @@ import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { isPromoted, validateCatalogueOverrides } from '../src/lib/vehicleCatalogue/derive.ts';
 import { parseVehicleCatalogue } from '../src/lib/vehicleCatalogue/validate.ts';
+import { validateReviewsFile } from '../netlify/functions/vehicle-review-core.ts';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const database = fileURLToPath(new URL('../data/vehicle-selector/australian-slide-on-vehicles.sqlite', import.meta.url));
 const cataloguePath = fileURLToPath(new URL('../src/data/vehicle-selector/catalogue.json', import.meta.url));
 const overridesPath = fileURLToPath(new URL('../src/data/vehicle-selector/overrides.json', import.meta.url));
+const reviewsPath = fileURLToPath(new URL('../data/vehicle-selector/reviews.json', import.meta.url));
 
 const publicationQuery = `
 SELECT v.id, v.customer_selectable,
@@ -47,6 +49,9 @@ test('the committed public catalogue exactly matches attributable publication de
   assert.equal(overrideResult.valid, true, overrideResult.errors.join('\n'));
   assert.ok(overrideResult.overrides);
   const overrides = overrideResult.overrides;
+  const reviewResult = validateReviewsFile(JSON.parse(readFileSync(reviewsPath, 'utf8')) as unknown);
+  assert.equal(reviewResult.valid, true, reviewResult.errors.join('\n'));
+  const reviewedIds = new Set(reviewResult.reviews?.map((review) => review.id));
 
   const readRows = (query: string) => {
     const out = execFileSync('sqlite3', ['-json', database, query], { cwd: root, encoding: 'utf8' });
@@ -59,7 +64,7 @@ test('the committed public catalogue exactly matches attributable publication de
     latest_review_decision: string | null;
   }>;
 
-  const expected = rows.filter((row) => isPromoted(row, overrides)).map((row) => row.id).sort();
+  const expected = rows.filter((row) => isPromoted(row, overrides, reviewedIds)).map((row) => row.id).sort();
   const published = catalogue.variants.map((variant) => variant.id).sort();
   assert.deepEqual(published, expected);
 });

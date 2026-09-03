@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.1",
-  "catalogueVersion": "vehicle-catalogue-2026-09-01",
-  "generatedAt": "2026-09-01T09:07:48.450Z",
+  "catalogueVersion": "vehicle-catalogue-2026-09-03",
+  "generatedAt": "2026-09-03T05:11:47.565Z",
   "sourceDatabaseRowCount": 169,
   "models": [
     {
@@ -106,13 +106,6 @@
     {
       "make": "Nissan",
       "model": "Navara",
-      "modelYears": [
-        2026
-      ]
-    },
-    {
-      "make": "RAM",
-      "model": "1500",
       "modelYears": [
         2026
       ]
@@ -3782,7 +3775,9 @@
       "rearGawrKg": 1910,
       "trayLengthMm": null,
       "trayWidthMm": null,
-      "correctedFields": [],
+      "correctedFields": [
+        "payloadKg"
+      ],
       "platform": "ute",
       "kerbIsOptimistic": false,
       "maxBodyLengthMm": null,
@@ -4902,7 +4897,9 @@
       "rearGawrKg": 1980,
       "trayLengthMm": null,
       "trayWidthMm": null,
-      "correctedFields": [],
+      "correctedFields": [
+        "payloadKg"
+      ],
       "platform": "ute",
       "kerbIsOptimistic": false,
       "maxBodyLengthMm": null,
@@ -4942,7 +4939,9 @@
       "rearGawrKg": 2040,
       "trayLengthMm": null,
       "trayWidthMm": null,
-      "correctedFields": [],
+      "correctedFields": [
+        "payloadKg"
+      ],
       "platform": "ute",
       "kerbIsOptimistic": false,
       "maxBodyLengthMm": null,
@@ -5398,166 +5397,6 @@
         "manufacturer": "Nissan Australia",
         "title": "All-New Navara Specifications and Pricing",
         "url": "https://www.nissan.com.au/vehicles/browse-range/all-new-navara/specs-and-pricing.html",
-        "accessedDate": "2026-08-18"
-      }
-    },
-    {
-      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-express-black-edition-hurricane-crew-cab-tub",
-      "make": "RAM",
-      "model": "1500",
-      "modelYear": 2026,
-      "grade": "Express Black Edition Hurricane",
-      "cabType": "crew_cab",
-      "bodyType": "pickup_tub",
-      "drivetrain": "part-time 4x4",
-      "engine": "3.0L Hurricane straight-six twin-turbo petrol, standard output, 313 kW / 635 Nm",
-      "transmission": "8-speed automatic",
-      "wheelbaseMm": 3672,
-      "label": "RAM 1500 Express Black Edition Hurricane crew cab pickup tub part-time 4x4 (2026)",
-      "gvmKg": 3505,
-      "kerbKg": 2491,
-      "kerbBasis": "manufacturer “Kerb Weight”; brochure footnote applies manufacturer-defined kerb basis",
-      "payloadKg": 1014,
-      "frontGawrKg": 1770,
-      "rearGawrKg": 1860,
-      "trayLengthMm": null,
-      "trayWidthMm": 1295,
-      "correctedFields": [],
-      "platform": "ute",
-      "kerbIsOptimistic": false,
-      "maxBodyLengthMm": null,
-      "trayState": "not_applicable",
-      "trayMassKg": null,
-      "promotedByOverride": true,
-      "publication": {
-        "approvalId": "override:ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-express-black-edition-hurricane-crew-cab-tub",
-        "approvedAt": "2026-09-01",
-        "method": "override"
-      },
-      "source": {
-        "manufacturer": "RAM Trucks Australia",
-        "title": "RAM 1500 Specification Brochure",
-        "url": "https://resource.digitaldealer.com.au/pdf/4385833746a1d25a063869361464389.pdf",
-        "accessedDate": "2026-08-18"
-      }
-    },
-    {
-      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-laramie-sport-hurricane-crew-cab-tub",
-      "make": "RAM",
-      "model": "1500",
-      "modelYear": 2026,
-      "grade": "Laramie Sport Hurricane",
-      "cabType": "crew_cab",
-      "bodyType": "pickup_tub",
-      "drivetrain": "on-demand 4x4",
-      "engine": "3.0L Hurricane straight-six twin-turbo petrol, standard output, 313 kW / 635 Nm",
-      "transmission": "8-speed automatic",
-      "wheelbaseMm": 3672,
-      "label": "RAM 1500 Laramie Sport Hurricane crew cab pickup tub on-demand 4x4 (2026)",
-      "gvmKg": 3505,
-      "kerbKg": 2642,
-      "kerbBasis": "manufacturer “Kerb Weight”; brochure footnote applies manufacturer-defined kerb basis",
-      "payloadKg": 863,
-      "frontGawrKg": 1770,
-      "rearGawrKg": 1860,
-      "trayLengthMm": null,
-      "trayWidthMm": 1270,
-      "correctedFields": [],
-      "platform": "ute",
-      "kerbIsOptimistic": false,
-      "maxBodyLengthMm": null,
-      "trayState": "not_applicable",
-      "trayMassKg": null,
-      "promotedByOverride": true,
-      "publication": {
-        "approvalId": "override:ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-laramie-sport-hurricane-crew-cab-tub",
-        "approvedAt": "2026-09-01",
-        "method": "override"
-      },
-      "source": {
-        "manufacturer": "RAM Trucks Australia",
-        "title": "RAM 1500 Specification Brochure",
-        "url": "https://resource.digitaldealer.com.au/pdf/4385833746a1d25a063869361464389.pdf",
-        "accessedDate": "2026-08-18"
-      }
-    },
-    {
-      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-limited-hurricane-high-output-crew-cab-tub",
-      "make": "RAM",
-      "model": "1500",
-      "modelYear": 2026,
-      "grade": "Limited Hurricane High Output",
-      "cabType": "crew_cab",
-      "bodyType": "pickup_tub",
-      "drivetrain": "on-demand 4x4",
-      "engine": "3.0L Hurricane straight-six twin-turbo petrol, high output, 403 kW / 707 Nm",
-      "transmission": "8-speed automatic",
-      "wheelbaseMm": 3672,
-      "label": "RAM 1500 Limited Hurricane High Output crew cab pickup tub on-demand 4x4 (2026)",
-      "gvmKg": 3505,
-      "kerbKg": 2722,
-      "kerbBasis": "manufacturer “Kerb Weight”; brochure footnote applies manufacturer-defined kerb basis",
-      "payloadKg": 783,
-      "frontGawrKg": 1770,
-      "rearGawrKg": 1860,
-      "trayLengthMm": null,
-      "trayWidthMm": 1270,
-      "correctedFields": [],
-      "platform": "ute",
-      "kerbIsOptimistic": false,
-      "maxBodyLengthMm": null,
-      "trayState": "not_applicable",
-      "trayMassKg": null,
-      "promotedByOverride": true,
-      "publication": {
-        "approvalId": "override:ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-limited-hurricane-high-output-crew-cab-tub",
-        "approvedAt": "2026-09-01",
-        "method": "override"
-      },
-      "source": {
-        "manufacturer": "RAM Trucks Australia",
-        "title": "RAM 1500 Specification Brochure",
-        "url": "https://resource.digitaldealer.com.au/pdf/4385833746a1d25a063869361464389.pdf",
-        "accessedDate": "2026-08-18"
-      }
-    },
-    {
-      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-rebel-hurricane-crew-cab-tub",
-      "make": "RAM",
-      "model": "1500",
-      "modelYear": 2026,
-      "grade": "Rebel Hurricane",
-      "cabType": "crew_cab",
-      "bodyType": "pickup_tub",
-      "drivetrain": "on-demand 4x4",
-      "engine": "3.0L Hurricane straight-six twin-turbo petrol, standard output, 313 kW / 635 Nm",
-      "transmission": "8-speed automatic",
-      "wheelbaseMm": 3672,
-      "label": "RAM 1500 Rebel Hurricane crew cab pickup tub on-demand 4x4 (2026)",
-      "gvmKg": 3505,
-      "kerbKg": 2612,
-      "kerbBasis": "manufacturer “Kerb Weight”; brochure footnote applies manufacturer-defined kerb basis",
-      "payloadKg": 893,
-      "frontGawrKg": 1770,
-      "rearGawrKg": 1860,
-      "trayLengthMm": null,
-      "trayWidthMm": 1295,
-      "correctedFields": [],
-      "platform": "ute",
-      "kerbIsOptimistic": false,
-      "maxBodyLengthMm": null,
-      "trayState": "not_applicable",
-      "trayMassKg": null,
-      "promotedByOverride": true,
-      "publication": {
-        "approvalId": "override:ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-rebel-hurricane-crew-cab-tub",
-        "approvedAt": "2026-09-01",
-        "method": "override"
-      },
-      "source": {
-        "manufacturer": "RAM Trucks Australia",
-        "title": "RAM 1500 Specification Brochure",
-        "url": "https://resource.digitaldealer.com.au/pdf/4385833746a1d25a063869361464389.pdf",
         "accessedDate": "2026-08-18"
       }
     },

@@ -409,8 +409,11 @@ nav.scrolled {
 }
 .model-card-content {
   position: absolute; bottom: 0; left: 0; right: 0;
-  padding: 2rem;
+  z-index: 3; padding: 2rem;
+  pointer-events: none;
 }
+.model-card-content a { pointer-events: auto; }
+.model-card-hitarea { position: absolute; inset: 0; z-index: 2; }
 .model-tag {
   display: inline-block;
   background: var(--orange-button); color: var(--white);
@@ -431,6 +434,20 @@ nav.scrolled {
   transition: opacity 0.3s, transform 0.3s;
 }
 .model-card:hover .model-link { opacity: 1; transform: translateY(0); }
+.model-card-actions {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 0.9rem;
+}
+.model-fit-link {
+  display: inline-flex;
+  padding: 0.7rem 1rem;
+  background: var(--orange-button); color: var(--white);
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.07em; line-height: 1.2;
+  text-decoration: none; text-transform: uppercase;
+  clip-path: polygon(7px 0%, 100% 0%, calc(100% - 7px) 100%, 0% 100%);
+}
+.model-fit-link:hover { background: var(--orange); }
+.model-card-hitarea:focus-visible,
+.model-fit-link:focus-visible { outline: 2px solid var(--white); outline-offset: -4px; }
 .model-card.featured { grid-column: span 2; aspect-ratio: 21/9; }
 
 /* ─── PRODUCT GRID (category listings) ─── */

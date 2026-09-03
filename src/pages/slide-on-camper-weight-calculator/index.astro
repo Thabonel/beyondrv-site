@@ -5,12 +5,13 @@ import { getVehicleCatalogue } from '../../lib/vehicleCatalogue.ts';
 import { serializeJsonForHtml } from '../../lib/safeJson.ts';
 import { getCollection } from 'astro:content';
 import { isPublicProduct } from '../../lib/productVisibility';
+import { ESTIMATE_DISCLAIMER } from '../../lib/vehicleSuitabilityCalculator.js';
 const vehicleCatalogue = getVehicleCatalogue();
 const vehicleCatalogueJson = serializeJsonForHtml(vehicleCatalogue);
 
 const pageUrl = 'https://beyondrv.com.au/slide-on-camper-weight-calculator/';
 const heroImage = '/images/site/homepage-slide-on-campers.webp';
-const disclaimer = 'This tool provides an estimate only. Final suitability depends on your exact vehicle variant, compliance plate, manufacturer specifications, towbar rating, axle limits, tyre ratings, accessories, real loaded weights and certified weighbridge results. Beyond RV must confirm final suitability before purchase.';
+const disclaimer = ESTIMATE_DISCLAIMER;
 
 const faqs = [
   {
