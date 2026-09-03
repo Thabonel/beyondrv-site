@@ -16,6 +16,7 @@ type CacheEntry = { researchedAt: string; result: DimensionResearchResult };
 const client = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
 const MODEL = process.env.OPENAI_VEHICLE_RESEARCH_MODEL ?? 'gpt-5.5';
 const CACHE_STORE = 'vehicle-dimension-research';
+const CACHE_VERSION = 'v1';
 const CACHE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 const jsonHeaders = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' };
 
@@ -55,7 +56,7 @@ function collectSources(response: unknown): ResearchSource[] {
 async function cachedResult(event: HandlerEvent, vehicleId: string) {
   connectBlobStore(event);
   try {
-    const entry = await getBlobStore(CACHE_STORE).get(`${vehicleId}.json`, { type: 'json' }) as CacheEntry | null;
+    const entry = await getBlobStore(CACHE_STORE).get(`${CACHE_VERSION}/${vehicleId}.json`, { type: 'json' }) as CacheEntry | null;
     if (!entry || Date.now() - Date.parse(entry.researchedAt) > CACHE_MAX_AGE_MS) return null;
     return { ...entry.result, cached: true };
   } catch (error) {
@@ -67,7 +68,7 @@ async function cachedResult(event: HandlerEvent, vehicleId: string) {
 async function cacheResult(event: HandlerEvent, result: DimensionResearchResult) {
   connectBlobStore(event);
   try {
-    await getBlobStore(CACHE_STORE).setJSON(`${result.vehicleId}.json`, {
+    await getBlobStore(CACHE_STORE).setJSON(`${CACHE_VERSION}/${result.vehicleId}.json`, {
       researchedAt: new Date().toISOString(),
       result,
     } satisfies CacheEntry);
@@ -135,7 +136,7 @@ export const handler: Handler = async (event) => {
       instructions: `Research Australian tray or pickup-tub dimensions for one exact vehicle variant.
 
 Safety and evidence rules:
-- Search the live web. Prefer the Australian vehicle manufacturer, then the exact tray maker, then a reputable Australian dealer or accessory installer.
+- Search the live web. Prefer the Australian vehicle manufacturer, then the exact tray maker, then a reputable Australian automotive specification publisher, dealer or accessory installer.
 - Match the exact model year, grade, cab and body. Do not transfer a dimension from a similar vehicle.
 - We need the usable load-floor length and the narrowest usable internal width in millimetres. Reject overall vehicle dimensions and exterior body dimensions.
 - A pickup tub normally has one factory configuration. A cab-chassis can have several trays; return each exact compatible option separately.

@@ -85,7 +85,11 @@ export function normaliseDimensionResearch(params: {
       dimensionKind,
       confidence,
       source: {
-        title: source.title || (typeof option.sourceTitle === 'string' ? option.sourceTitle : 'Source'),
+        title: source.title && source.title !== 'Web source'
+          ? source.title
+          : typeof option.sourceTitle === 'string' && option.sourceTitle.trim()
+            ? option.sourceTitle.trim().slice(0, 180)
+            : 'View source',
         url: source.url,
       },
     });
