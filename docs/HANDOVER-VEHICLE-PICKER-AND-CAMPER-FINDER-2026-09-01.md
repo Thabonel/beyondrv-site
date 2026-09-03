@@ -1,8 +1,10 @@
 # Handover: the vehicle picker, the camper finder, and the publication gate
 
-Date: 1 September 2026
+Date: 1 September 2026, updated 3 September 2026
 Repo: `Thabonel/beyondrv-site`
-Covers: pull requests #37 to #54, opened and merged on 30 and 31 August and 1 September 2026.
+Covers: pull requests #37 to #62, from 30 August to 3 September 2026.
+
+The filename keeps its original date so existing links still work.
 
 Read "Open items" and "Traps that cost time" before changing anything in the
 vehicle catalogue, the publication gate, or the end-to-end tests.
@@ -11,15 +13,17 @@ vehicle catalogue, the publication gate, or the end-to-end tests.
 
 | Item | Value |
 |---|---|
-| Live on production | 26 variants: 24 Ford, 2 Hino |
-| Merged | #37 to #54, including the #49, #50, #51 chain |
+| Live on production | **161 variants across 13 makes**, verified 3 September |
+| Of those, optimistic kerb | 23, each disclosed to the customer |
+| Merged | #37 to #62 |
+| Closed unmerged | #56, superseded by #58 |
 | Open | #34 (tray sizes, from August) |
 | Utes in the database | 159, of which 132 are `source_verified` and 27 `needs_secondary_review` |
 | Truck chassis | 15, of which 5 cannot publish |
 | Truck families still unresearched | 9 |
 
-After #49, #50 and #51 landed, the picker carried **161 variants across 12 makes
-plus Hino**, and the optimistic-kerb disclosure goes live with them.
+The 13 makes are Chevrolet, Ford, GWM, Hino, Isuzu, KGM, Kia, Mazda, Mitsubishi,
+Nissan, RAM, Toyota and Volkswagen.
 
 ## What shipped
 
@@ -87,16 +91,111 @@ The 4.7 m camper stated Unimog as a platform flatly in its tagline, `keySpecs`
 and `seoDesc`, while its body text said "adapted to suit a Unimog". The
 summaries now match the detail.
 
+## What shipped on 3 September
+
+### The last four variants, and a merged pull request that changed nothing
+
+`main` was at 157 variants when it should have been at 161. #50 had been opened
+with `--base data/publish-all-verified-utes` so it could stack on #49. #49 merged
+to `main` first, which left #50 pointing at a branch that was already spent.
+GitHub merged it there and marked it MERGED. Nothing reached `main`.
+
+It was caught only because the production check came back 134 variants with zero
+optimistic flags, against a stated expectation of 161. See "Traps".
+
+#58 then landed the 27 flagged variants from `staging`, and did it better than
+the replacement branch: it also records `correctedFields: ["payloadKg"]` on three
+entries. #56 was closed rather than merged, because merging it would have
+overwritten those three disclosures.
+
+That left four RAM 1500 Hurricane variants in the `hide` list. They had moved
+there in 87a0b28, a commit titled "make homepage range cards easier to navigate",
+as bare id strings with no reason, reviewer or date, unlike every `show` entry.
+No code rule required it. All four are read from the RAM 1500 Hurricane brochure
+and reconcile exactly: 3505 kg GVM less kerb equals the published payload at
+1014, 863, 783 and 893 kg.
+
+#60 published them on the owner's instruction, **with a reason recorded on each**,
+including the fact that the brochure states no model year and the catalogue
+resolves it to 2026. That was the most plausible motive for the original hide,
+and it is now written down.
+
+### The calculators feed the enquiry form
+
+The calculators handed the enquiry form one prose blob, twice, as `message` and
+`fit_check_summary`. The form had accepted structured fields from the URL all
+along and nothing ever sent one, so a customer who had just measured their tray
+was asked for it again, and the figure reached Beyond RV only as text inside a
+summary that cannot be sorted or counted.
+
+`tray_length`, `vehicle_make_model_year` and `tray_type` now travel (#61), and
+the towing calculator sends the vehicle too (#62).
+
+Deliberate refusals, each with a test:
+
+- **Never `requiredTrayLength` as the tray length.** It sits beside `trayLength`
+  and looks interchangeable, but it is the length the *camper* needs. Same shape
+  of error as reading a chassis's maximum body length as its tray.
+- **Never the `'your vehicle'` fallback.** The summary prose uses it when the
+  field is empty. It reads fine in a sentence and is nonsense in a field meant to
+  name a vehicle.
+- **Omitted, never empty.** A blank parameter clears the field on the enquiry
+  form, which is worse for the customer than typing it.
+
+### Two questions that did not exist
+
+`tray_type` and `gvm_upgrade_status` had no honest source on either calculator.
+The catalogue knows a tub from the manufacturer's body type and nothing else, and
+nothing anywhere asked about a GVM upgrade. Sending `Unsure` would have reached
+the admin as the customer's own answer to a question they were never asked.
+
+So #62 asks. Tray type on the slide-on calculator, beside the tray measurements.
+GVM upgrade on both, beside the GVM field, because it is the reason the figure on
+the compliance plate may be the wrong one to enter.
+
+**The customer outranks the specification sheet.** The catalogue-derived `Tub`
+now fills in only where they have not answered. Someone who has fitted a canopy
+to a tub says so, and their answer is what arrives. Verified on production: `Tub`
+before answering, `Tray with canopy` after.
+
+The towing calculator still sends no `tray_type`. A caravan is towed rather than
+carried on a tray, so the question would be noise there.
+
+### The picker filled the numbers and calculated nothing
+
+Reported from a screenshot: a Triton picked from the finder, GVM and current
+weight prefilled, and every result reading "Not calculated".
+
+`hasStarted` was set in exactly one place, the listener for typing into a field.
+Selecting a vehicle prefills programmatically, which fires no `input` event, so
+the calculator returned `initialSuitabilityResult()` no matter what was in the
+form. The page's own instruction says "Enter GVM and current weight for the first
+payload result", and the picker fills both.
+
+Pre-existing, confirmed by reproducing it on production before merging anything.
+Selecting a variant now counts as starting. On production the same Triton went
+from "Not calculated" to **1,055 kg**.
+
+The second half of that report was not a bug. No camper was suggested because the
+Triton is a tub, so the catalogue has no tray length to prefill and the finder
+asks the customer to measure. Entering 2300 mm suggests the Advent 2300. Inferring
+a tray length from a specification sheet is exactly the error described under
+"Max body length is not a tray length".
+
 ## Open items
 
-### 1. Completed: merge the chain #49, #50, #51
+### 1. Completed, but not as recorded at the time: #49, #50, #51
 
-They merged in that order. #50 was stacked on #49, and #51 touched the same
-catalogue output.
+#49 and #51 merged to `main`. **#50 did not**, despite reporting MERGED: it was
+stacked on #49's branch, which merged first, so its merge landed nowhere. Its 27
+variants reached `main` later through #58, and the last four through #60.
 
-Each carries a regenerated `catalogue.json`. If a merge conflicts, the conflict
-will be in a generated file: regenerate with `npm run catalogue:build` rather
-than hand-merging. See "Traps".
+Anything relying on "#50 merged" is wrong. See "A stacked pull request whose base
+merges first becomes a no-op".
+
+Each of these carries a regenerated `catalogue.json`. If a merge conflicts, the
+conflict will be in a generated file: regenerate with `npm run catalogue:build`
+rather than hand-merging. See "Traps".
 
 ### 2. The 23 optimistic-kerb Ford variants
 
@@ -148,7 +247,15 @@ the model, but it is wrong on a live product page.
 Held since 22 August because nothing was published, so the feature was
 unreachable. That reason has gone.
 
-### 7. Generated files are committed
+### 7. The review screen offers vehicles that are already published
+
+Every one of the 161 live variants shows `published: false` in
+`vehicle-review-candidates.json`, so the review screen still lists them all as
+candidates. The flag tracks `reviews.json` only, and everything live went through
+the override path instead. Pre-existing, and confirmed against `main` rather than
+assumed.
+
+### 8. Generated files are committed
 
 `catalogue.json` and `netlify/functions/vehicle-review-candidates.json` are
 generated and committed. Any two branches that touch vehicle data conflict in
@@ -171,6 +278,37 @@ The same trap appeared in a U1700 specification sheet, where `Length 6940 mm`
 sits beside shipping volume and approach angle. That is the whole vehicle. The
 tray measured 4200 mm.
 
+### A stacked pull request whose base merges first becomes a no-op
+
+#50 was opened against #49's branch. #49 merged to `main` first, so #50's merge
+landed in a branch that no longer led anywhere. GitHub reported MERGED. The 27
+variants never reached `main`.
+
+Either merge the stack strictly bottom-up, or open each pull request against
+`main` and rebase. "MERGED" says where a branch went, not that anything shipped.
+
+### Merged is not deployed, and deployed is not live
+
+Three separate states, and only the last one matters to a customer. On
+3 September a pull request reported MERGED while `main` was unchanged, and later
+a deploy was called pending when it had actually published 45 seconds after the
+merge.
+
+Check the last state directly: drive the live page, or read Netlify's own deploy
+record. `state: ready` with a `published_at` is the answer; a green pull request
+is not.
+
+### Watch for a signal that exists in the artefact you are checking
+
+A deploy watcher polled the served HTML for `vehicle_make_model_year`. That
+string lives in Astro's bundled JavaScript, not in the page source, so it would
+have polled forever. The catalogue checks worked because catalogue JSON *is*
+inlined, and the assumption was carried across to code that is not.
+
+Markup like `id="gvmUpgrade"` is in the HTML and is a sound signal. Anything from
+a `<script>` block is not. When a watcher does not fire, check the signal before
+concluding anything about the deploy.
+
 ### A verification has to be able to fail
 
 Four checks passed for the wrong reason on 1 September:
@@ -183,6 +321,17 @@ Four checks passed for the wrong reason on 1 September:
 Every one reported success regardless of the outcome. **Check something that
 should not have changed, alongside the thing that should.** If both read the
 same, the check is broken.
+
+Two more on 3 September: a diff that stringified override objects, so every entry
+read `[object Object]` and appeared to differ; and a count of `"make":"RAM"`
+occurrences that returned 10 for 7 variants, because the page emits each variant
+twice. Counting distinct ids gave the right answer, and a Ford control showed the
+duplication was page structure rather than a data fault.
+
+For the test suites written that day the method was: **revert the source change
+and confirm the right tests fail.** Ten tests passing proves nothing on its own.
+Reverting showed exactly the two that asserted new behaviour failing, with every
+control still passing.
 
 ### Run the commands CI runs
 
