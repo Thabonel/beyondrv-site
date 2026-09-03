@@ -933,7 +933,15 @@ const schema = [
       `Recommendation: ${result.recommendation}`
     ].join('\n');
     const send = byId('sendResult');
-    if (send) send.setAttribute('href', `/inquiry-form/?intent=vehicle-suitability&message=${encodeURIComponent(message)}&fit_check_summary=${encodeURIComponent(message)}`);
+    if (send) {
+      const params = new URLSearchParams({ intent: 'vehicle-suitability', message, fit_check_summary: message });
+      // The customer's own tray: the detailed field, or the finder step above it
+      // when that is all they have filled in. Never requiredTrayLength, which is
+      // the camper's requirement rather than the tray they own.
+      const customerTrayLength = value('trayLength') || value('finderTrayLength');
+      if (Number(customerTrayLength) > 0) params.set('tray_length', customerTrayLength);
+      send.setAttribute('href', `/inquiry-form/?${params}`);
+    }
   }
 
   fields.forEach(id => byId(id)?.addEventListener('input', () => {
