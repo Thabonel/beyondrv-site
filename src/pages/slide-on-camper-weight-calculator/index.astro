@@ -218,6 +218,7 @@ const schema = [
         <fieldset class="quick-step form-field--full">
           <legend><span>2</span> Your camper and tray</legend>
           <p class="quick-step-intro">Choose a camper and enter the usable length and width of your tray. These dimensions decide the preliminary physical fit; weight refines the payload check.</p>
+          <div class="tray-research" id="trayResearch" aria-live="polite" hidden></div>
           <div class="details-grid details-grid--quick">
             <div class="form-field">
               <label class="form-label" for="camperModel">Camper you want to check (optional)</label>
@@ -399,6 +400,23 @@ const schema = [
     catalogueVariantsForModel,
   } from '../../lib/vehicleCatalogue/picker';
   import type { CatalogueVariant, VehicleCatalogue } from '../../lib/vehicleCatalogue/types';
+
+  type TrayResearchOption = {
+    name: string;
+    lengthMm: number;
+    widthMm: number;
+    confidence: 'high' | 'medium';
+    source: { title: string; url: string };
+  };
+  type TrayResearchResult = {
+    status: 'single' | 'multiple' | 'not_found' | 'unavailable';
+    vehicleId: string;
+    vehicleLabel: string;
+    message: string;
+    options: TrayResearchOption[];
+    measurementSteps: string[];
+    cached?: boolean;
+  };
 
   const form = document.getElementById('slideCalculator');
   const resultPanel = document.getElementById('resultPanel');
@@ -614,6 +632,172 @@ const schema = [
   // The provenance panel has to be redrawn whenever what it claims stops being
   // true, which means keeping hold of the variant it is describing.
   let selectedVariant: CatalogueVariant | null = null;
+  let trayResearchRequest = 0;
+
+  function clearTrayResearch() {
+    trayResearchRequest += 1;
+    const panel = byId('trayResearch') as HTMLElement | null;
+    if (!panel) return;
+    panel.hidden = true;
+    panel.removeAttribute('data-state');
+    panel.replaceChildren();
+  }
+
+  function sourceLink(source: TrayResearchOption['source']) {
+    const link = document.createElement('a');
+    link.href = source.url;
+    link.textContent = source.title || 'View source';
+    link.target = '_blank';
+    link.rel = 'noopener';
+    return link;
+  }
+
+  function addMeasurementInstructions(panel: HTMLElement, steps: string[]) {
+    const heading = document.createElement('strong');
+    heading.textContent = 'Measure these two dimensions';
+    const list = document.createElement('ol');
+    for (const step of steps) {
+      const item = document.createElement('li');
+      item.textContent = step;
+      list.appendChild(item);
+    }
+    panel.append(heading, list);
+  }
+
+  function useResearchedDimensions(option: TrayResearchOption) {
+    const length = inputById('trayLength');
+    const width = inputById('trayWidth');
+    if (length) length.value = String(option.lengthMm);
+    if (width) width.value = String(option.widthMm);
+    customerEdited.delete('trayLength');
+    customerEdited.delete('trayWidth');
+    if (selectedVariant) renderProvenance(selectedVariant);
+    hasStarted = true;
+    renderFinder();
+    calculateSlideOn();
+
+    const panel = byId('trayResearch') as HTMLElement | null;
+    if (!panel) return;
+    panel.dataset.state = 'confirmed';
+    panel.replaceChildren();
+    const message = document.createElement('p');
+    message.append(
+      document.createTextNode(`${option.name}: ${option.lengthMm.toLocaleString()} mm long × ${option.widthMm.toLocaleString()} mm wide added. Confirmed from `),
+      sourceLink(option.source),
+      document.createTextNode('.'),
+    );
+    const change = document.createElement('button');
+    change.type = 'button';
+    change.className = 'tray-research-change';
+    change.textContent = 'That is not my tray or tub';
+    change.addEventListener('click', () => selectedVariant && researchTrayDimensions(selectedVariant, true));
+    panel.append(message, change);
+  }
+
+  function renderTrayResearch(result: TrayResearchResult) {
+    const panel = byId('trayResearch') as HTMLElement | null;
+    if (!panel) return;
+    panel.hidden = false;
+    panel.dataset.state = result.status;
+    panel.replaceChildren();
+
+    const heading = document.createElement('strong');
+    heading.textContent = result.status === 'multiple' ? 'Which tray or tub do you have?' : result.status === 'single' ? 'We found a likely match' : 'We could not verify the dimensions';
+    const message = document.createElement('p');
+    message.textContent = result.message;
+    panel.append(heading, message);
+
+    if (result.options.length) {
+      const choices = document.createElement('div');
+      choices.className = 'tray-research-choices';
+      for (const option of result.options) {
+        const choice = document.createElement('div');
+        choice.className = 'tray-research-choice';
+        const name = document.createElement('strong');
+        name.textContent = option.name;
+        const dimensions = document.createElement('span');
+        dimensions.textContent = `${option.lengthMm.toLocaleString()} mm long × ${option.widthMm.toLocaleString()} mm wide`;
+        const source = document.createElement('small');
+        source.append(document.createTextNode('Source: '), sourceLink(option.source));
+        const use = document.createElement('button');
+        use.type = 'button';
+        use.className = 'btn-ghost';
+        use.textContent = result.status === 'single' ? 'Yes, use these dimensions' : 'This is my tray or tub';
+        use.addEventListener('click', () => useResearchedDimensions(option));
+        choice.append(name, dimensions, source, use);
+        choices.appendChild(choice);
+      }
+      panel.appendChild(choices);
+      return;
+    }
+
+    addMeasurementInstructions(panel, result.measurementSteps);
+  }
+
+  async function researchTrayDimensions(variant: CatalogueVariant, forceInstructions = false) {
+    const panel = byId('trayResearch') as HTMLElement | null;
+    if (!panel) return;
+    if (variant.trayLengthMm && variant.trayWidthMm && !forceInstructions) {
+      panel.hidden = false;
+      panel.dataset.state = 'confirmed';
+      panel.replaceChildren();
+      const message = document.createElement('p');
+      message.append(
+        document.createTextNode(`Verified dimensions were added from `),
+        sourceLink(variant.source),
+        document.createTextNode('. Check that they match the vehicle in front of you.'),
+      );
+      panel.appendChild(message);
+      return;
+    }
+    if (forceInstructions) {
+      renderTrayResearch({
+        status: 'not_found', vehicleId: variant.id, vehicleLabel: variant.label,
+        message: 'No problem. Measure the tray or tub fitted to your vehicle instead.', options: [],
+        measurementSteps: [
+          'Measure the flat load-floor length from the front wall or headboard to the inside of the closed tailgate, or to the end of a tray.',
+          'Measure the narrowest flat usable width between wheel arches, rails, tie-downs or anything else that limits the camper.',
+          'Use millimetres and measure the vehicle as it is now. Do not use the vehicle’s overall exterior length or width.',
+        ],
+      });
+      return;
+    }
+
+    const request = ++trayResearchRequest;
+    panel.hidden = false;
+    panel.dataset.state = 'loading';
+    panel.replaceChildren();
+    const loading = document.createElement('strong');
+    loading.textContent = 'We’re finding the tub or tray dimensions for your vehicle…';
+    const detail = document.createElement('p');
+    detail.textContent = 'Checking manufacturer, tray-maker and reputable Australian fitment sources. This can take a few seconds.';
+    panel.append(loading, detail);
+
+    try {
+      const response = await fetch('/.netlify/functions/vehicle-dimension-research', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vehicleId: variant.id }),
+      });
+      if (request !== trayResearchRequest || selectedVariant?.id !== variant.id) return;
+      if (!response.ok) throw new Error(`Research request failed with ${response.status}`);
+      const result = await response.json() as TrayResearchResult;
+      if (result.vehicleId !== variant.id || !Array.isArray(result.options) || !Array.isArray(result.measurementSteps)) throw new Error('Invalid research response');
+      renderTrayResearch(result);
+    } catch (error) {
+      console.warn('Tray-dimension research was unavailable.', error);
+      if (request !== trayResearchRequest || selectedVariant?.id !== variant.id) return;
+      renderTrayResearch({
+        status: 'unavailable', vehicleId: variant.id, vehicleLabel: variant.label,
+        message: 'We could not complete the research just now. You can still enter two measurements yourself.', options: [],
+        measurementSteps: [
+          'Measure the flat load-floor length from the front wall or headboard to the inside of the closed tailgate, or to the end of a tray.',
+          'Measure the narrowest flat usable width between wheel arches, rails, tie-downs or anything else that limits the camper.',
+          'Use millimetres and measure the vehicle as it is now. Do not use the vehicle’s overall exterior length or width.',
+        ],
+      });
+    }
+  }
 
   function syncTrayRequirement() {
     const includedBox = inputById('trayIncluded');
@@ -779,6 +963,7 @@ const schema = [
   }
 
   function resetVehicleSelection() {
+    clearTrayResearch();
     PREFILLABLE_FIELDS.forEach((id) => {
       if (customerEdited.has(id)) return;
       const input = inputById(id);
@@ -830,6 +1015,7 @@ const schema = [
     }
     selectedVariant = variant;
     renderProvenance(variant);
+    researchTrayDimensions(variant);
     hasStarted = true;
     if (trayRequired) {
       const details = byId('vehicleDetails') as HTMLDetailsElement | null;

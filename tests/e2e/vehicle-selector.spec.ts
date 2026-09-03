@@ -94,6 +94,94 @@ test('picking a vehicle fills the published figures', async ({ page }) => {
   await expect(page.locator('#vehicleProvenance')).toContainText('Published by Mazda Australia');
 });
 
+test('a missing tub size starts research and adds one sourced result only after confirmation', async ({ page }) => {
+  let releaseResearch = () => {};
+  const researchReady = new Promise<void>((resolve) => { releaseResearch = resolve; });
+  await page.route('**/.netlify/functions/vehicle-dimension-research', async (route) => {
+    await researchReady;
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        status: 'single',
+        vehicleId: 'ford-ranger-2022my-4x4-xl-double-pickup-singleturbo',
+        vehicleLabel: 'Ford Ranger test vehicle',
+        message: 'We found one likely match. Confirm it is your tub or tray before using the dimensions.',
+        options: [{
+          name: 'Factory pickup tub', lengthMm: 1547, widthMm: 1584, confidence: 'high',
+          source: { title: 'Ford Australia dimensions', url: 'https://www.ford.com.au/ranger/dimensions/' },
+        }],
+        measurementSteps: [],
+      }),
+    });
+  });
+  await openCalculatorWithFixture(page);
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-pickup-singleturbo');
+
+  await expect(page.locator('#trayResearch')).toContainText('We’re finding the tub or tray dimensions for your vehicle');
+  await expect(page.locator('#trayLength')).toHaveValue('');
+  releaseResearch();
+  await expect(page.locator('#trayResearch')).toContainText('Factory pickup tub');
+  await expect(page.locator('#trayResearch a')).toHaveAttribute('href', 'https://www.ford.com.au/ranger/dimensions/');
+  await page.getByRole('button', { name: 'Yes, use these dimensions' }).click();
+  await expect(page.locator('#trayLength')).toHaveValue('1547');
+  await expect(page.locator('#trayWidth')).toHaveValue('1584');
+  await expect(page.locator('#trayResearch')).toContainText('added');
+});
+
+test('several researched configurations ask which tray or tub is fitted', async ({ page }) => {
+  await page.route('**/.netlify/functions/vehicle-dimension-research', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({
+      status: 'multiple', vehicleId: 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo', vehicleLabel: 'Ford Ranger',
+      message: 'More than one tray may fit this vehicle.',
+      options: [
+        { name: 'Ford alloy tray', lengthMm: 1800, widthMm: 1850, confidence: 'high', source: { title: 'Ford', url: 'https://ford.example/alloy' } },
+        { name: 'Triple M steel tray', lengthMm: 1750, widthMm: 1830, confidence: 'high', source: { title: 'Triple M', url: 'https://tray.example/steel' } },
+      ],
+      measurementSteps: [],
+    }),
+  }));
+  await openCalculatorWithFixture(page);
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
+
+  await expect(page.locator('#trayResearch')).toContainText('Which tray or tub do you have?');
+  await expect(page.getByRole('button', { name: 'This is my tray or tub' })).toHaveCount(2);
+  await page.getByRole('button', { name: 'This is my tray or tub' }).nth(1).click();
+  await expect(page.locator('#trayLength')).toHaveValue('1750');
+  await expect(page.locator('#trayWidth')).toHaveValue('1830');
+});
+
+test('failed research gives precise measuring instructions instead of guessing', async ({ page }) => {
+  await page.route('**/.netlify/functions/vehicle-dimension-research', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({
+      status: 'not_found', vehicleId: 'ford-ranger-2022my-4x4-xl-double-pickup-singleturbo', vehicleLabel: 'Ford Ranger',
+      message: 'We could not verify both usable dimensions for this exact vehicle.', options: [],
+      measurementSteps: [
+        'Measure the flat load-floor length from the front wall to the inside of the closed tailgate.',
+        'Measure the narrowest flat usable width between wheel arches.',
+      ],
+    }),
+  }));
+  await openCalculatorWithFixture(page);
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-pickup-singleturbo');
+
+  await expect(page.locator('#trayResearch')).toContainText('We could not verify the dimensions');
+  await expect(page.locator('#trayResearch')).toContainText('closed tailgate');
+  await expect(page.locator('#trayResearch')).toContainText('between wheel arches');
+  await expect(page.locator('#trayLength')).toHaveValue('');
+  await expect(page.locator('#trayWidth')).toHaveValue('');
+});
+
 test('the result explains how entered loads and tray dimensions become its numbers', async ({ page }) => {
   await page.goto(calculatorPath);
   for (const [id, value] of [
