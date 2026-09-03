@@ -211,10 +211,57 @@ The other 23 carry this note:
 
 They were published on the owner's instruction with that note in front of him,
 and #51 discloses the fact to customers. **The remedy the note asks for is still
-outstanding**: add Ford's heavier options kerb figure, after which the flag can
-be cleared properly rather than overridden. The note records that ford.com.au
-blocks automated retrieval, so this likely needs a manual copy of the
-specification, as the Hino did.
+outstanding**, and on 4 September it was established what exactly it is blocked
+on.
+
+#### The note's premise is correct, and the database already proves it
+
+Ford publishes both bases. Seventeen Ford rows already in the database carry
+`Kerb weight with heaviest factory optional equipment`, taken from
+*Next-Generation Ranger 2022MY Specifications*. The 23 flagged rows carry Ford's
+`Kerb Weight`, the lightest orderable combination, from the *Ranger 2026.50MY
+Specifications Brochure*.
+
+So the dataset holds two different kerb bases for the same make, and the flag
+marks precisely the rows using the optimistic one. The flag is correct and the
+disclosure is correctly targeted: 23 of 47 Ford variants carry it, and the 17
+heaviest-equipment rows rightly do not.
+
+#### What it is blocked on
+
+The heaviest-equipment figures for the 2026.50MY range. On 4 September:
+
+- `ford.com.au` returned **HTTP 403** to automated retrieval, as the note records
+- no mirror of the 2026.50MY Australian specifications brochure could be found,
+  unlike the Hino sheet, which was readable from a mirror
+- third-party pages publish only approximate ranges, which are not a manufacturer
+  figure and must not be entered as one
+
+**This needs a manual copy of the 2026.50MY brochure, page 21, table "4x4 |
+Wolftrak, Tremor, Wildtrak, Platinum, Raptor Ranger 2026.50MY Specifications",
+row group "Vehicle Masses (kg)"** — the same document the lightest figures came
+from, read for its heavier column. That is the one input required; everything
+downstream is mechanical.
+
+Do not derive these figures from the 2022MY rows. The generations differ, and a
+2026 Wildtrak's lightest kerb of 2331 kg sitting 10 kg under the 2022 Wildtrak's
+heaviest of 2341 kg is a coincidence of two different bases, not a relationship
+to extrapolate from.
+
+#### Until then
+
+Nothing is misrepresented to a customer. The calculator discloses the basis on
+every one of the 23, and the standing disclaimer says Beyond RV weighs the
+vehicle at the factory before build. The cost of the gap is a payload that reads
+better than the vehicle will deliver, which the disclosure states plainly.
+
+#### One thing worth a look while that document is being fetched
+
+Six F-150 rows record their basis only as `Published kerb weight`. That says
+nothing about which combination it describes, so it is not currently possible to
+say whether they belong with the optimistic 23 or the conservative 17. They are
+not flagged. Establishing their basis is a smaller job than the Ranger one and
+has the same shape.
 
 ### 3. Nine truck families still unresearched
 
