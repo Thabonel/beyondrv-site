@@ -24,7 +24,7 @@ const REQUIRED = [
   'source_id', 'source_manufacturer', 'source_title', 'source_url', 'source_accessed_date',
   'source_locator',
 ];
-const OPTIONAL = ['vehicle_make', 'vehicle_model', 'height_mm', 'fits_note', 'verification_status', 'notes'];
+const OPTIONAL = ['vehicle_make', 'vehicle_model', 'height_mm', 'tray_mass_kg', 'fits_note', 'verification_status', 'notes'];
 
 const CAB_TYPES = new Set(['single', 'extra', 'dual', 'crew', 'any']);
 const BASES = new Set(['outside', 'usable']);
@@ -93,6 +93,9 @@ export function validateRows(rows) {
     const height = (row.height_mm ?? '').trim()
       ? integerAt(row, 'height_mm', errors, index, { min: 1, max: 1999 })
       : null;
+    const trayMass = (row.tray_mass_kg ?? '').trim()
+      ? integerAt(row, 'tray_mass_kg', errors, index, { min: 1, max: 999 })
+      : null;
 
     // A row that names one half of a vehicle and not the other is a mapping nobody can use.
     const hasMake = Boolean((row.vehicle_make ?? '').trim());
@@ -125,7 +128,7 @@ export function validateRows(rows) {
       if (!/^https:\/\//.test(next.url)) errors.push(`row ${index}: source_url must be https`);
     }
 
-    parsed.push({ ...row, id, length, width, height, status });
+    parsed.push({ ...row, id, length, width, height, trayMass, status });
   });
 
   return { valid: errors.length === 0, errors, rows: parsed, sources: [...sources.values()] };
@@ -141,13 +144,13 @@ export function toSql({ rows, sources }) {
   out.push('');
   out.push('INSERT INTO tray_specifications (');
   out.push('  id, manufacturer, tray_model, vehicle_make, vehicle_model, cab_type, fits_note,');
-  out.push('  length_mm, width_mm, height_mm, dimension_basis, dimension_basis_quote,');
+  out.push('  length_mm, width_mm, height_mm, tray_mass_kg, dimension_basis, dimension_basis_quote,');
   out.push('  source_id, source_locator, verification_status, customer_selectable, notes');
   out.push(') VALUES');
   out.push(rows.map((r) => '  (' + [
     q(r.id), q(r.manufacturer.trim()), q(r.tray_model.trim()),
     qOrNull(r.vehicle_make), qOrNull(r.vehicle_model), q(r.cab_type.trim()), qOrNull(r.fits_note),
-    r.length, r.width, r.height === null ? 'NULL' : r.height,
+    r.length, r.width, r.height === null ? 'NULL' : r.height, r.trayMass === null ? 'NULL' : r.trayMass,
     q(r.dimension_basis.trim()), q(r.dimension_basis_quote.trim()),
     q(r.source_id.trim()), q(r.source_locator.trim()), q(r.status), '0', qOrNull(r.notes),
   ].join(', ') + ')').join(',\n') + ';');
