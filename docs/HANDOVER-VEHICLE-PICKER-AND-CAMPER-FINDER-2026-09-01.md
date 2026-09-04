@@ -318,7 +318,7 @@ seed fails it.
 The underlying habit is the thing to watch: research written straight into the
 binary is invisible to the seed, and nothing except that test will tell you.
 
-### 4. A published variant still says "Do not expose"
+### 4. Decided: the Super Duty is a guide like the other 23
 
 `ford-ranger-super-duty-my26-single-cab` is live on production and carries this
 research note:
@@ -331,19 +331,63 @@ Unlike the 23, it carries **no customer disclosure at all**: its kerb basis is
 derived figure rather than a published one, and `kerbIsOptimistic` is false
 because the note does not contain `OPTIMISTIC KERB`.
 
-That is the weaker position of the two. The 23 are optimistic and say so; this
-one is derived and says nothing. Three options: add a disclosure of its own,
-hide it until Ford publishes the mass table, or accept it as a guide like the 23
-and update the note to record that decision. Not decided.
+That was the weaker position of the two: the 23 were optimistic and said so,
+while this one was derived and said nothing.
 
-### 5. Nine truck families still unresearched
+Decided on 4 September, on the same basis as the 23. It now carries the same
+disclosure, which is accurate for it: Ford computes maximum payload against
+minimum kerb, so a kerb derived as GVM minus maximum payload **is** a
+lightest-equipment figure and the payload **is** a best case. The flag count went
+from 23 to 24.
 
-Isuzu Trucks N Series, Fuso Canter, Mercedes-Benz Sprinter Cab Chassis,
-Volkswagen Crafter Cab Chassis, IVECO T-Way 4x4/6x6, MAN TGS 4x4/6x6,
-Mercedes-Benz Arocs AWD, Scania XT 4x4/6x6, Volvo FMX 4x4/6x6.
+The note's second concern is already handled. The variant is `cab_chassis` with
+`trayState: excluded`, so the calculator asks for the tray weight rather than
+assuming one, which is what "tray/body deductions are configured" was asking for.
+
+### 5. Eight truck families still unresearched
+
+Fuso Canter, Mercedes-Benz Sprinter Cab Chassis, Volkswagen Crafter Cab Chassis,
+IVECO T-Way 4x4/6x6, MAN TGS 4x4/6x6, Mercedes-Benz Arocs AWD, Scania XT 4x4/6x6,
+Volvo FMX 4x4/6x6.
+
+Isuzu N Series came off this list on 4 September, partially: the NPS 75/45-155
+4X4 single and crew are recorded from specification sheet ARK 1443 10/21, in all
+four transmission combinations. The rest of the N Series is still outstanding, so
+the coverage row is `partially_seeded` rather than `seeded`.
+
+Those four remain `needs_secondary_review` and are not customer selectable, and
+they are **published anyway** through the override path on the owner's decision,
+which is the same route every other live variant took. The research record keeps
+saying preliminary; the override records that it was published in spite of that.
+
+The caveats stand and are recorded per row: the sheet is watermarked
+**PRELIMINARY ONLY** and dated 10/21, and Isuzu has since published a Next Gen N
+Series brochure (2024) whose per-variant figures are not captured. That brochure
+gives only ranges — GVM 4500 to 8000 kg for the 4x4 sub-series, no chassis mass at
+all — which is why it cannot supply variant figures.
+
+Publishing them needed `www.isuzu.com.au` added to `ALLOWED_SOURCE_HOSTS` in
+`src/lib/vehicleCatalogue/validate.ts`. Until then the build refused to write the
+catalogue at all, which is the intended behaviour: an unapproved source host
+fails the whole build rather than publishing one unverifiable row.
+
+The picker now lists **Isuzu** and **Isuzu Trucks** as separate makes. That
+matches the Australian businesses, which are separate companies, but a customer
+looking for a D-Max under "Isuzu Trucks" will not find one.
+
+Two things in that sheet were deliberately not recorded. Braked towing, because
+the summary page says 4500 kg while the footnote caps it at 4000 kg for the
+4500 kg GVM rating, and that contradiction should be resolved rather than picked
+from. And the second GVM rating: these are dual rated at 7500 kg or 4500 kg, and
+only the higher figure is stored.
 
 Hino 300 is no longer among them; it was researched on 1 September and moved to
 `seeded`.
+
+**Every attempt so far has needed the document supplied by hand.** ford.com.au
+returns 403, hino.com.au returned 403, and isuzu.com.au fails TLS certificate
+verification. The Hino sheet was read from a mirror; the Isuzu sheet was supplied
+by the owner. Budget for that rather than for a fetch.
 
 The method is proven. Hino publishes a specification sheet carrying exactly the
 fields the schema wants, including `max_body_length_mm`, which decides which
