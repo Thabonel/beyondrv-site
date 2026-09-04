@@ -285,7 +285,7 @@ say whether they belong with the optimistic 23 or the conservative 17. They are
 not flagged. Establishing their basis is a smaller job than the Ranger one and
 has the same shape.
 
-### 3. seed.sql no longer rebuilds the committed database
+### 3. Completed: seed.sql rebuilds the committed database again
 
 `bash data/vehicle-selector/build-database.sh` rebuilds the sqlite from
 `schema.sql` and `seed.sql`. Running it on 4 September produced **13 heavy
@@ -295,11 +295,21 @@ The missing rows are `hino-300-817-4x4-single-cab`, `hino-300-817-4x4-crew-cab`
 and the source `hino-300-817-4x4-spec-0822`. The Hino research on 1 September was
 written into the binary and never back into the seed.
 
-So **running the build script silently deletes the Hino**, and the script reports
-success while doing it. Either write those rows into `seed.sql`, or stop
-treating the script as a safe rebuild. Until then, edit the committed database
-directly with `UPDATE`, as the note change on 4 September did, and keep the seed
-and the CSV in step by hand.
+So **running the build script silently deleted the Hino**, and reported success
+while doing it.
+
+Fixed on 4 September. The two chassis, the source and the corrected `hino-300`
+coverage row are written into `seed.sql`, and a rebuild now reproduces the
+committed database exactly, all 244 rows. The three CSV exports were stale in the
+same way and are regenerated.
+
+`tests/vehicle-database-seed.test.ts` rebuilds from `schema.sql` and `seed.sql`
+into a temporary file and compares every row against the committed database, so
+the next divergence fails rather than waiting to be noticed. Restoring the old
+seed fails it.
+
+The underlying habit is the thing to watch: research written straight into the
+binary is invisible to the seed, and nothing except that test will tell you.
 
 ### 4. A published variant still says "Do not expose"
 
