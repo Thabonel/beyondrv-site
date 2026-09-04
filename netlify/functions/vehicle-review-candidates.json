@@ -3592,6 +3592,48 @@
       }
     },
     {
+      "id": "iveco-eurocargo-ml150e32w-4x4-3915",
+      "make": "IVECO",
+      "model": "Eurocargo 4x4",
+      "modelYear": 2024,
+      "grade": "ML150E32W 4x4 Cab Chassis 3915mm wheelbase",
+      "cabType": "day_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 15000,
+      "kerbKg": 5538,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "IVECO Trucks Australia",
+        "title": "Eurocargo 4x4 ML150E32W Specification Sheet",
+        "url": "https://www.iveco.com/au/-/media/IVECOdotcom/Australia/Products/EurocargoMy24/Files/Eurocargo-4x4-ML150-Spec-Sheet---Web-Version.pdf"
+      }
+    },
+    {
+      "id": "iveco-eurocargo-ml150e32w-4x4-4150",
+      "make": "IVECO",
+      "model": "Eurocargo 4x4",
+      "modelYear": 2024,
+      "grade": "ML150E32W 4x4 Cab Chassis 4150mm wheelbase",
+      "cabType": "day_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 15000,
+      "kerbKg": 5570,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "IVECO Trucks Australia",
+        "title": "Eurocargo 4x4 ML150E32W Specification Sheet",
+        "url": "https://www.iveco.com/au/-/media/IVECOdotcom/Australia/Products/EurocargoMy24/Files/Eurocargo-4x4-ML150-Spec-Sheet---Web-Version.pdf"
+      }
+    },
+    {
       "id": "isuzu-nps-75-45-155-4x4-single-mt",
       "make": "Isuzu Trucks",
       "model": "N Series",
