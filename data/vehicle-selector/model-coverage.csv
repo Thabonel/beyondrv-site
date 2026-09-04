@@ -22,7 +22,7 @@ ford-f150,Ford,F-150,full_size_pickup,current_or_limited,2,tub_or_tray_conversio
 fuso-canter,Fuso,Canter,light_truck,current,2,truck_body,research_backlog,"Variant-level body-builder specification required."
 gwm-cannon,GWM,Cannon,midsize_ute,current,2,tray_cab_chassis,seeded,"Seven 2026 grades seeded and verified directly against the official brochure, covering single cab and dual cab in tub and factory-alloy-tray bodies."
 gwm-cannon-alpha,GWM,"Cannon Alpha",large_ute,current,2,tub_or_tray_conversion,partially_seeded,"Five grades seeded and verified directly against the official brochure, including HEV and PHEV. Outstanding: two 3.0 turbo-diesel grades are listed without a mass table."
-hino-300,Hino,"300 Series",light_truck,current,2,truck_body,research_backlog,"Variant-level body-builder specification required."
+hino-300,Hino,"300 Series",light_truck,current,2,truck_body,seeded,"Manufacturer specification sheet HS3008174x4-0822 read on 1 September 2026. Both cab variants recorded with body length, chassis mass and axle limits."
 iveco-tway-awd,IVECO,"T-Way 4x4 / 6x6",heavy_truck_awd,current_or_order_specific,2,specialist_review,research_backlog,"Order-code, axle, wheelbase and Australian body-builder data required."
 kgm-musso,KGM,"Musso / Musso XLV",midsize_ute,current,2,tub_or_tray_conversion,seeded,"Six MY26 variants seeded and verified directly. The previously unattributed 880 kg and 1,010 kg payload configurations are Musso XLV variants, resolving the earlier mapping gap."
 man-tgs-awd,MAN,"TGS 4x4 / 6x6",heavy_truck_awd,current_or_order_specific,2,specialist_review,research_backlog,"Exact Australian order code and body-builder specifications required."
