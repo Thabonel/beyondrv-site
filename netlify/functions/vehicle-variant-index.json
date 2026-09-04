@@ -1,0 +1,829 @@
+{
+  "variants": [
+    {
+      "id": "chevrolet-silverado-1500-ltz-premium",
+      "bodyType": "pickup_tub",
+      "label": "Chevrolet Silverado 1500 LTZ Premium crew cab pickup tub 4x4 (2025)"
+    },
+    {
+      "id": "chevrolet-silverado-1500-zr2",
+      "bodyType": "pickup_tub",
+      "label": "Chevrolet Silverado 1500 ZR2 crew cab pickup tub 4x4 (2025)"
+    },
+    {
+      "id": "chevrolet-silverado-2500hd-ltz-nb1",
+      "bodyType": "pickup_tub",
+      "label": "Chevrolet Silverado 2500 HD LTZ Premium NB1 crew cab pickup tub 4x4 (2025)"
+    },
+    {
+      "id": "chevrolet-silverado-2500hd-ltz-nb2",
+      "bodyType": "pickup_tub",
+      "label": "Chevrolet Silverado 2500 HD LTZ Premium NB2 crew cab pickup tub 4x4 (2025)"
+    },
+    {
+      "id": "ford-f-150-2024-lariat-5-5-ft-tub-swb",
+      "bodyType": "pickup_tub",
+      "label": "Ford F-150 Lariat crew cab pickup tub (2024) 3697mm wheelbase"
+    },
+    {
+      "id": "ford-f-150-2024-lariat-6-5-ft-tub-lwb",
+      "bodyType": "pickup_tub",
+      "label": "Ford F-150 Lariat crew cab pickup tub (2024) 3997mm wheelbase"
+    },
+    {
+      "id": "ford-f-150-2024-platinum-5-5-ft-tub-swb",
+      "bodyType": "pickup_tub",
+      "label": "Ford F-150 Platinum crew cab pickup tub (2024) 3697mm wheelbase"
+    },
+    {
+      "id": "ford-f-150-2024-platinum-6-5-ft-tub-lwb",
+      "bodyType": "pickup_tub",
+      "label": "Ford F-150 Platinum crew cab pickup tub (2024) 3997mm wheelbase"
+    },
+    {
+      "id": "ford-f-150-2024-xlt-5-5-ft-tub-swb",
+      "bodyType": "pickup_tub",
+      "label": "Ford F-150 XLT crew cab pickup tub (2024) 3697mm wheelbase"
+    },
+    {
+      "id": "ford-f-150-2024-xlt-6-5-ft-tub-lwb",
+      "bodyType": "pickup_tub",
+      "label": "Ford F-150 XLT crew cab pickup tub (2024) 3997mm wheelbase"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-raptor-double-pickup-ecoboost",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger Raptor double cab pickup tub 4x4 full-time (2022)"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-sport-double-pickup-biturbo",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger Sport double cab pickup tub 4x4 part-time (2022)"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-sport-double-pickup-v6",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger Sport double cab pickup tub 4x4 full-time (2022)"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-wildtrak-double-pickup-biturbo",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger Wildtrak double cab pickup tub 4x4 part-time (2022)"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-wildtrak-double-pickup-v6",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger Wildtrak double cab pickup tub 4x4 full-time (2022)"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-cc-singleturbo",
+      "bodyType": "cab_chassis",
+      "label": "Ford Ranger XL double cab cab chassis 4x4 part-time (2022) 2.0L single-turbo diesel"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-cc-biturbo",
+      "bodyType": "cab_chassis",
+      "label": "Ford Ranger XL double cab cab chassis 4x4 part-time (2022) 2.0L bi-turbo diesel"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-pickup-singleturbo",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger XL double cab pickup tub 4x4 part-time (2022) 2.0L single-turbo diesel"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-pickup-biturbo",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger XL double cab pickup tub 4x4 part-time (2022) 2.0L bi-turbo diesel"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-single-cc-biturbo",
+      "bodyType": "cab_chassis",
+      "label": "Ford Ranger XL single cab cab chassis 4x4 part-time (2022)"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-super-cc-biturbo",
+      "bodyType": "cab_chassis",
+      "label": "Ford Ranger XL super cab cab chassis 4x4 part-time (2022)"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-super-pickup-biturbo",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger XL super cab pickup tub 4x4 part-time (2022)"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xls-double-pickup-biturbo",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger XLS double cab pickup tub 4x4 part-time (2022)"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-double-cc-v6",
+      "bodyType": "cab_chassis",
+      "label": "Ford Ranger XLT double cab cab chassis 4x4 full-time (2022)"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-double-pickup-biturbo",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger XLT double cab pickup tub 4x4 part-time (2022)"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-double-pickup-v6",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger XLT double cab pickup tub 4x4 full-time (2022)"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-super-pickup-biturbo",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger XLT super cab pickup tub 4x4 part-time (2022)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-black-edition-double-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger Black Edition double cab pickup tub part-time 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-black-edition-double-cab-tub-2",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger Black Edition double cab pickup tub full-time 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-platinum-double-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger Platinum double cab pickup tub full-time 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-raptor-double-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger Raptor double cab pickup tub full-time 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-tremor-double-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger Tremor double cab pickup tub full-time 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-wildtrak-double-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger Wildtrak double cab pickup tub full-time 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-wolftrak-double-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger Wolftrak double cab pickup tub full-time 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-double-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger XL double cab pickup tub RWD (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-double-cab-cc",
+      "bodyType": "cab_chassis",
+      "label": "Ford Ranger XL double cab cab chassis part-time 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-double-cab-cc-2",
+      "bodyType": "cab_chassis",
+      "label": "Ford Ranger XL double cab cab chassis full-time 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-double-cab-tub-2",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger XL double cab pickup tub part-time 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-double-cab-tub-3",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger XL double cab pickup tub full-time 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-single-cab-cc",
+      "bodyType": "cab_chassis",
+      "label": "Ford Ranger XL single cab cab chassis RWD (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-single-cab-cc-2",
+      "bodyType": "cab_chassis",
+      "label": "Ford Ranger XL single cab cab chassis part-time 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-single-cab-cc-3",
+      "bodyType": "cab_chassis",
+      "label": "Ford Ranger XL single cab cab chassis full-time 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-super-cab-cc",
+      "bodyType": "cab_chassis",
+      "label": "Ford Ranger XL super cab cab chassis RWD (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-super-cab-cc-2",
+      "bodyType": "cab_chassis",
+      "label": "Ford Ranger XL super cab cab chassis part-time 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-super-cab-cc-3",
+      "bodyType": "cab_chassis",
+      "label": "Ford Ranger XL super cab cab chassis full-time 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xls-double-cab-cc",
+      "bodyType": "cab_chassis",
+      "label": "Ford Ranger XLS double cab cab chassis full-time 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xlt-double-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger XLT double cab pickup tub RWD (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xlt-double-cab-cc",
+      "bodyType": "cab_chassis",
+      "label": "Ford Ranger XLT double cab cab chassis full-time 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xlt-double-cab-tub-2",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger XLT double cab pickup tub full-time 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xlt-super-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger XLT super cab pickup tub full-time 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-super-duty-my26-single-cab",
+      "bodyType": "cab_chassis",
+      "label": "Ford Ranger Super Duty Super Duty single cab cab chassis 4x4 (2026)"
+    },
+    {
+      "id": "gwm-cannon-2026-lux-dual-cab-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "GWM Cannon Lux Dual Cab dual cab pickup tub 4x4 (2026)"
+    },
+    {
+      "id": "gwm-cannon-2026-lux-dual-cab-chassis-factory-alloy-tray",
+      "bodyType": "cab_chassis",
+      "label": "GWM Cannon Lux Dual Cab Chassis dual cab cab chassis 4x4 (2026)"
+    },
+    {
+      "id": "gwm-cannon-2026-premium-dual-cab-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "GWM Cannon Premium Dual Cab dual cab pickup tub 4x4 (2026)"
+    },
+    {
+      "id": "gwm-cannon-2026-premium-single-cab-4x2-factory-alloy-tray",
+      "bodyType": "cab_chassis",
+      "label": "GWM Cannon Premium Single Cab 4x2 single cab cab chassis 4x2 (2026)"
+    },
+    {
+      "id": "gwm-cannon-2026-ultra-dual-cab-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "GWM Cannon Ultra Dual Cab dual cab pickup tub 4x4 (2026)"
+    },
+    {
+      "id": "gwm-cannon-2026-vanta-dual-cab-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "GWM Cannon Vanta Dual Cab dual cab pickup tub 4x4 (2026)"
+    },
+    {
+      "id": "gwm-cannon-2026-xsr-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "GWM Cannon XSR dual cab pickup tub 4x4 (2026)"
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-lux-phev-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "GWM Cannon Alpha Lux PHEV dual cab pickup tub 4x4 on-demand (2025)"
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-lux-turbo-diesel-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "GWM Cannon Alpha Lux Turbo Diesel dual cab pickup tub 4x4 on-demand (2025)"
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-ultra-hev-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "GWM Cannon Alpha Ultra HEV dual cab pickup tub 4x4 on-demand (2025)"
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-ultra-phev-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "GWM Cannon Alpha Ultra PHEV dual cab pickup tub 4x4 on-demand (2025)"
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-ultra-turbo-diesel-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "GWM Cannon Alpha Ultra Turbo Diesel dual cab pickup tub 4x4 on-demand (2025)"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-lsu-crew-3-0",
+      "bodyType": "cab_chassis",
+      "label": "Isuzu D-MAX LS-U crew cab cab chassis 4x4 (2025)"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-crew-2-2",
+      "bodyType": "cab_chassis",
+      "label": "Isuzu D-MAX SX crew cab cab chassis 4x2 high-ride (2025) 2.2L turbo-diesel"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-crew-3-0",
+      "bodyType": "cab_chassis",
+      "label": "Isuzu D-MAX SX crew cab cab chassis 4x2 high-ride (2025) 3.0L turbo-diesel"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-sx-crew-2-2",
+      "bodyType": "cab_chassis",
+      "label": "Isuzu D-MAX SX crew cab cab chassis 4x4 (2025) 2.2L turbo-diesel"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-sx-crew-3-0",
+      "bodyType": "cab_chassis",
+      "label": "Isuzu D-MAX SX crew cab cab chassis 4x4 (2025) 3.0L turbo-diesel"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-single-2-2",
+      "bodyType": "cab_chassis",
+      "label": "Isuzu D-MAX SX single cab cab chassis 4x2 high-ride (2025) 2.2L turbo-diesel"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-single-3-0",
+      "bodyType": "cab_chassis",
+      "label": "Isuzu D-MAX SX single cab cab chassis 4x2 high-ride (2025) 3.0L turbo-diesel"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-sx-single-3-0",
+      "bodyType": "cab_chassis",
+      "label": "Isuzu D-MAX SX single cab cab chassis 4x4 (2025)"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-space-3-0",
+      "bodyType": "cab_chassis",
+      "label": "Isuzu D-MAX SX space cab cab chassis 4x2 high-ride (2025)"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-sx-space-3-0",
+      "bodyType": "cab_chassis",
+      "label": "Isuzu D-MAX SX space cab cab chassis 4x4 (2025)"
+    },
+    {
+      "id": "kgm-musso-my26-advance-double-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "KGM Musso Advance double cab pickup tub part-time 4WD with selectable low range and auto-locking rear differential (2026)"
+    },
+    {
+      "id": "kgm-musso-my26-elx-double-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "KGM Musso ELX double cab pickup tub part-time 4WD with selectable low range and auto-locking rear differential (2026)"
+    },
+    {
+      "id": "kgm-musso-my26-ultimate-double-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "KGM Musso Ultimate double cab pickup tub part-time 4WD with selectable low range and auto-locking rear differential (2026)"
+    },
+    {
+      "id": "kgm-musso-xlv-my26-advance-double-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "KGM Musso XLV Advance double cab pickup tub part-time 4WD with selectable low range and auto-locking rear differential (2026)"
+    },
+    {
+      "id": "kgm-musso-xlv-my26-elx-double-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "KGM Musso XLV ELX double cab pickup tub part-time 4WD with selectable low range and auto-locking rear differential (2026)"
+    },
+    {
+      "id": "kgm-musso-xlv-my26-ultimate-double-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "KGM Musso XLV Ultimate double cab pickup tub part-time 4WD with selectable low range and auto-locking rear differential (2026)"
+    },
+    {
+      "id": "kia-tasman-2026-dual-cab-s-4x4-cab-chassis-optional-tray",
+      "bodyType": "cab_chassis",
+      "label": "Kia Tasman Dual Cab S 4x4 dual cab cab chassis 4x4 part-time (2026)"
+    },
+    {
+      "id": "kia-tasman-2026-dual-cab-sx-4x4-cab-chassis-optional-tray",
+      "bodyType": "cab_chassis",
+      "label": "Kia Tasman Dual Cab SX 4x4 dual cab cab chassis 4x4 part-time (2026)"
+    },
+    {
+      "id": "kia-tasman-my26-s-4x2",
+      "bodyType": "pickup_tub",
+      "label": "Kia Tasman S dual cab pickup tub 4x2 (2026)"
+    },
+    {
+      "id": "kia-tasman-my26-s-4x4",
+      "bodyType": "pickup_tub",
+      "label": "Kia Tasman S dual cab pickup tub 4x4 (2026)"
+    },
+    {
+      "id": "kia-tasman-my26-sx-4x4",
+      "bodyType": "pickup_tub",
+      "label": "Kia Tasman SX dual cab pickup tub 4x4 (2026)"
+    },
+    {
+      "id": "kia-tasman-my26-sxplus-4x4",
+      "bodyType": "pickup_tub",
+      "label": "Kia Tasman SX+ dual cab pickup tub 4x4 (2026)"
+    },
+    {
+      "id": "kia-tasman-2026-single-cab-s-4x2-cab-chassis-optional-tray",
+      "bodyType": "cab_chassis",
+      "label": "Kia Tasman Single Cab S 4x2 single cab cab chassis 4x2 (2026)"
+    },
+    {
+      "id": "kia-tasman-2026-single-cab-s-4x4-cab-chassis-optional-tray",
+      "bodyType": "cab_chassis",
+      "label": "Kia Tasman Single Cab S 4x4 single cab cab chassis 4x4 part-time (2026)"
+    },
+    {
+      "id": "kia-tasman-2026-single-cab-sx-4x4-cab-chassis-optional-tray",
+      "bodyType": "cab_chassis",
+      "label": "Kia Tasman Single Cab SX 4x4 single cab cab chassis 4x4 part-time (2026)"
+    },
+    {
+      "id": "kia-tasman-my26-xline-4x4",
+      "bodyType": "pickup_tub",
+      "label": "Kia Tasman X-Line dual cab pickup tub 4x4 (2026)"
+    },
+    {
+      "id": "kia-tasman-my26-xpro-4x4",
+      "bodyType": "pickup_tub",
+      "label": "Kia Tasman X-Pro dual cab pickup tub 4x4 (2026)"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-boss-pickup",
+      "bodyType": "pickup_tub",
+      "label": "Mazda BT-50 Boss dual cab pickup tub 4x4 (2025)"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-gt-cc",
+      "bodyType": "cab_chassis",
+      "label": "Mazda BT-50 GT dual cab cab chassis 4x4 (2025)"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-gt-pickup",
+      "bodyType": "pickup_tub",
+      "label": "Mazda BT-50 GT dual cab pickup tub 4x4 (2025)"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-sp-pickup",
+      "bodyType": "pickup_tub",
+      "label": "Mazda BT-50 SP dual cab pickup tub 4x4 (2025)"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-thunder-pickup",
+      "bodyType": "pickup_tub",
+      "label": "Mazda BT-50 Thunder dual cab pickup tub 4x4 (2025)"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xs-cc",
+      "bodyType": "cab_chassis",
+      "label": "Mazda BT-50 XS dual cab cab chassis 4x4 (2025)"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xs-pickup",
+      "bodyType": "pickup_tub",
+      "label": "Mazda BT-50 XS dual cab pickup tub 4x4 (2025)"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x2-xs-pickup",
+      "bodyType": "pickup_tub",
+      "label": "Mazda BT-50 XS dual cab pickup tub 4x2 (2025)"
+    },
+    {
+      "id": "mazda-bt50-my25-single-4x2-xs-cc",
+      "bodyType": "cab_chassis",
+      "label": "Mazda BT-50 XS single cab cab chassis 4x2 (2025)"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xt-cc",
+      "bodyType": "cab_chassis",
+      "label": "Mazda BT-50 XT dual cab cab chassis 4x4 (2025)"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x2-xt-cc",
+      "bodyType": "cab_chassis",
+      "label": "Mazda BT-50 XT dual cab cab chassis 4x2 (2025)"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xt-pickup",
+      "bodyType": "pickup_tub",
+      "label": "Mazda BT-50 XT dual cab pickup tub 4x4 (2025)"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x2-xt-pickup",
+      "bodyType": "pickup_tub",
+      "label": "Mazda BT-50 XT dual cab pickup tub 4x2 (2025)"
+    },
+    {
+      "id": "mazda-bt50-my25-freestyle-4x2-xt-cc",
+      "bodyType": "cab_chassis",
+      "label": "Mazda BT-50 XT freestyle cab cab chassis 4x2 (2025)"
+    },
+    {
+      "id": "mazda-bt50-my25-freestyle-4x4-xt-cc",
+      "bodyType": "cab_chassis",
+      "label": "Mazda BT-50 XT freestyle cab cab chassis 4x4 (2025)"
+    },
+    {
+      "id": "mazda-bt50-my25-single-4x2-xt-cc",
+      "bodyType": "cab_chassis",
+      "label": "Mazda BT-50 XT single cab cab chassis 4x2 (2025)"
+    },
+    {
+      "id": "mazda-bt50-my25-single-4x4-xt-cc",
+      "bodyType": "cab_chassis",
+      "label": "Mazda BT-50 XT single cab cab chassis 4x4 (2025)"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xtr-cc",
+      "bodyType": "cab_chassis",
+      "label": "Mazda BT-50 XTR dual cab cab chassis 4x4 (2025)"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xtr-pickup",
+      "bodyType": "pickup_tub",
+      "label": "Mazda BT-50 XTR dual cab pickup tub 4x4 (2025)"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x2-xtr-pickup",
+      "bodyType": "pickup_tub",
+      "label": "Mazda BT-50 XTR dual cab pickup tub 4x2 (2025)"
+    },
+    {
+      "id": "mitsubishi-triton-26my-gls-double-cc-4x4",
+      "bodyType": "cab_chassis",
+      "label": "Mitsubishi Triton GLS double cab cab chassis 4x4 (2026)"
+    },
+    {
+      "id": "mitsubishi-triton-26my-gls-double-pickup-4x4-1t",
+      "bodyType": "pickup_tub",
+      "label": "Mitsubishi Triton GLS double cab pickup tub 4x4 (2026) 1071 kg payload"
+    },
+    {
+      "id": "mitsubishi-triton-26my-gls-double-pickup-4x4-0-9t",
+      "bodyType": "pickup_tub",
+      "label": "Mitsubishi Triton GLS double cab pickup tub 4x4 (2026) 951 kg payload"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-club-cc-4x4",
+      "bodyType": "cab_chassis",
+      "label": "Mitsubishi Triton GLX club cab cab chassis 4x4 (2026)"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-double-pickup-4x2",
+      "bodyType": "pickup_tub",
+      "label": "Mitsubishi Triton GLX double cab pickup tub 4x2 (2026)"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-double-cc-4x4-manual",
+      "bodyType": "cab_chassis",
+      "label": "Mitsubishi Triton GLX double cab cab chassis 4x4 (2026) 6-speed manual"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-double-cc-4x4-auto",
+      "bodyType": "cab_chassis",
+      "label": "Mitsubishi Triton GLX double cab cab chassis 4x4 (2026) 6-speed automatic"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-double-pickup-4x4",
+      "bodyType": "pickup_tub",
+      "label": "Mitsubishi Triton GLX double cab pickup tub 4x4 (2026)"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-single-cc-4x2",
+      "bodyType": "cab_chassis",
+      "label": "Mitsubishi Triton GLX single cab cab chassis 4x2 (2026)"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-single-cc-4x4",
+      "bodyType": "cab_chassis",
+      "label": "Mitsubishi Triton GLX single cab cab chassis 4x4 (2026)"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glxplus-club-pickup-4x4",
+      "bodyType": "pickup_tub",
+      "label": "Mitsubishi Triton GLX+ club cab pickup tub 4x4 (2026)"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glxplus-double-cc-4x4",
+      "bodyType": "cab_chassis",
+      "label": "Mitsubishi Triton GLX+ double cab cab chassis 4x4 (2026)"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glxplus-double-pickup-4x4",
+      "bodyType": "pickup_tub",
+      "label": "Mitsubishi Triton GLX+ double cab pickup tub 4x4 (2026)"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glxr-double-pickup-4x4",
+      "bodyType": "pickup_tub",
+      "label": "Mitsubishi Triton GLX-R double cab pickup tub 4x4 (2026)"
+    },
+    {
+      "id": "mitsubishi-triton-26my-gsr-double-cc-4x4",
+      "bodyType": "cab_chassis",
+      "label": "Mitsubishi Triton GSR double cab cab chassis 4x4 (2026)"
+    },
+    {
+      "id": "mitsubishi-triton-26my-gsr-double-pickup-4x4-1t",
+      "bodyType": "pickup_tub",
+      "label": "Mitsubishi Triton GSR double cab pickup tub 4x4 (2026) 1030 kg payload"
+    },
+    {
+      "id": "mitsubishi-triton-26my-gsr-double-pickup-4x4-0-9t",
+      "bodyType": "pickup_tub",
+      "label": "Mitsubishi Triton GSR double cab pickup tub 4x4 (2026) 910 kg payload"
+    },
+    {
+      "id": "nissan-navara-2026-pro-4x-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "Nissan Navara PRO-4X dual cab pickup tub 4x4 selectable (2026)"
+    },
+    {
+      "id": "nissan-navara-2026-sl-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "Nissan Navara SL dual cab pickup tub 4x4 part-time (2026)"
+    },
+    {
+      "id": "nissan-navara-2026-st-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "Nissan Navara ST dual cab pickup tub 4x4 part-time (2026)"
+    },
+    {
+      "id": "nissan-navara-2026-st-x-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "Nissan Navara ST-X dual cab pickup tub 4x4 selectable (2026)"
+    },
+    {
+      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-express-black-edition-hurricane-crew-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "RAM 1500 Express Black Edition Hurricane crew cab pickup tub part-time 4x4 (2026)"
+    },
+    {
+      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-laramie-sport-hurricane-crew-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "RAM 1500 Laramie Sport Hurricane crew cab pickup tub on-demand 4x4 (2026)"
+    },
+    {
+      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-limited-hurricane-high-output-crew-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "RAM 1500 Limited Hurricane High Output crew cab pickup tub on-demand 4x4 (2026)"
+    },
+    {
+      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-rebel-hurricane-crew-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "RAM 1500 Rebel Hurricane crew cab pickup tub on-demand 4x4 (2026)"
+    },
+    {
+      "id": "ram-2500-2025-laramie-cummins-high-output-6-4-tub",
+      "bodyType": "pickup_tub",
+      "label": "RAM 2500 Laramie Cummins High Output crew cab pickup tub 4x4 part-time (2025)"
+    },
+    {
+      "id": "ram-3500-2025-laramie-cummins-ho-4-495-kg-gvm-derate-6-4-tub",
+      "bodyType": "pickup_tub",
+      "label": "RAM 3500 Laramie Cummins HO – 4,495 kg GVM derate crew cab pickup tub 4x4 part-time (2025)"
+    },
+    {
+      "id": "ram-3500-2025-laramie-cummins-high-output-6-4-tub",
+      "bodyType": "pickup_tub",
+      "label": "RAM 3500 Laramie Cummins High Output crew cab pickup tub 4x4 part-time (2025)"
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-sr-double-manual",
+      "bodyType": "cab_chassis",
+      "label": "Toyota HiLux SR double cab cab chassis 4x4 (2026) 6-speed manual"
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-sr-double-auto",
+      "bodyType": "cab_chassis",
+      "label": "Toyota HiLux SR double cab cab chassis 4x4 (2026) 6-speed automatic"
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-sr-extra-auto",
+      "bodyType": "cab_chassis",
+      "label": "Toyota HiLux SR extra cab cab chassis 4x4 (2026)"
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-workmate-double-auto",
+      "bodyType": "cab_chassis",
+      "label": "Toyota HiLux WorkMate double cab cab chassis 4x4 (2026)"
+    },
+    {
+      "id": "toyota-hilux-my26-4x2-workmate-single-manual",
+      "bodyType": "cab_chassis",
+      "label": "Toyota HiLux WorkMate single cab cab chassis 4x2 (2026) 6-speed manual"
+    },
+    {
+      "id": "toyota-hilux-my26-4x2-workmate-single-auto",
+      "bodyType": "cab_chassis",
+      "label": "Toyota HiLux WorkMate single cab cab chassis 4x2 (2026) 6-speed automatic"
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-workmate-single-auto",
+      "bodyType": "cab_chassis",
+      "label": "Toyota HiLux WorkMate single cab cab chassis 4x4 (2026)"
+    },
+    {
+      "id": "toyota-lc70-my25-gx-single-auto",
+      "bodyType": "cab_chassis",
+      "label": "Toyota LandCruiser 70 GX single cab cab chassis 4x4 (2025)"
+    },
+    {
+      "id": "toyota-lc70-my25-gxl-double-auto",
+      "bodyType": "cab_chassis",
+      "label": "Toyota LandCruiser 70 GXL double cab cab chassis 4x4 (2025)"
+    },
+    {
+      "id": "toyota-lc70-my25-gxl-single-auto",
+      "bodyType": "cab_chassis",
+      "label": "Toyota LandCruiser 70 GXL single cab cab chassis 4x4 (2025)"
+    },
+    {
+      "id": "toyota-lc70-my25-workmate-double-auto",
+      "bodyType": "cab_chassis",
+      "label": "Toyota LandCruiser 70 WorkMate double cab cab chassis 4x4 (2025)"
+    },
+    {
+      "id": "toyota-lc70-my25-workmate-single-auto",
+      "bodyType": "cab_chassis",
+      "label": "Toyota LandCruiser 70 WorkMate single cab cab chassis 4x4 (2025)"
+    },
+    {
+      "id": "toyota-tundra-my26-limited",
+      "bodyType": "pickup_tub",
+      "label": "Toyota Tundra Limited crew cab pickup tub part-time 4WD (2026)"
+    },
+    {
+      "id": "toyota-tundra-my26-platinum",
+      "bodyType": "pickup_tub",
+      "label": "Toyota Tundra Platinum crew cab pickup tub part-time 4WD (2026)"
+    },
+    {
+      "id": "volkswagen-amarok-2025-aventura-tdi-v6-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "Volkswagen Amarok Aventura TDI V6 dual cab pickup tub 4x4 4MOTION (2025)"
+    },
+    {
+      "id": "volkswagen-amarok-2025-aventura-tsi-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "Volkswagen Amarok Aventura TSI dual cab pickup tub 4x4 4MOTION (2025)"
+    },
+    {
+      "id": "volkswagen-amarok-2025-core-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "Volkswagen Amarok Core dual cab pickup tub 4x4 4MOTION (2025)"
+    },
+    {
+      "id": "volkswagen-amarok-2025-life-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "Volkswagen Amarok Life dual cab pickup tub 4x4 4MOTION (2025)"
+    },
+    {
+      "id": "volkswagen-amarok-2025-panamericana-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "Volkswagen Amarok PanAmericana dual cab pickup tub 4x4 4MOTION (2025)"
+    },
+    {
+      "id": "volkswagen-amarok-2025-style-2-0-tdi-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "Volkswagen Amarok Style 2.0 TDI dual cab pickup tub 4x4 4MOTION (2025)"
+    },
+    {
+      "id": "volkswagen-amarok-2025-style-3-0-tdi-v6-pick-up-tub",
+      "bodyType": "pickup_tub",
+      "label": "Volkswagen Amarok Style 3.0 TDI V6 dual cab pickup tub 4x4 4MOTION (2025)"
+    },
+    {
+      "id": "hino-300-817-4x4-single-cab",
+      "bodyType": "cab_chassis",
+      "label": "Hino 300 Series 817 4x4 single cab chassis selectable 4x4 with high and low range (2022)"
+    },
+    {
+      "id": "hino-300-817-4x4-crew-cab",
+      "bodyType": "cab_chassis",
+      "label": "Hino 300 Series 817 4x4 Crew crew cab chassis selectable 4x4 with high and low range (2022)"
+    },
+    {
+      "id": "isuzu-nps-75-45-155-4x4-single-mt",
+      "bodyType": "cab_chassis",
+      "label": "Isuzu Trucks N Series 75/45-155 4X4 single cab chassis part time 4WD with high and low range (2021)"
+    },
+    {
+      "id": "isuzu-nps-75-45-155-4x4-crew-mt",
+      "bodyType": "cab_chassis",
+      "label": "Isuzu Trucks N Series 75/45-155 4X4 Crew crew cab chassis part time 4WD with high and low range (2021)"
+    },
+    {
+      "id": "isuzu-nps-75-45-155-4x4-single-amt",
+      "bodyType": "cab_chassis",
+      "label": "Isuzu Trucks N Series 75/45-155 AMT 4X4 single cab chassis part time 4WD with high and low range (2021)"
+    },
+    {
+      "id": "isuzu-nps-75-45-155-4x4-crew-amt",
+      "bodyType": "cab_chassis",
+      "label": "Isuzu Trucks N Series 75/45-155 AMT 4X4 Crew crew cab chassis part time 4WD with high and low range (2021)"
+    }
+  ]
+}

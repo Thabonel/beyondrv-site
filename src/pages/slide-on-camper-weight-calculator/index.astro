@@ -267,6 +267,16 @@ const schema = [
           </select>
           <span class="form-help">Only a tub is known from the vehicle specification, so tell us if yours is a tray.</span>
         </div>
+        <div class="form-field" id="trayReportedField" hidden>
+          <p class="form-help" id="trayReportedText" data-testid="tray-reported" hidden></p>
+          <p class="form-help" id="trayInviteText" data-testid="tray-invite" hidden></p>
+          <div class="tray-report-actions">
+            <button type="button" id="trayConfirm" data-testid="tray-confirm" hidden>That is my tray</button>
+            <button type="button" id="trayCorrect" data-testid="tray-correct" hidden>Mine is different</button>
+            <button type="button" id="trayReport" data-testid="tray-report" hidden disabled>Report my tray size</button>
+          </div>
+          <p class="form-help" id="trayReportStatus" role="status" aria-live="polite"></p>
+        </div>
         <div class="form-field">
           <label class="form-label" for="requiredTrayLength">Required tray length (mm)</label>
           <input class="form-input" id="requiredTrayLength" type="number" min="0" placeholder="e.g. 2100" />
@@ -595,6 +605,121 @@ const schema = [
   // true, which means keeping hold of the variant it is describing.
   let selectedVariant: CatalogueVariant | null = null;
 
+  // A tray size is not a property of the vehicle — it is fitted after purchase
+  // and chosen by the buyer — so what is stored is what other owners reported,
+  // never a specification, and it is never accepted without an explicit press.
+  interface ReportedTraySize { lengthMm: number; widthMm: number; reports: number }
+
+  let reportedSizes: Record<string, ReportedTraySize> = {};
+  let reportedLoad: Promise<void> | null = null;
+  let traySizeReported = false;
+
+  function loadReportedTraySizes() {
+    if (!reportedLoad) {
+      reportedLoad = fetch('/.netlify/functions/tray-sizes')
+        .then((response) => (response.ok ? response.json() : null))
+        .then((payload) => { reportedSizes = payload?.sizes ?? {}; })
+        // A reporting outage must never block someone working out whether a
+        // camper fits, so the calculator carries on with empty tray fields.
+        .catch(() => { reportedSizes = {}; });
+    }
+    return reportedLoad;
+  }
+
+  function setTrayStatus(message: string) {
+    const status = byId('trayReportStatus');
+    if (status) status.textContent = message;
+  }
+
+  async function postTraySize(lengthMm: number, widthMm: number, button: HTMLInputElement | null) {
+    if (!selectedVariant || traySizeReported) return;
+    if (button) button.disabled = true;
+    setTrayStatus('Sending…');
+    try {
+      const response = await fetch('/.netlify/functions/tray-sizes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ variantId: selectedVariant.id, lengthMm, widthMm }),
+      });
+      if (!response.ok) throw new Error(String(response.status));
+      traySizeReported = true;
+      setTrayStatus('Thanks — recorded for the next owner of this vehicle.');
+    } catch {
+      // Only mark it reported on success, or a transient outage would lock the
+      // customer out of contributing for the rest of this selection.
+      if (button) button.disabled = false;
+      setTrayStatus('That did not send. Please try again.');
+    }
+  }
+
+  function syncTrayReportButton() {
+    const report = inputById('trayReport');
+    if (!report || report.hidden) return;
+    const length = Number(value('trayLength'));
+    const width = Number(value('trayWidth'));
+    report.disabled = traySizeReported || !Number.isInteger(length) || !Number.isInteger(width) || length <= 0 || width <= 0;
+  }
+
+  function showTrayReporting(variant: any) {
+    const field = byId('trayReportedField');
+    const confirm = inputById('trayConfirm');
+    const correct = inputById('trayCorrect');
+    const report = inputById('trayReport');
+    if (!field || !confirm || !correct || !report) return;
+
+    // Only a cab chassis with no published dimensions needs this: a tub is
+    // measured at the factory and already in the catalogue.
+    const wanted = variant.bodyType === 'cab_chassis' && !variant.trayLengthMm && !variant.trayWidthMm;
+    if (!wanted) {
+      (field as HTMLElement).hidden = true;
+      return;
+    }
+
+    const reported = reportedSizes[variant.id];
+    const text = byId('trayReportedText');
+    const invite = byId('trayInviteText');
+
+    if (reported) {
+      setIfNotEdited('trayLength', reported.lengthMm);
+      setIfNotEdited('trayWidth', reported.widthMm);
+      if (text) {
+        text.textContent = `Tray ${reported.lengthMm} × ${reported.widthMm} mm, reported by `
+          + `${reported.reports} owner${reported.reports === 1 ? '' : 's'} of this vehicle. `
+          + 'Trays are fitted after purchase, so please check yours.';
+        (text as HTMLElement).hidden = false;
+      }
+      if (invite) (invite as HTMLElement).hidden = true;
+      confirm.hidden = false;
+      correct.hidden = false;
+      report.hidden = true;
+      confirm.disabled = false;
+    } else {
+      if (text) (text as HTMLElement).hidden = true;
+      if (invite) {
+        invite.textContent = 'Nobody has reported a tray size for this vehicle yet. '
+          + 'Enter yours above and you can share it with the next owner.';
+        (invite as HTMLElement).hidden = false;
+      }
+      confirm.hidden = true;
+      correct.hidden = true;
+      report.hidden = false;
+    }
+
+    (field as HTMLElement).hidden = false;
+    syncTrayReportButton();
+    // The prefill above lands after applyVariant already calculated with empty
+    // tray fields, and assigning a value fires no input event.
+    calculateSlideOn();
+  }
+
+  function resetTrayReporting() {
+    traySizeReported = false;
+    setTrayStatus('');
+    const field = byId('trayReportedField');
+    if (field) (field as HTMLElement).hidden = true;
+  }
+
+
   function syncTrayRequirement() {
     const includedBox = inputById('trayIncluded');
     const currentWeightIncludesTray = includedBox?.checked ?? false;
@@ -772,6 +897,7 @@ const schema = [
     clearTrayMass();
     syncTrayRequirement();
     selectedVariant = null;
+    resetTrayReporting();
     const panel = byId('vehicleProvenance');
     if (panel) {
       panel.replaceChildren();
@@ -815,12 +941,55 @@ const schema = [
     // customer saw their own figures in the form beside "Not calculated".
     hasStarted = true;
     calculateSlideOn();
+    resetTrayReporting();
+    void loadReportedTraySizes().then(() => {
+      if (selectedVariant?.id === variant.id) showTrayReporting(variant);
+    });
   }
 
   inputById('trayIncluded')?.addEventListener('change', () => {
     syncTrayRequirement();
     calculateSlideOn();
   });
+
+  inputById('trayConfirm')?.addEventListener('click', () => {
+    const reported = selectedVariant ? reportedSizes[selectedVariant.id] : null;
+    if (!reported) return;
+    void postTraySize(reported.lengthMm, reported.widthMm, inputById('trayConfirm'));
+  });
+
+  inputById('trayCorrect')?.addEventListener('click', () => {
+    for (const id of ['trayLength', 'trayWidth']) {
+      const input = inputById(id);
+      if (input) input.value = '';
+      customerEdited.delete(id);
+    }
+    const confirm = inputById('trayConfirm');
+    const correct = inputById('trayCorrect');
+    const report = inputById('trayReport');
+    if (confirm) confirm.hidden = true;
+    if (correct) correct.hidden = true;
+    if (report) report.hidden = false;
+    setTrayStatus('');
+    const text = byId('trayReportedText');
+    const invite = byId('trayInviteText');
+    if (text) (text as HTMLElement).hidden = true;
+    if (invite) {
+      invite.textContent = 'Enter your own tray size above, then share it with the next owner.';
+      (invite as HTMLElement).hidden = false;
+    }
+    syncTrayReportButton();
+    inputById('trayLength')?.focus();
+    calculateSlideOn();
+  });
+
+  inputById('trayReport')?.addEventListener('click', () => {
+    void postTraySize(Number(value('trayLength')), Number(value('trayWidth')), inputById('trayReport'));
+  });
+
+  for (const id of ['trayLength', 'trayWidth']) {
+    inputById(id)?.addEventListener('input', syncTrayReportButton);
+  }
 
   selectById('vehicleMake')?.addEventListener('change', (event) => {
     const make = (event.target as HTMLSelectElement).value;

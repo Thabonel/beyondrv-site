@@ -11,6 +11,7 @@ import { applyCorrections, validateReviewsFile } from '../netlify/functions/vehi
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dbPath = resolve(root, 'data/vehicle-selector/australian-slide-on-vehicles.sqlite');
 const outPath = resolve(root, 'src/data/vehicle-selector/catalogue.json');
+const variantIndexPath = resolve(root, 'netlify/functions/vehicle-variant-index.json');
 const overridesPath = resolve(root, 'src/data/vehicle-selector/overrides.json');
 const reviewsPath = resolve(root, 'data/vehicle-selector/reviews.json');
 const candidatesPath = resolve(root, 'netlify/functions/vehicle-review-candidates.json');
@@ -242,6 +243,12 @@ for (const w of validation.warnings) console.warn(`Warning: ${w}`);
 
 mkdirSync(dirname(outPath), { recursive: true });
 writeFileSync(outPath, `${JSON.stringify(catalogue, null, 2)}\n`);
+
+// Netlify functions import JSON only from beside themselves, so the tray-size
+// endpoint gets a slim copy of just the fields it validates against.
+const variantIndex = { variants: variants.map((v) => ({ id: v.id, bodyType: v.bodyType, label: v.label })) };
+writeFileSync(variantIndexPath, `${JSON.stringify(variantIndex, null, 2)}\n`);
+console.log(`Wrote ${variantIndexPath}`);
 console.log(`Wrote ${outPath}`);
 console.log(`${variants.length} variants across ${models.length} models, from ${rows.length} database rows.`);
 
