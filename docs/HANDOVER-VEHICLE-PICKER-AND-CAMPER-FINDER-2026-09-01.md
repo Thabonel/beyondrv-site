@@ -311,7 +311,7 @@ seed fails it.
 The underlying habit is the thing to watch: research written straight into the
 binary is invisible to the seed, and nothing except that test will tell you.
 
-### 4. A published variant still says "Do not expose"
+### 4. Decided: the Super Duty is a guide like the other 23
 
 `ford-ranger-super-duty-my26-single-cab` is live on production and carries this
 research note:
@@ -324,10 +324,18 @@ Unlike the 23, it carries **no customer disclosure at all**: its kerb basis is
 derived figure rather than a published one, and `kerbIsOptimistic` is false
 because the note does not contain `OPTIMISTIC KERB`.
 
-That is the weaker position of the two. The 23 are optimistic and say so; this
-one is derived and says nothing. Three options: add a disclosure of its own,
-hide it until Ford publishes the mass table, or accept it as a guide like the 23
-and update the note to record that decision. Not decided.
+That was the weaker position of the two: the 23 were optimistic and said so,
+while this one was derived and said nothing.
+
+Decided on 4 September, on the same basis as the 23. It now carries the same
+disclosure, which is accurate for it: Ford computes maximum payload against
+minimum kerb, so a kerb derived as GVM minus maximum payload **is** a
+lightest-equipment figure and the payload **is** a best case. The flag count went
+from 23 to 24.
+
+The note's second concern is already handled. The variant is `cab_chassis` with
+`trayState: excluded`, so the calculator asks for the tray weight rather than
+assuming one, which is what "tray/body deductions are configured" was asking for.
 
 ### 5. Nine truck families still unresearched
 
