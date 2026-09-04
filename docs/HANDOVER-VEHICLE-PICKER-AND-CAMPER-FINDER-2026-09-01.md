@@ -279,11 +279,18 @@ better than the vehicle will deliver, which the disclosure states plainly.
 
 #### One thing worth a look while that document is being fetched
 
-Six F-150 rows record their basis only as `Published kerb weight`. That says
-nothing about which combination it describes, so it is not currently possible to
-say whether they belong with the optimistic 23 or the conservative 17. They are
-not flagged. Establishing their basis is a smaller job than the Ranger one and
-has the same shape.
+Six F-150 rows recorded their basis only as `Published kerb weight`, which says
+nothing about which equipment combination it describes.
+
+Resolved on 4 September by disclosing rather than by proving. Ford Australia
+defines Kerb Weight across its range as the lightest orderable combination, which
+is read from the Ranger brochure footnote we already hold; the F-150 MY24 sheet's
+own footnote has not been read. The six are flagged on the owner's standing
+decision, because under-disclosing an optimistic figure is the worse error: a
+customer told the payload is a best case is more careful, not less.
+
+**This is an inference, and the note on each row says so.** Confirm against the
+F-150 sheet footnote when a copy is to hand, alongside the Ranger figures.
 
 ### 3. Completed: seed.sql rebuilds the committed database again
 
