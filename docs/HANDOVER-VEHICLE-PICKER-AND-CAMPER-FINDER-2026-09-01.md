@@ -6,6 +6,12 @@ Covers: pull requests #37 to #62, from 30 August to 3 September 2026.
 
 The filename keeps its original date so existing links still work.
 
+> **Superseded in part.** Its "Current state" and "Open items" are out of date as
+> of 4 September. Read [HANDOVER-2026-09-04.md](HANDOVER-2026-09-04.md) for the
+> current position and the outstanding work. This document remains the record of
+> how the picker, the finder and the publication gate were built, and its traps
+> still apply.
+
 Read "Open items" and "Traps that cost time" before changing anything in the
 vehicle catalogue, the publication gate, or the end-to-end tests.
 
