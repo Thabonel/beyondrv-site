@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.1",
   "catalogueVersion": "vehicle-catalogue-2026-09-04",
-  "generatedAt": "2026-09-04T08:09:41.434Z",
-  "sourceDatabaseRowCount": 184,
+  "generatedAt": "2026-09-04T08:49:07.979Z",
+  "sourceDatabaseRowCount": 187,
   "models": [
     {
       "make": "Chevrolet",
@@ -2179,11 +2179,11 @@
       "drivetrain": "4x4",
       "engine": "3.0L V6 turbo-diesel",
       "transmission": "10-speed automatic",
-      "wheelbaseMm": null,
+      "wheelbaseMm": 3270,
       "label": "Ford Ranger Super Duty Super Duty single cab cab chassis 4x4 (2026)",
       "gvmKg": 4500,
       "kerbKg": 2518,
-      "kerbBasis": "Derived from GVM minus published maximum payload; excludes tray",
+      "kerbBasis": "Ford 'Kerb Weight': full tank of fuel, without occupants, luggage or cargo, with the standard combination of factory-fit equipment. Excludes the weight of a tray body.",
       "payloadKg": 1982,
       "frontGawrKg": 1900,
       "rearGawrKg": 2800,
@@ -2191,7 +2191,7 @@
       "trayWidthMm": null,
       "correctedFields": [],
       "platform": "ute",
-      "kerbIsOptimistic": true,
+      "kerbIsOptimistic": false,
       "maxBodyLengthMm": null,
       "trayState": "excluded",
       "trayMassKg": null,
@@ -2203,9 +2203,9 @@
       },
       "source": {
         "manufacturer": "Ford Australia",
-        "title": "Ford Ranger Super Duty",
+        "title": "Ranger Super Duty 2026.50MY Specifications (super-duty-specs-17-april.pdf)",
         "url": "https://www.ford.com.au/showroom/trucks-and-vans/ranger/super-duty/",
-        "accessedDate": "2026-08-17"
+        "accessedDate": "2026-09-04"
       }
     },
     {
