@@ -702,3 +702,47 @@ test('going back to a real make restores the picker help and re-enables the mode
   await expect(page.locator('#vehiclePickerHelp')).toContainText('Not sure which variant?');
   await expect(page.locator('#vehicleModel')).toBeEnabled();
 });
+
+// These run against the real catalogue and coverage rather than the fixture,
+// because the point is that vehicles we have no figures for are listed.
+test('the make list includes makes we know of but have no published figures for', async ({ page }) => {
+  await page.goto(calculatorPath);
+  const makes = await page.locator('#vehicleMake option').evaluateAll((nodes) =>
+    nodes.map((n) => (n as HTMLOptionElement).textContent?.trim()));
+  // Mercedes-Benz has no published variant at all; it is listed from coverage.
+  expect(makes).toContain('Mercedes-Benz');
+});
+
+test('a model we have no figures for says so and opens the manual fields', async ({ page }) => {
+  await page.goto(calculatorPath);
+  await page.selectOption('#vehicleMake', 'Mercedes-Benz');
+  const models = await page.locator('#vehicleModel option').evaluateAll((nodes) =>
+    nodes.map((n) => (n as HTMLOptionElement).value));
+  expect(models).toContain('Unimog U 1700 L');
+
+  await page.selectOption('#vehicleModel', 'Unimog U 1700 L');
+  const notice = page.getByTestId('vehicle-no-figures');
+  await expect(notice).toBeVisible();
+  await expect(notice).toContainText('Unimog U 1700 L');
+  await expect(notice).toContainText('compliance plate');
+  await expect(notice).toContainText('weighbridge');
+  await expect(page.locator('#vehicleVariant')).toBeDisabled();
+  await expect(page.locator('#vehicleDetails')).toHaveAttribute('open', '');
+});
+
+test('a model that does have figures shows no such notice', async ({ page }) => {
+  await page.goto(calculatorPath);
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'Ranger');
+  await expect(page.getByTestId('vehicle-no-figures')).toBeHidden();
+  await expect(page.locator('#vehicleVariant')).toBeEnabled();
+});
+
+test('the notice clears when moving from an unlisted model to a make with figures', async ({ page }) => {
+  await page.goto(calculatorPath);
+  await page.selectOption('#vehicleMake', 'Mercedes-Benz');
+  await page.selectOption('#vehicleModel', 'Unimog U 1700 L');
+  await expect(page.getByTestId('vehicle-no-figures')).toBeVisible();
+  await page.selectOption('#vehicleMake', 'Ford');
+  await expect(page.getByTestId('vehicle-no-figures')).toBeHidden();
+});

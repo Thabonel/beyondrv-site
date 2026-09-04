@@ -1,0 +1,317 @@
+{
+  "generatedAt": "2026-09-04T12:41:56.762Z",
+  "models": [
+    {
+      "make": "BYD",
+      "model": "Shark 6",
+      "hasVariants": false,
+      "status": "partially_seeded"
+    },
+    {
+      "make": "Chery",
+      "model": "Stockman",
+      "hasVariants": false,
+      "status": "research_backlog"
+    },
+    {
+      "make": "Chevrolet",
+      "model": "Silverado 1500",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "Chevrolet",
+      "model": "Silverado 2500 HD",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "Ford",
+      "model": "F-150",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "Ford",
+      "model": "Ranger",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "Ford",
+      "model": "Ranger Super Duty",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "Fuso",
+      "model": "Canter",
+      "hasVariants": false,
+      "status": "source_identified"
+    },
+    {
+      "make": "Fuso",
+      "model": "Canter 4x4",
+      "hasVariants": false,
+      "status": "seeded"
+    },
+    {
+      "make": "GAC",
+      "model": "Dual cab ute",
+      "hasVariants": false,
+      "status": "research_backlog"
+    },
+    {
+      "make": "GWM",
+      "model": "Cannon",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "GWM",
+      "model": "Cannon Alpha",
+      "hasVariants": true,
+      "status": "partially_seeded"
+    },
+    {
+      "make": "Hino",
+      "model": "300 Series",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "IVECO",
+      "model": "Daily 4x4",
+      "hasVariants": false,
+      "status": "seeded"
+    },
+    {
+      "make": "IVECO",
+      "model": "Eurocargo ML150 4x4",
+      "hasVariants": false,
+      "status": "partially_seeded"
+    },
+    {
+      "make": "IVECO",
+      "model": "T-Way 4x4 / 6x6",
+      "hasVariants": false,
+      "status": "partially_seeded"
+    },
+    {
+      "make": "Isuzu",
+      "model": "D-MAX",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "Isuzu Trucks",
+      "model": "N Series",
+      "hasVariants": true,
+      "status": "partially_seeded"
+    },
+    {
+      "make": "Isuzu Trucks",
+      "model": "NPS 75-175 4x4",
+      "hasVariants": false,
+      "status": "seeded"
+    },
+    {
+      "make": "JAC",
+      "model": "Hunter",
+      "hasVariants": false,
+      "status": "research_backlog"
+    },
+    {
+      "make": "KGM",
+      "model": "Musso",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "KGM",
+      "model": "Musso XLV",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "Kia",
+      "model": "Tasman",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "LDV",
+      "model": "eTerron 9",
+      "hasVariants": false,
+      "status": "research_backlog"
+    },
+    {
+      "make": "MAN",
+      "model": "TGM 13.250-290 4x4 RV",
+      "hasVariants": false,
+      "status": "seeded"
+    },
+    {
+      "make": "MG",
+      "model": "U9",
+      "hasVariants": false,
+      "status": "research_backlog"
+    },
+    {
+      "make": "Mahindra",
+      "model": "Ladder-frame ute",
+      "hasVariants": false,
+      "status": "research_backlog"
+    },
+    {
+      "make": "Mazda",
+      "model": "BT-50",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "Actros",
+      "hasVariants": false,
+      "status": "research_backlog"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "Arocs AWD",
+      "hasVariants": false,
+      "status": "specialist_review"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "Atego",
+      "hasVariants": false,
+      "status": "research_backlog"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "Sprinter Cab Chassis",
+      "hasVariants": false,
+      "status": "partially_seeded"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "Unimog U 1700 L",
+      "hasVariants": false,
+      "status": "specialist_review"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "Unimog U 4023",
+      "hasVariants": false,
+      "status": "partially_seeded"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "Unimog U 5023",
+      "hasVariants": false,
+      "status": "source_identified"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "Unimog legacy / ex-service",
+      "hasVariants": false,
+      "status": "exclude_from_automatic_match"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "X-Class",
+      "hasVariants": false,
+      "status": "research_backlog"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "Zetros",
+      "hasVariants": false,
+      "status": "specialist_review"
+    },
+    {
+      "make": "Mitsubishi",
+      "model": "Triton",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "Nissan",
+      "model": "Navara",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "RAM",
+      "model": "1500",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "RAM",
+      "model": "2500",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "RAM",
+      "model": "3500",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "Scania",
+      "model": "XT 4x4 / 6x6",
+      "hasVariants": false,
+      "status": "specialist_review"
+    },
+    {
+      "make": "Tatra",
+      "model": "Phoenix",
+      "hasVariants": false,
+      "status": "specialist_review"
+    },
+    {
+      "make": "Toyota",
+      "model": "HiLux",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "Toyota",
+      "model": "LandCruiser 70",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "Toyota",
+      "model": "Tundra",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Amarok",
+      "hasVariants": true,
+      "status": "seeded"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Crafter Cab Chassis",
+      "hasVariants": false,
+      "status": "partially_seeded"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Transporter",
+      "hasVariants": false,
+      "status": "exclude_from_automatic_match"
+    },
+    {
+      "make": "Volvo",
+      "model": "FMX 4x4 / 6x6",
+      "hasVariants": false,
+      "status": "source_identified"
+    }
+  ]
+}
