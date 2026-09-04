@@ -1080,7 +1080,7 @@ const schema = [
   function trayLine(trayState: string) {
     if (trayState === 'included') return 'Kerb mass includes the standard tray.';
     if (trayState === 'excluded') return 'Kerb mass excludes the tray.';
-    if (trayState === 'not_applicable') return 'This is a tub vehicle, so no tray applies.';
+    if (trayState === 'not_applicable') return 'This is a tub vehicle. A Beyond RV slide-on mounts on a flat tray, so it would need its tub replaced with a tray before a camper could be fitted.';
     return 'The manufacturer does not state whether kerb mass includes a tray.';
   }
 
@@ -1205,8 +1205,14 @@ const schema = [
     if (!variant) return;
     setIfNotEdited('gvm', variant.gvmKg);
     setIfNotEdited('currentWeight', variant.kerbKg);
-    setIfNotEdited('trayLength', variant.trayLengthMm);
-    setIfNotEdited('trayWidth', variant.trayWidthMm);
+    // A tub's dimensions are not a tray length. A Beyond RV slide-on mounts on a
+    // flat tray, so filling the camper-fit field with a tub measurement answers a
+    // different question than the field asks, and the number can never produce a
+    // match: tubs run to 2000mm and the shortest camper needs 2120mm.
+    if (variant.trayState !== 'not_applicable') {
+      setIfNotEdited('trayLength', variant.trayLengthMm);
+      setIfNotEdited('trayWidth', variant.trayWidthMm);
+    }
 
     const nameInput = inputById('vehicleName');
     if (nameInput && !customerEdited.has('vehicleName')) nameInput.value = variant.label;

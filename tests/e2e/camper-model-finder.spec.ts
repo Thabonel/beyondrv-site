@@ -123,3 +123,17 @@ test('a tray that is genuinely too short still gets the measurement answer', asy
   await expect(panel).toContainText('needs about');
   await expect(panel).not.toContainText('replaced with a tray');
 });
+
+test('picking a tub ute says so straight away, without a tray measurement', async ({ page }) => {
+  await page.goto(pagePath);
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'F-150');
+  await page.selectOption('#vehicleVariant', 'ford-f-150-2024-lariat-5-5-ft-tub-swb');
+
+  // The tub's own 1700mm is not a tray length, so it must not fill the field a
+  // camper is matched against.
+  await expect(page.locator('#trayLength')).toHaveValue('');
+  // And the customer is told why, before being asked to measure anything.
+  await expect(page.locator('#vehicleProvenance')).toContainText('mounts on a flat tray');
+  await expect(page.locator('#vehicleProvenance')).toContainText('replaced with a tray');
+});
