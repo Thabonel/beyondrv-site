@@ -804,6 +804,26 @@
       "id": "hino-300-817-4x4-crew-cab",
       "bodyType": "cab_chassis",
       "label": "Hino 300 Series 817 4x4 Crew crew cab chassis selectable 4x4 with high and low range (2022)"
+    },
+    {
+      "id": "isuzu-nps-75-45-155-4x4-single-mt",
+      "bodyType": "cab_chassis",
+      "label": "Isuzu Trucks N Series 75/45-155 4X4 single cab chassis part time 4WD with high and low range (2021)"
+    },
+    {
+      "id": "isuzu-nps-75-45-155-4x4-crew-mt",
+      "bodyType": "cab_chassis",
+      "label": "Isuzu Trucks N Series 75/45-155 4X4 Crew crew cab chassis part time 4WD with high and low range (2021)"
+    },
+    {
+      "id": "isuzu-nps-75-45-155-4x4-single-amt",
+      "bodyType": "cab_chassis",
+      "label": "Isuzu Trucks N Series 75/45-155 AMT 4X4 single cab chassis part time 4WD with high and low range (2021)"
+    },
+    {
+      "id": "isuzu-nps-75-45-155-4x4-crew-amt",
+      "bodyType": "cab_chassis",
+      "label": "Isuzu Trucks N Series 75/45-155 AMT 4X4 Crew crew cab chassis part time 4WD with high and low range (2021)"
     }
   ]
 }
