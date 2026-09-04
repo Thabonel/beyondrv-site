@@ -251,9 +251,24 @@
       "label": "Ford Ranger XLT super cab pickup tub full-time 4x4 (2026)"
     },
     {
+      "id": "ford-ranger-super-duty-my26-double-cab-cc",
+      "bodyType": "cab_chassis",
+      "label": "Ford Ranger Super Duty double cab cab chassis 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-super-duty-my26-double-cab-tub",
+      "bodyType": "pickup_tub",
+      "label": "Ford Ranger Super Duty double cab pickup tub 4x4 (2026)"
+    },
+    {
       "id": "ford-ranger-super-duty-my26-single-cab",
       "bodyType": "cab_chassis",
-      "label": "Ford Ranger Super Duty Super Duty single cab cab chassis 4x4 (2026)"
+      "label": "Ford Ranger Super Duty single cab cab chassis 4x4 (2026)"
+    },
+    {
+      "id": "ford-ranger-super-duty-my26-super-cab-cc",
+      "bodyType": "cab_chassis",
+      "label": "Ford Ranger Super Duty super cab cab chassis 4x4 (2026)"
     },
     {
       "id": "gwm-cannon-2026-lux-dual-cab-pick-up-tub",

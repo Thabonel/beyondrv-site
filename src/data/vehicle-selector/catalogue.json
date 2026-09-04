@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.1",
   "catalogueVersion": "vehicle-catalogue-2026-09-04",
-  "generatedAt": "2026-09-04T08:49:07.979Z",
+  "generatedAt": "2026-09-04T09:21:07.150Z",
   "sourceDatabaseRowCount": 187,
   "models": [
     {
@@ -2169,6 +2169,86 @@
       }
     },
     {
+      "id": "ford-ranger-super-duty-my26-double-cab-cc",
+      "make": "Ford",
+      "model": "Ranger Super Duty",
+      "modelYear": 2026,
+      "grade": "Super Duty",
+      "cabType": "double_cab",
+      "bodyType": "cab_chassis",
+      "drivetrain": "4x4",
+      "engine": "3.0L V6 turbo-diesel",
+      "transmission": "10-speed automatic",
+      "wheelbaseMm": 3270,
+      "label": "Ford Ranger Super Duty double cab cab chassis 4x4 (2026)",
+      "gvmKg": 4500,
+      "kerbKg": 2675,
+      "kerbBasis": "Ford 'Kerb Weight': full tank of fuel, without occupants, luggage or cargo, with the standard combination of factory-fit equipment. Excludes the weight of a tray body.",
+      "payloadKg": 1825,
+      "frontGawrKg": 1900,
+      "rearGawrKg": 2800,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "correctedFields": [],
+      "platform": "ute",
+      "kerbIsOptimistic": false,
+      "maxBodyLengthMm": null,
+      "trayState": "excluded",
+      "trayMassKg": null,
+      "promotedByOverride": true,
+      "publication": {
+        "approvalId": "override:ford-ranger-super-duty-my26-double-cab-cc",
+        "approvedAt": "2026-09-04",
+        "method": "override"
+      },
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger Super Duty 2026.50MY Specifications (super-duty-specs-17-april.pdf)",
+        "url": "https://www.ford.com.au/showroom/trucks-and-vans/ranger/super-duty/",
+        "accessedDate": "2026-09-04"
+      }
+    },
+    {
+      "id": "ford-ranger-super-duty-my26-double-cab-tub",
+      "make": "Ford",
+      "model": "Ranger Super Duty",
+      "modelYear": 2026,
+      "grade": "Super Duty",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "drivetrain": "4x4",
+      "engine": "3.0L V6 turbo-diesel",
+      "transmission": "10-speed automatic",
+      "wheelbaseMm": 3270,
+      "label": "Ford Ranger Super Duty double cab pickup tub 4x4 (2026)",
+      "gvmKg": 4500,
+      "kerbKg": 2803,
+      "kerbBasis": "Ford 'Kerb Weight': full tank of fuel, without occupants, luggage or cargo, with the standard combination of factory-fit equipment. Excludes the weight of a tray body.",
+      "payloadKg": 1697,
+      "frontGawrKg": 1900,
+      "rearGawrKg": 2800,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "correctedFields": [],
+      "platform": "ute",
+      "kerbIsOptimistic": false,
+      "maxBodyLengthMm": null,
+      "trayState": "not_applicable",
+      "trayMassKg": null,
+      "promotedByOverride": true,
+      "publication": {
+        "approvalId": "override:ford-ranger-super-duty-my26-double-cab-tub",
+        "approvedAt": "2026-09-04",
+        "method": "override"
+      },
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger Super Duty 2026.50MY Specifications (super-duty-specs-17-april.pdf)",
+        "url": "https://www.ford.com.au/showroom/trucks-and-vans/ranger/super-duty/",
+        "accessedDate": "2026-09-04"
+      }
+    },
+    {
       "id": "ford-ranger-super-duty-my26-single-cab",
       "make": "Ford",
       "model": "Ranger Super Duty",
@@ -2180,7 +2260,7 @@
       "engine": "3.0L V6 turbo-diesel",
       "transmission": "10-speed automatic",
       "wheelbaseMm": 3270,
-      "label": "Ford Ranger Super Duty Super Duty single cab cab chassis 4x4 (2026)",
+      "label": "Ford Ranger Super Duty single cab cab chassis 4x4 (2026)",
       "gvmKg": 4500,
       "kerbKg": 2518,
       "kerbBasis": "Ford 'Kerb Weight': full tank of fuel, without occupants, luggage or cargo, with the standard combination of factory-fit equipment. Excludes the weight of a tray body.",
@@ -2199,6 +2279,46 @@
       "publication": {
         "approvalId": "override:ford-ranger-super-duty-my26-single-cab",
         "approvedAt": "2026-09-01",
+        "method": "override"
+      },
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger Super Duty 2026.50MY Specifications (super-duty-specs-17-april.pdf)",
+        "url": "https://www.ford.com.au/showroom/trucks-and-vans/ranger/super-duty/",
+        "accessedDate": "2026-09-04"
+      }
+    },
+    {
+      "id": "ford-ranger-super-duty-my26-super-cab-cc",
+      "make": "Ford",
+      "model": "Ranger Super Duty",
+      "modelYear": 2026,
+      "grade": "Super Duty",
+      "cabType": "super_cab",
+      "bodyType": "cab_chassis",
+      "drivetrain": "4x4",
+      "engine": "3.0L V6 turbo-diesel",
+      "transmission": "10-speed automatic",
+      "wheelbaseMm": 3270,
+      "label": "Ford Ranger Super Duty super cab cab chassis 4x4 (2026)",
+      "gvmKg": 4500,
+      "kerbKg": 2615,
+      "kerbBasis": "Ford 'Kerb Weight': full tank of fuel, without occupants, luggage or cargo, with the standard combination of factory-fit equipment. Excludes the weight of a tray body.",
+      "payloadKg": 1885,
+      "frontGawrKg": 1900,
+      "rearGawrKg": 2800,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "correctedFields": [],
+      "platform": "ute",
+      "kerbIsOptimistic": false,
+      "maxBodyLengthMm": null,
+      "trayState": "excluded",
+      "trayMassKg": null,
+      "promotedByOverride": true,
+      "publication": {
+        "approvalId": "override:ford-ranger-super-duty-my26-super-cab-cc",
+        "approvedAt": "2026-09-04",
         "method": "override"
       },
       "source": {

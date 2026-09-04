@@ -25,11 +25,26 @@ export interface LabelSource {
 
 const words = (value: string) => value.replace(/_/g, ' ');
 
+/**
+ * Some models carry their grade in the model name, and repeating it reads as a
+ * stutter: "Ford Ranger Super Duty Super Duty single cab". Drop the grade only
+ * when the model ends with it, which is the case that stutters. A grade that
+ * merely shares a word with the model ("Super" against "Ranger Super Duty")
+ * still separates one row from another, so it is kept.
+ */
+function gradeUnlessInModel(model: string, grade: string) {
+  if (!grade) return grade;
+  const m = model.trim().toLowerCase();
+  const g = grade.trim().toLowerCase();
+  if (m === g) return '';
+  return m.endsWith(` ${g}`) ? '' : grade;
+}
+
 function baseLabel(row: LabelSource) {
   return [
     row.make,
     row.model,
-    row.grade,
+    gradeUnlessInModel(row.model, row.grade),
     words(row.cabType),
     words(row.bodyType),
     row.drivetrain,
