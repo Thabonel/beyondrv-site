@@ -59,6 +59,18 @@ const raw = execFileSync('sqlite3', ['-json', dbPath, QUERY.trim()], { encoding:
 const rows = JSON.parse(raw);
 
 const truckRaw = execFileSync('sqlite3', ['-json', dbPath, TRUCK_QUERY.trim()], { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
+
+// Every vehicle we know exists, not just the ones with published figures. A
+// model that is not sold here would be a dead end in the picker, so it is the
+// one thing left out.
+const COVERAGE_QUERY = `
+SELECT make, model, research_status, australian_market_status
+FROM vehicle_model_coverage
+WHERE australian_market_status <> 'not_offered_in_australia'
+ORDER BY make, model;
+`;
+const coverageRaw = execFileSync('sqlite3', ['-json', dbPath, COVERAGE_QUERY.trim()], { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
+const coverageRows = coverageRaw.trim() ? JSON.parse(coverageRaw) : [];
 const allTrucks = truckRaw.trim() ? JSON.parse(truckRaw) : [];
 
 // Payload has to reconcile, and it cannot without a chassis mass. A row that
@@ -243,6 +255,23 @@ for (const w of validation.warnings) console.warn(`Warning: ${w}`);
 
 mkdirSync(dirname(outPath), { recursive: true });
 writeFileSync(outPath, `${JSON.stringify(catalogue, null, 2)}\n`);
+
+// hasVariants is computed from the catalogue that was actually built, not from
+// the research status, so the flag can never disagree with what the picker holds.
+const publishedModelKeys = new Set(models.map((m) => `${m.make}|${m.model}`));
+const coverage = {
+  generatedAt: catalogue.generatedAt,
+  models: coverageRows.map((r) => ({
+    make: r.make,
+    model: r.model,
+    hasVariants: publishedModelKeys.has(`${r.make}|${r.model}`),
+    status: r.research_status,
+  })),
+};
+const coveragePath = resolve(root, 'src/data/vehicle-selector/coverage.json');
+writeFileSync(coveragePath, `${JSON.stringify(coverage, null, 2)}\n`);
+console.log(`Wrote ${coveragePath}`);
+console.log(`${coverage.models.length} known models, ${coverage.models.filter((m) => m.hasVariants).length} with published figures.`);
 
 // Netlify functions import JSON only from beside themselves, so the tray-size
 // endpoint gets a slim copy of just the fields it validates against.

@@ -2,12 +2,15 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { displayImageUrl } from '../../lib/media';
 import { getVehicleCatalogue } from '../../lib/vehicleCatalogue.ts';
+import { getVehicleCoverage } from '../../lib/vehicleCoverage.ts';
 import { serializeJsonForHtml } from '../../lib/safeJson.ts';
 import { getCollection } from 'astro:content';
 import { isPublicProduct } from '../../lib/productVisibility';
 import { ESTIMATE_DISCLAIMER } from '../../lib/vehicleSuitabilityCalculator.js';
 const vehicleCatalogue = getVehicleCatalogue();
 const vehicleCatalogueJson = serializeJsonForHtml(vehicleCatalogue);
+const vehicleCoverage = getVehicleCoverage();
+const vehicleCoverageJson = serializeJsonForHtml(vehicleCoverage);
 
 const pageUrl = 'https://beyondrv.com.au/slide-on-camper-weight-calculator/';
 const heroImage = '/images/site/homepage-slide-on-campers.webp';
@@ -182,8 +185,10 @@ const schema = [
           <span class="form-help" id="vehiclePickerHelp">
             Not sure which variant? Match the year, cab, body, drivetrain and engine shown on your vehicle documents.
           </span>
+          <p class="form-help" id="vehicleNoFigures" data-testid="vehicle-no-figures" hidden></p>
           </div>
         <script type="application/json" id="vehicleCatalogueData" set:html={vehicleCatalogueJson}></script>
+        <script type="application/json" id="vehicleCoverageData" set:html={vehicleCoverageJson}></script>
           <details class="advanced-details" id="vehicleDetails">
             <summary>Use a weighbridge weight or enter my vehicle manually</summary>
             <div class="details-grid">
@@ -417,11 +422,13 @@ const schema = [
   import { emptyVehicleCatalogue, validateVehicleCatalogue } from '../../lib/vehicleCatalogue/validate';
   import { BUILD_TOLERANCE_MM, modelsForTray, type CamperModel } from '../../lib/camperModels';
   import {
-    catalogueMakes,
-    catalogueModelsForMake,
     catalogueVariantById,
     catalogueVariantsForModel,
+    pickerMakes,
+    pickerModelsForMake,
   } from '../../lib/vehicleCatalogue/picker';
+  import { emptyVehicleCoverage, parseVehicleCoverage } from '../../lib/vehicleCatalogue/coverage';
+  import type { VehicleCoverage } from '../../lib/vehicleCatalogue/coverage';
   import type { CatalogueVariant, VehicleCatalogue } from '../../lib/vehicleCatalogue/types';
 
   type TrayResearchOption = {
@@ -720,6 +727,28 @@ const schema = [
     return emptyVehicleCatalogue();
   }
   const catalogue = parseCatalogue();
+
+  const coverageEl = document.getElementById('vehicleCoverageData');
+  function parseCoverage(): VehicleCoverage {
+    if (!coverageEl) return emptyVehicleCoverage();
+    try {
+      return parseVehicleCoverage(JSON.parse(coverageEl.textContent || 'null'));
+    } catch (err) {
+      // Coverage only widens the lists. Losing it costs the customer the models
+      // we have no figures for, not the picker itself, so it never throws.
+      console.warn('Vehicle coverage data could not be parsed; only published models will be listed.', err);
+      return emptyVehicleCoverage();
+    }
+  }
+  const coverage = parseCoverage();
+  /**
+   * Coverage widens a working picker; it must never resurrect a failed one.
+   * With no catalogue the picker is hidden and the notice above it sends the
+   * customer to the manual fields — listing makes from coverage would put back
+   * the control that failure path deliberately removes, and every model under
+   * it would report no figures anyway.
+   */
+  const pickerCoverage = catalogue.variants.length > 0 ? coverage : emptyVehicleCoverage();
   const customerEdited = new Set<string>();
   // The catalogue says whether the published kerb mass includes a tray; only
   // the customer knows whether the weight they actually typed does. See
@@ -1078,6 +1107,29 @@ const schema = [
     select.appendChild(option);
   }
 
+  /**
+   * A model we know of but have no figures for. Saying so is the point: the
+   * customer has found their vehicle, so the answer is "we have not recorded
+   * this one yet", not silence they have to interpret as unsuitability.
+   */
+  function showModelWithoutFigures(make: string, model: string) {
+    const notice = byId('vehicleNoFigures');
+    if (notice) {
+      notice.textContent = `We do not have verified figures for the ${make} ${model} yet. `
+        + 'Enter yours below and the calculator will use them: the GVM is on the compliance plate, '
+        + 'and the most reliable weight is a weighbridge ticket for the vehicle as it stands.';
+      (notice as HTMLElement).hidden = false;
+    }
+    const details = byId('vehicleDetails') as HTMLDetailsElement | null;
+    if (details) details.open = true;
+    inputById('vehicleName')?.focus();
+  }
+
+  function hideModelWithoutFigures() {
+    const notice = byId('vehicleNoFigures');
+    if (notice) (notice as HTMLElement).hidden = true;
+  }
+
   function chooseOtherVehicle() {
     const models = selectById('vehicleModel');
     const variants = selectById('vehicleVariant');
@@ -1086,6 +1138,7 @@ const schema = [
     if (models) models.disabled = true;
     if (variants) variants.disabled = true;
     resetVehicleSelection();
+    hideModelWithoutFigures();
     const details = byId('vehicleDetails') as HTMLDetailsElement | null;
     if (details) details.open = true;
     const help = byId('vehiclePickerHelp');
@@ -1344,7 +1397,8 @@ const schema = [
     }
     const help = byId('vehiclePickerHelp');
     if (help) help.textContent = PICKER_HELP_DEFAULT;
-    const models = catalogueModelsForMake(catalogue, make);
+    hideModelWithoutFigures();
+    const models = pickerModelsForMake(catalogue, pickerCoverage, make);
     fillSelect(selectById('vehicleModel'), models, 'Select a model');
     fillSelect(selectById('vehicleVariant'), [], 'Select a variant');
     resetVehicleSelection();
@@ -1369,6 +1423,8 @@ const schema = [
     }
     select.disabled = variants.length === 0;
     resetVehicleSelection();
+    if (model && variants.length === 0) showModelWithoutFigures(make ?? '', model);
+    else hideModelWithoutFigures();
   });
 
   selectById('vehicleVariant')?.addEventListener('change', (event) => {
@@ -1391,7 +1447,7 @@ const schema = [
   const pickerHelp = byId('vehiclePickerHelp');
   if (pickerHelp) (pickerHelp as HTMLElement).hidden = !pickerAvailable;
 
-  fillMakeSelect(selectById('vehicleMake'), catalogueMakes(catalogue));
+  fillMakeSelect(selectById('vehicleMake'), pickerMakes(catalogue, pickerCoverage));
   type SlideOnResultValues = {
     vehiclePayloadBeforeAdditions?: number;
     additionalVehicleLoad?: number;

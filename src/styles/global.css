@@ -3178,3 +3178,4 @@ footer {
 .vehicle-picker[hidden] { display: none; }
 #vehiclePickerUnavailable[hidden] { display: none; }
 #vehiclePickerHelp[hidden] { display: none; }
+#vehicleNoFigures[hidden] { display: none; }
