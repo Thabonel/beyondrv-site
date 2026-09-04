@@ -659,3 +659,46 @@ test('a variant with an ordinary kerb mass shows no such note', async ({ page })
 
   await expect(page.getByTestId('vehicle-optimistic-kerb')).toHaveCount(0);
 });
+
+test('the make list offers Other, so a vehicle that is not in the catalogue is not a dead end', async ({ page }) => {
+  await openCalculatorWithFixture(page);
+  const make = page.locator('#vehicleMake');
+  await expect(make.locator('option[value="__other__"]')).toHaveCount(1);
+  // It belongs at the end, after the real makes, not competing with them.
+  const values = await make.locator('option').evaluateAll((nodes) =>
+    nodes.map((n) => (n as HTMLOptionElement).value));
+  expect(values[values.length - 1]).toBe('__other__');
+});
+
+test('choosing Other opens the manual entry path and leaves the variant lists empty', async ({ page }) => {
+  await openCalculatorWithFixture(page);
+  await page.selectOption('#vehicleMake', '__other__');
+  await expect(page.locator('#vehicleDetails')).toHaveAttribute('open', '');
+  await expect(page.locator('#vehicleModel')).toBeDisabled();
+  await expect(page.locator('#vehicleVariant')).toBeDisabled();
+  await expect(page.locator('#vehiclePickerHelp')).toContainText('compliance plate');
+  await expect(page.locator('#vehiclePickerHelp')).toContainText('weighbridge');
+});
+
+test('Other lets a vehicle outside the catalogue still reach a result', async ({ page }) => {
+  await openCalculatorWithFixture(page);
+  await page.selectOption('#vehicleMake', '__other__');
+  await fillField(page, '#vehicleName', 'Mercedes-Benz Unimog U1700 L ex-army');
+  for (const [id, value] of [
+    ['gvm', '9000'], ['currentWeight', '5200'], ['passengers', '180'],
+    ['accessories', '80'], ['luggageGear', '120'],
+  ] as const) {
+    await fillField(page, `#${id}`, value);
+  }
+  await expect(page.locator('#payloadBreakdown')).toContainText('remaining for the camper');
+  await expect(page.locator('#vehicleName')).toHaveValue('Mercedes-Benz Unimog U1700 L ex-army');
+});
+
+test('going back to a real make restores the picker help and re-enables the model list', async ({ page }) => {
+  await openCalculatorWithFixture(page);
+  await page.selectOption('#vehicleMake', '__other__');
+  await expect(page.locator('#vehiclePickerHelp')).toContainText('compliance plate');
+  await page.selectOption('#vehicleMake', catalogue.variants[0].make);
+  await expect(page.locator('#vehiclePickerHelp')).toContainText('Not sure which variant?');
+  await expect(page.locator('#vehicleModel')).toBeEnabled();
+});
