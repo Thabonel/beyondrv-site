@@ -6,7 +6,7 @@ fuso-canter-4x4,Fuso,"Canter 4x4",light_truck_4x4,current,1,truck_body,partially
 iveco-daily-4x4,IVECO,"Daily 4x4",light_truck_4x4,current,1,truck_body,seeded,"Six current single/crew-cab wheelbase and mass configurations seeded; engineering review remains mandatory."
 iveco-eurocargo-4x4,IVECO,"Eurocargo ML150 4x4",medium_truck_4x4,current,1,truck_body,partially_seeded,"Model-level GVM, GCM and wheelbase choices seeded; exact chassis mass and axle table outstanding."
 isuzu-dmax,Isuzu,D-MAX,midsize_ute,current,1,tray_cab_chassis,seeded,"Core cab-chassis variants, axle ratings and accessory tray dimensions seeded."
-isuzu-n-series,"Isuzu Trucks","N Series",light_truck,current,1,truck_body,research_backlog,"Large variant family; ingest exact model code, wheelbase, tare, GVM and axle ratings."
+isuzu-n-series,"Isuzu Trucks","N Series",light_truck,current,1,truck_body,partially_seeded,"NPS 75/45-155 4X4 single and crew recorded from specification sheet ARK 1443 10/21 on 4 September 2026. The rest of the N Series, and any Next Gen revision of these figures, are still outstanding."
 isuzu-nps,"Isuzu Trucks","NPS 75-175 4x4",light_truck_4x4,current,1,truck_body,seeded,"Current day- and crew-cab chassis masses, axle limits and wheelbase seeded; body-builder approval remains mandatory."
 kia-tasman,Kia,Tasman,midsize_ute,current,1,tub_or_tray_conversion,seeded,"MY26 dual-cab pickups plus five cab-chassis variants from the separate official cab-chassis brochure, verified directly. Kia states cab-chassis kerb and payload exclude tray bodies."
 man-tgm-4x4-rv,MAN,"TGM 13.250-290 4x4 RV",medium_truck_4x4,current,1,truck_body,seeded,"Short- and long-cab RV chassis mass and axle data seeded from the Australian RV specification."
