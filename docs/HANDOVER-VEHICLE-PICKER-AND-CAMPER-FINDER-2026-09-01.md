@@ -344,11 +344,28 @@ The note's second concern is already handled. The variant is `cab_chassis` with
 `trayState: excluded`, so the calculator asks for the tray weight rather than
 assuming one, which is what "tray/body deductions are configured" was asking for.
 
-### 5. Eight truck families still unresearched
+### 5. Six truck families still unresearched
 
-Fuso Canter, Mercedes-Benz Sprinter Cab Chassis, Volkswagen Crafter Cab Chassis,
-IVECO T-Way 4x4/6x6, MAN TGS 4x4/6x6, Mercedes-Benz Arocs AWD, Scania XT 4x4/6x6,
-Volvo FMX 4x4/6x6.
+Fuso Canter, IVECO T-Way 4x4/6x6, MAN TGS 4x4/6x6, Mercedes-Benz Arocs AWD,
+Scania XT 4x4/6x6, Volvo FMX 4x4/6x6.
+
+**Sprinter and Crafter came off the list on 4 September**, from brochures the
+owner supplied. Ten Sprinter cab chassis at 5.0 and 5.5 tonnes are recorded and
+every one reconciles. Four Crafter 55 are recorded and reconcile, but cannot
+publish: see below.
+
+Two boundaries decided what could be entered, and both are the schema's rather
+than mine. `heavy_overland_chassis` carries `CHECK (gvm_kg > 4500)`, so the nine
+Sprinter variants at 4.49 tonnes and the whole Crafter 50 range at 4490 kg were
+left out rather than widening the constraint. And this file forbids substituting
+a research date for a model year, so the Crafter rows carry no year and the build
+names them in its skip list until one is established.
+
+Two things found in those documents worth knowing. The Sprinter brochure labels
+its dual cab pages "RWD Single Cab Chassis" in the body style row while the page
+title and the 9072 model type codes say dual cab; the title is right. And two
+Crafter 50 dual cab rows do not reconcile as printed, 2247/2295 and 2243/2195
+against a 4490 kg GVM, which needs resolving before anyone lowers that threshold.
 
 Isuzu N Series came off this list on 4 September, partially: the NPS 75/45-155
 4X4 single and crew are recorded from specification sheet ARK 1443 10/21, in all
