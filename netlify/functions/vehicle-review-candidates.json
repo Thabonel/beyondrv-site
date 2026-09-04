@@ -3632,6 +3632,216 @@
         "title": "TGM 13.250-290 4x4 BL CH RV Specification",
         "url": "https://www.man.com.au/wp-content/uploads/2025/02/TGM-13.250-290-4X4-RV-Spec.pdf"
       }
+    },
+    {
+      "id": "mercedes-sprinter-517-lwb-hd",
+      "make": "Mercedes-Benz",
+      "model": "Sprinter Cab Chassis",
+      "modelYear": 2025,
+      "grade": "517 LWB HD",
+      "cabType": "single",
+      "bodyType": "cab_chassis",
+      "gvmKg": 5000,
+      "kerbKg": 2152,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "Mercedes-Benz Australia",
+        "title": "Sprinter and eSprinter Technical Data: Panel Van, Cab Chassis, Dual Cab Chassis and Transfer Minibus (VS30, MY25/MY26)",
+        "url": "https://www.mercedes-benz.com.au/content/dam/australia/vans/brochures-and-specifications/sprinter-panel-van/Sprinter%20VS30%20MY25%20MY26%20AU%20Tech%20Brochure%20April%202026%2020260326%20NEW.pdf"
+      }
+    },
+    {
+      "id": "mercedes-sprinter-517-mwb-hd",
+      "make": "Mercedes-Benz",
+      "model": "Sprinter Cab Chassis",
+      "modelYear": 2025,
+      "grade": "517 MWB HD",
+      "cabType": "single",
+      "bodyType": "cab_chassis",
+      "gvmKg": 5000,
+      "kerbKg": 2112,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "Mercedes-Benz Australia",
+        "title": "Sprinter and eSprinter Technical Data: Panel Van, Cab Chassis, Dual Cab Chassis and Transfer Minibus (VS30, MY25/MY26)",
+        "url": "https://www.mercedes-benz.com.au/content/dam/australia/vans/brochures-and-specifications/sprinter-panel-van/Sprinter%20VS30%20MY25%20MY26%20AU%20Tech%20Brochure%20April%202026%2020260326%20NEW.pdf"
+      }
+    },
+    {
+      "id": "mercedes-sprinter-519-lwb-dual-hd",
+      "make": "Mercedes-Benz",
+      "model": "Sprinter Cab Chassis",
+      "modelYear": 2025,
+      "grade": "519 LWB Dual HD",
+      "cabType": "dual",
+      "bodyType": "cab_chassis",
+      "gvmKg": 5000,
+      "kerbKg": 2330,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "Mercedes-Benz Australia",
+        "title": "Sprinter and eSprinter Technical Data: Panel Van, Cab Chassis, Dual Cab Chassis and Transfer Minibus (VS30, MY25/MY26)",
+        "url": "https://www.mercedes-benz.com.au/content/dam/australia/vans/brochures-and-specifications/sprinter-panel-van/Sprinter%20VS30%20MY25%20MY26%20AU%20Tech%20Brochure%20April%202026%2020260326%20NEW.pdf"
+      }
+    },
+    {
+      "id": "mercedes-sprinter-519-lwb-dual-hd-a4m",
+      "make": "Mercedes-Benz",
+      "model": "Sprinter Cab Chassis",
+      "modelYear": 2025,
+      "grade": "519 LWB Dual HD A4M",
+      "cabType": "dual",
+      "bodyType": "cab_chassis",
+      "gvmKg": 5500,
+      "kerbKg": 2466,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "Mercedes-Benz Australia",
+        "title": "Sprinter and eSprinter Technical Data: Panel Van, Cab Chassis, Dual Cab Chassis and Transfer Minibus (VS30, MY25/MY26)",
+        "url": "https://www.mercedes-benz.com.au/content/dam/australia/vans/brochures-and-specifications/sprinter-panel-van/Sprinter%20VS30%20MY25%20MY26%20AU%20Tech%20Brochure%20April%202026%2020260326%20NEW.pdf"
+      }
+    },
+    {
+      "id": "mercedes-sprinter-519-lwb-hd",
+      "make": "Mercedes-Benz",
+      "model": "Sprinter Cab Chassis",
+      "modelYear": 2025,
+      "grade": "519 LWB HD",
+      "cabType": "single",
+      "bodyType": "cab_chassis",
+      "gvmKg": 5000,
+      "kerbKg": 2157,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "Mercedes-Benz Australia",
+        "title": "Sprinter and eSprinter Technical Data: Panel Van, Cab Chassis, Dual Cab Chassis and Transfer Minibus (VS30, MY25/MY26)",
+        "url": "https://www.mercedes-benz.com.au/content/dam/australia/vans/brochures-and-specifications/sprinter-panel-van/Sprinter%20VS30%20MY25%20MY26%20AU%20Tech%20Brochure%20April%202026%2020260326%20NEW.pdf"
+      }
+    },
+    {
+      "id": "mercedes-sprinter-519-lwb-hd-a4m",
+      "make": "Mercedes-Benz",
+      "model": "Sprinter Cab Chassis",
+      "modelYear": 2025,
+      "grade": "519 LWB HD A4M",
+      "cabType": "single",
+      "bodyType": "cab_chassis",
+      "gvmKg": 5500,
+      "kerbKg": 2293,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "Mercedes-Benz Australia",
+        "title": "Sprinter and eSprinter Technical Data: Panel Van, Cab Chassis, Dual Cab Chassis and Transfer Minibus (VS30, MY25/MY26)",
+        "url": "https://www.mercedes-benz.com.au/content/dam/australia/vans/brochures-and-specifications/sprinter-panel-van/Sprinter%20VS30%20MY25%20MY26%20AU%20Tech%20Brochure%20April%202026%2020260326%20NEW.pdf"
+      }
+    },
+    {
+      "id": "mercedes-sprinter-519-mwb-dual-hd",
+      "make": "Mercedes-Benz",
+      "model": "Sprinter Cab Chassis",
+      "modelYear": 2025,
+      "grade": "519 MWB Dual HD",
+      "cabType": "dual",
+      "bodyType": "cab_chassis",
+      "gvmKg": 5000,
+      "kerbKg": 2290,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "Mercedes-Benz Australia",
+        "title": "Sprinter and eSprinter Technical Data: Panel Van, Cab Chassis, Dual Cab Chassis and Transfer Minibus (VS30, MY25/MY26)",
+        "url": "https://www.mercedes-benz.com.au/content/dam/australia/vans/brochures-and-specifications/sprinter-panel-van/Sprinter%20VS30%20MY25%20MY26%20AU%20Tech%20Brochure%20April%202026%2020260326%20NEW.pdf"
+      }
+    },
+    {
+      "id": "mercedes-sprinter-519-mwb-dual-hd-a4m",
+      "make": "Mercedes-Benz",
+      "model": "Sprinter Cab Chassis",
+      "modelYear": 2025,
+      "grade": "519 MWB Dual HD A4M",
+      "cabType": "dual",
+      "bodyType": "cab_chassis",
+      "gvmKg": 5500,
+      "kerbKg": 2428,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "Mercedes-Benz Australia",
+        "title": "Sprinter and eSprinter Technical Data: Panel Van, Cab Chassis, Dual Cab Chassis and Transfer Minibus (VS30, MY25/MY26)",
+        "url": "https://www.mercedes-benz.com.au/content/dam/australia/vans/brochures-and-specifications/sprinter-panel-van/Sprinter%20VS30%20MY25%20MY26%20AU%20Tech%20Brochure%20April%202026%2020260326%20NEW.pdf"
+      }
+    },
+    {
+      "id": "mercedes-sprinter-519-mwb-hd",
+      "make": "Mercedes-Benz",
+      "model": "Sprinter Cab Chassis",
+      "modelYear": 2025,
+      "grade": "519 MWB HD",
+      "cabType": "single",
+      "bodyType": "cab_chassis",
+      "gvmKg": 5000,
+      "kerbKg": 2117,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "Mercedes-Benz Australia",
+        "title": "Sprinter and eSprinter Technical Data: Panel Van, Cab Chassis, Dual Cab Chassis and Transfer Minibus (VS30, MY25/MY26)",
+        "url": "https://www.mercedes-benz.com.au/content/dam/australia/vans/brochures-and-specifications/sprinter-panel-van/Sprinter%20VS30%20MY25%20MY26%20AU%20Tech%20Brochure%20April%202026%2020260326%20NEW.pdf"
+      }
+    },
+    {
+      "id": "mercedes-sprinter-519-mwb-hd-a4m",
+      "make": "Mercedes-Benz",
+      "model": "Sprinter Cab Chassis",
+      "modelYear": 2025,
+      "grade": "519 MWB HD A4M",
+      "cabType": "single",
+      "bodyType": "cab_chassis",
+      "gvmKg": 5500,
+      "kerbKg": 2255,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "truck",
+      "published": false,
+      "source": {
+        "manufacturer": "Mercedes-Benz Australia",
+        "title": "Sprinter and eSprinter Technical Data: Panel Van, Cab Chassis, Dual Cab Chassis and Transfer Minibus (VS30, MY25/MY26)",
+        "url": "https://www.mercedes-benz.com.au/content/dam/australia/vans/brochures-and-specifications/sprinter-panel-van/Sprinter%20VS30%20MY25%20MY26%20AU%20Tech%20Brochure%20April%202026%2020260326%20NEW.pdf"
+      }
     }
   ]
 }
