@@ -245,3 +245,15 @@ test('picking a vehicle produces the first payload result', async ({ page }) => 
   await expect(page.locator('#availablePayload')).not.toHaveText('Not calculated');
   await expect(page.locator('#statusLabel')).not.toHaveText('Enter your numbers to calculate a result.');
 });
+
+test('the tray type is asked before the measurements', async ({ page }) => {
+  await page.goto(calculatorPath);
+  // A customer should say what they have before being asked to measure it: a tub's
+  // size comes from the vehicle specification, a fitted tray has to be measured.
+  const order = await page.evaluate(() => {
+    const seen: string[] = [];
+    document.querySelectorAll('#trayType, #trayLength, #trayWidth').forEach((el) => seen.push(el.id));
+    return seen; // querySelectorAll returns document order
+  });
+  expect(order).toEqual(['trayType', 'trayLength', 'trayWidth']);
+});

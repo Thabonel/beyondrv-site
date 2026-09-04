@@ -230,17 +230,7 @@ const schema = [
           <p class="quick-step-intro">Enter the usable length and width of your tray. We will show the closest standard camper automatically; weight then refines the payload check.</p>
           <div class="tray-research" id="trayResearch" aria-live="polite" hidden></div>
           <div class="details-grid details-grid--quick">
-            <div class="form-field">
-              <label class="form-label" for="trayLength">Usable tray or tub length (mm)</label>
-              <input class="form-input" id="trayLength" name="trayLength" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 2300" aria-describedby="trayLengthHelp" />
-              <span class="form-help" id="trayLengthHelp">Measure the flat usable area, not the vehicle's overall length.</span>
-            </div>
-            <div class="form-field">
-              <label class="form-label" for="trayWidth">Usable tray or tub width (mm)</label>
-              <input class="form-input" id="trayWidth" name="trayWidth" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 1850" aria-describedby="trayWidthHelp" />
-              <span class="form-help" id="trayWidthHelp">Measure the narrowest flat usable width between anything that limits the camper.</span>
-            </div>
-            <div class="form-field">
+            <div class="form-field form-field--full">
               <label class="form-label" for="trayType">Tray or tub type</label>
               <select class="form-input" id="trayType" name="trayType">
                 <option value="">— Select —</option>
@@ -250,7 +240,17 @@ const schema = [
                 <option value="Tray with canopy">Tray with canopy</option>
                 <option value="Unsure">Unsure</option>
               </select>
-              <span class="form-help">Only a tub is known from the vehicle specification, so tell us if yours is a tray.</span>
+              <span class="form-help">Tell us this first. A tub's size comes from the vehicle specification; a fitted tray has to be measured.</span>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="trayLength">Usable tray or tub length (mm)</label>
+              <input class="form-input" id="trayLength" name="trayLength" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 2300" aria-describedby="trayLengthHelp" />
+              <span class="form-help" id="trayLengthHelp">Measure the flat usable area, not the vehicle's overall length.</span>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="trayWidth">Usable tray or tub width (mm)</label>
+              <input class="form-input" id="trayWidth" name="trayWidth" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 1850" aria-describedby="trayWidthHelp" />
+              <span class="form-help" id="trayWidthHelp">Measure the narrowest flat usable width between anything that limits the camper.</span>
             </div>
             <div class="form-field" id="trayReportedField" hidden>
               <p class="form-help" id="trayReportedText" data-testid="tray-reported" hidden></p>
