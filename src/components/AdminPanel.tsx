@@ -7219,6 +7219,7 @@ export default function AdminPanel({ onOpenGmWorkspace, onSignOut }: { onOpenGmW
                 <li><strong>Enquiries, Customers, and Leads:</strong> customer contact, status, follow-up, and normalized records.</li>
                 <li><strong>Contracts:</strong> agreements, revisions, customer acceptance, and post-acceptance addenda.</li>
                 <li><strong>Orders:</strong> payment, production, shipping, fitout, handover, and next actions.</li>
+                <li><strong>Configurator:</strong> option pricing, customer configurations, drawings, customer review links, and release to production.</li>
                 <li><strong>Google and Matches:</strong> read-only Gmail/Drive sync and owner-controlled record matching.</li>
                 <li><strong>AI Drafts:</strong> review AI-prepared actions, including proposed contract changes. AI drafts do nothing until the owner approves them.</li>
                 <li><strong>Audit and Reports:</strong> review recorded actions and generate weekly owner summaries.</li>
@@ -7390,6 +7391,56 @@ export default function AdminPanel({ onOpenGmWorkspace, onSignOut }: { onOpenGmW
                 <li>Keep Enquiries as the working place for contact status, follow-up dates, and notes. Customer and Lead records support matching and contract history.</li>
                 <li>Audit records important owner and system actions. Use it to check what was approved, prepared, sent, or accepted.</li>
                 <li>Reports generates a saved weekly summary with recommended owner actions. Treat it as an operating summary, not accounting or legal advice.</li>
+                <li>A daily lead summary is produced automatically. Use it to catch a new enquiry you have not yet actioned, not as a replacement for the Enquiries tab.</li>
+              </ul>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Price and approve a configuration</h3>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Open Configurator and use Manage Catalogue to set model and option pricing. Saving any catalogue change returns the catalogue to owner review, and internal approval is a separate confirmation.</li>
+                <li>Create a configuration against a customer, and an optional lead.</li>
+                <li>Give every off-catalogue alteration a positive customer charge and a visual brief. An alteration without an approved drawing blocks configuration approval.</li>
+                <li>Upload each drawing as PDF, PNG, JPEG, WebP or GLB, or link it over HTTPS. Only an owner-approved drawing version reaches the customer.</li>
+                <li>Create the private 14-day customer review link. The link goes stale if the configuration changes afterwards, so re-issue it after any edit.</li>
+                <li>Wait for the customer to approve. Customer approval is required before you can approve internally.</li>
+                <li>Approve the configuration. This produces a locked snapshot with a digest.</li>
+                <li>Create the contract draft, then complete it in Contracts as normal.</li>
+                <li>Release to production only after the verified contract and deposit evidence exist.</li>
+              </ol>
+              <p style={{ margin: '0.4rem 0 0', color: '#aaa' }}>Original CAD is never published. A customer never sees private costs, margins, owner notes, or an unapproved drawing version.</p>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Publish vehicle data</h3>
+              <ul style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Open Dashboard and find the vehicle review list. Each candidate shows its figures, its manufacturer source, and any correction applied.</li>
+                <li>Check the figures against the source document before publishing. A published vehicle drives a customer's payload calculation.</li>
+                <li>Publish only the variants you have checked. Nothing reaches the vehicle picker until you do.</li>
+                <li>A vehicle with no recorded figures still appears in the customer picker, and the page asks that customer for their compliance plate and weighbridge figures rather than guessing.</li>
+              </ul>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Review reported tray sizes</h3>
+              <ul style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Customers report the tray dimensions fitted to their own vehicle. Reported sizes appear on Dashboard.</li>
+                <li>The most-reported size for a vehicle is the one shown to the next customer with that vehicle.</li>
+                <li>Delete a size that is clearly wrong, such as a mistyped figure or a size no tray builder makes.</li>
+              </ul>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Use marketing ideas</h3>
+              <ul style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Dashboard generates marketing ideas from your own product and enquiry data, not from generic advice.</li>
+                <li>Save an idea to keep it, and update a saved idea as you act on it.</li>
+                <li>An idea is a suggestion. It changes nothing on the website until you make the change in Products, Media, Homepage, or Admin Chat.</li>
+              </ul>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Log a customer call by voice</h3>
+              <ul style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Open Log Customer Call at /admin/quick-note, on a phone or at the desk.</li>
+                <li>Record the conversation. The system extracts the customer details and what was discussed.</li>
+                <li>Check the extraction, then confirm or discard it. Nothing is saved until you confirm.</li>
+                <li>Do not record payment details or passwords.</li>
               </ul>
             </section>
             <section>
