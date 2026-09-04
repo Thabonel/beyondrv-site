@@ -1,6 +1,27 @@
 {
   "candidates": [
     {
+      "id": "byd-shark-6-premium-dual-cab-tub",
+      "make": "BYD",
+      "model": "Shark 6",
+      "modelYear": 2025,
+      "grade": "Premium",
+      "cabType": "dual",
+      "bodyType": "pickup_tub",
+      "gvmKg": 3500,
+      "kerbKg": 2710,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "needs_secondary_review",
+      "platform": "ute",
+      "published": false,
+      "source": {
+        "manufacturer": "BYD Automotive Australia",
+        "title": "BYD Shark 6 specification brochure (version 03.05C)",
+        "url": "https://bydautomotive.com.au/brochures/BYD-SHARK-6-2025.pdf"
+      }
+    },
+    {
       "id": "chevrolet-silverado-1500-ltz-premium",
       "make": "Chevrolet",
       "model": "Silverado 1500",
@@ -1051,6 +1072,48 @@
       }
     },
     {
+      "id": "ford-ranger-super-duty-my26-double-cab-cc",
+      "make": "Ford",
+      "model": "Ranger Super Duty",
+      "modelYear": 2026,
+      "grade": "Super Duty",
+      "cabType": "double_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 4500,
+      "kerbKg": 2675,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "ute",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger Super Duty 2026.50MY Specifications (super-duty-specs-17-april.pdf)",
+        "url": "https://www.ford.com.au/showroom/trucks-and-vans/ranger/super-duty/"
+      }
+    },
+    {
+      "id": "ford-ranger-super-duty-my26-double-cab-tub",
+      "make": "Ford",
+      "model": "Ranger Super Duty",
+      "modelYear": 2026,
+      "grade": "Super Duty",
+      "cabType": "double_cab",
+      "bodyType": "pickup_tub",
+      "gvmKg": 4500,
+      "kerbKg": 2803,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "ute",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger Super Duty 2026.50MY Specifications (super-duty-specs-17-april.pdf)",
+        "url": "https://www.ford.com.au/showroom/trucks-and-vans/ranger/super-duty/"
+      }
+    },
+    {
       "id": "ford-ranger-super-duty-my26-single-cab",
       "make": "Ford",
       "model": "Ranger Super Duty",
@@ -1067,7 +1130,28 @@
       "published": true,
       "source": {
         "manufacturer": "Ford Australia",
-        "title": "Ford Ranger Super Duty",
+        "title": "Ranger Super Duty 2026.50MY Specifications (super-duty-specs-17-april.pdf)",
+        "url": "https://www.ford.com.au/showroom/trucks-and-vans/ranger/super-duty/"
+      }
+    },
+    {
+      "id": "ford-ranger-super-duty-my26-super-cab-cc",
+      "make": "Ford",
+      "model": "Ranger Super Duty",
+      "modelYear": 2026,
+      "grade": "Super Duty",
+      "cabType": "super_cab",
+      "bodyType": "cab_chassis",
+      "gvmKg": 4500,
+      "kerbKg": 2615,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "source_verified",
+      "platform": "ute",
+      "published": false,
+      "source": {
+        "manufacturer": "Ford Australia",
+        "title": "Ranger Super Duty 2026.50MY Specifications (super-duty-specs-17-april.pdf)",
         "url": "https://www.ford.com.au/showroom/trucks-and-vans/ranger/super-duty/"
       }
     },

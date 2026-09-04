@@ -1,7 +1,7 @@
 id,make,model,platform_category,australian_market_status,selector_priority,fitment_mode,research_status,rationale
 chevrolet-silverado-2500,Chevrolet,"Silverado 2500 HD",heavy_duty_pickup,current,1,tub_or_tray_conversion,seeded,"NB1 and NB2 certification variants seeded separately."
 ford-ranger,Ford,Ranger,midsize_ute,current,1,tray_cab_chassis,seeded,"Two model years recorded: 17 verified 2022MY variants, and 23 from the 2026.50MY brochure covering 4x2 and 4x4 in cab-chassis and pick-up. Outstanding: the 2026.50MY rows store the lightest-equipment kerb mass, so the heavier options figure must be added before customer exposure, and ford.com.au blocks automated retrieval."
-ford-ranger-super-duty,Ford,"Ranger Super Duty",heavy_duty_ute,current,1,tray_cab_chassis,seeded,"Highest-priority OEM platform; full delivered-variant table still required."
+ford-ranger-super-duty,Ford,"Ranger Super Duty",heavy_duty_ute,current,1,tray_cab_chassis,seeded,"Full delivered-variant mass table captured from the official 2026.50MY specification sheet: all four cab types stored."
 fuso-canter-4x4,Fuso,"Canter 4x4",light_truck_4x4,current,1,truck_body,partially_seeded,"GVM, GCM and wheelbase seeded; exact chassis mass, axle limits and body-builder data remain outstanding."
 iveco-daily-4x4,IVECO,"Daily 4x4",light_truck_4x4,current,1,truck_body,seeded,"Six current single/crew-cab wheelbase and mass configurations seeded; engineering review remains mandatory."
 iveco-eurocargo-4x4,IVECO,"Eurocargo ML150 4x4",medium_truck_4x4,current,1,truck_body,partially_seeded,"Model-level GVM, GCM and wheelbase choices seeded; exact chassis mass and axle table outstanding."
