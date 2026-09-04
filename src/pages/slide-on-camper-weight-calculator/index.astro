@@ -35,6 +35,7 @@ const faqs = [
 // adding a camper later is a data change rather than a code change.
 const camperEntries = (await getCollection('products'))
   .filter(isPublicProduct)
+  .filter((entry) => entry.data.category === 'slide-on')
   .filter((entry) => Boolean(entry.data.suitabilityData?.requiredTrayLengthMm));
 
 function nominalLengthMm(entry: typeof camperEntries[number]): number | null {
@@ -55,6 +56,8 @@ const camperModels = camperEntries
     name: entry.data.title,
     url: `/${entry.id}/`,
     nominalLengthMm: nominalLengthMm(entry),
+    dryWeightKg: entry.data.suitabilityData?.dryWeightKg ?? null,
+    requiredTrayWidthMm: entry.data.suitabilityData?.requiredTrayWidthMm ?? null,
     status: entry.data.suitabilityData?.status ?? 'draft',
   }))
   .sort((a, b) => (b.nominalLengthMm ?? -1) - (a.nominalLengthMm ?? -1));
@@ -64,7 +67,7 @@ const camperModelsJson = serializeJsonForHtml(camperModels);
 const products = camperModels.map((model) => ({
   name: model.name,
   url: model.url,
-  dryWeight: 'Manual entry required',
+  dryWeight: model.dryWeightKg ? `${model.dryWeightKg} kg` : 'Confirm with Beyond RV',
 }));
 
 const schema = [
@@ -74,6 +77,15 @@ const schema = [
     name: 'Slide-On Camper Weight Calculator',
     url: pageUrl,
     description: 'Manual Australian payload and GVM calculator for checking whether a ute may suit a Beyond RV slide-on camper.'
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'Beyond RV Slide-On Camper Weight Calculator',
+    url: pageUrl,
+    applicationCategory: 'UtilityApplication',
+    operatingSystem: 'Any',
+    description: 'Estimate ute payload, loaded GVM margin and preliminary tray-size matches for Beyond RV slide-on campers.'
   },
   {
     '@context': 'https://schema.org',
@@ -126,205 +138,225 @@ const schema = [
       </div>
       <h1 class="hero-title">Can Your Ute Carry a Slide-On?</h1>
       <p class="hero-sub">
-        Enter your own vehicle figures to estimate payload, loaded vehicle weight, GVM margin and which Beyond RV slide-on range may be worth discussing.
+        Choose your ute, add your real-world load and compare Beyond RV slide-ons. Useful results appear as soon as there is enough information.
       </p>
     </div>
   </section>
 
-  <section class="container camper-finder">
-    <h2 class="camper-finder-title">Which model suits your tray?</h2>
-    <p class="camper-finder-intro">
-      Campers are built to order, so the question is which model your tray length calls for.
-      Enter it and we will name the model.
-    </p>
-    <script type="application/json" id="camperModelData" set:html={camperModelsJson}></script>
-    <div class="form-field">
-      <label class="form-label" for="finderTrayLength">Tray length (mm)</label>
-      <input class="form-input" id="finderTrayLength" type="number" min="0" placeholder="e.g. 2300" />
-    </div>
-    <div id="camperFinderResult" data-testid="camper-finder-result" hidden></div>
-  </section>
-
   <section class="container checker-layout">
     <div class="checker-panel">
+      <div class="calculator-start">
+        <span class="calculator-start-kicker">Quick estimate</span>
+        <h2>Start with your vehicle</h2>
+        <p>Choose a listed ute for an immediate payload estimate. Open the detailed sections only when you need to change a figure or make the estimate more accurate.</p>
+      </div>
+      <a class="mobile-result-peek" id="mobileResultPeek" href="#resultPanel" hidden>
+        <span><strong id="mobileResultTitle">Estimate started</strong><small id="mobileResultValue">View current result</small></span>
+        <span aria-hidden="true">View →</span>
+      </a>
       <form class="checker-form" id="slideCalculator">
-        <div class="form-section-heading form-field--full">
-          <h2>Start with your ute</h2>
-          <p>Enter GVM and current weight for the first payload result. The vehicle finder is optional.</p>
-        </div>
-        <div class="form-field form-field--full" id="vehiclePickerField">
-          <label class="form-label" for="vehicleMake">Find your vehicle (optional)</label>
+        <script type="application/json" id="camperModelData" set:html={camperModelsJson}></script>
+        <fieldset class="quick-step form-field--full">
+          <legend><span>1</span> Your vehicle</legend>
+          <p class="quick-step-intro">Selecting the exact variant fills its published GVM and kerb weight. You can review or replace those figures below.</p>
+          <div class="form-field" id="vehiclePickerField">
           <p class="form-help" id="vehiclePickerUnavailable" data-testid="vehicle-picker-unavailable" hidden>
             Vehicle lookup is unavailable while these specifications are being reviewed.
             Take your GVM from your compliance plate, and enter your ute's current weight
             below. An approximate weight is enough for an estimate.
           </p>
           <div class="vehicle-picker">
-            <select class="form-input" id="vehicleMake"><option value="">Select a make</option></select>
-            <select class="form-input" id="vehicleModel" disabled><option value="">Select a model</option></select>
-            <select class="form-input" id="vehicleVariant" disabled><option value="">Select a variant</option></select>
+            <div>
+              <label class="form-label" for="vehicleMake">Make</label>
+              <select class="form-input" id="vehicleMake" name="vehicleMake" autocomplete="off"><option value="">Select a make</option></select>
+            </div>
+            <div>
+              <label class="form-label" for="vehicleModel">Model</label>
+              <select class="form-input" id="vehicleModel" name="vehicleModel" autocomplete="off" disabled><option value="">Select a model</option></select>
+            </div>
+            <div>
+              <label class="form-label" for="vehicleVariant">Exact variant</label>
+              <select class="form-input" id="vehicleVariant" name="vehicleVariant" autocomplete="off" disabled><option value="">Select a variant</option></select>
+            </div>
           </div>
           <span class="form-help" id="vehiclePickerHelp">
-            Picking a vehicle fills only the published figures available for that exact variant.
-            Check every filled value; a weighbridge figure for your own vehicle is always better.
+            Not sure which variant? Match the year, cab, body, drivetrain and engine shown on your vehicle documents.
           </span>
-          <div id="vehicleProvenance" class="vehicle-provenance" hidden></div>
-        </div>
+          </div>
         <script type="application/json" id="vehicleCatalogueData" set:html={vehicleCatalogueJson}></script>
-        <div class="form-field form-field--full">
-          <label class="form-label" for="vehicleName">Vehicle</label>
-          <input class="form-input" id="vehicleName" type="text" placeholder="Example: Ford Ranger dual cab" />
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="gvm">Vehicle GVM (kg)</label>
-          <input class="form-input" id="gvm" type="number" min="0" placeholder="e.g. 3350" />
-          <span class="form-help">Find this on the vehicle compliance plate or manufacturer specification.</span>
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="gvmUpgrade">Has this vehicle had a GVM upgrade?</label>
-          <select class="form-input" id="gvmUpgrade">
-            <option value="">— Select —</option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-            <option value="Unsure">Unsure</option>
-          </select>
-          <span class="form-help">An upgrade raises the GVM above the figure on the plate. If you have had one, enter the upgraded GVM above.</span>
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="currentWeight">Current vehicle weight before listed additions (kg)</label>
-          <input class="form-input" id="currentWeight" type="number" min="0" placeholder="e.g. 2200" />
-          <span class="form-help">Use a current weighbridge weight if possible. If it already includes passengers or accessories, enter 0 for those items below.</span>
-        </div>
-        <div class="form-field" id="trayMassField" hidden>
-          <label class="form-label" for="trayIncluded">The weight I entered above already includes my tray</label>
-          <input id="trayIncluded" type="checkbox" />
-          <span class="form-help">Tick this if you used a weighbridge figure taken with the tray fitted.</span>
-          <div id="trayMassRow">
-            <label class="form-label" for="trayMass">Tray weight (kg)</label>
-            <input class="form-input" id="trayMass" type="number" min="0" placeholder="e.g. 120" />
-            <span class="form-help" id="trayMassHelp"></span>
+          <details class="advanced-details" id="vehicleDetails">
+            <summary>Use a weighbridge weight or enter my vehicle manually</summary>
+            <div class="details-grid">
+              <div class="form-field form-field--full">
+                <label class="form-label" for="vehicleName">Vehicle description</label>
+                <input class="form-input" id="vehicleName" name="vehicleName" type="text" autocomplete="off" placeholder="Example: Ford Ranger dual cab" />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="gvm">Vehicle GVM (kg)</label>
+                <input class="form-input" id="gvm" name="gvm" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 3350" aria-describedby="gvmHelp" />
+                <span class="form-help" id="gvmHelp">Find this on the compliance plate or manufacturer specification.</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="gvmUpgrade">Has this vehicle had a GVM upgrade?</label>
+                <select class="form-input" id="gvmUpgrade" name="gvmUpgrade">
+                  <option value="">— Select —</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                  <option value="Unsure">Unsure</option>
+                </select>
+                <span class="form-help">An upgrade raises the GVM above the figure on the plate. If you have had one, enter the upgraded GVM above.</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="currentWeight">Current vehicle weight (kg)</label>
+                <input class="form-input" id="currentWeight" name="currentWeight" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 2200" aria-describedby="currentWeightHelp" />
+                <span class="form-help" id="currentWeightHelp">A current weighbridge figure is best. Do not add anything below that was already on the scales.</span>
+              </div>
+              <div class="form-field form-field--full" id="trayMassField" hidden>
+                <label class="check-label" for="trayIncluded"><input id="trayIncluded" name="trayIncluded" type="checkbox" /> The weight above already includes my tray</label>
+                <span class="form-help">Tick this if the vehicle was weighed with the tray fitted.</span>
+                <div id="trayMassRow">
+                  <label class="form-label" for="trayMass">Tray weight (kg)</label>
+                  <input class="form-input" id="trayMass" name="trayMass" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 120" aria-describedby="trayMassHelp" />
+                  <span class="form-help" id="trayMassHelp"></span>
+                </div>
+              </div>
+              <div id="vehicleProvenance" class="vehicle-provenance form-field--full" hidden></div>
+            </div>
+          </details>
+        </fieldset>
+
+        <fieldset class="quick-step form-field--full">
+          <legend><span>2</span> Your camper and tray</legend>
+          <p class="quick-step-intro">Enter the usable length and width of your tray. We will show the closest standard camper automatically; weight then refines the payload check.</p>
+          <div class="tray-research" id="trayResearch" aria-live="polite" hidden></div>
+          <div class="details-grid details-grid--quick">
+            <div class="form-field">
+              <label class="form-label" for="trayLength">Usable tray or tub length (mm)</label>
+              <input class="form-input" id="trayLength" name="trayLength" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 2300" aria-describedby="trayLengthHelp" />
+              <span class="form-help" id="trayLengthHelp">Measure the flat usable area, not the vehicle's overall length.</span>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="trayWidth">Usable tray or tub width (mm)</label>
+              <input class="form-input" id="trayWidth" name="trayWidth" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 1850" aria-describedby="trayWidthHelp" />
+              <span class="form-help" id="trayWidthHelp">Measure the narrowest flat usable width between anything that limits the camper.</span>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="trayType">Tray or tub type</label>
+              <select class="form-input" id="trayType" name="trayType">
+                <option value="">— Select —</option>
+                <option value="Steel tray">Steel tray</option>
+                <option value="Alloy tray">Alloy tray</option>
+                <option value="Tub">Tub</option>
+                <option value="Tray with canopy">Tray with canopy</option>
+                <option value="Unsure">Unsure</option>
+              </select>
+              <span class="form-help">Only a tub is known from the vehicle specification, so tell us if yours is a tray.</span>
+            </div>
+            <div class="form-field" id="trayReportedField" hidden>
+              <p class="form-help" id="trayReportedText" data-testid="tray-reported" hidden></p>
+              <p class="form-help" id="trayInviteText" data-testid="tray-invite" hidden></p>
+              <div class="tray-report-actions">
+                <button type="button" id="trayConfirm" data-testid="tray-confirm" hidden>That is my tray</button>
+                <button type="button" id="trayCorrect" data-testid="tray-correct" hidden>Mine is different</button>
+                <button type="button" id="trayReport" data-testid="tray-report" hidden disabled>Report my tray size</button>
+              </div>
+              <p class="form-help" id="trayReportStatus" role="status" aria-live="polite"></p>
+            </div>
+            <div class="form-field" id="camperDryField">
+              <label class="form-label" for="camperDry">Camper dry weight (kg)</label>
+              <input class="form-input" id="camperDry" name="camperDry" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 650" aria-describedby="camperDryHelp" />
+              <span class="form-help" id="camperDryHelp">Use the confirmed product specification. Beyond RV will verify it before build.</span>
+            </div>
           </div>
-        </div>
-        <div class="form-section-heading form-field--full">
-          <h2>Your planned load</h2>
-          <p>Optional. Leave a field blank if it adds no extra weight; blank additions count as 0 kg.</p>
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="passengers">Passengers (kg)</label>
-          <input class="form-input" id="passengers" type="number" min="0" placeholder="e.g. 180" />
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="accessories">Accessories already fitted (kg)</label>
-          <input class="form-input" id="accessories" type="number" min="0" placeholder="e.g. 80" />
-          <span class="form-help">Only include bull bar, winch, canopy, drawers, racks or battery weight not already counted above.</span>
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="luggageGear">Vehicle luggage and gear (kg)</label>
-          <input class="form-input" id="luggageGear" type="number" min="0" placeholder="e.g. 120" />
-        </div>
-        <div class="form-section-heading form-field--full">
-          <h2>Your camper</h2>
-          <p>Dry weight starts the camper estimate. Leave water, gear or options blank if none are planned.</p>
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="camperDry">Camper dry weight (kg)</label>
-          <input class="form-input" id="camperDry" type="number" min="0" placeholder="e.g. 650" />
-          <span class="form-help">Use the confirmed product specification or ask Beyond RV.</span>
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="camperWater">Camper water weight (kg)</label>
-          <input class="form-input" id="camperWater" type="number" min="0" placeholder="e.g. 80" />
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="camperGear">Camper gear weight (kg)</label>
-          <input class="form-input" id="camperGear" type="number" min="0" placeholder="e.g. 100" />
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="camperOptions">Camper options weight (kg)</label>
-          <input class="form-input" id="camperOptions" type="number" min="0" placeholder="e.g. 50" />
-        </div>
-        <div class="form-section-heading form-field--full">
-          <h2>Tray fit</h2>
-          <p>Measure the usable flat tray or tub area. Compare it with the camper’s confirmed required dimensions.</p>
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="trayLength">Tray or tub usable length (mm)</label>
-          <input class="form-input" id="trayLength" type="number" min="0" placeholder="e.g. 2150" />
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="trayWidth">Tray or tub usable width (mm)</label>
-          <input class="form-input" id="trayWidth" type="number" min="0" placeholder="e.g. 1850" />
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="trayType">Tray or tub type</label>
-          <select class="form-input" id="trayType">
-            <option value="">— Select —</option>
-            <option value="Steel tray">Steel tray</option>
-            <option value="Alloy tray">Alloy tray</option>
-            <option value="Tub">Tub</option>
-            <option value="Tray with canopy">Tray with canopy</option>
-            <option value="Unsure">Unsure</option>
-          </select>
-          <span class="form-help">Only a tub is known from the vehicle specification, so tell us if yours is a tray.</span>
-        </div>
-        <div class="form-field" id="trayReportedField" hidden>
-          <p class="form-help" id="trayReportedText" data-testid="tray-reported" hidden></p>
-          <p class="form-help" id="trayInviteText" data-testid="tray-invite" hidden></p>
-          <div class="tray-report-actions">
-            <button type="button" id="trayConfirm" data-testid="tray-confirm" hidden>That is my tray</button>
-            <button type="button" id="trayCorrect" data-testid="tray-correct" hidden>Mine is different</button>
-            <button type="button" id="trayReport" data-testid="tray-report" hidden disabled>Report my tray size</button>
+          <div id="camperFinderResult" data-testid="camper-finder-result" aria-live="polite" hidden></div>
+          <details class="advanced-details" id="camperDetails">
+            <summary>Add water, gear, options and camper dimensions</summary>
+            <div class="details-grid">
+              <div class="form-field">
+                <label class="form-label" for="camperWater">Camper water weight (kg)</label>
+                <input class="form-input" id="camperWater" name="camperWater" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 80" />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="camperGear">Camper gear weight (kg)</label>
+                <input class="form-input" id="camperGear" name="camperGear" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 100" />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="camperOptions">Camper options weight (kg)</label>
+                <input class="form-input" id="camperOptions" name="camperOptions" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 50" />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="requiredTrayLength">Camper required tray length (mm)</label>
+                <input class="form-input" id="requiredTrayLength" name="requiredTrayLength" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 2100" />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="requiredTrayWidth">Camper required tray width (mm)</label>
+                <input class="form-input" id="requiredTrayWidth" name="requiredTrayWidth" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 1750" />
+              </div>
+            </div>
+          </details>
+        </fieldset>
+
+        <fieldset class="quick-step form-field--full">
+          <legend><span>3</span> People and extra vehicle load</legend>
+          <p class="quick-step-intro">Only add weight that is not already included in your current vehicle weight. Blank additions count as 0 kg.</p>
+          <div class="form-field quick-primary-field">
+            <label class="form-label" for="passengers">People (total kg)</label>
+            <input class="form-input" id="passengers" name="passengers" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 180" />
           </div>
-          <p class="form-help" id="trayReportStatus" role="status" aria-live="polite"></p>
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="requiredTrayLength">Required tray length (mm)</label>
-          <input class="form-input" id="requiredTrayLength" type="number" min="0" placeholder="e.g. 2100" />
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="requiredTrayWidth">Required tray width (mm)</label>
-          <input class="form-input" id="requiredTrayWidth" type="number" min="0" placeholder="e.g. 1750" />
-        </div>
-        <div class="form-section-heading form-field--full">
-          <h2>Final safety checks</h2>
-          <p>These checks improve confidence but do not block the preliminary figures above.</p>
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="rearAxleChecked">Rear axle limits checked</label>
-          <input id="rearAxleChecked" type="checkbox" />
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="tyreRatingsChecked">Tyre ratings checked</label>
-          <input id="tyreRatingsChecked" type="checkbox" />
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="centreOfGravityChecked">Centre of gravity checked</label>
-          <input id="centreOfGravityChecked" type="checkbox" />
-        </div>
+          <details class="advanced-details" id="loadDetails">
+            <summary>Add accessories, luggage and vehicle gear</summary>
+            <div class="details-grid">
+              <div class="form-field">
+                <label class="form-label" for="accessories">Accessories not in the current weight (kg)</label>
+                <input class="form-input" id="accessories" name="accessories" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 80" />
+                <span class="form-help">For example a bull bar, winch, canopy, drawers, racks or battery.</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="luggageGear">Vehicle luggage and gear (kg)</label>
+                <input class="form-input" id="luggageGear" name="luggageGear" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 120" />
+              </div>
+            </div>
+          </details>
+        </fieldset>
+
+        <details class="advanced-details safety-details form-field--full" id="safetyDetails">
+          <summary>Final safety confirmations</summary>
+          <p class="form-help">These do not block preliminary figures. Confirm them before relying on a final result.</p>
+          <div class="safety-checks">
+            <label class="check-label" for="rearAxleChecked"><input id="rearAxleChecked" name="rearAxleChecked" type="checkbox" /> Rear axle limits checked</label>
+            <label class="check-label" for="tyreRatingsChecked"><input id="tyreRatingsChecked" name="tyreRatingsChecked" type="checkbox" /> Tyre ratings checked</label>
+            <label class="check-label" for="centreOfGravityChecked"><input id="centreOfGravityChecked" name="centreOfGravityChecked" type="checkbox" /> Centre of gravity checked</label>
+          </div>
+        </details>
       </form>
       <p class="calculator-disclaimer">{disclaimer}</p>
     </div>
 
-    <aside class="result-panel" id="resultPanel" data-status="neutral" aria-live="polite">
+    <aside class="result-panel" id="resultPanel" data-status="neutral" aria-labelledby="resultTitle">
+      <p class="visually-hidden" id="resultAnnouncement" aria-live="polite"></p>
       <div class="result-status" id="statusLabel">Enter GVM and current weight to start</div>
       <h2 id="resultTitle">Start with two numbers</h2>
       <p class="result-summary" id="resultSummary">Each result appears as soon as its own required information is available.</p>
+      <div class="result-breakdown" id="resultBreakdown" hidden>
+        <p id="payloadBreakdown" hidden></p>
+        <p id="dimensionBreakdown" hidden></p>
+      </div>
       <div class="result-metrics">
-        <div class="result-metric"><span>Available payload before camper</span><strong id="availablePayload">Not calculated</strong></div>
+        <div class="result-metric"><span>Payload remaining for camper</span><strong id="availablePayload">Not calculated</strong></div>
         <div class="result-metric"><span>Estimated loaded vehicle weight</span><strong id="loadedWeight">Not calculated</strong></div>
         <div class="result-metric"><span>Remaining GVM margin</span><strong id="gvmMargin">Not calculated</strong></div>
         <div class="result-metric"><span>Estimated loaded camper weight</span><strong id="loadedCamper">Not calculated</strong></div>
-        <div class="result-metric"><span>Tray length fit</span><strong id="trayLengthFit">Not calculated</strong></div>
-        <div class="result-metric"><span>Tray width fit</span><strong id="trayWidthFit">Not calculated</strong></div>
+        <div class="result-metric"><span>Length clearance</span><strong id="trayLengthFit">Not calculated</strong></div>
+        <div class="result-metric"><span>Width clearance</span><strong id="trayWidthFit">Not calculated</strong></div>
         <div class="result-metric"><span>Tray-size model match</span><strong id="camperModelMatch">Enter tray length</strong></div>
-        <div class="result-metric"><span>Data quality</span><strong id="dataQuality">Needs review</strong></div>
+        <div class="result-metric"><span>Estimate status</span><strong id="dataQuality">Not started</strong></div>
       </div>
       <div class="result-recommendation">
         <strong>Next step</strong>
         <p id="recommendation">Add your first figures, then confirm the final result with Beyond RV.</p>
       </div>
       <ul class="result-notes" id="warningNotes"></ul>
-      <a class="btn-primary" id="sendResult" href="/inquiry-form/?intent=vehicle-suitability">Continue to Enquiry With These Results</a>
+      <a class="btn-primary" id="sendResult" href="/inquiry-form/?intent=vehicle-suitability">Ask Beyond RV for Help</a>
     </aside>
   </section>
 
@@ -393,6 +425,23 @@ const schema = [
   } from '../../lib/vehicleCatalogue/picker';
   import type { CatalogueVariant, VehicleCatalogue } from '../../lib/vehicleCatalogue/types';
 
+  type TrayResearchOption = {
+    name: string;
+    lengthMm: number;
+    widthMm: number;
+    confidence: 'high' | 'medium';
+    source: { title: string; url: string };
+  };
+  type TrayResearchResult = {
+    status: 'single' | 'multiple' | 'not_found' | 'unavailable';
+    vehicleId: string;
+    vehicleLabel: string;
+    message: string;
+    options: TrayResearchOption[];
+    measurementSteps: string[];
+    cached?: boolean;
+  };
+
   const form = document.getElementById('slideCalculator');
   const resultPanel = document.getElementById('resultPanel');
   const fields = ['vehicleName', 'gvm', 'currentWeight', 'trayMass', 'passengers', 'accessories', 'luggageGear', 'camperDry', 'camperWater', 'camperGear', 'camperOptions', 'trayLength', 'trayWidth', 'requiredTrayLength', 'requiredTrayWidth', 'rearAxleChecked', 'tyreRatingsChecked', 'centreOfGravityChecked'];
@@ -413,8 +462,10 @@ const schema = [
     console.warn('Camper model data could not be parsed; the model finder will be unavailable.');
   }
 
-  const finderInput = inputById('finderTrayLength');
+  const finderInput = inputById('trayLength');
   const finderResult = byId('camperFinderResult');
+  let selectedCamperSlug = '';
+  const productFilled = new Set<string>();
 
   function modelLink(model: CamperModel) {
     const link = document.createElement('a');
@@ -427,11 +478,108 @@ const schema = [
     return modelsForTray(trayLength, camperModels).find((result) => result.verdict === 'best');
   }
 
+  function shortestStandardModel() {
+    return camperModels
+      .filter((model) => Number.isFinite(model.nominalLengthMm) && Number(model.nominalLengthMm) > 0)
+      .sort((a, b) => Number(a.nominalLengthMm) - Number(b.nominalLengthMm))[0];
+  }
+
+  function noStandardFitFor(trayLength: number) {
+    if (!Number.isFinite(trayLength) || trayLength <= 0 || bestModelForTray(trayLength)) return null;
+    const shortest = shortestStandardModel();
+    if (!shortest?.nominalLengthMm) return null;
+    return {
+      shortest,
+      shortfallMm: Math.max(0, shortest.nominalLengthMm - trayLength),
+    };
+  }
+
+  function customCamperStarted() {
+    return ['camperDry', 'camperWater', 'camperGear', 'camperOptions', 'requiredTrayLength', 'requiredTrayWidth']
+      .some((id) => Number(value(id)) > 0);
+  }
+
+  function automaticNoFitFor(trayLength: number) {
+    return customCamperStarted() ? null : noStandardFitFor(trayLength);
+  }
+
+  /**
+   * The enquiry link, carrying the answers the customer has already given so the
+   * form does not ask for them twice. Never requiredTrayLength, which is the
+   * camper's requirement rather than the tray they own, and never the prose
+   * fallbacks, which read as placeholder text in a structured field.
+   */
+  function enquiryUrl(message?: string) {
+    const params = new URLSearchParams({ intent: 'vehicle-suitability' });
+    if (message) {
+      params.set('message', message);
+      params.set('fit_check_summary', message);
+    }
+    const customerTrayLength = value('trayLength');
+    if (Number(customerTrayLength) > 0) params.set('tray_length', customerTrayLength);
+    const typedVehicle = value('vehicleName').trim();
+    if (typedVehicle) params.set('vehicle_make_model_year', typedVehicle);
+    // The catalogue only ever knows a tub, so it fills in where the customer has
+    // not answered rather than overriding them.
+    const trayType = value('trayType') || (selectedVariant?.trayState === 'not_applicable' ? 'Tub' : '');
+    if (trayType) params.set('tray_type', trayType);
+    const gvmUpgrade = value('gvmUpgrade');
+    if (gvmUpgrade) params.set('gvm_upgrade_status', gvmUpgrade);
+    return `/inquiry-form/?${params}`;
+  }
+
+  function customSolutionUrl(trayLength: number) {
+    const vehicleName = inputById('vehicleName')?.value || 'my vehicle';
+    const trayWidth = Number(value('trayWidth'));
+    const fit = noStandardFitFor(trayLength);
+    const dimensions = `${fmtMm(trayLength)} usable length${Number.isFinite(trayWidth) && trayWidth > 0 ? ` × ${fmtMm(trayWidth)} usable width` : ''}`;
+    const message = fit
+      ? `I would like help with a custom slide-on solution for ${vehicleName}. Its tub or tray has ${dimensions}. The shortest standard camper needs about ${fmtMm(fit.shortest.nominalLengthMm!)} (${fmtMm(fit.shortfallMm)} longer).`
+      : `I would like help finding a slide-on camper for ${vehicleName}.`;
+    return enquiryUrl(message);
+  }
+
+  function clearProductFields() {
+    productFilled.forEach((id) => {
+      const input = inputById(id);
+      if (input) input.value = '';
+    });
+    productFilled.clear();
+  }
+
+  function fillCamperFields(model: CamperModel) {
+    const setProductValue = (id: string, next: string | number | null | undefined) => {
+      const input = inputById(id);
+      if (!input || next === null || next === undefined || next === '') return;
+      input.value = String(next);
+      productFilled.add(id);
+    };
+    setProductValue('requiredTrayLength', model.nominalLengthMm);
+    setProductValue('requiredTrayWidth', model.requiredTrayWidthMm);
+    setProductValue('camperDry', model.dryWeightKg);
+  }
+
+  function syncCamperQuestions(trayLength: number) {
+    const noFit = Boolean(automaticNoFitFor(trayLength));
+    const dryField = byId('camperDryField') as HTMLElement | null;
+    const details = byId('camperDetails') as HTMLDetailsElement | null;
+    if (dryField) dryField.hidden = noFit;
+    if (details) {
+      details.hidden = noFit;
+      if (noFit) details.open = false;
+    }
+  }
+
   function renderModelMatch() {
     const output = byId('camperModelMatch');
     const trayLength = Number(value('trayLength'));
     if (!output) return 'Not calculated';
     output.replaceChildren();
+    const selected = camperModels.find((model) => model.slug === selectedCamperSlug);
+    if (selected) {
+      output.append(modelLink(selected));
+      return selected.name;
+    }
     if (!Number.isFinite(trayLength) || trayLength <= 0) {
       output.textContent = 'Enter tray length';
       return 'Not calculated';
@@ -448,6 +596,13 @@ const schema = [
   function renderFinder() {
     if (!finderResult || !finderInput) return;
     const trayLength = Number(finderInput.value);
+    const selectedResult = modelsForTray(trayLength, camperModels)
+      .find((result) => result.model.slug === selectedCamperSlug);
+    if (selectedCamperSlug && (!selectedResult || selectedResult.verdict === 'too_long' || selectedResult.verdict === 'unknown')) {
+      selectedCamperSlug = '';
+      clearProductFields();
+    }
+    syncCamperQuestions(trayLength);
     if (!Number.isFinite(trayLength) || trayLength <= 0) {
       finderResult.hidden = true;
       finderResult.replaceChildren();
@@ -457,9 +612,15 @@ const schema = [
     const results = modelsForTray(trayLength, camperModels);
     const best = bestModelForTray(trayLength);
     const also = results.filter((r) => r.verdict === 'also_suits');
-    const smaller = results.filter((r) => r.verdict === 'smaller');
-    const tooLong = results.filter((r) => r.verdict === 'too_long');
-    const unknown = results.filter((r) => r.verdict === 'unknown');
+
+    // The tray length has already made the choice. Applying the recorded
+    // product figures here avoids asking the customer to confirm the same
+    // match in a second control before useful results can appear.
+    if (best && !customCamperStarted() && selectedCamperSlug !== best.model.slug) {
+      clearProductFields();
+      selectedCamperSlug = best.model.slug;
+      fillCamperFields(best.model);
+    }
 
     finderResult.replaceChildren();
     finderResult.hidden = false;
@@ -469,35 +630,25 @@ const schema = [
     if (best) {
       const strong = document.createElement('strong');
       strong.appendChild(modelLink(best.model));
-      headline.append(strong, document.createTextNode(` — built for a ${best.model.nominalLengthMm} mm tray.`));
-      const choose = document.createElement('button');
-      choose.type = 'button';
-      choose.className = 'btn-ghost camper-finder-choose';
-      choose.dataset.testid = 'camper-finder-choose';
-      choose.textContent = 'Use available dimensions below';
-      choose.addEventListener('click', () => {
-        const required = inputById('requiredTrayLength');
-        const tray = inputById('trayLength');
-        if (required && best.model.nominalLengthMm) {
-          required.value = String(best.model.nominalLengthMm);
-          required.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-        if (tray && !tray.value) {
-          tray.value = String(trayLength);
-          tray.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-        byId('slideCalculator')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-      finderResult.append(headline, choose);
-    } else {
-      headline.textContent = 'No standard model is built for a tray this short. Beyond RV builds to order, so talk to us about your vehicle.';
+      headline.append(strong, document.createTextNode(` is the closest standard length match for a ${trayLength} mm tray.`));
       finderResult.append(headline);
+    } else {
+      const noFit = noStandardFitFor(trayLength);
+      if (!noFit) return;
+      headline.textContent = `No standard Beyond RV slide-on fits this ${fmtMm(trayLength)} tub or tray. Our shortest standard model, ${noFit.shortest.name}, needs about ${fmtMm(noFit.shortest.nominalLengthMm!)} — ${fmtMm(noFit.shortfallMm)} more.`;
+      const explanation = document.createElement('p');
+      explanation.className = 'camper-finder-note';
+      explanation.textContent = 'A custom build or a suitable replacement tray may be possible. Beyond RV needs to confirm it with you.';
+      const enquiry = document.createElement('a');
+      enquiry.className = 'btn-primary camper-finder-custom';
+      enquiry.dataset.testid = 'camper-finder-custom';
+      enquiry.href = customSolutionUrl(trayLength);
+      enquiry.textContent = 'Ask Beyond RV about a custom solution';
+      finderResult.append(headline, explanation, enquiry);
     }
 
-    // Two models within the build tolerance of each other are the same size
-    // decision, so say what actually differs.
-    // The early return above narrows finderResult, but that narrowing does not
-    // reach inside a nested function, so hold it in a local.
+    // Keep the shortlist short. A visitor checking a ute does not need a list
+    // of every larger camper that cannot fit it.
     const panel = finderResult;
     function listLine(testId: string, lead: string, entries: typeof also, tail = '.') {
       const line = document.createElement('p');
@@ -527,47 +678,6 @@ const schema = [
       if (oneSizeDown.length) {
         listLine('camper-finder-also', 'One size down, if you want more room around it: ', oneSizeDown);
       }
-    }
-
-    // Smaller campers do fit, they are just not what a tray this size calls for.
-    // Named quietly rather than offered as alternatives.
-    if (smaller.length) {
-      const line = document.createElement('p');
-      line.className = 'camper-finder-note';
-      line.dataset.testid = 'camper-finder-smaller';
-      line.append(document.createTextNode('Smaller campers fit too, if you want spare tray space: '));
-      smaller.forEach((r, index) => {
-        if (index > 0) line.append(document.createTextNode(', '));
-        line.append(modelLink(r.model));
-      });
-      line.append(document.createTextNode('.'));
-      finderResult.append(line);
-    }
-
-    if (tooLong.length) {
-      const line = document.createElement('p');
-      line.className = 'camper-finder-note';
-      line.dataset.testid = 'camper-finder-too-long';
-      line.append(document.createTextNode('Too long for this tray: '));
-      tooLong.forEach((r, index) => {
-        if (index > 0) line.append(document.createTextNode(', '));
-        line.append(modelLink(r.model));
-      });
-      line.append(document.createTextNode('.'));
-      finderResult.append(line);
-    }
-
-    if (unknown.length) {
-      const line = document.createElement('p');
-      line.className = 'camper-finder-note';
-      line.dataset.testid = 'camper-finder-unknown';
-      line.append(document.createTextNode('Made to order, talk to Beyond RV about: '));
-      unknown.forEach((r, index) => {
-        if (index > 0) line.append(document.createTextNode(', '));
-        line.append(modelLink(r.model));
-      });
-      line.append(document.createTextNode('.'));
-      finderResult.append(line);
     }
 
     const indicative = camperModels.some((model) => model.status !== 'confirmed');
@@ -604,6 +714,172 @@ const schema = [
   // The provenance panel has to be redrawn whenever what it claims stops being
   // true, which means keeping hold of the variant it is describing.
   let selectedVariant: CatalogueVariant | null = null;
+  let trayResearchRequest = 0;
+
+  function clearTrayResearch() {
+    trayResearchRequest += 1;
+    const panel = byId('trayResearch') as HTMLElement | null;
+    if (!panel) return;
+    panel.hidden = true;
+    panel.removeAttribute('data-state');
+    panel.replaceChildren();
+  }
+
+  function sourceLink(source: TrayResearchOption['source']) {
+    const link = document.createElement('a');
+    link.href = source.url;
+    link.textContent = source.title || 'View source';
+    link.target = '_blank';
+    link.rel = 'noopener';
+    return link;
+  }
+
+  function addMeasurementInstructions(panel: HTMLElement, steps: string[]) {
+    const heading = document.createElement('strong');
+    heading.textContent = 'Measure these two dimensions';
+    const list = document.createElement('ol');
+    for (const step of steps) {
+      const item = document.createElement('li');
+      item.textContent = step;
+      list.appendChild(item);
+    }
+    panel.append(heading, list);
+  }
+
+  function useResearchedDimensions(option: TrayResearchOption) {
+    const length = inputById('trayLength');
+    const width = inputById('trayWidth');
+    if (length) length.value = String(option.lengthMm);
+    if (width) width.value = String(option.widthMm);
+    customerEdited.delete('trayLength');
+    customerEdited.delete('trayWidth');
+    if (selectedVariant) renderProvenance(selectedVariant);
+    hasStarted = true;
+    renderFinder();
+    calculateSlideOn();
+
+    const panel = byId('trayResearch') as HTMLElement | null;
+    if (!panel) return;
+    panel.dataset.state = 'confirmed';
+    panel.replaceChildren();
+    const message = document.createElement('p');
+    message.append(
+      document.createTextNode(`${option.name}: ${option.lengthMm.toLocaleString()} mm long × ${option.widthMm.toLocaleString()} mm wide added. Confirmed from `),
+      sourceLink(option.source),
+      document.createTextNode('.'),
+    );
+    const change = document.createElement('button');
+    change.type = 'button';
+    change.className = 'tray-research-change';
+    change.textContent = 'That is not my tray or tub';
+    change.addEventListener('click', () => selectedVariant && researchTrayDimensions(selectedVariant, true));
+    panel.append(message, change);
+  }
+
+  function renderTrayResearch(result: TrayResearchResult) {
+    const panel = byId('trayResearch') as HTMLElement | null;
+    if (!panel) return;
+    panel.hidden = false;
+    panel.dataset.state = result.status;
+    panel.replaceChildren();
+
+    const heading = document.createElement('strong');
+    heading.textContent = result.status === 'multiple' ? 'Which tray or tub do you have?' : result.status === 'single' ? 'We found a likely match' : 'We could not verify the dimensions';
+    const message = document.createElement('p');
+    message.textContent = result.message;
+    panel.append(heading, message);
+
+    if (result.options.length) {
+      const choices = document.createElement('div');
+      choices.className = 'tray-research-choices';
+      for (const option of result.options) {
+        const choice = document.createElement('div');
+        choice.className = 'tray-research-choice';
+        const name = document.createElement('strong');
+        name.textContent = option.name;
+        const dimensions = document.createElement('span');
+        dimensions.textContent = `${option.lengthMm.toLocaleString()} mm long × ${option.widthMm.toLocaleString()} mm wide`;
+        const source = document.createElement('small');
+        source.append(document.createTextNode('Source: '), sourceLink(option.source));
+        const use = document.createElement('button');
+        use.type = 'button';
+        use.className = 'btn-ghost';
+        use.textContent = result.status === 'single' ? 'Yes, use these dimensions' : 'This is my tray or tub';
+        use.addEventListener('click', () => useResearchedDimensions(option));
+        choice.append(name, dimensions, source, use);
+        choices.appendChild(choice);
+      }
+      panel.appendChild(choices);
+      return;
+    }
+
+    addMeasurementInstructions(panel, result.measurementSteps);
+  }
+
+  async function researchTrayDimensions(variant: CatalogueVariant, forceInstructions = false) {
+    const panel = byId('trayResearch') as HTMLElement | null;
+    if (!panel) return;
+    if (variant.trayLengthMm && variant.trayWidthMm && !forceInstructions) {
+      panel.hidden = false;
+      panel.dataset.state = 'confirmed';
+      panel.replaceChildren();
+      const message = document.createElement('p');
+      message.append(
+        document.createTextNode(`Verified dimensions were added from `),
+        sourceLink(variant.source),
+        document.createTextNode('. Check that they match the vehicle in front of you.'),
+      );
+      panel.appendChild(message);
+      return;
+    }
+    if (forceInstructions) {
+      renderTrayResearch({
+        status: 'not_found', vehicleId: variant.id, vehicleLabel: variant.label,
+        message: 'No problem. Measure the tray or tub fitted to your vehicle instead.', options: [],
+        measurementSteps: [
+          'Measure the flat load-floor length from the front wall or headboard to the inside of the closed tailgate, or to the end of a tray.',
+          'Measure the narrowest flat usable width between wheel arches, rails, tie-downs or anything else that limits the camper.',
+          'Use millimetres and measure the vehicle as it is now. Do not use the vehicle’s overall exterior length or width.',
+        ],
+      });
+      return;
+    }
+
+    const request = ++trayResearchRequest;
+    panel.hidden = false;
+    panel.dataset.state = 'loading';
+    panel.replaceChildren();
+    const loading = document.createElement('strong');
+    loading.textContent = 'We’re finding the tub or tray dimensions for your vehicle…';
+    const detail = document.createElement('p');
+    detail.textContent = 'Checking manufacturer, tray-maker and reputable Australian fitment sources. This may take up to a minute.';
+    panel.append(loading, detail);
+
+    try {
+      const response = await fetch('/.netlify/functions/vehicle-dimension-research', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vehicleId: variant.id }),
+      });
+      if (request !== trayResearchRequest || selectedVariant?.id !== variant.id) return;
+      if (!response.ok) throw new Error(`Research request failed with ${response.status}`);
+      const result = await response.json() as TrayResearchResult;
+      if (result.vehicleId !== variant.id || !Array.isArray(result.options) || !Array.isArray(result.measurementSteps)) throw new Error('Invalid research response');
+      renderTrayResearch(result);
+    } catch (error) {
+      console.warn('Tray-dimension research was unavailable.', error);
+      if (request !== trayResearchRequest || selectedVariant?.id !== variant.id) return;
+      renderTrayResearch({
+        status: 'unavailable', vehicleId: variant.id, vehicleLabel: variant.label,
+        message: 'We could not complete the research just now. You can still enter two measurements yourself.', options: [],
+        measurementSteps: [
+          'Measure the flat load-floor length from the front wall or headboard to the inside of the closed tailgate, or to the end of a tray.',
+          'Measure the narrowest flat usable width between wheel arches, rails, tie-downs or anything else that limits the camper.',
+          'Use millimetres and measure the vehicle as it is now. Do not use the vehicle’s overall exterior length or width.',
+        ],
+      });
+    }
+  }
 
   // A tray size is not a property of the vehicle — it is fitted after purchase
   // and chosen by the buyer — so what is stored is what other owners reported,
@@ -884,6 +1160,7 @@ const schema = [
   }
 
   function resetVehicleSelection() {
+    clearTrayResearch();
     PREFILLABLE_FIELDS.forEach((id) => {
       if (customerEdited.has(id)) return;
       const input = inputById(id);
@@ -904,6 +1181,7 @@ const schema = [
       (panel as HTMLElement).hidden = true;
     }
     calculateSlideOn();
+    resetTrayReporting();
   }
 
   function applyVariant(variantId: string) {
@@ -936,10 +1214,13 @@ const schema = [
     }
     selectedVariant = variant;
     renderProvenance(variant);
-    // Picking a vehicle fills GVM and the current weight, which is exactly what
-    // the page asks for to produce the first payload result. Without this the
-    // customer saw their own figures in the form beside "Not calculated".
+    researchTrayDimensions(variant);
     hasStarted = true;
+    if (trayRequired) {
+      const details = byId('vehicleDetails') as HTMLDetailsElement | null;
+      if (details) details.open = true;
+    }
+    renderFinder();
     calculateSlideOn();
     resetTrayReporting();
     void loadReportedTraySizes().then(() => {
@@ -1042,19 +1323,36 @@ const schema = [
 
   fillSelect(selectById('vehicleMake'), catalogueMakes(catalogue), 'Select a make');
   type SlideOnResultValues = {
+    vehiclePayloadBeforeAdditions?: number;
+    additionalVehicleLoad?: number;
     availablePayloadBeforeCamper?: number;
     estimatedLoadedVehicleWeight?: number;
     remainingGvmMargin?: number;
     estimatedLoadedCamperWeight?: number;
     trayLengthFit?: number;
     trayWidthFit?: number;
+    trayLength?: number;
+    trayWidth?: number;
+    requiredTrayLength?: number;
+    requiredTrayWidth?: number;
   };
   const kgOrNotCalculated = (value?: number) => value === undefined ? 'Not calculated' : fmt(value);
-  const mmOrNotCalculated = (value?: number) => value === undefined ? 'Not calculated' : fmtMm(value);
+  const clearance = (value: number | undefined, dimension: string) => {
+    if (value === undefined) return 'Not calculated';
+    if (value === 0) return `Exact ${dimension} match`;
+    return value > 0 ? `${fmtMm(value)} spare` : `${fmtMm(Math.abs(value))} too short`;
+  };
 
   function setText(id: string, value: string) {
     const el = byId(id);
     if (el) el.textContent = value;
+  }
+
+  function setBreakdown(id: string, text: string | null) {
+    const el = byId(id) as HTMLElement | null;
+    if (!el) return;
+    el.hidden = !text;
+    el.textContent = text ?? '';
   }
 
   function setNotes(notes: string[]) {
@@ -1097,70 +1395,105 @@ const schema = [
       centreOfGravityChecked: inputById('centreOfGravityChecked')?.checked ?? false
     }, { started: hasStarted });
     const values: SlideOnResultValues = 'values' in result ? result.values : {};
+    const trayLength = Number(value('trayLength'));
+    const noFit = automaticNoFitFor(trayLength);
+    const displayedStatus = noFit ? 'red' : result.status;
+    const displayedStatusLabel = noFit ? 'No standard camper match' : result.statusLabel;
+    const displayedTitle = noFit ? 'No standard camper fits this tub or tray' : result.title;
+    const displayedSummary = noFit
+      ? `${fmtMm(trayLength)} usable length is ${fmtMm(noFit.shortfallMm)} shorter than our shortest standard camper, ${noFit.shortest.name}, which needs about ${fmtMm(noFit.shortest.nominalLengthMm!)}.`
+      : result.summary;
+    const displayedRecommendation = noFit
+      ? 'Ask Beyond RV about a custom solution or a suitable replacement tray.'
+      : result.recommendation;
+    const displayedDataQuality = noFit
+      ? `Tray is ${fmtMm(noFit.shortfallMm)} shorter than the shortest standard model`
+      : result.dataQuality;
+    const displayedNotes = noFit
+      ? [
+          `The shortest standard camper requires about ${fmtMm(noFit.shortest.nominalLengthMm!)}; this tub or tray is ${fmtMm(trayLength)}.`,
+          'A replacement tray or custom build needs Beyond RV confirmation.',
+        ]
+      : result.notes;
 
-    resultPanel?.setAttribute('data-status', result.status);
-    setText('statusLabel', result.statusLabel);
-    setText('resultTitle', result.title);
-    setText('resultSummary', result.summary);
+    resultPanel?.setAttribute('data-status', displayedStatus);
+    setText('statusLabel', displayedStatusLabel);
+    setText('resultTitle', displayedTitle);
+    setText('resultSummary', displayedSummary);
     setText('availablePayload', kgOrNotCalculated(values.availablePayloadBeforeCamper));
     setText('loadedWeight', kgOrNotCalculated(values.estimatedLoadedVehicleWeight));
     setText('gvmMargin', kgOrNotCalculated(values.remainingGvmMargin));
     setText('loadedCamper', kgOrNotCalculated(values.estimatedLoadedCamperWeight));
-    setText('trayLengthFit', mmOrNotCalculated(values.trayLengthFit));
-    setText('trayWidthFit', mmOrNotCalculated(values.trayWidthFit));
-    const camperModelMatch = renderModelMatch();
-    setText('dataQuality', result.dataQuality);
-    setText('recommendation', result.recommendation);
-    setNotes(result.notes);
+    setText('trayLengthFit', noFit ? `${fmtMm(noFit.shortfallMm)} short of shortest model` : clearance(values.trayLengthFit, 'length'));
+    setText('trayWidthFit', noFit ? 'Not needed — length does not fit' : clearance(values.trayWidthFit, 'width'));
+    setBreakdown('payloadBreakdown', values.vehiclePayloadBeforeAdditions !== undefined
+      && values.additionalVehicleLoad !== undefined
+      && values.availablePayloadBeforeCamper !== undefined
+      ? `${fmt(values.vehiclePayloadBeforeAdditions)} vehicle payload − ${fmt(values.additionalVehicleLoad)} people, accessories and vehicle gear = ${fmt(values.availablePayloadBeforeCamper)} remaining for the camper.`
+      : null);
+    const lengthBreakdown = values.trayLength !== undefined && values.requiredTrayLength !== undefined
+      ? `${fmtMm(values.trayLength)} usable − ${fmtMm(values.requiredTrayLength)} required = ${clearance(values.trayLengthFit, 'length').toLowerCase()}.`
+      : null;
+    const widthBreakdown = values.trayWidth !== undefined && values.requiredTrayWidth !== undefined
+      ? `${fmtMm(values.trayWidth)} usable − ${fmtMm(values.requiredTrayWidth)} required = ${clearance(values.trayWidthFit, 'width').toLowerCase()}.`
+      : null;
+    setBreakdown('dimensionBreakdown', noFit
+      ? `Standard camper fit: ${fmtMm(trayLength)} usable length; shortest standard model needs about ${fmtMm(noFit.shortest.nominalLengthMm!)}.`
+      : lengthBreakdown || widthBreakdown
+        ? `Tray fit: ${[lengthBreakdown, widthBreakdown].filter(Boolean).join(' Width: ')}`
+        : null);
+    const resultBreakdown = byId('resultBreakdown') as HTMLElement | null;
+    if (resultBreakdown) resultBreakdown.hidden = !(noFit || lengthBreakdown || widthBreakdown || values.vehiclePayloadBeforeAdditions !== undefined);
+    const camperModelMatch = noFit
+      ? `None — shortest needs ${fmtMm(noFit.shortest.nominalLengthMm!)}`
+      : renderModelMatch();
+    if (noFit) setText('camperModelMatch', camperModelMatch);
+    setText('dataQuality', displayedDataQuality);
+    setText('recommendation', displayedRecommendation);
+    setNotes(displayedNotes);
+
+    const announcement = byId('resultAnnouncement');
+    if (announcement) announcement.textContent = `${displayedStatusLabel}. ${displayedSummary}`;
+    const mobilePeek = byId('mobileResultPeek');
+    if (mobilePeek) (mobilePeek as HTMLElement).hidden = !hasStarted;
+    setText('mobileResultTitle', displayedStatusLabel);
+    const firstUsefulValue = values.remainingGvmMargin !== undefined
+      ? `${fmt(values.remainingGvmMargin)} GVM margin`
+      : values.availablePayloadBeforeCamper !== undefined
+        ? `${fmt(values.availablePayloadBeforeCamper)} available payload`
+        : values.estimatedLoadedCamperWeight !== undefined
+          ? `${fmt(values.estimatedLoadedCamperWeight)} loaded camper`
+          : 'View current result';
+    setText('mobileResultValue', firstUsefulValue);
 
     const message = [
       'Vehicle Suitability Checker result - slide-on camper',
       `Vehicle: ${vehicleName}`,
-      `Status: ${result.statusLabel}`,
-      `Available payload before camper: ${kgOrNotCalculated(values.availablePayloadBeforeCamper)}`,
+      `Status: ${displayedStatusLabel}`,
+      `Payload remaining for camper: ${kgOrNotCalculated(values.availablePayloadBeforeCamper)}`,
       `Estimated loaded vehicle weight: ${kgOrNotCalculated(values.estimatedLoadedVehicleWeight)}`,
       `Remaining GVM margin: ${kgOrNotCalculated(values.remainingGvmMargin)}`,
       `Estimated loaded camper weight: ${kgOrNotCalculated(values.estimatedLoadedCamperWeight)}`,
-      `Tray length fit: ${mmOrNotCalculated(values.trayLengthFit)}`,
-      `Tray width fit: ${mmOrNotCalculated(values.trayWidthFit)}`,
+      `Length clearance: ${clearance(values.trayLengthFit, 'length')}`,
+      `Width clearance: ${clearance(values.trayWidthFit, 'width')}`,
       `Tray-size model match: ${camperModelMatch}`,
-      `Data quality: ${result.dataQuality}`,
-      `Recommendation: ${result.recommendation}`
+      `Data quality: ${displayedDataQuality}`,
+      `Recommendation: ${displayedRecommendation}`
     ].join('\n');
     const send = byId('sendResult');
     if (send) {
-      const params = new URLSearchParams({ intent: 'vehicle-suitability', message, fit_check_summary: message });
-      // The customer's own tray: the detailed field, or the finder step above it
-      // when that is all they have filled in. Never requiredTrayLength, which is
-      // the camper's requirement rather than the tray they own.
-      const customerTrayLength = value('trayLength') || value('finderTrayLength');
-      if (Number(customerTrayLength) > 0) params.set('tray_length', customerTrayLength);
-      // What the customer typed, or what the picker filled in for them. Never the
-      // 'your vehicle' fallback the summary prose uses, which would arrive as
-      // literal placeholder text in a field meant to name a vehicle.
-      const typedVehicle = value('vehicleName').trim();
-      if (typedVehicle) params.set('vehicle_make_model_year', typedVehicle);
-      // A tub is the one tray type the catalogue actually knows, from the
-      // manufacturer's body type. A tray tells us nothing about steel, alloy or
-      // canopy, so that stays for the customer to answer. Read from the selected
-      // variant rather than the module-level trayState, which starts life as
-      // 'not_applicable' and would otherwise claim a tub before anyone picked a
-      // vehicle.
-      // What the customer answered wins. The catalogue only ever knows a tub, so
-      // it fills in when they have not answered rather than overriding them.
-      const trayType = value('trayType') || (selectedVariant?.trayState === 'not_applicable' ? 'Tub' : '');
-      if (trayType) params.set('tray_type', trayType);
-      const gvmUpgrade = value('gvmUpgrade');
-      if (gvmUpgrade) params.set('gvm_upgrade_status', gvmUpgrade);
-      send.setAttribute('href', `/inquiry-form/?${params}`);
+      send.textContent = noFit
+        ? 'Ask Beyond RV About a Custom Solution'
+        : hasStarted ? 'Continue to Enquiry With These Results' : 'Ask Beyond RV for Help';
+      send.setAttribute('href', noFit
+        ? customSolutionUrl(trayLength)
+        : hasStarted ? enquiryUrl(message) : enquiryUrl());
     }
   }
 
-  // Rebuild the enquiry link when either answer changes. Deliberately not in
-  // `fields`: neither affects the arithmetic, and answering one should not count
-  // as having started the estimate.
   ['trayType', 'gvmUpgrade'].forEach(id => byId(id)?.addEventListener('change', () => calculateSlideOn()));
   fields.forEach(id => byId(id)?.addEventListener('input', () => {
+    productFilled.delete(id);
     hasStarted = true;
     calculateSlideOn();
   }));

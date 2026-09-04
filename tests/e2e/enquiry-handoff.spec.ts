@@ -24,6 +24,20 @@ async function openWithFixture(page: Page) {
   await page.goto(calculatorPath);
 }
 
+/**
+ * GVM and the current weight sit inside a collapsed "vehicle details" section
+ * since the calculator was simplified to lead with tray dimensions. A customer
+ * usually never opens it, because picking a vehicle fills both.
+ */
+async function openVehicleDetails(page: Page) {
+  await openSection(page, 'vehicleDetails');
+}
+
+/** Expand one of the calculator's collapsed groups so its fields are reachable. */
+async function openSection(page: Page, id: string) {
+  await page.locator(`#${id}`).evaluate((el) => { (el as HTMLDetailsElement).open = true; });
+}
+
 /** The result link is rebuilt on every recalculation, so read it after filling. */
 async function sendHref(page: Page) {
   const href = await page.getAttribute('#sendResult', 'href');
@@ -32,6 +46,7 @@ async function sendHref(page: Page) {
 
 test('the tray length the customer entered travels to the enquiry form', async ({ page }) => {
   await page.goto(calculatorPath);
+  await openVehicleDetails(page);
   await page.fill('#gvm', '3500');
   await page.fill('#trayLength', '2300');
 
@@ -41,10 +56,11 @@ test('the tray length the customer entered travels to the enquiry form', async (
   expect(url.searchParams.get('fit_check_summary')).toContain('Vehicle Suitability Checker result');
 });
 
-test('the finder tray length is used when the detailed field is empty', async ({ page }) => {
+test('the tray length travels without any weight being entered', async ({ page }) => {
+  // The redesign leads with tray dimensions, so this is the common path: a
+  // customer gives their tray size and nothing else.
   await page.goto(calculatorPath);
-  await page.fill('#finderTrayLength', '2450');
-  await page.fill('#gvm', '3500');
+  await page.fill('#trayLength', '2450');
 
   const url = await sendHref(page);
   expect(url.searchParams.get('tray_length')).toBe('2450');
@@ -52,6 +68,7 @@ test('the finder tray length is used when the detailed field is empty', async ({
 
 test('no tray length is sent when the customer has not given one', async ({ page }) => {
   await page.goto(calculatorPath);
+  await openVehicleDetails(page);
   await page.fill('#gvm', '3500');
 
   const url = await sendHref(page);
@@ -63,8 +80,10 @@ test('no tray length is sent when the customer has not given one', async ({ page
 
 test('the camper requirement is never sent as the customer tray length', async ({ page }) => {
   await page.goto(calculatorPath);
+  await openVehicleDetails(page);
   await page.fill('#gvm', '3500');
   // requiredTrayLength is the length the camper needs, not the tray they own.
+  await openSection(page, 'camperDetails');
   await page.fill('#requiredTrayLength', '2100');
 
   const url = await sendHref(page);
@@ -78,6 +97,7 @@ test('the enquiry form fills its tray length from the parameter', async ({ page 
 
 test('the vehicle the customer named travels to the enquiry form', async ({ page }) => {
   await page.goto(calculatorPath);
+  await openVehicleDetails(page);
   await page.fill('#gvm', '3500');
   await page.fill('#vehicleName', '2022 Ford Ranger Wildtrak');
 
@@ -87,6 +107,7 @@ test('the vehicle the customer named travels to the enquiry form', async ({ page
 
 test('the placeholder the summary uses is never sent as the vehicle', async ({ page }) => {
   await page.goto(calculatorPath);
+  await openVehicleDetails(page);
   await page.fill('#gvm', '3500');
 
   const url = await sendHref(page);
@@ -121,6 +142,7 @@ test('a cab chassis sends no tray type, because a tray is not a tub', async ({ p
 
 test('no vehicle chosen means no tray type, despite the default state', async ({ page }) => {
   await openWithFixture(page);
+  await openVehicleDetails(page);
   await page.fill('#gvm', '3500');
 
   const url = await sendHref(page);
@@ -177,6 +199,7 @@ test('the towing calculator never sends its prose placeholder as the vehicle', a
 
 test('the answers to the two new questions travel from the slide-on calculator', async ({ page }) => {
   await page.goto(calculatorPath);
+  await openVehicleDetails(page);
   await page.fill('#gvm', '3500');
   await page.selectOption('#trayType', 'Alloy tray');
   await page.selectOption('#gvmUpgrade', 'Yes');
@@ -202,6 +225,7 @@ test('the customer answer beats the catalogue guess about the tray', async ({ pa
 
 test('neither new answer is sent until the customer gives one', async ({ page }) => {
   await page.goto(calculatorPath);
+  await openVehicleDetails(page);
   await page.fill('#gvm', '3500');
 
   const url = await sendHref(page);

@@ -44,13 +44,13 @@ test('a slide-on product links directly to the payload calculator', async ({ pag
     .toHaveAttribute('href', '/slide-on-camper-weight-calculator/');
 });
 
-test('the calculator exposes its first input in the initial desktop viewport', async ({ page }) => {
+test('the calculator exposes its first control in the initial desktop viewport', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/slide-on-camper-weight-calculator/');
 
-  const firstInput = page.locator('#finderTrayLength');
-  await expect(firstInput).toBeVisible();
-  const box = await firstInput.boundingBox();
+  const firstControl = page.locator('#vehicleMake');
+  await expect(firstControl).toBeVisible();
+  const box = await firstControl.boundingBox();
   expect(box).not.toBeNull();
   expect(box!.y + box!.height).toBeLessThanOrEqual(900);
 });

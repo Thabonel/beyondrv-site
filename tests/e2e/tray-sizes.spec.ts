@@ -89,6 +89,12 @@ test('the result is recalculated once the reported size arrives', async ({ page 
   stubTraySizes(page, { reported: REPORTED, delayMs: 600 });
   await openCalculator(page);
 
+  // The calculator groups the weight and camper fields behind collapsed
+  // sections, so expand them before filling.
+  for (const section of ['vehicleDetails', 'camperDetails', 'loadDetails', 'safetyDetails']) {
+    await page.locator(`#${section}`).evaluate((el) => { (el as HTMLDetailsElement).open = true; });
+  }
+
   // Every required field must be present or the calculator short-circuits to
   // its missing-field path and reports no fit at all.
   for (const [id, v] of [['gvm', '5000'], ['passengers', '1'], ['accessories', '1'], ['luggageGear', '1'],
