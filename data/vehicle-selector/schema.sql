@@ -175,3 +175,55 @@ SELECT
   s.accessed_date AS source_accessed_date
 FROM heavy_overland_chassis h
 JOIN sources s ON s.id = h.source_id;
+
+-- Aftermarket tray dimensions, published by tray manufacturers.
+--
+-- These exist because a cab chassis leaves the factory without a tray, so the
+-- vehicle specification cannot say how long the load floor is. Tray makers build
+-- to a small number of standard sizes per cab configuration, which is what makes
+-- this table small enough to maintain.
+--
+-- dimension_basis is NOT NULL on purpose. Norweld publishes OUTSIDE dimensions,
+-- headboard front to tray rear; the calculator asks the customer for the USABLE
+-- flat floor. Those differ by the headboard and rear frame, and the camper model
+-- finder matches within 50mm, so a figure whose basis is unknown cannot be used
+-- and must not be stored as though it were.
+CREATE TABLE IF NOT EXISTS tray_specifications (
+  id TEXT PRIMARY KEY,
+  manufacturer TEXT NOT NULL,
+  tray_model TEXT NOT NULL,
+  vehicle_make TEXT,
+  vehicle_model TEXT,
+  cab_type TEXT NOT NULL CHECK (cab_type IN ('single', 'extra', 'dual', 'crew', 'any')),
+  fits_note TEXT,
+  length_mm INTEGER NOT NULL,
+  width_mm INTEGER NOT NULL,
+  height_mm INTEGER,
+  dimension_basis TEXT NOT NULL CHECK (dimension_basis IN ('outside', 'usable')),
+  dimension_basis_quote TEXT NOT NULL,
+  source_id TEXT NOT NULL REFERENCES sources(id),
+  source_locator TEXT NOT NULL,
+  verification_status TEXT NOT NULL
+    CHECK (verification_status IN ('source_verified', 'needs_secondary_review')),
+  customer_selectable INTEGER NOT NULL DEFAULT 0 CHECK (customer_selectable IN (0, 1)),
+  notes TEXT,
+  CHECK (length_mm > 0 AND length_mm < 5000),
+  CHECK (width_mm > 0 AND width_mm < 3000),
+  CHECK (height_mm IS NULL OR (height_mm > 0 AND height_mm < 2000))
+);
+
+CREATE INDEX IF NOT EXISTS tray_specification_vehicle_idx
+  ON tray_specifications (vehicle_make, vehicle_model, cab_type);
+
+-- A tray is only offered to a customer as a starting point they confirm, so the
+-- view marks which rows can be offered as a usable floor length without any
+-- further judgement: the ones whose basis is already usable.
+CREATE VIEW IF NOT EXISTS tray_specification_quality AS
+SELECT
+  t.*,
+  CASE WHEN t.dimension_basis = 'usable' THEN 1 ELSE 0 END AS usable_length_directly_known,
+  CASE
+    WHEN t.vehicle_make IS NOT NULL AND t.vehicle_model IS NOT NULL THEN 'vehicle'
+    ELSE 'class'
+  END AS mapping_kind
+FROM tray_specifications t;
