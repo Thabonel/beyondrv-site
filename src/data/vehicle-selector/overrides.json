@@ -451,6 +451,30 @@
       "approvedAt": "2026-09-01"
     },
     {
+      "id": "isuzu-nps-75-45-155-4x4-crew-amt",
+      "reason": "Published on the owner instruction, overriding the PRELIMINARY ONLY watermark on specification sheet ARK 1443 10/21. Figures are read from that sheet and reconcile; a Next Gen N Series revision may supersede them. Beyond RV weighs the vehicle at the factory before build.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-04"
+    },
+    {
+      "id": "isuzu-nps-75-45-155-4x4-crew-mt",
+      "reason": "Published on the owner instruction, overriding the PRELIMINARY ONLY watermark on specification sheet ARK 1443 10/21. Figures are read from that sheet and reconcile; a Next Gen N Series revision may supersede them. Beyond RV weighs the vehicle at the factory before build.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-04"
+    },
+    {
+      "id": "isuzu-nps-75-45-155-4x4-single-amt",
+      "reason": "Published on the owner instruction, overriding the PRELIMINARY ONLY watermark on specification sheet ARK 1443 10/21. Figures are read from that sheet and reconcile; a Next Gen N Series revision may supersede them. Beyond RV weighs the vehicle at the factory before build.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-04"
+    },
+    {
+      "id": "isuzu-nps-75-45-155-4x4-single-mt",
+      "reason": "Published on the owner instruction, overriding the PRELIMINARY ONLY watermark on specification sheet ARK 1443 10/21. Figures are read from that sheet and reconcile; a Next Gen N Series revision may supersede them. Beyond RV weighs the vehicle at the factory before build.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-04"
+    },
+    {
       "id": "kgm-musso-my26-advance-double-cab-tub",
       "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
       "reviewer": "Thabo Nel",

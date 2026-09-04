@@ -3521,7 +3521,7 @@
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
       "platform": "truck",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Isuzu Trucks",
         "title": "Isuzu N Series NPS 75/45-155 4X4 and NPS 75/45-155 4X4 Crew specification sheet (ARK 1443 10/21)",
@@ -3542,7 +3542,7 @@
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
       "platform": "truck",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Isuzu Trucks",
         "title": "Isuzu N Series NPS 75/45-155 4X4 and NPS 75/45-155 4X4 Crew specification sheet (ARK 1443 10/21)",
@@ -3563,7 +3563,7 @@
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
       "platform": "truck",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Isuzu Trucks",
         "title": "Isuzu N Series NPS 75/45-155 4X4 and NPS 75/45-155 4X4 Crew specification sheet (ARK 1443 10/21)",
@@ -3584,7 +3584,7 @@
       "trayWidthMm": null,
       "verificationStatus": "needs_secondary_review",
       "platform": "truck",
-      "published": false,
+      "published": true,
       "source": {
         "manufacturer": "Isuzu Trucks",
         "title": "Isuzu N Series NPS 75/45-155 4X4 and NPS 75/45-155 4X4 Crew specification sheet (ARK 1443 10/21)",
