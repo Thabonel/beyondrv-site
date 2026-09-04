@@ -84,3 +84,26 @@ test('variants separated only by their payload rating say so, rather than showin
   assert.ok(labels.some((l) => l.includes('910 kg payload')), labels.join(' | '));
   assert.ok(labels.every((l) => !l.includes('[')), labels.join(' | '));
 });
+
+test('a grade the model already states is not repeated', () => {
+  const [label] = buildVariantLabels([
+    row({ id: 'a', model: 'Ranger Super Duty', grade: 'Super Duty' }),
+  ]);
+  assert.ok(label.includes('Ranger Super Duty'), label);
+  assert.ok(!label.includes('Super Duty Super Duty'), label);
+});
+
+test('a grade that only shares a word with the model is still shown', () => {
+  const [label] = buildVariantLabels([
+    row({ id: 'a', model: 'Ranger Super Duty', grade: 'Super' }),
+  ]);
+  assert.ok(label.includes('Ranger Super Duty Super'), label);
+});
+
+test('dropping a repeated grade never merges two distinct variants', () => {
+  const labels = buildVariantLabels([
+    row({ id: 'a', model: 'Ranger Super Duty', grade: 'Super Duty' }),
+    row({ id: 'b', model: 'Ranger Super Duty', grade: 'XLT' }),
+  ]);
+  assert.equal(new Set(labels).size, 2, `labels collided: ${labels.join(' | ')}`);
+});

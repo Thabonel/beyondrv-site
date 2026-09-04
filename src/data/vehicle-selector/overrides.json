@@ -998,6 +998,24 @@
       "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
       "reviewer": "Thabo Nel",
       "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-super-duty-my26-super-cab-cc",
+      "reason": "Published on the owner instruction alongside the single cab. Kerb and payload come from the official Ranger Super Duty 2026.50MY specification sheet Vehicle Masses table, and reconcile exactly against GVM.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-04"
+    },
+    {
+      "id": "ford-ranger-super-duty-my26-double-cab-cc",
+      "reason": "Published on the owner instruction alongside the single cab. Kerb and payload come from the official Ranger Super Duty 2026.50MY specification sheet Vehicle Masses table, and reconcile exactly against GVM.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-04"
+    },
+    {
+      "id": "ford-ranger-super-duty-my26-double-cab-tub",
+      "reason": "Published on the owner instruction alongside the single cab. Factory tub, so the calculator tells the customer a slide-on needs a tray fitted. Kerb and payload come from the official Ranger Super Duty 2026.50MY specification sheet Vehicle Masses table.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-04"
     }
   ],
   "hide": [],
