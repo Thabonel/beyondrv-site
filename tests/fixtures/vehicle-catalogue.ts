@@ -25,7 +25,7 @@ export const vehicleCatalogueFixture: VehicleCatalogue = {
       gvmKg: 3250, kerbKg: 2046, kerbBasis: 'Kerb weight with heaviest factory optional equipment; excludes tray body',
       payloadKg: 1204, frontGawrKg: 1450, rearGawrKg: 1959,
       trayLengthMm: null, trayWidthMm: null, trayState: 'excluded', trayMassKg: null,
-      promotedByOverride: false, publication: reviewedPublication,
+      platform: 'ute' as const, maxBodyLengthMm: null, kerbIsOptimistic: false, correctedFields: [], promotedByOverride: false, publication: reviewedPublication,
       source: {
         manufacturer: 'Ford Australia', title: 'Next-Generation Ranger 2022MY Specifications',
         url: 'https://www.ford.com.au/ranger/specifications', accessedDate: '2026-08-17',
@@ -40,7 +40,7 @@ export const vehicleCatalogueFixture: VehicleCatalogue = {
       gvmKg: 3250, kerbKg: 2072, kerbBasis: 'Kerb weight with heaviest factory optional equipment; excludes tray body',
       payloadKg: 1178, frontGawrKg: 1450, rearGawrKg: 1959,
       trayLengthMm: null, trayWidthMm: null, trayState: 'excluded', trayMassKg: null,
-      promotedByOverride: false, publication: reviewedPublication,
+      platform: 'ute' as const, maxBodyLengthMm: null, kerbIsOptimistic: false, correctedFields: [], promotedByOverride: false, publication: reviewedPublication,
       source: {
         manufacturer: 'Ford Australia', title: 'Next-Generation Ranger 2022MY Specifications',
         url: 'https://www.ford.com.au/ranger/specifications', accessedDate: '2026-08-17',
@@ -55,7 +55,7 @@ export const vehicleCatalogueFixture: VehicleCatalogue = {
       gvmKg: 3250, kerbKg: 2201, kerbBasis: 'Kerb weight with heaviest factory optional equipment',
       payloadKg: 1049, frontGawrKg: 1450, rearGawrKg: 1959,
       trayLengthMm: null, trayWidthMm: null, trayState: 'not_applicable', trayMassKg: null,
-      promotedByOverride: false, publication: reviewedPublication,
+      platform: 'ute' as const, maxBodyLengthMm: null, kerbIsOptimistic: false, correctedFields: [], promotedByOverride: false, publication: reviewedPublication,
       source: {
         manufacturer: 'Ford Australia', title: 'Next-Generation Ranger 2022MY Specifications',
         url: 'https://www.ford.com.au/ranger/specifications', accessedDate: '2026-08-17',
@@ -68,7 +68,7 @@ export const vehicleCatalogueFixture: VehicleCatalogue = {
       transmission: 'automatic', wheelbaseMm: null, label: 'Mazda BT-50 GT dual cab cab chassis 4x4 (2025)',
       gvmKg: 3100, kerbKg: 2073, kerbBasis: 'Kerb weight with Mazda standard tray fitted', payloadKg: 1027,
       frontGawrKg: 1450, rearGawrKg: 1910, trayLengthMm: null, trayWidthMm: null,
-      trayState: 'included', trayMassKg: null, promotedByOverride: false, publication: reviewedPublication,
+      trayState: 'included', trayMassKg: null, platform: 'ute' as const, maxBodyLengthMm: null, kerbIsOptimistic: false, correctedFields: [], promotedByOverride: false, publication: reviewedPublication,
       source: {
         manufacturer: 'Mazda Australia', title: 'Mazda BT-50 Payload Calculator',
         url: 'https://www.mazda.com.au/cars/bt-50/payload/', accessedDate: '2026-08-17',
@@ -81,7 +81,7 @@ export const vehicleCatalogueFixture: VehicleCatalogue = {
       transmission: 'automatic', wheelbaseMm: null, label: 'Mazda BT-50 GT dual cab pickup tub 4x4 (2025)',
       gvmKg: 3100, kerbKg: 2102, kerbBasis: 'Published kerb weight; tub body', payloadKg: 998,
       frontGawrKg: 1450, rearGawrKg: 1910, trayLengthMm: null, trayWidthMm: null,
-      trayState: 'not_applicable', trayMassKg: null, promotedByOverride: false, publication: reviewedPublication,
+      trayState: 'not_applicable', trayMassKg: null, platform: 'ute' as const, maxBodyLengthMm: null, kerbIsOptimistic: false, correctedFields: [], promotedByOverride: false, publication: reviewedPublication,
       source: {
         manufacturer: 'Mazda Australia', title: 'Mazda BT-50 Payload Calculator',
         url: 'https://www.mazda.com.au/cars/bt-50/payload/', accessedDate: '2026-08-17',

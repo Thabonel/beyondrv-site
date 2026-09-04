@@ -7,7 +7,7 @@ priceBadge: BUILD TO ORDER
 status: available
 onlinePurchaseEnabled: true
 onSale: false
-featured: true
+featured: false
 heroImage: /images/optimized/products/advent-2150-hardtop-slide-on/01-advent-2150-hardtop-slide-on-hero.webp
 gallery:
   - /images/optimized/products/advent-2150-hardtop-slide-on/02-20250801-114510.webp
@@ -146,11 +146,12 @@ availability: made_to_order
 purchasableOnline: true
 depositEnabled: true
 fullPaymentEnabled: true
-sourceType: china_container
+sourceType: other
 leadTimeText: Made to order. Once the deposit is paid, production starts in China. The camper is then shipped to our Mutdapilly factory for local finishing, certification and handover preparation.
 containerEligible: true
 suitabilityData:
-  status: draft
+  status: target
+  requiredTrayLengthMm: "2150"
 ---
 
 The **Advent 2150** is built to order for owners who want a compact hardtop slide-on camper matched to a serious 4x4 ute. Once the deposit is paid, production starts in China before the camper is shipped to our Mutdapilly factory for local finishing, certification and handover preparation.

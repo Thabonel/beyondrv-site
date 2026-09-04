@@ -138,6 +138,9 @@ youtubeVideo:
   description: "Video walkthrough for the Beyond RV 7ft electric pop-top ute camper."
 seoTitle: "7ft Electric Pop-Top Slide-On Camper | Beyond RV"
 seoDesc: "Beyond RV 7ft electric pop-top slide-on camper for single cab ute platforms."
+suitabilityData:
+  status: target
+  requiredTrayLengthMm: "2120"
 ---
 
 The **7ft Electric Pop-Top Slide-On** is built to order for single cab ute owners who want a lower travel profile with standing room once camped. Once the deposit is paid, production starts in China before the camper is shipped to our Mutdapilly factory for local finishing, certification and handover preparation.

@@ -56,7 +56,7 @@ specGroups:
       - label: Overall size
         value: 4410mm x 2050mm x 2000mm (L x W x H)
       - label: Base
-        value: 2450mm x 2050mm base with north-south cabover sleeping area
+        value: 2450mm x 2000mm base with north-south cabover sleeping area
       - label: Roof
         value: Hardtop
   - group: Build and Construction
@@ -158,7 +158,8 @@ sourceType: china_container
 leadTimeText: Made to order. Once the deposit is paid, production starts in China. The camper is then shipped to our Mutdapilly factory for local finishing, certification and handover preparation.
 containerEligible: true
 suitabilityData:
-  status: draft
+  status: target
+  requiredTrayLengthMm: "2450"
 ---
 
 The **Advent 2450** remains part of the ute slide-on range as a build-to-order model. It is designed for single cab utes. Once the deposit is paid, production starts in China before the camper is shipped to our Mutdapilly factory for local finishing, certification and handover preparation.

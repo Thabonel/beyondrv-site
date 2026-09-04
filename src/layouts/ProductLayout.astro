@@ -302,6 +302,9 @@ const schemas = [primarySchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : 
         data-deposit-percent={configuredDepositPercent}
         data-selected-extra-ids=""
       >
+        {data.category === 'slide-on' && (
+          <a href="/slide-on-camper-weight-calculator/" class="btn-ghost">Check Ute Fit &amp; Payload</a>
+        )}
         {canDeposit || canFullPayment ? (
           <>
             {canDeposit && (

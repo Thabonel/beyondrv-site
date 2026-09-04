@@ -1,7 +1,7 @@
 ---
 title: 4.7m Hardtop Truck Camper
 category: expedition
-tagline: Premier couples truck camper for single cab truck or Unimog platforms.
+tagline: Premier couples truck camper for single cab trucks, adaptable to a Unimog.
 price: From $98,000
 status: available
 onSale: false
@@ -31,7 +31,7 @@ keySpecs:
   - label: Roof
     value: Hardtop
   - label: Platform
-    value: Single cab truck or Unimog
+    value: Single cab truck, or adapted to suit a Unimog
 specGroups:
   - group: "Dimensions"
     items:
@@ -132,9 +132,10 @@ youtubeVideo:
   description: Video walkthrough for the Beyond RV 4.7m truck camper and Mercedes Sprinter motorhome.
   startSeconds: 9
 seoTitle: 4.7m Hardtop Truck Camper | Beyond RV
-seoDesc: Beyond RV 4.7m hardtop couples truck camper for single cab truck and Unimog platforms, priced from $98,000.
+seoDesc: Beyond RV 4.7m hardtop couples truck camper for single cab trucks, adaptable to suit a Unimog, priced from $98,000.
 suitabilityData:
-  status: draft
+  status: target
+  requiredTrayLengthMm: "4700"
 ---
 
 The **4.7m Hardtop Truck Camper** is the premier Beyond RV truck camper option for couples. It can be built for single cab truck platforms or adapted to suit a Unimog, with 2.2m and 2.4m wide configurations available.

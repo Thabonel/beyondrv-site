@@ -5,6 +5,7 @@ export type PublicationOverride = {
   reason: string;
   reviewer: string;
   approvedAt: string;
+  correctedFields?: ['payloadKg'];
 };
 
 export type CatalogueOverrides = { show: PublicationOverride[]; hide: string[] };
@@ -52,6 +53,7 @@ export function validateCatalogueOverrides(value: unknown): { valid: boolean; er
     const reason = typeof record.reason === 'string' ? record.reason.trim() : '';
     const reviewer = typeof record.reviewer === 'string' ? record.reviewer.trim() : '';
     const approvedAt = typeof record.approvedAt === 'string' ? record.approvedAt.trim() : '';
+    const correctedFields = record.correctedFields;
     if (!id) errors.push(`Catalogue overrides show[${index}].id is required.`);
     if (!reason) errors.push(`Catalogue overrides show[${index}].reason is required.`);
     if (!reviewer) errors.push(`Catalogue overrides show[${index}].reviewer is required.`);
@@ -59,8 +61,14 @@ export function validateCatalogueOverrides(value: unknown): { valid: boolean; er
     if (reason.length > 500) errors.push(`Catalogue overrides show[${index}].reason must be at most 500 characters.`);
     if (reviewer.length > 120) errors.push(`Catalogue overrides show[${index}].reviewer must be at most 120 characters.`);
     if (!isIsoDate(approvedAt)) errors.push(`Catalogue overrides show[${index}].approvedAt must be a real YYYY-MM-DD date.`);
+    if (correctedFields !== undefined
+      && (!Array.isArray(correctedFields) || correctedFields.length !== 1 || correctedFields[0] !== 'payloadKg')) {
+      errors.push(`Catalogue overrides show[${index}].correctedFields may only be ["payloadKg"].`);
+    }
     if (id && id.length <= 240 && reason && reason.length <= 500 && reviewer && reviewer.length <= 120 && isIsoDate(approvedAt)) {
-      normalizedShow.push({ id, reason, reviewer, approvedAt });
+      const normalized: PublicationOverride = { id, reason, reviewer, approvedAt };
+      if (correctedFields) normalized.correctedFields = ['payloadKg'];
+      normalizedShow.push(normalized);
     }
   }
 
@@ -93,9 +101,13 @@ export function deriveTrayState(kerbMassBasis: string | null, bodyType: string):
 export function isPromoted(
   row: CataloguePromotionRow,
   overrides: CatalogueOverrides,
+  reviewedIds: ReadonlySet<string> = new Set(),
 ): boolean {
   if (overrides.hide.includes(row.id)) return false;
   if (overrides.show.some((entry) => entry.id === row.id)) return true;
+  // An approval recorded in reviews.json is a real review, unlike a show
+  // override, which is the escape hatch that skips every check above.
+  if (reviewedIds.has(row.id)) return true;
   return row.customer_selectable === 1
     && row.latest_review_id !== null
     && row.latest_review_decision === 'approved';

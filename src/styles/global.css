@@ -250,6 +250,9 @@ nav.scrolled {
   padding-top: var(--nav-height);
 }
 .page-hero--short { min-height: 35vh; }
+.page-hero--calculator { min-height: 28vh; }
+.page-hero--calculator .page-hero-content { padding-bottom: 2rem; }
+.page-hero--calculator .hero-title { font-size: clamp(3.4rem, 6vw, 5.4rem); }
 .page-hero-bg {
   position: absolute; inset: 0;
   background-size: cover; background-position: center; background-repeat: no-repeat;
@@ -277,6 +280,8 @@ nav.scrolled {
   transition: all 0.25s;
 }
 .btn-ghost:hover { border-color: var(--orange); color: var(--orange); }
+.camper-finder-choose { background: var(--cream); color: var(--dark); }
+.camper-finder-choose:hover { color: var(--orange); }
 
 /* ─── BADGES ─── */
 .badge {
@@ -406,8 +411,11 @@ nav.scrolled {
 }
 .model-card-content {
   position: absolute; bottom: 0; left: 0; right: 0;
-  padding: 2rem;
+  z-index: 3; padding: 2rem;
+  pointer-events: none;
 }
+.model-card-content a { pointer-events: auto; }
+.model-card-hitarea { position: absolute; inset: 0; z-index: 2; }
 .model-tag {
   display: inline-block;
   background: var(--orange-button); color: var(--white);
@@ -428,6 +436,20 @@ nav.scrolled {
   transition: opacity 0.3s, transform 0.3s;
 }
 .model-card:hover .model-link { opacity: 1; transform: translateY(0); }
+.model-card-actions {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 0.9rem;
+}
+.model-fit-link {
+  display: inline-flex;
+  padding: 0.7rem 1rem;
+  background: var(--orange-button); color: var(--white);
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.07em; line-height: 1.2;
+  text-decoration: none; text-transform: uppercase;
+  clip-path: polygon(7px 0%, 100% 0%, calc(100% - 7px) 100%, 0% 100%);
+}
+.model-fit-link:hover { background: var(--orange); }
+.model-card-hitarea:focus-visible,
+.model-fit-link:focus-visible { outline: 2px solid var(--white); outline-offset: -4px; }
 .model-card.featured { grid-column: span 2; aspect-ratio: 21/9; }
 
 /* ─── PRODUCT GRID (category listings) ─── */
@@ -1572,6 +1594,28 @@ nav.scrolled {
 }
 .checker-form .form-field { margin-bottom: 0; }
 .checker-form .form-field--full { grid-column: 1 / -1; }
+.form-section-heading {
+  margin-top: 0.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+.form-section-heading:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.form-section-heading h2 {
+  margin: 0 0 0.35rem;
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: 1.65rem;
+}
+.form-section-heading p { margin: 0; color: var(--muted); font-size: 0.86rem; line-height: 1.55; }
+.tool-links { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+.range-calculator-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-top: 2rem;
+}
+.range-calculator-link p { margin: 0; color: var(--muted); }
 .form-help {
   display: block;
   margin-top: 0.35rem;
@@ -2350,6 +2394,9 @@ footer {
   .nav-hamburger { display: flex; }
 }
 @media (max-width: 768px) {
+  .page-hero--calculator { min-height: 24vh; }
+  .page-hero--calculator .page-hero-content { padding-bottom: 1.5rem; }
+  .page-hero--calculator .hero-title { font-size: clamp(3rem, 15vw, 4.5rem); }
   .checker-form { grid-template-columns: 1fr; }
   .vehicle-picker { grid-template-columns: 1fr; }
   .checker-panel,
@@ -2364,6 +2411,7 @@ footer {
   .gallery-strip { height: 240px; }
   .footer-grid { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
+  .range-calculator-link { align-items: flex-start; flex-direction: column; }
   .not-found-section { flex-direction: column; }
   .not-found-image { max-width: 100%; }
   .key-specs { grid-template-columns: 1fr; }
@@ -2894,3 +2942,6 @@ footer {
   .cart-shipping-field { max-width: none; }
   .cart-shipping-submit { width: 100%; }
 }
+.vehicle-picker[hidden] { display: none; }
+#vehiclePickerUnavailable[hidden] { display: none; }
+#vehiclePickerHelp[hidden] { display: none; }

@@ -13,6 +13,17 @@ export type CataloguePublication = {
   method: 'review' | 'override';
 };
 
+/**
+ * Figures Beyond RV corrected during review. Anything listed here did not come
+ * from the manufacturer source, so the provenance panel must not credit it to
+ * them. payloadKg appears because it is derived from GVM and kerb mass.
+ */
+export const CORRECTABLE_CATALOGUE_FIELDS = ['gvmKg', 'kerbKg', 'payloadKg', 'trayLengthMm', 'trayWidthMm'] as const;
+export type CorrectableCatalogueField = typeof CORRECTABLE_CATALOGUE_FIELDS[number];
+
+export const CATALOGUE_PLATFORMS = ['ute', 'truck'] as const;
+export type CataloguePlatform = typeof CATALOGUE_PLATFORMS[number];
+
 export type CatalogueVariant = {
   id: string;
   make: string;
@@ -36,6 +47,16 @@ export type CatalogueVariant = {
   trayWidthMm: number | null;
   trayState: TrayState;
   trayMassKg: number | null;
+  platform: CataloguePlatform;
+  /**
+   * The stored kerb mass is the manufacturer's lightest-equipment figure, which
+   * yields the largest payload. Disclosed to the customer, because the error
+   * runs toward more headroom than the vehicle actually has.
+   */
+  kerbIsOptimistic: boolean;
+  /** The longest body this chassis takes. Never the tray someone fitted. */
+  maxBodyLengthMm: number | null;
+  correctedFields: CorrectableCatalogueField[];
   promotedByOverride: boolean;
   publication: CataloguePublication;
   source: CatalogueSource;

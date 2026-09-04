@@ -1,5 +1,981 @@
 {
-  "show": [],
+  "show": [
+    {
+      "id": "chevrolet-silverado-1500-ltz-premium",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "chevrolet-silverado-1500-zr2",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "chevrolet-silverado-2500hd-ltz-nb1",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "chevrolet-silverado-2500hd-ltz-nb2",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-f-150-2024-lariat-5-5-ft-tub-swb",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-f-150-2024-lariat-6-5-ft-tub-lwb",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-f-150-2024-platinum-5-5-ft-tub-swb",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-f-150-2024-platinum-6-5-ft-tub-lwb",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-f-150-2024-xlt-5-5-ft-tub-swb",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-f-150-2024-xlt-6-5-ft-tub-lwb",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-raptor-double-pickup-ecoboost",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-sport-double-pickup-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-sport-double-pickup-v6",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-wildtrak-double-pickup-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-wildtrak-double-pickup-v6",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-cc-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-cc-singleturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-pickup-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-double-pickup-singleturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-single-cc-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-super-cc-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xl-super-pickup-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xls-double-pickup-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-double-cc-v6",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-double-pickup-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-double-pickup-v6",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2022my-4x4-xlt-super-pickup-biturbo",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-black-edition-double-cab-tub",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-black-edition-double-cab-tub-2",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-platinum-double-cab-tub",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-raptor-double-cab-tub",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-tremor-double-cab-tub",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-wildtrak-double-cab-tub",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-wolftrak-double-cab-tub",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-double-cab-cc",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-double-cab-cc-2",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-double-cab-tub",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-double-cab-tub-2",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-double-cab-tub-3",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-single-cab-cc",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-single-cab-cc-2",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-single-cab-cc-3",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-super-cab-cc",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-super-cab-cc-2",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xl-super-cab-cc-3",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xls-double-cab-cc",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xlt-double-cab-cc",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xlt-double-cab-tub",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xlt-double-cab-tub-2",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-2026-50my-xlt-super-cab-tub",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. The stored kerb mass is the lightest orderable equipment figure, which yields the largest payload, and the heavier options figure Ford also publishes is not captured. The research note said not to expose this until the conservative figure is added.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ford-ranger-super-duty-my26-single-cab",
+      "reason": "Published on the owner instruction. Figures are source verified against the manufacturer document but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "gwm-cannon-2026-lux-dual-cab-chassis-factory-alloy-tray",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "gwm-cannon-2026-lux-dual-cab-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "gwm-cannon-2026-premium-dual-cab-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "gwm-cannon-2026-premium-single-cab-4x2-factory-alloy-tray",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "gwm-cannon-2026-ultra-dual-cab-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "gwm-cannon-2026-vanta-dual-cab-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "gwm-cannon-2026-xsr-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-lux-phev-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-lux-turbo-diesel-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-ultra-hev-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-ultra-phev-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "gwm-cannon-alpha-2025-ultra-turbo-diesel-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "hino-300-817-4x4-crew-cab",
+      "reason": "Published on the owner instruction. Hino 300 817 4x4 crew cab, read from manufacturer specification sheet HS3008174x4-0822.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "hino-300-817-4x4-single-cab",
+      "reason": "Published on the owner instruction. Hino 300 817 4x4 single cab, read from manufacturer specification sheet HS3008174x4-0822.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-crew-2-2",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-crew-3-0",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-single-2-2",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-single-3-0",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x2-sx-space-3-0",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-lsu-crew-3-0",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-sx-crew-2-2",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-sx-crew-3-0",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-sx-single-3-0",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "isuzu-dmax-25-5my-4x4-sx-space-3-0",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "kgm-musso-my26-advance-double-cab-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "kgm-musso-my26-elx-double-cab-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "kgm-musso-my26-ultimate-double-cab-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "kgm-musso-xlv-my26-advance-double-cab-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "kgm-musso-xlv-my26-elx-double-cab-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "kgm-musso-xlv-my26-ultimate-double-cab-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "kia-tasman-2026-dual-cab-s-4x4-cab-chassis-optional-tray",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "kia-tasman-2026-dual-cab-sx-4x4-cab-chassis-optional-tray",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "kia-tasman-2026-single-cab-s-4x2-cab-chassis-optional-tray",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "kia-tasman-2026-single-cab-s-4x4-cab-chassis-optional-tray",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "kia-tasman-2026-single-cab-sx-4x4-cab-chassis-optional-tray",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "kia-tasman-my26-s-4x2",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "kia-tasman-my26-s-4x4",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "kia-tasman-my26-sx-4x4",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "kia-tasman-my26-sxplus-4x4",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "kia-tasman-my26-xline-4x4",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "kia-tasman-my26-xpro-4x4",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x2-xs-pickup",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x2-xt-cc",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x2-xt-pickup",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x2-xtr-pickup",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-boss-pickup",
+      "reason": "Published on the owner instruction. Flagged for secondary review over a discrepancy in the manufacturer published payload; the stored figures reconcile.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01",
+      "correctedFields": [
+        "payloadKg"
+      ]
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-gt-cc",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-gt-pickup",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-sp-pickup",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-thunder-pickup",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xs-cc",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xs-pickup",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xt-cc",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xt-pickup",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xtr-cc",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mazda-bt50-my25-dual-4x4-xtr-pickup",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mazda-bt50-my25-freestyle-4x2-xt-cc",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mazda-bt50-my25-freestyle-4x4-xt-cc",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mazda-bt50-my25-single-4x2-xs-cc",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mazda-bt50-my25-single-4x2-xt-cc",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mazda-bt50-my25-single-4x4-xt-cc",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mitsubishi-triton-26my-gls-double-cc-4x4",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mitsubishi-triton-26my-gls-double-pickup-4x4-0-9t",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mitsubishi-triton-26my-gls-double-pickup-4x4-1t",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-club-cc-4x4",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-double-cc-4x4-auto",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-double-cc-4x4-manual",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-double-pickup-4x2",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-double-pickup-4x4",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-single-cc-4x2",
+      "reason": "Published on the owner instruction. Flagged for secondary review over a discrepancy in the manufacturer published payload; the stored figures reconcile.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01",
+      "correctedFields": [
+        "payloadKg"
+      ]
+    },
+    {
+      "id": "mitsubishi-triton-26my-glx-single-cc-4x4",
+      "reason": "Published on the owner instruction. Flagged for secondary review over a discrepancy in the manufacturer published payload; the stored figures reconcile.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01",
+      "correctedFields": [
+        "payloadKg"
+      ]
+    },
+    {
+      "id": "mitsubishi-triton-26my-glxplus-club-pickup-4x4",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glxplus-double-cc-4x4",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glxplus-double-pickup-4x4",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mitsubishi-triton-26my-glxr-double-pickup-4x4",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mitsubishi-triton-26my-gsr-double-cc-4x4",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mitsubishi-triton-26my-gsr-double-pickup-4x4-0-9t",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "mitsubishi-triton-26my-gsr-double-pickup-4x4-1t",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "nissan-navara-2026-pro-4x-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "nissan-navara-2026-sl-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "nissan-navara-2026-st-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "nissan-navara-2026-st-x-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-express-black-edition-hurricane-crew-cab-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row. The brochure states no model year, so the catalogue records 2026.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-03"
+    },
+    {
+      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-laramie-sport-hurricane-crew-cab-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row. The brochure states no model year, so the catalogue records 2026.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-03"
+    },
+    {
+      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-limited-hurricane-high-output-crew-cab-tub",
+      "reason": "Published on the owner instruction, overriding the recorded research flag. Source verified against the RAM 1500 Hurricane brochure, and the figures reconcile: 3505 kg GVM less 2722 kg kerb equals the published 783 kg payload. The brochure states no model year, so the catalogue records 2026.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-03"
+    },
+    {
+      "id": "ram-1500-current-listed-hurricane-range-brochure-model-year-not-stated-rebel-hurricane-crew-cab-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row. The brochure states no model year, so the catalogue records 2026.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-03"
+    },
+    {
+      "id": "ram-2500-2025-laramie-cummins-high-output-6-4-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ram-3500-2025-laramie-cummins-high-output-6-4-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "ram-3500-2025-laramie-cummins-ho-4-495-kg-gvm-derate-6-4-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "toyota-hilux-my26-4x2-workmate-single-auto",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "toyota-hilux-my26-4x2-workmate-single-manual",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-sr-double-auto",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-sr-double-manual",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-sr-extra-auto",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-workmate-double-auto",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "toyota-hilux-my26-4x4-workmate-single-auto",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "toyota-lc70-my25-gx-single-auto",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "toyota-lc70-my25-gxl-double-auto",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "toyota-lc70-my25-gxl-single-auto",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "toyota-lc70-my25-workmate-double-auto",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "toyota-lc70-my25-workmate-single-auto",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "toyota-tundra-my26-limited",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "toyota-tundra-my26-platinum",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "volkswagen-amarok-2025-aventura-tdi-v6-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "volkswagen-amarok-2025-aventura-tsi-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "volkswagen-amarok-2025-core-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "volkswagen-amarok-2025-life-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "volkswagen-amarok-2025-panamericana-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "volkswagen-amarok-2025-style-2-0-tdi-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    },
+    {
+      "id": "volkswagen-amarok-2025-style-3-0-tdi-v6-pick-up-tub",
+      "reason": "Published on the owner instruction. Source verified against the manufacturer document, with figures that reconcile, but not individually reviewed row by row.",
+      "reviewer": "Thabo Nel",
+      "approvedAt": "2026-09-01"
+    }
+  ],
   "hide": [],
-  "note": "show entries require id, reason, reviewer and approvedAt. hide removes a variant. Conflicting entries fail the build."
+  "note": "show entries require id, reason, reviewer and approvedAt. hide removes a variant. Conflicting entries fail the build. Variants published this way are disclosed to customers as manually published by Beyond RV."
 }
