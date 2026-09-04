@@ -94,7 +94,7 @@ test('picking a vehicle fills the published figures', async ({ page }) => {
   await expect(page.locator('#vehicleProvenance')).toContainText('Published by Mazda Australia');
 });
 
-test('a missing tub size starts research and adds one sourced result only after confirmation', async ({ page }) => {
+test('a missing tray size starts research and adds one sourced result only after confirmation', async ({ page }) => {
   let releaseResearch = () => {};
   const researchReady = new Promise<void>((resolve) => { releaseResearch = resolve; });
   await page.route('**/.netlify/functions/vehicle-dimension-research', async (route) => {
@@ -120,7 +120,7 @@ test('a missing tub size starts research and adds one sourced result only after 
   await page.selectOption('#vehicleModel', 'Ranger');
   await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-pickup-singleturbo');
 
-  await expect(page.locator('#trayResearch')).toContainText('We’re finding the tub or tray dimensions for your vehicle');
+  await expect(page.locator('#trayResearch')).toContainText('We’re finding the tray dimensions for your vehicle');
   await expect(page.locator('#trayLength')).toHaveValue('');
   releaseResearch();
   await expect(page.locator('#trayResearch')).toContainText('Factory pickup tub');
@@ -131,7 +131,7 @@ test('a missing tub size starts research and adds one sourced result only after 
   await expect(page.locator('#trayResearch')).toContainText('added');
 });
 
-test('several researched configurations ask which tray or tub is fitted', async ({ page }) => {
+test('several researched configurations ask which tray is fitted', async ({ page }) => {
   await page.route('**/.netlify/functions/vehicle-dimension-research', (route) => route.fulfill({
     status: 200,
     contentType: 'application/json',
@@ -150,9 +150,9 @@ test('several researched configurations ask which tray or tub is fitted', async 
   await page.selectOption('#vehicleModel', 'Ranger');
   await page.selectOption('#vehicleVariant', 'ford-ranger-2022my-4x4-xl-double-cc-singleturbo');
 
-  await expect(page.locator('#trayResearch')).toContainText('Which tray or tub do you have?');
-  await expect(page.getByRole('button', { name: 'This is my tray or tub' })).toHaveCount(2);
-  await page.getByRole('button', { name: 'This is my tray or tub' }).nth(1).click();
+  await expect(page.locator('#trayResearch')).toContainText('Which tray do you have?');
+  await expect(page.getByRole('button', { name: 'This is my tray' })).toHaveCount(2);
+  await page.getByRole('button', { name: 'This is my tray' }).nth(1).click();
   await expect(page.locator('#trayLength')).toHaveValue('1750');
   await expect(page.locator('#trayWidth')).toHaveValue('1830');
 });
