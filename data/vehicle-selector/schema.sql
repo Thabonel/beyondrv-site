@@ -199,6 +199,9 @@ CREATE TABLE IF NOT EXISTS tray_specifications (
   length_mm INTEGER NOT NULL,
   width_mm INTEGER NOT NULL,
   height_mm INTEGER,
+  -- The calculator asks a cab chassis owner for their tray weight, because the
+  -- vehicle's kerb mass excludes it. Tray makers publish it, so hold it here.
+  tray_mass_kg INTEGER,
   dimension_basis TEXT NOT NULL CHECK (dimension_basis IN ('outside', 'usable')),
   dimension_basis_quote TEXT NOT NULL,
   source_id TEXT NOT NULL REFERENCES sources(id),
@@ -209,7 +212,8 @@ CREATE TABLE IF NOT EXISTS tray_specifications (
   notes TEXT,
   CHECK (length_mm > 0 AND length_mm < 5000),
   CHECK (width_mm > 0 AND width_mm < 3000),
-  CHECK (height_mm IS NULL OR (height_mm > 0 AND height_mm < 2000))
+  CHECK (height_mm IS NULL OR (height_mm > 0 AND height_mm < 2000)),
+  CHECK (tray_mass_kg IS NULL OR (tray_mass_kg > 0 AND tray_mass_kg < 1000))
 );
 
 CREATE INDEX IF NOT EXISTS tray_specification_vehicle_idx
