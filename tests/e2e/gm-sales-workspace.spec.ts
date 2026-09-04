@@ -172,6 +172,11 @@ test('GM records outcomes with mobile controls and safely retries the same comma
   await action.getByLabel('Reason').selectOption('other');
   await action.getByLabel('Reason details').fill('Customer is moving interstate.');
   await action.getByRole('button', { name: 'Save not proceeding' }).click();
+  // click() resolves when the click is dispatched, not when the request it
+  // triggers has been intercepted. Without this wait a loaded runner reaches the
+  // assertion with requests[2] still undefined, which is what failed on firefox
+  // in CI on 4 September while passing everywhere else.
+  await expect.poll(() => requests.length).toBe(3);
   expect(requests[2]).toMatchObject({ enquiryId: 'enquiry-1', outcome: 'not_proceeding', lossReason: 'other', note: 'Customer is moving interstate.' });
 });
 
