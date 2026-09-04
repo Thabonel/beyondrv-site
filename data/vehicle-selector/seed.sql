@@ -33,7 +33,7 @@ INSERT INTO sources (id, manufacturer, title, url, published_date, accessed_date
 -- Ford Ranger Super Duty: official page states 1,982 kg maximum payload for
 -- single cab excluding tray, 4,500 kg GVM, 8,000 kg GCM, and 1,900/2,800 kg GAWR.
 INSERT INTO vehicle_variants VALUES
-  ('ford-ranger-super-duty-my26-single-cab', 'Ford', 'Ranger Super Duty', 2026, NULL, 'Super Duty', 'single_cab', 'cab_chassis', '4x4', '3.0L V6 turbo-diesel', '10-speed automatic', NULL, 'Check state licence requirements after body fitment and final GVM', NULL, 2518, 'Derived from GVM minus published maximum payload; excludes tray', 4500, 8000, 1900, 2800, 1982, 'Maximum payload; single cab excluding tray', 4500, NULL, NULL, NULL, NULL, 'ford-ranger-super-duty-au', 'Overview and disclosures: Carry more / payload / GAWR', 'source_verified', 0, 'Do not expose until Ford publishes a full delivered-variant mass table and tray/body deductions are configured.');
+  ('ford-ranger-super-duty-my26-single-cab', 'Ford', 'Ranger Super Duty', 2026, NULL, 'Super Duty', 'single_cab', 'cab_chassis', '4x4', '3.0L V6 turbo-diesel', '10-speed automatic', NULL, 'Check state licence requirements after body fitment and final GVM', NULL, 2518, 'Derived from GVM minus published maximum payload; excludes tray', 4500, 8000, 1900, 2800, 1982, 'Maximum payload; single cab excluding tray', 4500, NULL, NULL, NULL, NULL, 'ford-ranger-super-duty-au', 'Overview and disclosures: Carry more / payload / GAWR', 'source_verified', 0, 'OPTIMISTIC KERB: kerb mass is derived as GVM minus Ford''s published maximum payload, and Ford computes maximum payload against minimum kerb, so the figure is a lightest-equipment kerb and the payload is a best case. Published on the owner''s decision as a guide, with the basis disclosed to the customer on the calculator: Beyond RV weighs the vehicle at the factory before build and those figures decide. Replace with a delivered-variant mass table when Ford publishes one. Cab chassis: kerb excludes the tray, and the calculator asks for the tray weight separately.');
 
 -- Ford Ranger 4x4 cab-chassis, 2022MY launch brochure. Every row reconciles
 -- exactly against GVM minus kerb weight. Ford publishes two payload figures per
@@ -285,7 +285,7 @@ INSERT INTO vehicle_model_coverage VALUES
   ('ram-2500', 'RAM', '2500', 'heavy_duty_pickup', 'current', 1, 'tub_or_tray_conversion', 'seeded', 'Laramie Cummins High Output seeded and verified directly against the official specification brochure.'),
   ('ram-3500', 'RAM', '3500', 'heavy_duty_pickup', 'current', 1, 'tub_or_tray_conversion', 'seeded', 'Laramie Cummins High Output seeded and verified directly, including the optional derated 4,495 kg GVM configuration recorded as its own row.'),
   ('ford-f150', 'Ford', 'F-150', 'full_size_pickup', 'current_or_limited', 2, 'tub_or_tray_conversion', 'seeded', 'Six grades seeded and verified directly against the official MY24 specification sheet across both wheelbase and box-length configurations. Outstanding: confirm whether Ford has published a detailed mass sheet newer than MY24.'),
-  ('isuzu-n-series', 'Isuzu Trucks', 'N Series', 'light_truck', 'current', 1, 'truck_body', 'research_backlog', 'Large variant family; ingest exact model code, wheelbase, tare, GVM and axle ratings.'),
+  ('isuzu-n-series', 'Isuzu Trucks', 'N Series', 'light_truck', 'current', 1, 'truck_body', 'partially_seeded', 'NPS 75/45-155 4X4 single and crew recorded from specification sheet ARK 1443 10/21 on 4 September 2026. The rest of the N Series, and any Next Gen revision of these figures, are still outstanding.'),
   ('isuzu-nps', 'Isuzu Trucks', 'NPS 75-175 4x4', 'light_truck_4x4', 'current', 1, 'truck_body', 'seeded', 'Current day- and crew-cab chassis masses, axle limits and wheelbase seeded; body-builder approval remains mandatory.'),
   ('hino-300', 'Hino', '300 Series', 'light_truck', 'current', 2, 'truck_body', 'seeded', 'Manufacturer specification sheet HS3008174x4-0822 read on 1 September 2026. Both cab variants recorded with body length, chassis mass and axle limits.'),
   ('fuso-canter', 'Fuso', 'Canter', 'light_truck', 'current', 2, 'truck_body', 'research_backlog', 'Variant-level body-builder specification required.'),
@@ -357,3 +357,66 @@ COMMIT;
 INSERT INTO sources VALUES('hino-300-817-4x4-spec-0822','Hino','Hino 300 Series 817 4x4 and 817 4x4 Crew specification sheet (HS3008174x4-0822)','https://www.hino.com.au/uploads/pdf/specification/HS3008174x4-0822_WEB_(4).pdf','2022-08','2026-09-01','manufacturer_pdf','AU','hino.com.au returned HTTP 403 to a direct fetch; the identical document was read from a mirrored copy at earthcruiser.net.au.');
 INSERT INTO heavy_overland_chassis VALUES('hino-300-817-4x4-crew-cab','Hino','300 Series',2022,NULL,'817 4x4 Crew','crew','4x4','selectable 4x4 with high and low range','N04C UT','6 speed manual',3500,7500,11000,2800,6200,2200,1205,3405,NULL,'Indicative chassis mass, standard tools and 10 litres of fuel, without spare tyre, subject to a plus or minus 3 percent tolerance',1820,3840,NULL,NULL,'GVM 7500kg exceeds a car licence; a factory downrate to 4495kg GVM is offered. Confirm licence class before purchase.','Refer to the Hino Body Mounting Manual for chassis layouts. Nominal body length is a body-builder figure, not a measured tray.','hino-300-817-4x4-spec-0822','Dimensions and capacities table, model code XZC810R-QKFRTQ3','source_verified',0,'Crew cab loses 1025mm of body length to the longer cab.');
 INSERT INTO heavy_overland_chassis VALUES('hino-300-817-4x4-single-cab','Hino','300 Series',2022,NULL,'817 4x4','single','4x4','selectable 4x4 with high and low range','N04C UT','6 speed manual',3500,7500,11000,2800,6200,2055,1105,3160,NULL,'Indicative chassis mass, standard tools and 10 litres of fuel, without spare tyre, subject to a plus or minus 3 percent tolerance',2845,4865,NULL,NULL,'GVM 7500kg exceeds a car licence; a factory downrate to 4495kg GVM is offered. Confirm licence class before purchase.','Refer to the Hino Body Mounting Manual for chassis layouts. Nominal body length is a body-builder figure, not a measured tray.','hino-300-817-4x4-spec-0822','Dimensions and capacities table, model code XZC810R-HKFRTQ3','source_verified',0,'GVM downratable to 4495kg and GCM to 7995kg as a factory option.');
+
+-- Isuzu N Series NPS 75/45-155 4X4, read from the manufacturer specification
+-- sheet on 4 September 2026. isuzu.com.au could not be fetched automatically
+-- (TLS certificate chain error), so the owner supplied the document.
+--
+-- The sheet is watermarked PRELIMINARY ONLY and dated 10/21, and Isuzu has since
+-- published a Next Gen N Series brochure (2024) whose per-variant figures are not
+-- captured here. Every row is needs_secondary_review for that reason, and none is
+-- customer_selectable: they enter the review queue rather than the picker.
+INSERT INTO sources (id, manufacturer, title, url, published_date, accessed_date, source_type, market, notes) VALUES
+  ('isuzu-nps-75-45-155-4x4-ark1443-1021', 'Isuzu Trucks',
+   'Isuzu N Series NPS 75/45-155 4X4 and NPS 75/45-155 4X4 Crew specification sheet (ARK 1443 10/21)',
+   'https://www.isuzu.com.au/Media/Isuzu_Files/Spec_Sheets/Current_spec_sheets/NPS%2075%2045-155_4X4_NPS%2075%2045-155_4X4%20Crew_ARK1443_V10.pdf',
+   '2021-10', '2026-09-04', 'manufacturer_pdf', 'AU',
+   'Watermarked PRELIMINARY ONLY. isuzu.com.au returned a TLS certificate chain error to an automated fetch; the document was supplied manually by the owner, as the Hino sheet was.');
+
+INSERT INTO heavy_overland_chassis (
+  id, make, model, model_year_start, model_year_end, variant, cab_type, axle_configuration, drivetrain,
+  engine, transmission, wheelbase_mm, gvm_kg, gcm_kg, front_axle_limit_kg, rear_axle_limit_kg,
+  chassis_cab_front_mass_kg, chassis_cab_rear_mass_kg, chassis_cab_total_mass_kg, published_body_payload_kg,
+  mass_basis, cab_to_rear_axle_mm, max_body_length_mm, max_body_width_mm, braked_towing_kg,
+  licence_class_note, mounting_architecture_note, source_id, source_locator, verification_status,
+  customer_selectable, notes
+) VALUES
+  ('isuzu-nps-75-45-155-4x4-single-mt', 'Isuzu Trucks', 'N Series', 2021, NULL, '75/45-155 4X4', 'single', '4x4',
+   'part time 4WD with high and low range', '4HK1-TCN', '5 speed manual', 3395, 7500, 11000, 3100, 6000,
+   1960, 970, 2930, NULL,
+   'Cab chassis only as supplied and including 10 litres of fuel.', 2710, 4332, NULL, NULL,
+   'GVM 7500kg exceeds a car licence; the same model is offered at a 4500kg GVM rating. Confirm licence class before purchase.',
+   'Ladder frame cab chassis, side rail 216 x 70 x 6.0mm, rear frame width 850mm. Maximum body length is the sheet''s CE dimension, cab to end of frame, and is a body-builder figure rather than a measured tray.',
+   'isuzu-nps-75-45-155-4x4-ark1443-1021', 'Specification sheet ARK 1443 10/21, WEIGHTS (kg) and DIMENSIONS (mm) tables.',
+   'needs_secondary_review', 0,
+   'PRELIMINARY: the sheet is watermarked PRELIMINARY ONLY and dated 10/21, and a Next Gen N Series brochure (2024) may supersede it. Dual rated 7500kg or 4500kg GVM and 11000kg or 9000kg GCM; the higher rating is recorded. Braked towing is left unrecorded because the sheet states 4500kg on the summary page and caps it at 4000kg in the footnote for the 4500kg GVM rating.'),
+
+  ('isuzu-nps-75-45-155-4x4-single-amt', 'Isuzu Trucks', 'N Series', 2021, NULL, '75/45-155 AMT 4X4', 'single', '4x4',
+   'part time 4WD with high and low range', '4HK1-TCN', '5 speed automated manual', 3395, 7500, 11000, 3100, 6000,
+   1980, 970, 2950, NULL,
+   'Cab chassis only as supplied and including 10 litres of fuel.', 2710, 4332, NULL, NULL,
+   'GVM 7500kg exceeds a car licence; the same model is offered at a 4500kg GVM rating. Confirm licence class before purchase.',
+   'Ladder frame cab chassis, side rail 216 x 70 x 6.0mm, rear frame width 850mm. Maximum body length is the sheet''s CE dimension, cab to end of frame, and is a body-builder figure rather than a measured tray.',
+   'isuzu-nps-75-45-155-4x4-ark1443-1021', 'Specification sheet ARK 1443 10/21, WEIGHTS (kg) and DIMENSIONS (mm) tables.',
+   'needs_secondary_review', 0,
+   'PRELIMINARY: the sheet is watermarked PRELIMINARY ONLY and dated 10/21, and a Next Gen N Series brochure (2024) may supersede it. Dual rated 7500kg or 4500kg GVM and 11000kg or 9000kg GCM; the higher rating is recorded. Braked towing is left unrecorded because the sheet states 4500kg on the summary page and caps it at 4000kg in the footnote for the 4500kg GVM rating.'),
+
+  ('isuzu-nps-75-45-155-4x4-crew-mt', 'Isuzu Trucks', 'N Series', 2021, NULL, '75/45-155 4X4 Crew', 'crew', '4x4',
+   'part time 4WD with high and low range', '4HK1-TCN', '5 speed manual', 3395, 7500, 11000, 3100, 6000,
+   2100, 1070, 3170, NULL,
+   'Cab chassis only as supplied and including 10 litres of fuel.', 1730, 3331, NULL, NULL,
+   'GVM 7500kg exceeds a car licence; the same model is offered at a 4500kg GVM rating. Confirm licence class before purchase.',
+   'Ladder frame cab chassis, side rail 216 x 70 x 6.0mm, rear frame width 850mm. Maximum body length is the sheet''s CE dimension, cab to end of frame, and is a body-builder figure rather than a measured tray.',
+   'isuzu-nps-75-45-155-4x4-ark1443-1021', 'Specification sheet ARK 1443 10/21, WEIGHTS (kg) and DIMENSIONS (mm) tables.',
+   'needs_secondary_review', 0,
+   'PRELIMINARY: the sheet is watermarked PRELIMINARY ONLY and dated 10/21, and a Next Gen N Series brochure (2024) may supersede it. Dual rated 7500kg or 4500kg GVM and 11000kg or 9000kg GCM; the higher rating is recorded. Braked towing is left unrecorded because the sheet states 4500kg on the summary page and caps it at 4000kg in the footnote for the 4500kg GVM rating.'),
+
+  ('isuzu-nps-75-45-155-4x4-crew-amt', 'Isuzu Trucks', 'N Series', 2021, NULL, '75/45-155 AMT 4X4 Crew', 'crew', '4x4',
+   'part time 4WD with high and low range', '4HK1-TCN', '5 speed automated manual', 3395, 7500, 11000, 3100, 6000,
+   2120, 1070, 3190, NULL,
+   'Cab chassis only as supplied and including 10 litres of fuel.', 1730, 3331, NULL, NULL,
+   'GVM 7500kg exceeds a car licence; the same model is offered at a 4500kg GVM rating. Confirm licence class before purchase.',
+   'Ladder frame cab chassis, side rail 216 x 70 x 6.0mm, rear frame width 850mm. Maximum body length is the sheet''s CE dimension, cab to end of frame, and is a body-builder figure rather than a measured tray.',
+   'isuzu-nps-75-45-155-4x4-ark1443-1021', 'Specification sheet ARK 1443 10/21, WEIGHTS (kg) and DIMENSIONS (mm) tables.',
+   'needs_secondary_review', 0,
+   'PRELIMINARY: the sheet is watermarked PRELIMINARY ONLY and dated 10/21, and a Next Gen N Series brochure (2024) may supersede it. Dual rated 7500kg or 4500kg GVM and 11000kg or 9000kg GCM; the higher rating is recorded. Braked towing is left unrecorded because the sheet states 4500kg on the summary page and caps it at 4000kg in the footnote for the 4500kg GVM rating.');

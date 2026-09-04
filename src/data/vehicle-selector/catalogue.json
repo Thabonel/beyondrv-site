@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.1",
   "catalogueVersion": "vehicle-catalogue-2026-09-04",
-  "generatedAt": "2026-09-04T02:32:38.211Z",
-  "sourceDatabaseRowCount": 169,
+  "generatedAt": "2026-09-04T03:12:52.778Z",
+  "sourceDatabaseRowCount": 173,
   "models": [
     {
       "make": "Chevrolet",
@@ -66,6 +66,13 @@
       "model": "D-MAX",
       "modelYears": [
         2025
+      ]
+    },
+    {
+      "make": "Isuzu Trucks",
+      "model": "N Series",
+      "modelYears": [
+        2021
       ]
     },
     {
@@ -2184,7 +2191,7 @@
       "trayWidthMm": null,
       "correctedFields": [],
       "platform": "ute",
-      "kerbIsOptimistic": false,
+      "kerbIsOptimistic": true,
       "maxBodyLengthMm": null,
       "trayState": "excluded",
       "trayMassKg": null,
@@ -6605,6 +6612,166 @@
         "title": "Hino 300 Series 817 4x4 and 817 4x4 Crew specification sheet (HS3008174x4-0822)",
         "url": "https://www.hino.com.au/uploads/pdf/specification/HS3008174x4-0822_WEB_(4).pdf",
         "accessedDate": "2026-09-01"
+      }
+    },
+    {
+      "id": "isuzu-nps-75-45-155-4x4-single-mt",
+      "make": "Isuzu Trucks",
+      "model": "N Series",
+      "modelYear": 2021,
+      "grade": "75/45-155 4X4",
+      "cabType": "single",
+      "bodyType": "cab_chassis",
+      "drivetrain": "part time 4WD with high and low range",
+      "engine": "4HK1-TCN",
+      "transmission": "5 speed manual",
+      "wheelbaseMm": 3395,
+      "label": "Isuzu Trucks N Series 75/45-155 4X4 single cab chassis part time 4WD with high and low range (2021)",
+      "gvmKg": 7500,
+      "kerbKg": 2930,
+      "kerbBasis": "Cab chassis only as supplied and including 10 litres of fuel. Excludes any body or tray.",
+      "payloadKg": 4570,
+      "frontGawrKg": 3100,
+      "rearGawrKg": 6000,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "correctedFields": [],
+      "platform": "truck",
+      "kerbIsOptimistic": false,
+      "maxBodyLengthMm": 4332,
+      "trayState": "excluded",
+      "trayMassKg": null,
+      "promotedByOverride": true,
+      "publication": {
+        "approvalId": "override:isuzu-nps-75-45-155-4x4-single-mt",
+        "approvedAt": "2026-09-04",
+        "method": "override"
+      },
+      "source": {
+        "manufacturer": "Isuzu Trucks",
+        "title": "Isuzu N Series NPS 75/45-155 4X4 and NPS 75/45-155 4X4 Crew specification sheet (ARK 1443 10/21)",
+        "url": "https://www.isuzu.com.au/Media/Isuzu_Files/Spec_Sheets/Current_spec_sheets/NPS%2075%2045-155_4X4_NPS%2075%2045-155_4X4%20Crew_ARK1443_V10.pdf",
+        "accessedDate": "2026-09-04"
+      }
+    },
+    {
+      "id": "isuzu-nps-75-45-155-4x4-crew-mt",
+      "make": "Isuzu Trucks",
+      "model": "N Series",
+      "modelYear": 2021,
+      "grade": "75/45-155 4X4 Crew",
+      "cabType": "crew",
+      "bodyType": "cab_chassis",
+      "drivetrain": "part time 4WD with high and low range",
+      "engine": "4HK1-TCN",
+      "transmission": "5 speed manual",
+      "wheelbaseMm": 3395,
+      "label": "Isuzu Trucks N Series 75/45-155 4X4 Crew crew cab chassis part time 4WD with high and low range (2021)",
+      "gvmKg": 7500,
+      "kerbKg": 3170,
+      "kerbBasis": "Cab chassis only as supplied and including 10 litres of fuel. Excludes any body or tray.",
+      "payloadKg": 4330,
+      "frontGawrKg": 3100,
+      "rearGawrKg": 6000,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "correctedFields": [],
+      "platform": "truck",
+      "kerbIsOptimistic": false,
+      "maxBodyLengthMm": 3331,
+      "trayState": "excluded",
+      "trayMassKg": null,
+      "promotedByOverride": true,
+      "publication": {
+        "approvalId": "override:isuzu-nps-75-45-155-4x4-crew-mt",
+        "approvedAt": "2026-09-04",
+        "method": "override"
+      },
+      "source": {
+        "manufacturer": "Isuzu Trucks",
+        "title": "Isuzu N Series NPS 75/45-155 4X4 and NPS 75/45-155 4X4 Crew specification sheet (ARK 1443 10/21)",
+        "url": "https://www.isuzu.com.au/Media/Isuzu_Files/Spec_Sheets/Current_spec_sheets/NPS%2075%2045-155_4X4_NPS%2075%2045-155_4X4%20Crew_ARK1443_V10.pdf",
+        "accessedDate": "2026-09-04"
+      }
+    },
+    {
+      "id": "isuzu-nps-75-45-155-4x4-single-amt",
+      "make": "Isuzu Trucks",
+      "model": "N Series",
+      "modelYear": 2021,
+      "grade": "75/45-155 AMT 4X4",
+      "cabType": "single",
+      "bodyType": "cab_chassis",
+      "drivetrain": "part time 4WD with high and low range",
+      "engine": "4HK1-TCN",
+      "transmission": "5 speed automated manual",
+      "wheelbaseMm": 3395,
+      "label": "Isuzu Trucks N Series 75/45-155 AMT 4X4 single cab chassis part time 4WD with high and low range (2021)",
+      "gvmKg": 7500,
+      "kerbKg": 2950,
+      "kerbBasis": "Cab chassis only as supplied and including 10 litres of fuel. Excludes any body or tray.",
+      "payloadKg": 4550,
+      "frontGawrKg": 3100,
+      "rearGawrKg": 6000,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "correctedFields": [],
+      "platform": "truck",
+      "kerbIsOptimistic": false,
+      "maxBodyLengthMm": 4332,
+      "trayState": "excluded",
+      "trayMassKg": null,
+      "promotedByOverride": true,
+      "publication": {
+        "approvalId": "override:isuzu-nps-75-45-155-4x4-single-amt",
+        "approvedAt": "2026-09-04",
+        "method": "override"
+      },
+      "source": {
+        "manufacturer": "Isuzu Trucks",
+        "title": "Isuzu N Series NPS 75/45-155 4X4 and NPS 75/45-155 4X4 Crew specification sheet (ARK 1443 10/21)",
+        "url": "https://www.isuzu.com.au/Media/Isuzu_Files/Spec_Sheets/Current_spec_sheets/NPS%2075%2045-155_4X4_NPS%2075%2045-155_4X4%20Crew_ARK1443_V10.pdf",
+        "accessedDate": "2026-09-04"
+      }
+    },
+    {
+      "id": "isuzu-nps-75-45-155-4x4-crew-amt",
+      "make": "Isuzu Trucks",
+      "model": "N Series",
+      "modelYear": 2021,
+      "grade": "75/45-155 AMT 4X4 Crew",
+      "cabType": "crew",
+      "bodyType": "cab_chassis",
+      "drivetrain": "part time 4WD with high and low range",
+      "engine": "4HK1-TCN",
+      "transmission": "5 speed automated manual",
+      "wheelbaseMm": 3395,
+      "label": "Isuzu Trucks N Series 75/45-155 AMT 4X4 Crew crew cab chassis part time 4WD with high and low range (2021)",
+      "gvmKg": 7500,
+      "kerbKg": 3190,
+      "kerbBasis": "Cab chassis only as supplied and including 10 litres of fuel. Excludes any body or tray.",
+      "payloadKg": 4310,
+      "frontGawrKg": 3100,
+      "rearGawrKg": 6000,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "correctedFields": [],
+      "platform": "truck",
+      "kerbIsOptimistic": false,
+      "maxBodyLengthMm": 3331,
+      "trayState": "excluded",
+      "trayMassKg": null,
+      "promotedByOverride": true,
+      "publication": {
+        "approvalId": "override:isuzu-nps-75-45-155-4x4-crew-amt",
+        "approvedAt": "2026-09-04",
+        "method": "override"
+      },
+      "source": {
+        "manufacturer": "Isuzu Trucks",
+        "title": "Isuzu N Series NPS 75/45-155 4X4 and NPS 75/45-155 4X4 Crew specification sheet (ARK 1443 10/21)",
+        "url": "https://www.isuzu.com.au/Media/Isuzu_Files/Spec_Sheets/Current_spec_sheets/NPS%2075%2045-155_4X4_NPS%2075%2045-155_4X4%20Crew_ARK1443_V10.pdf",
+        "accessedDate": "2026-09-04"
       }
     }
   ]

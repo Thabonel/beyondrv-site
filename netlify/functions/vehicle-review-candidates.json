@@ -3508,6 +3508,90 @@
       }
     },
     {
+      "id": "isuzu-nps-75-45-155-4x4-single-mt",
+      "make": "Isuzu Trucks",
+      "model": "N Series",
+      "modelYear": 2021,
+      "grade": "75/45-155 4X4",
+      "cabType": "single",
+      "bodyType": "cab_chassis",
+      "gvmKg": 7500,
+      "kerbKg": 2930,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "needs_secondary_review",
+      "platform": "truck",
+      "published": true,
+      "source": {
+        "manufacturer": "Isuzu Trucks",
+        "title": "Isuzu N Series NPS 75/45-155 4X4 and NPS 75/45-155 4X4 Crew specification sheet (ARK 1443 10/21)",
+        "url": "https://www.isuzu.com.au/Media/Isuzu_Files/Spec_Sheets/Current_spec_sheets/NPS%2075%2045-155_4X4_NPS%2075%2045-155_4X4%20Crew_ARK1443_V10.pdf"
+      }
+    },
+    {
+      "id": "isuzu-nps-75-45-155-4x4-crew-mt",
+      "make": "Isuzu Trucks",
+      "model": "N Series",
+      "modelYear": 2021,
+      "grade": "75/45-155 4X4 Crew",
+      "cabType": "crew",
+      "bodyType": "cab_chassis",
+      "gvmKg": 7500,
+      "kerbKg": 3170,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "needs_secondary_review",
+      "platform": "truck",
+      "published": true,
+      "source": {
+        "manufacturer": "Isuzu Trucks",
+        "title": "Isuzu N Series NPS 75/45-155 4X4 and NPS 75/45-155 4X4 Crew specification sheet (ARK 1443 10/21)",
+        "url": "https://www.isuzu.com.au/Media/Isuzu_Files/Spec_Sheets/Current_spec_sheets/NPS%2075%2045-155_4X4_NPS%2075%2045-155_4X4%20Crew_ARK1443_V10.pdf"
+      }
+    },
+    {
+      "id": "isuzu-nps-75-45-155-4x4-single-amt",
+      "make": "Isuzu Trucks",
+      "model": "N Series",
+      "modelYear": 2021,
+      "grade": "75/45-155 AMT 4X4",
+      "cabType": "single",
+      "bodyType": "cab_chassis",
+      "gvmKg": 7500,
+      "kerbKg": 2950,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "needs_secondary_review",
+      "platform": "truck",
+      "published": true,
+      "source": {
+        "manufacturer": "Isuzu Trucks",
+        "title": "Isuzu N Series NPS 75/45-155 4X4 and NPS 75/45-155 4X4 Crew specification sheet (ARK 1443 10/21)",
+        "url": "https://www.isuzu.com.au/Media/Isuzu_Files/Spec_Sheets/Current_spec_sheets/NPS%2075%2045-155_4X4_NPS%2075%2045-155_4X4%20Crew_ARK1443_V10.pdf"
+      }
+    },
+    {
+      "id": "isuzu-nps-75-45-155-4x4-crew-amt",
+      "make": "Isuzu Trucks",
+      "model": "N Series",
+      "modelYear": 2021,
+      "grade": "75/45-155 AMT 4X4 Crew",
+      "cabType": "crew",
+      "bodyType": "cab_chassis",
+      "gvmKg": 7500,
+      "kerbKg": 3190,
+      "trayLengthMm": null,
+      "trayWidthMm": null,
+      "verificationStatus": "needs_secondary_review",
+      "platform": "truck",
+      "published": true,
+      "source": {
+        "manufacturer": "Isuzu Trucks",
+        "title": "Isuzu N Series NPS 75/45-155 4X4 and NPS 75/45-155 4X4 Crew specification sheet (ARK 1443 10/21)",
+        "url": "https://www.isuzu.com.au/Media/Isuzu_Files/Spec_Sheets/Current_spec_sheets/NPS%2075%2045-155_4X4_NPS%2075%2045-155_4X4%20Crew_ARK1443_V10.pdf"
+      }
+    },
+    {
       "id": "man-tgm-13-250-290-4x4-cc",
       "make": "MAN",
       "model": "TGM 4x4 RV",
