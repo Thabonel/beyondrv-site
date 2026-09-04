@@ -31,14 +31,14 @@ test('a short tray gives one clear no-fit result and removes irrelevant camper q
   await page.fill('#trayLength', '1600');
 
   const panel = page.getByTestId(result);
-  await expect(panel).toContainText('No standard Beyond RV slide-on fits this 1,600 mm tub or tray');
+  await expect(panel).toContainText('No standard Beyond RV slide-on fits this 1,600 mm tray');
   await expect(panel).toContainText('needs about 2,120 mm — 520 mm more');
   await expect(page.locator('#camperModel')).toHaveCount(0);
   await expect(page.locator('#camperDryField')).toBeHidden();
   await expect(page.locator('#camperDetails')).toBeHidden();
   await expect(page.getByTestId('camper-finder-custom')).toHaveAttribute('href', /inquiry-form/);
 
-  await expect(page.locator('#resultTitle')).toHaveText('No standard camper fits this tub or tray');
+  await expect(page.locator('#resultTitle')).toHaveText('No standard camper fits this tray');
   await expect(page.locator('#trayLengthFit')).toHaveText('520 mm short of shortest model');
   await expect(page.locator('#camperModelMatch')).toHaveText('None — shortest needs 2,120 mm');
   await expect(page.locator('#warningNotes')).not.toContainText('camper dry weight');
@@ -97,4 +97,43 @@ test('target dimensions are described as preliminary', async ({ page }) => {
   await page.fill('#trayLength', '2300');
 
   await expect(page.getByTestId('camper-finder-indicative')).toContainText('Beyond RV confirms the final size');
+});
+
+// Beyond RV slide-ons mount on a flat tray. A tub cannot carry one at any length,
+// so a tub owner told their tub is "270mm short" goes looking for a longer ute
+// when what they need is a tray fitted.
+test('a tub is told it needs a tray, not that it is too short', async ({ page }) => {
+  await page.goto(pagePath);
+  await page.selectOption('#trayType', 'Tub');
+  await page.fill('#trayLength', '1850');
+
+  const panel = page.getByTestId(result);
+  await expect(panel).toContainText('mounts on a flat tray');
+  await expect(panel).toContainText('replaced with a tray');
+  // The arithmetic answer is right but the wrong thing to say to a tub owner.
+  await expect(panel).not.toContainText('needs about');
+});
+
+test('a tray that is genuinely too short still gets the measurement answer', async ({ page }) => {
+  await page.goto(pagePath);
+  await page.selectOption('#trayType', 'Steel tray');
+  await page.fill('#trayLength', '1850');
+
+  const panel = page.getByTestId(result);
+  await expect(panel).toContainText('needs about');
+  await expect(panel).not.toContainText('replaced with a tray');
+});
+
+test('picking a tub ute says so straight away, without a tray measurement', async ({ page }) => {
+  await page.goto(pagePath);
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'F-150');
+  await page.selectOption('#vehicleVariant', 'ford-f-150-2024-lariat-5-5-ft-tub-swb');
+
+  // The tub's own 1700mm is not a tray length, so it must not fill the field a
+  // camper is matched against.
+  await expect(page.locator('#trayLength')).toHaveValue('');
+  // And the customer is told why, before being asked to measure anything.
+  await expect(page.locator('#vehicleProvenance')).toContainText('mounts on a flat tray');
+  await expect(page.locator('#vehicleProvenance')).toContainText('replaced with a tray');
 });

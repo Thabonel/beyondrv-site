@@ -484,6 +484,18 @@ const schema = [
       .sort((a, b) => Number(a.nominalLengthMm) - Number(b.nominalLengthMm))[0];
   }
 
+  /**
+   * A Beyond RV slide-on mounts on a flat tray. A tub cannot carry one at any
+   * length, so a tub owner must not be told their tub is merely too short: that
+   * sends them looking for a longer ute when what they need is a tray.
+   */
+  function isTubVehicle() {
+    const answered = value('trayType');
+    return answered === 'Tub' || (!answered && selectedVariant?.trayState === 'not_applicable');
+  }
+
+  const TUB_EXPLANATION = 'A Beyond RV slide-on mounts on a flat tray. A tub cannot carry one whatever its length, so this vehicle would need its tub replaced with a tray. The tray length then decides which model suits.';
+
   function noStandardFitFor(trayLength: number) {
     if (!Number.isFinite(trayLength) || trayLength <= 0 || bestModelForTray(trayLength)) return null;
     const shortest = shortestStandardModel();
@@ -534,7 +546,9 @@ const schema = [
     const fit = noStandardFitFor(trayLength);
     const dimensions = `${fmtMm(trayLength)} usable length${Number.isFinite(trayWidth) && trayWidth > 0 ? ` × ${fmtMm(trayWidth)} usable width` : ''}`;
     const message = fit
-      ? `I would like help with a custom slide-on solution for ${vehicleName}. Its tub or tray has ${dimensions}. The shortest standard camper needs about ${fmtMm(fit.shortest.nominalLengthMm!)} (${fmtMm(fit.shortfallMm)} longer).`
+      ? (isTubVehicle()
+        ? `I would like help fitting a slide-on to ${vehicleName}. It has a tub, which cannot carry a slide-on, so I understand it would need a tray fitted. The tub measures ${dimensions}.`
+        : `I would like help with a custom slide-on solution for ${vehicleName}. Its tray has ${dimensions}. The shortest standard camper needs about ${fmtMm(fit.shortest.nominalLengthMm!)} (${fmtMm(fit.shortfallMm)} longer).`)
       : `I would like help finding a slide-on camper for ${vehicleName}.`;
     return enquiryUrl(message);
   }
@@ -635,7 +649,9 @@ const schema = [
     } else {
       const noFit = noStandardFitFor(trayLength);
       if (!noFit) return;
-      headline.textContent = `No standard Beyond RV slide-on fits this ${fmtMm(trayLength)} tub or tray. Our shortest standard model, ${noFit.shortest.name}, needs about ${fmtMm(noFit.shortest.nominalLengthMm!)} — ${fmtMm(noFit.shortfallMm)} more.`;
+      headline.textContent = isTubVehicle()
+        ? TUB_EXPLANATION
+        : `No standard Beyond RV slide-on fits this ${fmtMm(trayLength)} tray. Our shortest standard model, ${noFit.shortest.name}, needs about ${fmtMm(noFit.shortest.nominalLengthMm!)} — ${fmtMm(noFit.shortfallMm)} more.`;
       const explanation = document.createElement('p');
       explanation.className = 'camper-finder-note';
       explanation.textContent = 'A custom build or a suitable replacement tray may be possible. Beyond RV needs to confirm it with you.';
@@ -1064,7 +1080,7 @@ const schema = [
   function trayLine(trayState: string) {
     if (trayState === 'included') return 'Kerb mass includes the standard tray.';
     if (trayState === 'excluded') return 'Kerb mass excludes the tray.';
-    if (trayState === 'not_applicable') return 'This is a tub vehicle, so no tray applies.';
+    if (trayState === 'not_applicable') return 'This is a tub vehicle. A Beyond RV slide-on mounts on a flat tray, so it would need its tub replaced with a tray before a camper could be fitted.';
     return 'The manufacturer does not state whether kerb mass includes a tray.';
   }
 
@@ -1189,8 +1205,14 @@ const schema = [
     if (!variant) return;
     setIfNotEdited('gvm', variant.gvmKg);
     setIfNotEdited('currentWeight', variant.kerbKg);
-    setIfNotEdited('trayLength', variant.trayLengthMm);
-    setIfNotEdited('trayWidth', variant.trayWidthMm);
+    // A tub's dimensions are not a tray length. A Beyond RV slide-on mounts on a
+    // flat tray, so filling the camper-fit field with a tub measurement answers a
+    // different question than the field asks, and the number can never produce a
+    // match: tubs run to 2000mm and the shortest camper needs 2120mm.
+    if (variant.trayState !== 'not_applicable') {
+      setIfNotEdited('trayLength', variant.trayLengthMm);
+      setIfNotEdited('trayWidth', variant.trayWidthMm);
+    }
 
     const nameInput = inputById('vehicleName');
     if (nameInput && !customerEdited.has('vehicleName')) nameInput.value = variant.label;
@@ -1399,7 +1421,9 @@ const schema = [
     const noFit = automaticNoFitFor(trayLength);
     const displayedStatus = noFit ? 'red' : result.status;
     const displayedStatusLabel = noFit ? 'No standard camper match' : result.statusLabel;
-    const displayedTitle = noFit ? 'No standard camper fits this tub or tray' : result.title;
+    const displayedTitle = noFit
+      ? (isTubVehicle() ? 'A slide-on needs a flat tray' : 'No standard camper fits this tray')
+      : result.title;
     const displayedSummary = noFit
       ? `${fmtMm(trayLength)} usable length is ${fmtMm(noFit.shortfallMm)} shorter than our shortest standard camper, ${noFit.shortest.name}, which needs about ${fmtMm(noFit.shortest.nominalLengthMm!)}.`
       : result.summary;
@@ -1411,7 +1435,9 @@ const schema = [
       : result.dataQuality;
     const displayedNotes = noFit
       ? [
-          `The shortest standard camper requires about ${fmtMm(noFit.shortest.nominalLengthMm!)}; this tub or tray is ${fmtMm(trayLength)}.`,
+          isTubVehicle()
+            ? TUB_EXPLANATION
+            : `The shortest standard camper requires about ${fmtMm(noFit.shortest.nominalLengthMm!)}; this tray is ${fmtMm(trayLength)}.`,
           'A replacement tray or custom build needs Beyond RV confirmation.',
         ]
       : result.notes;
