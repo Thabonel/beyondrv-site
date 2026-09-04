@@ -1054,6 +1054,49 @@ const schema = [
     select.disabled = values.length === 0;
   }
 
+  /**
+   * Not every vehicle a customer arrives with is in the catalogue: an older
+   * import, an ex-service truck, anything modified. Without a way to say so,
+   * a make list that does not contain their vehicle reads as "this tool is
+   * not for me", when the manual path below has always been able to take it.
+   */
+  const OTHER_MAKE = '__other__';
+  const OTHER_MAKE_LABEL = 'Other — my vehicle is not listed';
+  // Captured before anything overwrites it, so choosing a real make restores it.
+  const PICKER_HELP_DEFAULT = byId('vehiclePickerHelp')?.textContent ?? '';
+
+  function fillMakeSelect(select: HTMLSelectElement | null, values: string[]) {
+    if (!select) return;
+    fillSelect(select, values, 'Select a make');
+    // With no catalogue the whole picker is hidden and the notice above already
+    // sends the customer to the manual fields, so an Other option here would be
+    // an invisible control offering a route they have already been given.
+    if (values.length === 0) return;
+    const option = document.createElement('option');
+    option.value = OTHER_MAKE;
+    option.textContent = OTHER_MAKE_LABEL;
+    select.appendChild(option);
+  }
+
+  function chooseOtherVehicle() {
+    const models = selectById('vehicleModel');
+    const variants = selectById('vehicleVariant');
+    fillSelect(models, [], 'Select a model');
+    fillSelect(variants, [], 'Select a variant');
+    if (models) models.disabled = true;
+    if (variants) variants.disabled = true;
+    resetVehicleSelection();
+    const details = byId('vehicleDetails') as HTMLDetailsElement | null;
+    if (details) details.open = true;
+    const help = byId('vehiclePickerHelp');
+    if (help) {
+      help.textContent = 'Enter your vehicle below. Take the GVM from the compliance plate, '
+        + 'and weigh the vehicle as it stands — for anything modified, ex-service or older, '
+        + 'a weighbridge ticket is the only figure worth trusting.';
+    }
+    inputById('vehicleName')?.focus();
+  }
+
   function setIfNotEdited(id: string, value: number | null) {
     if (customerEdited.has(id)) return;
     const input = inputById(id);
@@ -1295,6 +1338,12 @@ const schema = [
 
   selectById('vehicleMake')?.addEventListener('change', (event) => {
     const make = (event.target as HTMLSelectElement).value;
+    if (make === OTHER_MAKE) {
+      chooseOtherVehicle();
+      return;
+    }
+    const help = byId('vehiclePickerHelp');
+    if (help) help.textContent = PICKER_HELP_DEFAULT;
     const models = catalogueModelsForMake(catalogue, make);
     fillSelect(selectById('vehicleModel'), models, 'Select a model');
     fillSelect(selectById('vehicleVariant'), [], 'Select a variant');
@@ -1342,7 +1391,7 @@ const schema = [
   const pickerHelp = byId('vehiclePickerHelp');
   if (pickerHelp) (pickerHelp as HTMLElement).hidden = !pickerAvailable;
 
-  fillSelect(selectById('vehicleMake'), catalogueMakes(catalogue), 'Select a make');
+  fillMakeSelect(selectById('vehicleMake'), catalogueMakes(catalogue));
   type SlideOnResultValues = {
     vehiclePayloadBeforeAdditions?: number;
     additionalVehicleLoad?: number;
