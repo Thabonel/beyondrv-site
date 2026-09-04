@@ -20,7 +20,7 @@ const faqs = [
   },
   {
     q: 'Does tray size matter as much as payload?',
-    a: 'Yes. A slide-on camper must suit the physical tray or tub as well as the manufacturer ratings and loaded weight limits. Tray length, tray width, centre of gravity and rear overhang all matter.'
+    a: 'Yes. A slide-on camper mounts on a flat tray, so it must suit that tray as well as the manufacturer ratings and loaded weight limits. Tray length, tray width, centre of gravity and rear overhang all matter.'
   },
   {
     q: 'Should I use tare weight or weighbridge weight?',
@@ -231,24 +231,23 @@ const schema = [
           <div class="tray-research" id="trayResearch" aria-live="polite" hidden></div>
           <div class="details-grid details-grid--quick">
             <div class="form-field form-field--full">
-              <label class="form-label" for="trayType">Tray or tub type</label>
+              <label class="form-label" for="trayType">Tray type</label>
               <select class="form-input" id="trayType" name="trayType">
                 <option value="">— Select —</option>
                 <option value="Steel tray">Steel tray</option>
                 <option value="Alloy tray">Alloy tray</option>
-                <option value="Tub">Tub</option>
                 <option value="Tray with canopy">Tray with canopy</option>
                 <option value="Unsure">Unsure</option>
               </select>
-              <span class="form-help">Tell us this first. A tub's size comes from the vehicle specification; a fitted tray has to be measured.</span>
+              <span class="form-help">Tell us this first. A slide-on mounts on a flat tray, and the tray decides which model suits.</span>
             </div>
             <div class="form-field">
-              <label class="form-label" for="trayLength">Usable tray or tub length (mm)</label>
+              <label class="form-label" for="trayLength">Usable tray length (mm)</label>
               <input class="form-input" id="trayLength" name="trayLength" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 2300" aria-describedby="trayLengthHelp" />
               <span class="form-help" id="trayLengthHelp">Measure the flat usable area, not the vehicle's overall length.</span>
             </div>
             <div class="form-field">
-              <label class="form-label" for="trayWidth">Usable tray or tub width (mm)</label>
+              <label class="form-label" for="trayWidth">Usable tray width (mm)</label>
               <input class="form-input" id="trayWidth" name="trayWidth" type="number" min="0" inputmode="numeric" autocomplete="off" placeholder="e.g. 1850" aria-describedby="trayWidthHelp" />
               <span class="form-help" id="trayWidthHelp">Measure the narrowest flat usable width between anything that limits the camper.</span>
             </div>
@@ -367,7 +366,7 @@ const schema = [
         The calculator starts with your vehicle GVM, subtracts the current vehicle weight, then allows for passengers, accessories, the camper dry weight and the loaded camper weight. It also flags tray dimensions because a ute can have enough payload but still be physically unsuitable.
       </p>
       <p>
-        This is a GVM and fit estimate only. Final suitability also depends on axle ratings, tyre ratings, tray or tub rating, mounting method, load distribution, suspension setup and certified weighbridge results.
+        This is a GVM and fit estimate only. Final suitability also depends on axle ratings, tyre ratings, tray rating, mounting method, load distribution, suspension setup and certified weighbridge results.
       </p>
       <div class="worked-example">
         <h3>Worked example</h3>
@@ -489,12 +488,12 @@ const schema = [
    * length, so a tub owner must not be told their tub is merely too short: that
    * sends them looking for a longer ute when what they need is a tray.
    */
-  function isTubVehicle() {
-    const answered = value('trayType');
-    return answered === 'Tub' || (!answered && selectedVariant?.trayState === 'not_applicable');
+  function needsTrayFitted() {
+    // No tray fitted: the vehicle's load area is not a tray a camper can sit on.
+    return !value('trayType') && selectedVariant?.trayState === 'not_applicable';
   }
 
-  const TUB_EXPLANATION = 'A Beyond RV slide-on mounts on a flat tray. A tub cannot carry one whatever its length, so this vehicle would need its tub replaced with a tray. The tray length then decides which model suits.';
+  const TRAY_REQUIRED = 'A Beyond RV slide-on mounts on a flat tray. This vehicle would need a tray fitted before a camper could go on, and the tray length then decides which model suits.';
 
   function noStandardFitFor(trayLength: number) {
     if (!Number.isFinite(trayLength) || trayLength <= 0 || bestModelForTray(trayLength)) return null;
@@ -546,8 +545,8 @@ const schema = [
     const fit = noStandardFitFor(trayLength);
     const dimensions = `${fmtMm(trayLength)} usable length${Number.isFinite(trayWidth) && trayWidth > 0 ? ` × ${fmtMm(trayWidth)} usable width` : ''}`;
     const message = fit
-      ? (isTubVehicle()
-        ? `I would like help fitting a slide-on to ${vehicleName}. It has a tub, which cannot carry a slide-on, so I understand it would need a tray fitted. The tub measures ${dimensions}.`
+      ? (needsTrayFitted()
+        ? `I would like help fitting a slide-on to ${vehicleName}. I understand it would need a tray fitted first. Its load area measures ${dimensions}.`
         : `I would like help with a custom slide-on solution for ${vehicleName}. Its tray has ${dimensions}. The shortest standard camper needs about ${fmtMm(fit.shortest.nominalLengthMm!)} (${fmtMm(fit.shortfallMm)} longer).`)
       : `I would like help finding a slide-on camper for ${vehicleName}.`;
     return enquiryUrl(message);
@@ -649,8 +648,8 @@ const schema = [
     } else {
       const noFit = noStandardFitFor(trayLength);
       if (!noFit) return;
-      headline.textContent = isTubVehicle()
-        ? TUB_EXPLANATION
+      headline.textContent = needsTrayFitted()
+        ? TRAY_REQUIRED
         : `No standard Beyond RV slide-on fits this ${fmtMm(trayLength)} tray. Our shortest standard model, ${noFit.shortest.name}, needs about ${fmtMm(noFit.shortest.nominalLengthMm!)} — ${fmtMm(noFit.shortfallMm)} more.`;
       const explanation = document.createElement('p');
       explanation.className = 'camper-finder-note';
@@ -787,7 +786,7 @@ const schema = [
     const change = document.createElement('button');
     change.type = 'button';
     change.className = 'tray-research-change';
-    change.textContent = 'That is not my tray or tub';
+    change.textContent = 'That is not my tray';
     change.addEventListener('click', () => selectedVariant && researchTrayDimensions(selectedVariant, true));
     panel.append(message, change);
   }
@@ -800,7 +799,7 @@ const schema = [
     panel.replaceChildren();
 
     const heading = document.createElement('strong');
-    heading.textContent = result.status === 'multiple' ? 'Which tray or tub do you have?' : result.status === 'single' ? 'We found a likely match' : 'We could not verify the dimensions';
+    heading.textContent = result.status === 'multiple' ? 'Which tray do you have?' : result.status === 'single' ? 'We found a likely match' : 'We could not verify the dimensions';
     const message = document.createElement('p');
     message.textContent = result.message;
     panel.append(heading, message);
@@ -820,7 +819,7 @@ const schema = [
         const use = document.createElement('button');
         use.type = 'button';
         use.className = 'btn-ghost';
-        use.textContent = result.status === 'single' ? 'Yes, use these dimensions' : 'This is my tray or tub';
+        use.textContent = result.status === 'single' ? 'Yes, use these dimensions' : 'This is my tray';
         use.addEventListener('click', () => useResearchedDimensions(option));
         choice.append(name, dimensions, source, use);
         choices.appendChild(choice);
@@ -851,7 +850,7 @@ const schema = [
     if (forceInstructions) {
       renderTrayResearch({
         status: 'not_found', vehicleId: variant.id, vehicleLabel: variant.label,
-        message: 'No problem. Measure the tray or tub fitted to your vehicle instead.', options: [],
+        message: 'No problem. Measure the tray fitted to your vehicle instead.', options: [],
         measurementSteps: [
           'Measure the flat load-floor length from the front wall or headboard to the inside of the closed tailgate, or to the end of a tray.',
           'Measure the narrowest flat usable width between wheel arches, rails, tie-downs or anything else that limits the camper.',
@@ -866,7 +865,7 @@ const schema = [
     panel.dataset.state = 'loading';
     panel.replaceChildren();
     const loading = document.createElement('strong');
-    loading.textContent = 'We’re finding the tub or tray dimensions for your vehicle…';
+    loading.textContent = 'We’re finding the tray dimensions for your vehicle…';
     const detail = document.createElement('p');
     detail.textContent = 'Checking manufacturer, tray-maker and reputable Australian fitment sources. This may take up to a minute.';
     panel.append(loading, detail);
@@ -1080,7 +1079,7 @@ const schema = [
   function trayLine(trayState: string) {
     if (trayState === 'included') return 'Kerb mass includes the standard tray.';
     if (trayState === 'excluded') return 'Kerb mass excludes the tray.';
-    if (trayState === 'not_applicable') return 'This is a tub vehicle. A Beyond RV slide-on mounts on a flat tray, so it would need its tub replaced with a tray before a camper could be fitted.';
+    if (trayState === 'not_applicable') return 'A Beyond RV slide-on mounts on a flat tray. This vehicle would need a tray fitted before a camper could go on.';
     return 'The manufacturer does not state whether kerb mass includes a tray.';
   }
 
@@ -1422,7 +1421,7 @@ const schema = [
     const displayedStatus = noFit ? 'red' : result.status;
     const displayedStatusLabel = noFit ? 'No standard camper match' : result.statusLabel;
     const displayedTitle = noFit
-      ? (isTubVehicle() ? 'A slide-on needs a flat tray' : 'No standard camper fits this tray')
+      ? (needsTrayFitted() ? 'A slide-on needs a flat tray' : 'No standard camper fits this tray')
       : result.title;
     const displayedSummary = noFit
       ? `${fmtMm(trayLength)} usable length is ${fmtMm(noFit.shortfallMm)} shorter than our shortest standard camper, ${noFit.shortest.name}, which needs about ${fmtMm(noFit.shortest.nominalLengthMm!)}.`
@@ -1435,8 +1434,8 @@ const schema = [
       : result.dataQuality;
     const displayedNotes = noFit
       ? [
-          isTubVehicle()
-            ? TUB_EXPLANATION
+          needsTrayFitted()
+            ? TRAY_REQUIRED
             : `The shortest standard camper requires about ${fmtMm(noFit.shortest.nominalLengthMm!)}; this tray is ${fmtMm(trayLength)}.`,
           'A replacement tray or custom build needs Beyond RV confirmation.',
         ]

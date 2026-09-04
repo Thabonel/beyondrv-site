@@ -102,15 +102,17 @@ test('target dimensions are described as preliminary', async ({ page }) => {
 // Beyond RV slide-ons mount on a flat tray. A tub cannot carry one at any length,
 // so a tub owner told their tub is "270mm short" goes looking for a longer ute
 // when what they need is a tray fitted.
-test('a tub is told it needs a tray, not that it is too short', async ({ page }) => {
+test('a vehicle with no tray is told one is needed, not that it is too short', async ({ page }) => {
   await page.goto(pagePath);
-  await page.selectOption('#trayType', 'Tub');
+  // A factory load area is not a tray, so the finder must not answer with arithmetic.
+  await page.selectOption('#vehicleMake', 'Ford');
+  await page.selectOption('#vehicleModel', 'F-150');
+  await page.selectOption('#vehicleVariant', 'ford-f-150-2024-lariat-5-5-ft-tub-swb');
   await page.fill('#trayLength', '1850');
 
   const panel = page.getByTestId(result);
   await expect(panel).toContainText('mounts on a flat tray');
-  await expect(panel).toContainText('replaced with a tray');
-  // The arithmetic answer is right but the wrong thing to say to a tub owner.
+  await expect(panel).toContainText('would need a tray fitted');
   await expect(panel).not.toContainText('needs about');
 });
 
@@ -124,7 +126,7 @@ test('a tray that is genuinely too short still gets the measurement answer', asy
   await expect(panel).not.toContainText('replaced with a tray');
 });
 
-test('picking a tub ute says so straight away, without a tray measurement', async ({ page }) => {
+test('picking a vehicle with no tray says so straight away', async ({ page }) => {
   await page.goto(pagePath);
   await page.selectOption('#vehicleMake', 'Ford');
   await page.selectOption('#vehicleModel', 'F-150');
@@ -135,5 +137,5 @@ test('picking a tub ute says so straight away, without a tray measurement', asyn
   await expect(page.locator('#trayLength')).toHaveValue('');
   // And the customer is told why, before being asked to measure anything.
   await expect(page.locator('#vehicleProvenance')).toContainText('mounts on a flat tray');
-  await expect(page.locator('#vehicleProvenance')).toContainText('replaced with a tray');
+  await expect(page.locator('#vehicleProvenance')).toContainText('would need a tray fitted');
 });
