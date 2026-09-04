@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.1",
   "catalogueVersion": "vehicle-catalogue-2026-09-04",
-  "generatedAt": "2026-09-04T07:42:05.436Z",
-  "sourceDatabaseRowCount": 183,
+  "generatedAt": "2026-09-04T08:09:41.434Z",
+  "sourceDatabaseRowCount": 184,
   "models": [
     {
       "make": "Chevrolet",

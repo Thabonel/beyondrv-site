@@ -14,6 +14,7 @@ const ALLOWED_SOURCE_HOSTS = new Set([
   'www.isuzu.com.au',
   'www.mercedes-benz.com.au',
   'norweld.com.au',
+  'bydautomotive.com.au',
   'www.fuso.com.au', 'www.gmspecialtyvehicles.com', 'www.hino.com.au', 'www.iveco.com', 'www.kia.com',
   'www.man.com.au', 'www.mazda.com.au', 'www.mercedes-benz-trucks.com',
   'www.mitsubishi-motors.com.au', 'www.nissan.com.au', 'www.ramtrucks.com.au',

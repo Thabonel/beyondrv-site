@@ -118,10 +118,37 @@ Masses (kg)". **Do not derive them from the 2022MY rows**: a 2026 Wildtrak's
 lightest kerb of 2331 kg sitting 10 kg under the 2022 Wildtrak's heaviest of
 2341 kg is two bases coinciding, not a relationship.
 
-### Tray specifications: the table is empty
+### Hybrid utes carry their battery in the payload
 
-`tray_specifications` and `SCRIPTS/load-tray-specifications.mjs` are built and
-tested, with no data in them. This matters more than it looks: if a camper only
+Recorded on 4 September, and worth knowing before anyone recommends one.
+
+| | Payload |
+|---|---|
+| GWM Cannon Alpha PHEV | 685 kg |
+| GWM Cannon Alpha HEV | 735 kg |
+| BYD Shark 6 Premium | 790 kg |
+| Average non-hybrid tub ute in the catalogue | **964 kg** |
+
+A Beyond RV slide-on is 700 kg to 1 tonne dry. **None of these can carry one**
+once occupants, fuel and gear are counted, and the plug-in hybrids cannot carry
+the lightest camper even empty. The battery is the difference.
+
+The BYD is recorded and sits in the review queue rather than the picker: its
+brochure states no model year and no kerb mass basis, so 2025 comes from BYD's
+own document naming rather than a stated year.
+
+### Tray specifications: five rows, and two makers that cannot be loaded
+
+Five Norweld rows are loaded, with tray weights, because Norweld states its
+basis: *"Yes, they go from the front of the headboard to the back the of the
+tray."* Its class mapping is dual cab 1826 mm, space cab 2126 mm, single cab
+2526 mm, all 1850 mm wide.
+
+**MITS Alloy and Duratray cannot be loaded.** Both publish sizes; neither states
+whether they are outside or usable dimensions, and the loader refuses a row whose
+basis is unknown. MITS says only that *"Our dimensions are set to accommodate our
+range of canopies."* Ask them, or measure one, and the data is loadable in
+minutes. This matters more than it looks: if a camper only
 goes on a tray, tray dimensions are the whole question for 96 of 165 vehicles.
 
 Norweld, MITS Alloy and Duratray publish the data. **Every row needs
