@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-09-05T10:04:47.997Z",
-  "sourceDatabaseRowCount": 206,
+  "generatedAt": "2026-09-05T10:36:30.955Z",
+  "sourceDatabaseRowCount": 208,
   "models": [
     {
       "slug": "byd-shark-6",
@@ -50,6 +50,7 @@
           "title": "BYD Shark 6 specification brochure (version 03.05C)",
           "url": "https://bydautomotive.com.au/brochures/BYD-SHARK-6-2025.pdf",
           "accessedDate": "2026-09-04",
+          "sourceType": "manufacturer_pdf",
           "notes": "Specification table for the Premium variant. States no model year and no definition of how kerb weight is measured."
         }
       ]
@@ -129,6 +130,7 @@
           "title": "Towing With Silverado",
           "url": "https://www.gmspecialtyvehicles.com/au-en/chevrolet/trucks/trailering-and-towing",
           "accessedDate": "2026-08-17",
+          "sourceType": "manufacturer_webpage",
           "notes": "Official Australian mass, payload, rear axle, towing and towball figures."
         }
       ]
@@ -208,6 +210,7 @@
           "title": "Towing With Silverado",
           "url": "https://www.gmspecialtyvehicles.com/au-en/chevrolet/trucks/trailering-and-towing",
           "accessedDate": "2026-08-17",
+          "sourceType": "manufacturer_webpage",
           "notes": "Official Australian mass, payload, rear axle, towing and towball figures."
         }
       ]
@@ -399,6 +402,7 @@
           "title": "F-150 MY24 Specification Sheet",
           "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/f-150/brochures/f-150-spec-sheet-my24.pdf",
           "accessedDate": "2026-08-18",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official Australian MY24 specification sheet, supplied manually because ford.com.au blocks automated retrieval. Verified directly: GVM, GCM, kerb, payload, front and rear GAWR and wheelbase all match for both the 145-inch/5.5-foot and 157-inch/6.5-foot configurations. Ford states payload is derived by subtracting kerb weight from GVM, so its payload is a calculation. Currency caveat: this is the MY24 sheet while the range is currently listed."
         }
       ]
@@ -1543,6 +1547,7 @@
           "title": "Next-Generation Ranger 2022MY Specifications",
           "url": "https://www.ford.com.au/content/dam/ecomm/Release-3/AU/landing/next-gen-ranger-ebrochure-specifications.pdf",
           "accessedDate": "2026-08-17",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official Australian launch specification brochure with per-variant mass tables, verified directly with exact payload arithmetic on every row. CURRENCY WARNING: this is the 2022MY document and the current Australian range is 2026.50MY, so every figure needs refreshing before customer exposure. Rows are source_verified because they were checked against this document; staleness is tracked in the coverage register and row notes, not in verification_status. Ford blocks automated retrieval; obtained manually. The 4x2 section in this document omits its Vehicle Masses page, so only 4x4 masses are recorded."
         },
         {
@@ -1551,6 +1556,7 @@
           "title": "Ranger 2026.50MY Specifications Brochure",
           "url": "https://www.ford.com.au/content/dam/Ford/au/nameplate/ranger/brochure/specs-brochure/2026-50-my-ranger-brochure.pdf",
           "accessedDate": "2026-08-18",
+          "sourceType": "manufacturer_pdf",
           "notes": "NOT INDEPENDENTLY VERIFIED: ford.com.au blocks automated retrieval. Figures come from a supplied compilation with page-level locators. IMPORTANT: the stored kerb mass is Ford's lightest-orderable-equipment figure, which yields the LARGEST payload. On the 2022MY brochure the heavier options figure was up to 68 kg greater. Obtain the brochure and add the heavy-options kerb before any customer exposure."
         }
       ]
@@ -1686,6 +1692,7 @@
           "title": "Ranger Super Duty 2026.50MY Specifications (super-duty-specs-17-april.pdf)",
           "url": "https://www.ford.com.au/showroom/trucks-and-vans/ranger/super-duty/",
           "accessedDate": "2026-09-04",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official Ford Australia specification sheet, supplied as a PDF by the site owner and read directly. The canonical ford.com.au download URL was not confirmed because ford.com.au returns HTTP 403 to automated retrieval; the showroom page the sheet is published from is recorded instead. Publishes a full Vehicle Masses table for all four cab types. Ford's kerb basis here is the STANDARD combination of factory-fit equipment, not the lightest orderable combination used in the 2026.50MY Ranger brochure, so these figures carry no optimistic-kerb caveat."
         }
       ]
@@ -1806,6 +1813,7 @@
           "title": "Canter FG 4x4 Wide Cab / Manual High/Low Range Specifications (part number TSC190E-SSV2)",
           "url": "https://www.fuso.com.au/siteassets/media/documents/spec-sheets/canter/canter-fg-4x4-wide-cab-b.pdf",
           "accessedDate": "2026-09-04",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official Fuso Australia variant specification sheet, read directly. Publishes an estimated mass table split front/rear/total, max axle loading, and a full dimension table. The sheet states no model year; it is dated \"Valid from 05-Nov-21\", which is a document validity date and must not be read as a model year."
         },
         {
@@ -1814,6 +1822,7 @@
           "title": "Canter FG 4x4 Wide Crew Cab / Manual High/Low Range Specifications (part number TSC195B-SSV2)",
           "url": "https://www.fuso.com.au/siteassets/media/documents/spec-sheets/canter/canter-fg-4x4-wide-crew-cab-b.pdf",
           "accessedDate": "2026-09-04",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official Fuso Australia variant specification sheet, read directly. Same mass and dimension structure as the wide cab sheet. States no model year."
         }
       ]
@@ -2033,6 +2042,7 @@
           "title": "Cannon 2026 Brochure",
           "url": "https://assets.gwmanz.com/f/256395/x/f66059e2b4/y4rt9h-au-cannon-brochure-2026-a4-210x297mm.pdf",
           "accessedDate": "2026-08-18",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official Australian 2026 brochure. Verified directly against the kerb weight, payload and GVM rows."
         }
       ]
@@ -2196,6 +2206,7 @@
           "title": "Cannon Alpha Brochure",
           "url": "https://assets.gwmanz.com/f/256395/x/43c46a95d0/cannon-alpha-brochure-au.pdf",
           "accessedDate": "2026-08-18",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official Australian brochure. Verified directly. Two 3.0 turbo-diesel grades are listed without a mass table and are not recorded."
         }
       ]
@@ -2285,6 +2296,7 @@
           "title": "Hino 300 Series 817 4x4 and 817 4x4 Crew specification sheet (HS3008174x4-0822)",
           "url": "https://www.hino.com.au/uploads/pdf/specification/HS3008174x4-0822_WEB_(4).pdf",
           "accessedDate": "2026-09-01",
+          "sourceType": "manufacturer_pdf",
           "notes": "hino.com.au returned HTTP 403 to a direct fetch; the identical document was read from a mirrored copy at earthcruiser.net.au."
         }
       ]
@@ -2588,6 +2600,7 @@
           "title": "25.5MY Isuzu D-MAX Specifications",
           "url": "https://cdn-iua.dataweavers.io/-/media/d-max/documents/25-5my-isuzu-d-max-vehicle-specifications.pdf?rev=30680420a74d44c9af2c12f77ee2d85d",
           "accessedDate": "2026-08-17",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official Australian specification table. Cab-chassis kerb mass excludes tray body."
         }
       ]
@@ -2675,6 +2688,7 @@
           "title": "NPS 75-175 4x4 Specifications",
           "url": "https://prd1.isuzu.com.au/media/5rrdsxuw/spec_nps_75_175_4x4_2605_r3.pdf",
           "accessedDate": "2026-08-17",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official current Australian day-cab and crew-cab specification sheet."
         }
       ]
@@ -2830,6 +2844,7 @@
           "title": "Isuzu N Series NPS 75/45-155 4X4 and NPS 75/45-155 4X4 Crew specification sheet (ARK 1443 10/21)",
           "url": "https://www.isuzu.com.au/Media/Isuzu_Files/Spec_Sheets/Current_spec_sheets/NPS%2075%2045-155_4X4_NPS%2075%2045-155_4X4%20Crew_ARK1443_V10.pdf",
           "accessedDate": "2026-09-04",
+          "sourceType": "manufacturer_pdf",
           "notes": "Watermarked PRELIMINARY ONLY. isuzu.com.au returned a TLS certificate chain error to an automated fetch; the document was supplied manually by the owner, as the Hino sheet was."
         }
       ]
@@ -3051,6 +3066,7 @@
           "title": "New Daily 4x4 Specification Sheet",
           "url": "https://www.iveco.com/au/-/media/IVECOdotcom/Australia/Products/DailyMy24/Brochures/New-Daily-4x4-Spec-Sheet---Web-Version.pdf?rev=0fa977f9dcb94b2a930710f0f71e1b36",
           "accessedDate": "2026-08-17",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official Australian specification sheet. Kerb includes chassis cab, 75 kg driver, full fuel, oils, tools and spare wheel where present."
         }
       ]
@@ -3140,6 +3156,7 @@
           "title": "Eurocargo 4x4 ML150E32W Specification Sheet",
           "url": "https://www.iveco.com/au/-/media/IVECOdotcom/Australia/Products/EurocargoMy24/Files/Eurocargo-4x4-ML150-Spec-Sheet---Web-Version.pdf",
           "accessedDate": "2026-09-05",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official IVECO Australia specification sheet, read directly. Publishes total kerbweight with a front/rear split for both wheelbases, plated GVM and GCM, and axle and suspension capacities. Its kerb basis INCLUDES 180 litres of fuel, 30 litres of AdBlue and a driver, which is heavier and more conservative than the T-Way sheets in the same range, which exclude all three. Document footer dated 01/26; the MY24 designation comes from the product line the sheet sits under."
         }
       ]
@@ -3260,6 +3277,7 @@
           "title": "T-Way 4x4 Cab Chassis AD190T36W Specification Sheet",
           "url": "https://www.iveco.com/au/-/media/IVECOdotcom/Australia/Products/T-Way/T-Way-4x4-Cab-Chassis.pdf",
           "accessedDate": "2026-09-04",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official IVECO Australia specification sheet, read directly. Publishes total kerb weight and a front/rear split for all three wheelbases, plated GVM and GCM, and axle and suspension capacities. States no model year. IVECO also publishes 6x6 (AD380T45W) and 8x4 (AD410T51) sheets in the same series that have not been extracted."
         }
       ]
@@ -3380,6 +3398,7 @@
           "title": "T-Way 6x6 Cab Chassis AD380T45W Specification Sheet",
           "url": "https://www.iveco.com/au/-/media/IVECOdotcom/Australia/Products/T-Way/T-Way-6x6-Cab-Chassis.pdf",
           "accessedDate": "2026-09-05",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official IVECO Australia specification sheet, read directly. Same series and same mass basis as the T-Way 4x4 sheet. States no model year."
         }
       ]
@@ -3434,6 +3453,7 @@
           "title": "T-Way 8x4 Cab Chassis AD410T51 Specification Sheet",
           "url": "https://www.iveco.com/au/-/media/IVECOdotcom/Australia/Products/T-Way/T-Way-8x4-Cab-Chassis.pdf",
           "accessedDate": "2026-09-05",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official IVECO Australia specification sheet, read directly. States no model year."
         }
       ]
@@ -3541,6 +3561,7 @@
           "title": "Musso and Musso XLV MY26 Specifications and Features",
           "url": "https://payload.therefinerydesign.com/api/media/file/KGM-Musso-MY26-Specs-and-Features.pdf",
           "accessedDate": "2026-08-18",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official MY26 specification sheet. Verified directly: resolves the previously unattributed 880 kg and 1,010 kg payload configurations as Musso XLV variants."
         }
       ]
@@ -3648,6 +3669,7 @@
           "title": "Musso and Musso XLV MY26 Specifications and Features",
           "url": "https://payload.therefinerydesign.com/api/media/file/KGM-Musso-MY26-Specs-and-Features.pdf",
           "accessedDate": "2026-08-18",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official MY26 specification sheet. Verified directly: resolves the previously unattributed 880 kg and 1,010 kg payload configurations as Musso XLV variants."
         }
       ]
@@ -3979,6 +4001,7 @@
           "title": "Kia Tasman Cab Chassis Brochure",
           "url": "https://www.kia.com/content/dam/kwcms/au/en/images/pdf/tasman/kia-tasman-cab-chassis-brochure.pdf",
           "accessedDate": "2026-08-18",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official Australian cab-chassis brochure, separate from the pickup brochure. Verified directly. Kia states kerb weight and payload exclude the weight of tray bodies."
         },
         {
@@ -3987,6 +4010,7 @@
           "title": "Kia Tasman Model Year 2026 Brochure",
           "url": "https://www.kia.com/content/dam/kwcms/au/en/images/pdf/tasman/kia-tasman-brochure.pdf",
           "accessedDate": "2026-08-17",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official Australian brochure for MY26 dual-cab pickup variants. These are tub vehicles, not cab-chassis records."
         }
       ]
@@ -4076,6 +4100,7 @@
           "title": "TGM 13.250-290 4x4 BL CH RV Specification",
           "url": "https://www.man.com.au/wp-content/uploads/2025/02/TGM-13.250-290-4X4-RV-Spec.pdf",
           "accessedDate": "2026-08-17",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official Australian RV chassis specification. GCM is listed as 28,000 kg, with 20,000 kg applicable with engageable transfer case; conservative 20,000 kg is stored."
         }
       ]
@@ -4659,6 +4684,7 @@
           "title": "Mazda BT-50 Payload Calculator",
           "url": "https://www.mazda.com.au/cars/bt-50/payload/",
           "accessedDate": "2026-08-17",
+          "sourceType": "manufacturer_webpage",
           "notes": "Official interactive calculator. Publishes bare-chassis and standard-tray-fitted mass states per grade, plus an accessory weight table (canopy 130 kg, bull bar 62-68 kg, suspension upgrade 85-95 kg). Vehicle assets are dated October 2025."
         }
       ]
@@ -5012,6 +5038,7 @@
           "title": "Sprinter and eSprinter Technical Data: Panel Van, Cab Chassis, Dual Cab Chassis and Transfer Minibus (VS30, MY25/MY26)",
           "url": "https://www.mercedes-benz.com.au/content/dam/australia/vans/brochures-and-specifications/sprinter-panel-van/Sprinter%20VS30%20MY25%20MY26%20AU%20Tech%20Brochure%20April%202026%2020260326%20NEW.pdf",
           "accessedDate": "2026-09-04",
+          "sourceType": "manufacturer_pdf",
           "notes": "Effective July 2025 production, issued April 2026, footer states Model Year 2025. Cab chassis data on pages 23 to 26. Pages 25 and 26 label the body style row RWD Single Cab Chassis while the page title and the 9072 model type codes say Dual Cab Chassis; the title is correct."
         }
       ]
@@ -5066,7 +5093,96 @@
           "title": "Unimog U 4023 Extreme Off-road Technical Data",
           "url": "https://www.mercedes-benz-trucks.com/au/en/trucks/unimog-offroad.html",
           "accessedDate": "2026-08-17",
+          "sourceType": "manufacturer_webpage",
           "notes": "Current Australian U 4023 page. The page labels 10.3 t as maximum permissible gross combination weight, while context suggests permissible gross vehicle weight; retain as a review issue."
+        }
+      ]
+    },
+    {
+      "slug": "mercedes-benz-unimog-u1700l",
+      "make": "Mercedes-Benz",
+      "model": "Unimog U1700L",
+      "coverageId": "mercedes-unimog-legacy",
+      "platform": "extreme_offroad_truck",
+      "fitmentMode": "specialist_review",
+      "modelYears": [],
+      "variants": [
+        {
+          "id": "unimog-u1700l-cargo-no-winch",
+          "kind": "heavy",
+          "modelYear": null,
+          "modelYearEnd": null,
+          "grade": "UL 1700 L cargo, without winch",
+          "cabType": "day_cab",
+          "drivetrain": "4x4",
+          "gvmKg": 12000,
+          "gcmKg": 24500,
+          "kerbKg": 6600,
+          "kerbBasis": "Unladen mass with the Army cargo tray fitted, from the EMEI data summary. Front and rear axle masses sum to the stated total.",
+          "payloadKg": null,
+          "calculatedPayloadKg": 5400,
+          "payloadArithmeticMatches": null,
+          "frontGawrKg": 5300,
+          "rearGawrKg": 7000,
+          "trayState": "included",
+          "trayLengthMm": null,
+          "trayWidthMm": null,
+          "brakedTowingKg": 12500,
+          "sourceId": "adf-emei-vehicle-g600-unimog",
+          "sourceLocator": "Issue 3, Feb 09, paragraph 6 (Mass) and paragraph 5 (Dimensions), page 2",
+          "verificationStatus": "source_verified",
+          "notes": "Body dimensions given are the internal dimensions of the fitted Army cargo tray (4,050 x 2,375 x 500 mm), not a body-builder maximum. The EMEI describes the role as carrying a five tonne load, which is 400 kg below the 5,400 kg the mass arithmetic gives; the difference covers crew, fuel and kit. Ex-service vehicles are re-plated and modified individually: verify GVM, axle limits and tare against the compliance plate and a weighbridge ticket for any specific vehicle.",
+          "publishedBodyPayloadKg": null,
+          "chassisCabTotalMassKg": 6600,
+          "chassisCabFrontMassKg": 3810,
+          "chassisCabRearMassKg": 2790,
+          "mountingArchitectureNote": "Torsionally flexible ex-service chassis. A camper body needs a three-point or equivalent subframe that lets the chassis articulate. Never hard-mount a box to this chassis.",
+          "maxBodyLengthMm": 4050,
+          "maxBodyWidthMm": 2375
+        },
+        {
+          "id": "unimog-u1700l-cargo-winch",
+          "kind": "heavy",
+          "modelYear": null,
+          "modelYearEnd": null,
+          "grade": "UL 1700 L cargo, with winch",
+          "cabType": "day_cab",
+          "drivetrain": "4x4",
+          "gvmKg": 12000,
+          "gcmKg": 24500,
+          "kerbKg": 6800,
+          "kerbBasis": "Unladen mass with the Army cargo tray fitted, and a winch, from the EMEI data summary. Front and rear axle masses sum to the stated total.",
+          "payloadKg": null,
+          "calculatedPayloadKg": 5200,
+          "payloadArithmeticMatches": null,
+          "frontGawrKg": 5300,
+          "rearGawrKg": 7000,
+          "trayState": "included",
+          "trayLengthMm": null,
+          "trayWidthMm": null,
+          "brakedTowingKg": 12500,
+          "sourceId": "adf-emei-vehicle-g600-unimog",
+          "sourceLocator": "Issue 3, Feb 09, paragraph 6 (Mass) and paragraph 5 (Dimensions), page 2",
+          "verificationStatus": "source_verified",
+          "notes": "The winch adds 200 kg over the unwinched vehicle and moves mass forward onto the front axle. Body dimensions given are the internal dimensions of the fitted Army cargo tray, not a body-builder maximum. Ex-service vehicles are re-plated and modified individually: verify against the compliance plate and a weighbridge ticket.",
+          "publishedBodyPayloadKg": null,
+          "chassisCabTotalMassKg": 6800,
+          "chassisCabFrontMassKg": 4060,
+          "chassisCabRearMassKg": 2740,
+          "mountingArchitectureNote": "Torsionally flexible ex-service chassis. A camper body needs a three-point or equivalent subframe that lets the chassis articulate. Never hard-mount a box to this chassis.",
+          "maxBodyLengthMm": 4050,
+          "maxBodyWidthMm": 2375
+        }
+      ],
+      "sources": [
+        {
+          "id": "adf-emei-vehicle-g600-unimog",
+          "manufacturer": "Australian Army (EMEI)",
+          "title": "EMEI Vehicle G 600 Issue 3: Truck, Cargo, Medium, MC2 - Unimog, Data Summary",
+          "url": "",
+          "accessedDate": "2026-09-05",
+          "sourceType": "manufacturer_manual",
+          "notes": "Australian Army Electrical and Mechanical Engineering Instruction, authorised by command of the Chief of Army, held by Beyond RV. Covers the ex-service UL 1700 L. Offline document: a reader cannot check it online. Mass figures reconcile internally, with front and rear axle masses summing to the stated total on both winch configurations."
         }
       ]
     },
@@ -5565,6 +5681,7 @@
           "title": "26MY Triton Brochure",
           "url": "https://www.mitsubishi-motors.com.au/content/dam/mmal/pdfs/vehicle-brochures/26MY%20Triton%20Brochure.pdf",
           "accessedDate": "2026-08-18",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official Australian 26MY brochure with a full 14-column Dimensions and Weights table covering 2WD and 4WD, single, club and double cab, in cab-chassis and pick-up bodies. Supersedes the 25MY model-level page."
         }
       ]
@@ -5700,6 +5817,7 @@
           "title": "All-New Navara Specifications and Pricing",
           "url": "https://www.nissan.com.au/vehicles/browse-range/all-new-navara/specs-and-pricing.html",
           "accessedDate": "2026-08-18",
+          "sourceType": "manufacturer_webpage",
           "notes": "Official Australian specifications page. Verified directly for all four grades."
         }
       ]
@@ -5835,6 +5953,7 @@
           "title": "RAM 1500 Specification Brochure",
           "url": "https://resource.digitaldealer.com.au/pdf/4385833746a1d25a063869361464389.pdf",
           "accessedDate": "2026-08-18",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official RAM specification brochure on a dealer resource CDN. Verified directly. Supersedes the earlier unverified RAM 1500 rows, which had the Rebel and Limited kerb and payload figures wrong."
         }
       ]
@@ -5886,6 +6005,7 @@
           "title": "RAM 2500 and 3500 Laramie Cummins High Output Specification",
           "url": "https://resource.digitaldealer.com.au/pdf/211467751697043e181834349841250.pdf",
           "accessedDate": "2026-08-18",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official RAM specification brochure, hosted on a dealer resource CDN rather than ramtrucks.com.au. Verified directly, including the optional derating of the 3500 to 4,495 kg GVM and 795 kg payload."
         }
       ]
@@ -5965,6 +6085,7 @@
           "title": "RAM 2500 and 3500 Laramie Cummins High Output Specification",
           "url": "https://resource.digitaldealer.com.au/pdf/211467751697043e181834349841250.pdf",
           "accessedDate": "2026-08-18",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official RAM specification brochure, hosted on a dealer resource CDN rather than ramtrucks.com.au. Verified directly, including the optional derating of the 3500 to 4,495 kg GVM and 795 kg payload."
         }
       ]
@@ -6184,6 +6305,7 @@
           "title": "Toyota HiLux Spec Table June 2026",
           "url": "https://www.toyota.com.au/-/media/toyota/main-site/vehicle-hubs/hilux/files/20260630_hilux_spec_sheet_gto010060.pdf?rev=d222769888af49519347727deb13bb73",
           "accessedDate": "2026-08-17",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official Australian specification table. Toyota labels weights approximate."
         }
       ]
@@ -6347,6 +6469,7 @@
           "title": "Toyota LC70 Spec Table October 2025",
           "url": "https://www.toyota.com.au/-/media/toyota/main-site/vehicle-hubs/lc70/files/20251021_lc70_spec_table_gto009454.pdf?rev=4e4c662a09fe418c9a5a7b00509b16dd",
           "accessedDate": "2026-08-17",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official Australian specification table. Toyota labels weights approximate."
         }
       ]
@@ -6426,6 +6549,7 @@
           "title": "Toyota Tundra Spec Table May 2026",
           "url": "https://www.toyota.com.au/-/media/toyota/main-site/vehicle-hubs/tundra/files/20260506-tundra_spec-table_gto009469-v1.pdf?rev=fe8c44cde59d4c339adb2c9124278b61",
           "accessedDate": "2026-08-17",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official Australian specification table. Payload is derived from published GVM minus maximum kerb weight."
         }
       ]
@@ -6645,6 +6769,7 @@
           "title": "Amarok MY25 Brochure and Specifications",
           "url": "https://www.volkswagen.com.au/idhub/content/dam/onehub_pkw/importers/au/pdfs/commercial-vehicles/VW_CV_Amarok_VWCAMAROKMY25_BrochureSpec_Sep25_FA.pdf",
           "accessedDate": "2026-08-18",
+          "sourceType": "manufacturer_pdf",
           "notes": "Official Australian MY25 brochure. Verified directly: kerb and payload rows match to the kilogram. Note 2 states Volkswagen derives payload by subtracting kerb weight from GVM, so its published payload is a calculation, not an independent measurement."
         }
       ]
@@ -6798,6 +6923,7 @@
           "title": "Commercial Vehicles: The Crafter Range",
           "url": "https://www.volkswagen.com.au/idhub/content/dam/onehub_pkw/importers/au/pdfs/commercial-vehicles/Volkswagen_Crafter_brochure_Feb21.pdf",
           "accessedDate": "2026-09-04",
+          "sourceType": "manufacturer_pdf",
           "notes": "Supplied manually by the owner. Crafter 50/55 cab chassis weights on page 45. The brochure is dated February 2021 and states no model year, so it may be superseded; the current range page still lists Crafter 50 and 55."
         }
       ]

@@ -7,9 +7,12 @@ CREATE TABLE IF NOT EXISTS sources (
   url TEXT NOT NULL,
   published_date TEXT,
   accessed_date TEXT NOT NULL,
-  source_type TEXT NOT NULL CHECK (source_type IN ('manufacturer_pdf', 'manufacturer_webpage')),
+  source_type TEXT NOT NULL CHECK (source_type IN ('manufacturer_pdf', 'manufacturer_webpage', 'manufacturer_manual')),
   market TEXT NOT NULL DEFAULT 'AU',
-  notes TEXT
+  notes TEXT,
+  -- An offline manual has no retrievable URL. Every other source must have one,
+  -- because a citation a reader cannot follow is not a citation.
+  CHECK (source_type = 'manufacturer_manual' OR url LIKE 'http%')
 );
 
 CREATE TABLE IF NOT EXISTS vehicle_variants (
