@@ -50,7 +50,7 @@ export async function mockCalendar(page: Page) {
     const body = request.postDataJSON() as Record<string, unknown>;
     writes.push({ method: request.method(), url: request.url(), body });
     if (request.method() === 'POST') {
-      const event = { id: `cal-${stored.length + 1}`, notes: '', location: '', links: {}, source: 'gm', createdBy: 'owner', createdAt: today, updatedAt: today, ...body };
+      const event = { id: `cal-${stored.length + 1}`, notes: '', location: '', links: {}, assigneeIds: [], source: 'gm', createdBy: 'owner', createdAt: today, updatedAt: today, ...body };
       stored.push(event);
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, event, message: `Saved "${String(body.title)}".` }) });
       return;

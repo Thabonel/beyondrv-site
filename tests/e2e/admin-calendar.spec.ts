@@ -380,3 +380,40 @@ test('assigning a meeting sticks, because it is filed where the calendar looks',
   // id the grid reads them back by.
   expect(assign.body).toMatchObject({ kind: 'meeting', recordId: 'cal-ai-1', eventId: 'calendar:cal-ai-1', assigneeIds: ['crew-li'] });
 });
+
+test('people picked while creating are still on it afterwards', async ({ page, isMobile }) => {
+  test.skip(Boolean(isMobile));
+  // Every kind, created from scratch with people on it. The earlier tests
+  // covered a task on create and a meeting on edit, and missed this square of
+  // the grid: a meeting created with someone picked dropped them silently.
+  const { writes } = await mockCalendar(page);
+  await page.goto('/admin/');
+
+  for (const [kind, label] of [['meeting', 'Meeting'], ['reminder', 'Reminder'], ['task', 'Task']] as const) {
+    writes.length = 0;
+    await page.getByTestId('calendar-create').click();
+    const form = page.getByTestId('event-form');
+    await form.getByRole('radio', { name: label }).click();
+    await page.getByTestId('event-title').fill(`A ${label}`);
+    await page.getByTestId('event-assignee-crew-li').click();
+    await page.getByTestId('event-save').click();
+
+    await expect.poll(() => writes.length, { message: `${label} produced no write` }).toBe(1);
+    expect(writes[0].body, `${label} dropped who was on it`).toMatchObject({ assigneeIds: ['crew-li'] });
+  }
+});
+
+test('an event created with someone on it says so when reopened', async ({ page, isMobile }) => {
+  test.skip(Boolean(isMobile));
+  await mockCalendar(page);
+  await page.goto('/admin/');
+
+  await page.getByTestId('calendar-create').click();
+  await page.getByTestId('event-title').fill('Supplier call');
+  await page.getByTestId('event-assignee-crew-li').click();
+  await page.getByTestId('event-save').click();
+
+  await page.locator('.fc-event', { hasText: 'Supplier call' }).click();
+  // The symptom the GM reported: it came back saying nobody was assigned.
+  await expect(page.getByTestId('event-assignee-name')).toHaveText('On it: Li');
+});
