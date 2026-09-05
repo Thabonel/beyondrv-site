@@ -21,6 +21,7 @@ import {
   etaDisagreement,
   extractionInput,
   extractionInstructions,
+  orderDateFromCandidate,
   selectUnprocessedMessages,
   validateCandidates,
   type ExtractionContext,
@@ -29,6 +30,7 @@ import { CALENDAR_EVENT_STORE, calendarEventKey, isDuplicate, validateEvent, typ
 import { appendGoogleAudit, getGoogleConnection, googleOAuthConfig, publicGoogleConnectionState } from './google-oauth-core';
 import { gmailThreadKey, OWNER_COPILOT_GMAIL_THREAD_STORE } from './owner-copilot-core';
 import { appendOwnerTimeline, listJsonStore } from './owner-copilot-store-utils';
+import { writeOrderDate } from './order-date-write';
 import catalogue from './product-catalogue.json';
 
 export const config = {
@@ -95,6 +97,7 @@ export async function runGmailCalendarSync(event: Parameters<Handler>[0]): Promi
     const instructions = extractionInstructions(context);
     let candidates = 0;
     let written = 0;
+    let orderDates = 0;
     let duplicates = 0;
     let rejected = 0;
     const disagreements: string[] = [];
@@ -122,6 +125,14 @@ export async function runGmailCalendarSync(event: Parameters<Handler>[0]): Promi
       rejected += validated.rejected.length;
 
       for (const candidate of validated.accepted) {
+        // A visit or handover that names its order goes onto the order.
+        const orderDate = orderDateFromCandidate(candidate);
+        if (orderDate) {
+          const result = await writeOrderDate({ ...orderDate, source: 'gmail-calendar-sync', reason: `email "${message.subject}" (${message.fromEmail})` });
+          if (result.ok) { orderDates += 1; continue; }
+          // The order vanished between the model reading it and the write;
+          // fall through and keep the date on the calendar instead of losing it.
+        }
         const input = candidateToEventInput(candidate, message);
         const result = validateEvent(input, { actor: 'gmail-calendar-sync' });
         if (!result.ok) { rejected += 1; continue; }
@@ -152,8 +163,8 @@ export async function runGmailCalendarSync(event: Parameters<Handler>[0]): Promi
       }
     }
 
-    await appendGoogleAudit('gmail_calendar_sync_completed', { read: messages.length, candidates, written, duplicates, rejected, disagreements, model: settings.model });
-    return respond(200, { ready: true, read: messages.length, candidates, written, duplicates, rejected, disagreements });
+    await appendGoogleAudit('gmail_calendar_sync_completed', { read: messages.length, candidates, written, orderDates, duplicates, rejected, disagreements, model: settings.model });
+    return respond(200, { ready: true, read: messages.length, candidates, written, orderDates, duplicates, rejected, disagreements });
   } catch (error) {
     console.warn('google-gmail-calendar-sync: unavailable', { error: safeBlobStoreError(error) });
     return respond(503, { ready: false, message: 'Calendar sync could not run.' });

@@ -26,3 +26,16 @@ test('Android WebM recordings retain their supported media type when Chrome adds
   assert.equal(normaliseAudioMimeType('audio/webm;codecs=opus'), 'audio/webm');
   assert.equal(normaliseAudioMimeType(' Audio/MP4 ; codecs=mp4a.40.2'), 'audio/mp4');
 });
+
+test('a visit or handover fixed on the call is kept with its day and time, and nothing else is guessed', () => {
+  const handover = normaliseVoiceProposal({ summary: 'Call', appointmentKind: 'expected_handover', appointmentDate: '2026-09-20', appointmentTime: '10:00' });
+  assert.equal(handover.appointmentKind, 'expected_handover');
+  assert.equal(handover.appointmentDate, '2026-09-20');
+  assert.equal(handover.appointmentTime, '10:00');
+  assert.match(voiceCaptureSummary(handover), /Handover agreed: 2026-09-20 10:00/);
+
+  const vague = normaliseVoiceProposal({ summary: 'Call', appointmentKind: 'delivery', appointmentDate: 'Saturday', appointmentTime: '10am' });
+  assert.equal(vague.appointmentKind, '');
+  assert.equal(vague.appointmentDate, '');
+  assert.equal(vague.appointmentTime, '');
+});

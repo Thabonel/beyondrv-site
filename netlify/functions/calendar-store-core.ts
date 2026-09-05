@@ -37,7 +37,7 @@ export function newCalendarEventId() {
  * which order or product the email means; they draw in the same colour as the
  * projected kind, so the GM sees one thing, not two systems.
  */
-export const STORE_KINDS = ['meeting', 'reminder', 'customer_visit', 'container_eta', 'expected_arrival'] as const;
+export const STORE_KINDS = ['meeting', 'reminder', 'customer_visit', 'expected_handover', 'container_eta', 'expected_arrival'] as const;
 export type StoreEventKind = typeof STORE_KINDS[number];
 
 export interface CalendarSourceEmail {

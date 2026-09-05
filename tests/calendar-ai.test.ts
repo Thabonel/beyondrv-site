@@ -4,6 +4,7 @@ import {
   candidateToEventInput,
   etaDisagreement,
   extractionInstructions,
+  orderDateFromCandidate,
   selectUnprocessedMessages,
   validateCandidates,
   type CalendarMessage,
@@ -121,4 +122,18 @@ test('the instructions carry today, business hours, and the orders the model may
   assert.match(text, /08:00 to 17:00/);
   assert.match(text, /o1 \| Tasmanian customer/);
   assert.match(text, /advent-2450 \| Advent 2450 \| container ETA 2026-09-20/);
+});
+
+test('a handover that names its order becomes a date on that order, not a calendar event', () => {
+  const [accepted] = validateCandidates({ candidates: [
+    candidate({ kind: 'expected_handover', title: 'Handover: Tasmanian customer', relatedOrderId: 'o1', relatedProductSlug: '', allDay: false, startTime: '10:00' }),
+  ] }, context).accepted;
+  assert.deepEqual(orderDateFromCandidate(accepted), { kind: 'expected_handover', orderId: 'o1', date: '2026-09-18', time: '10:00' });
+});
+
+test('a visit with no order stays a calendar event for someone to place', () => {
+  const [accepted] = validateCandidates({ candidates: [candidate({ kind: 'customer_visit', relatedProductSlug: '' })] }, context).accepted;
+  assert.equal(orderDateFromCandidate(accepted), null);
+  assert.equal(orderDateFromCandidate(validateCandidates({ candidates: [candidate({ kind: 'meeting', relatedOrderId: 'o1' })] }, context).accepted[0]), null,
+    'a meeting about an order is still a meeting');
 });

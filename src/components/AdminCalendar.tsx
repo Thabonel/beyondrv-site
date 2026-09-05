@@ -30,6 +30,7 @@ import {
   loadHiddenKinds,
   matchesSearch,
   MOVABLE_RECORD_KINDS,
+  ORDER_DATE_KINDS,
   parseWall,
   PHONE_QUERY,
   rectAt,
@@ -330,8 +331,9 @@ export default function AdminCalendar({ events, storedDetails, clashes = [], loa
       }
     } else if (values.kind === 'task') {
       result = await actions.createTask(values.title, values.date, values.allDay ? '' : values.startTime);
-    } else if (values.kind === 'customer_visit') {
-      result = await actions.moveRecord('customer_visit', values.orderId, values.date, values.allDay ? '' : values.startTime);
+    } else if (ORDER_DATE_KINDS.has(values.kind)) {
+      // A visit or a handover is a date on an order; write it there.
+      result = await actions.moveRecord(values.kind, values.orderId, values.date, values.allDay ? '' : values.startTime);
     } else {
       result = await actions.createStoreEvent({ title: values.title, kind: values.kind, start, end, allDay: values.allDay, notes: values.notes, source: 'gm' });
     }

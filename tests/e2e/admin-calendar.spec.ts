@@ -149,3 +149,30 @@ test('a phone opens on Schedule with the sidebar hidden, and Week shows three da
   await page.getByRole('button', { name: 'Main menu' }).click();
   await expect(page.getByTestId('calendar-sidebar')).toBeVisible();
 });
+
+test('a handover created from the popup picks an order and writes the date onto it', async ({ page, isMobile }) => {
+  test.skip(Boolean(isMobile));
+  const { writes } = await mockCalendar(page);
+  await page.goto('/admin/');
+
+  await page.getByTestId('calendar-create').click();
+  const form = page.getByTestId('event-form');
+  await expect(form).toBeVisible();
+  await form.getByRole('radio', { name: 'Handover' }).click();
+  // The order names the event, so there is no title to type.
+  await expect(page.getByTestId('event-title-from-order')).toContainText('Handover');
+  await expect(page.getByTestId('event-title')).toHaveCount(0);
+
+  await page.getByTestId('event-title-from-order').waitFor();
+  const order = page.getByTestId('event-order');
+  await expect(order.locator('option', { hasText: 'Ben · Sunpatch 15' })).toHaveCount(1);
+  await order.selectOption('o2');
+  await page.getByTestId('event-date').fill(`${today}`);
+  await page.getByTestId('event-start').fill('10:00');
+  await page.getByTestId('event-save').click();
+
+  await expect.poll(() => writes.length).toBe(1);
+  expect(writes[0].url).toContain('admin-calendar-write');
+  expect(writes[0].body).toEqual({ kind: 'expected_handover', recordId: 'o2', date: today, time: '10:00' });
+  await expect(page.getByTestId('calendar-status')).toContainText('Moved');
+});

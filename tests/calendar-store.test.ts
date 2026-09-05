@@ -125,3 +125,8 @@ test('range checks include an event that overlaps either edge', () => {
 test('store keys are namespaced so a listing can tell events from anything else', () => {
   assert.equal(calendarEventKey('cal-1'), 'events/cal-1.json');
 });
+
+test('a handover can live in the store when its order is not yet known', () => {
+  const result = validateEvent({ title: 'Handover: someone', kind: 'expected_handover', allDay: true, start: '2026-09-20' }, { actor });
+  assert.equal(result.ok, true);
+});

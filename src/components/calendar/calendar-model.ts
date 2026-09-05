@@ -22,12 +22,20 @@ export const VIEW_LABELS: Record<CalendarView, string> = {
 export const VIEW_SHORTCUTS: Record<CalendarView, string> = { day: 'D', week: 'W', month: 'M', schedule: 'A' };
 
 /** Kinds the GM can pick when creating from the grid. */
-export const CREATABLE_KINDS: ReadonlyArray<{ value: 'meeting' | 'reminder' | 'task' | 'customer_visit'; label: string }> = [
+export const CREATABLE_KINDS: ReadonlyArray<{ value: 'meeting' | 'reminder' | 'task' | 'customer_visit' | 'expected_handover'; label: string }> = [
   { value: 'meeting', label: 'Meeting' },
   { value: 'reminder', label: 'Reminder' },
   { value: 'task', label: 'Task' },
   { value: 'customer_visit', label: 'Customer visit' },
+  { value: 'expected_handover', label: 'Handover' },
 ];
+
+/**
+ * Kinds created from the grid that are really a date on an order. The popup
+ * asks which order, and the date is written there rather than into the
+ * calendar's own store, so the order stays the one place the date lives.
+ */
+export const ORDER_DATE_KINDS = new Set<string>(['customer_visit', 'expected_handover']);
 
 /** Record-owned kinds that can be dragged. Mirrors WRITE_TARGETS on the server. */
 export const MOVABLE_RECORD_KINDS = new Set<CalendarEventKind>([

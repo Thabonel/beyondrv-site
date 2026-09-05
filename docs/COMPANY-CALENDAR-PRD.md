@@ -130,9 +130,9 @@ Colour is meaning, so the kind, not the source, chooses the colour.
 | Reminder | Graphite `#616161` | calendar event store | Yes |
 
 Kinds in the calendar event store are `meeting`, `reminder`, `customer_visit`,
-`container_eta`, and `expected_arrival`. The last three exist so the AI can
-record a visit or a date it read in an email when it cannot resolve the order
-or product. They carry the same colour as the projected kind.
+`expected_handover`, `container_eta`, and `expected_arrival`. The last four
+exist so the AI can record a visit, a handover, or a supplier date it read in
+an email or a call note when it cannot resolve the order or product. They carry the same colour as the projected kind.
 
 Commitments (visits and handovers) get a small filled dot before the title.
 AI-added events get a sparkle badge after the title.
@@ -176,10 +176,38 @@ moves and deletes. Undo writes the previous values back.
 ### Quick-create popover
 
 Fields: **Title** (focused), **Kind** (Meeting, Reminder, Task, Customer
-visit), **Date**, **Start**, **End**, **All day**, **Notes**. **Save** and
-**Cancel**. Customer visit asks for the order in a search field and writes the
-date and time to that order; it does not create a store event. Task writes to
-the task store. Meeting and Reminder write to the calendar event store.
+visit, Handover), **Date**, **Start**, **End**, **All day**, **Notes**.
+**Save** and **Cancel**. Customer visit and Handover ask for the order and
+write the date and time onto that order (`customerVisitDate` and
+`customerVisitTime`, or `expectedHandoverDate` and `expectedHandoverTime`);
+they do not create a store event, and the order names the event, so there is
+no title field. Task writes to the task store. Meeting and Reminder write to
+the calendar event store.
+
+The other order dates (expected arrival, factory order, next action), lead
+follow-ups, and container ETAs are set where the record is and appear here.
+
+### Visits and handovers from the AI
+
+A visit or handover the AI finds is written the same way, onto the order:
+
+- **Gmail.** When the extraction returns a `customer_visit` or
+  `expected_handover` candidate with a `relatedOrderId`, the sync writes the
+  date and time onto that order and records an `order_date_set` audit and
+  timeline entry naming the email. With no order it becomes a calendar event
+  for someone to attach.
+- **Call notes.** The voice-capture extraction returns `appointmentKind`,
+  `appointmentDate`, and `appointmentTime` when the call fixed a visit or a
+  handover. On confirmation, the customer is matched to one live order by
+  email, then phone, then an unambiguous name (narrowed by product when two
+  orders share a name), and the date is written onto it. With no match it
+  becomes a calendar event linked to the enquiry, marked "Added by AI from a
+  call note".
+- **Assistant.** `set_order_date` with `expected_handover` and a `time`.
+
+The matching rule lives in `order-date-core.ts`; the write in
+`order-date-write.ts`. A wrong customer's order is worse than a date left on
+the calendar, so anything ambiguous stays on the calendar.
 
 ### Keyboard shortcuts
 

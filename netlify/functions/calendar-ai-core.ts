@@ -13,6 +13,7 @@
 
 import { addMinutes, DEFAULT_DURATION_MINUTES, isIsoDate, isWallTime } from './calendar-events-core.ts';
 import { STORE_KINDS, type CompanyCalendarEvent, type StoreEventKind } from './calendar-store-core.ts';
+import { isOrderDateKind, type OrderDateKind } from './order-date-core.ts';
 
 const MODEL_ALLOWLIST = new Set(['gpt-5.4-nano', 'gpt-5.6-luna', 'gpt-5.6-terra']);
 
@@ -106,7 +107,8 @@ export function extractionInstructions(context: ExtractionContext) {
     `Today in Brisbane is ${context.today}. Business hours: ${BUSINESS_HOURS_TEXT}`,
     '',
     'Return a candidate for each of these, when the email states a specific date:',
-    '- A customer saying when they will visit, call, or collect. kind: customer_visit for a visit in person, meeting for a call.',
+    '- A customer saying when they will visit or call. kind: customer_visit for a visit in person, meeting for a call.',
+    '- A date a specific customer collects or is delivered their finished vehicle. kind: expected_handover.',
     '- A supplier or shipping line giving a container, vessel, or arrival date. kind: container_eta.',
     '- A supplier giving a production, dispatch, or delivery date for a vehicle. kind: expected_arrival.',
     '- A meeting, inspection, or appointment with a date. kind: meeting.',
@@ -114,7 +116,7 @@ export function extractionInstructions(context: ExtractionContext) {
     '',
     'Return nothing for marketing, receipts, newsletters, automated notifications, or dates only quoted from an earlier message in the thread.',
     'Resolve relative wording ("next Tuesday", "the 18th") against the date the email was received. Never invent a time: leave startTime empty and set allDay true when the email gives no time.',
-    'Set relatedOrderId only when the sender or the named customer matches an order below. Set relatedProductSlug only when the email names a product below. Leave both empty otherwise; a wrong link is worse than none.',
+    'A customer_visit or expected_handover with a relatedOrderId is written onto that order, so set it only when you are sure which order the customer means. Set relatedOrderId only when the sender or the named customer matches an order below. Set relatedProductSlug only when the email names a product below. Leave both empty otherwise; a wrong link is worse than none.',
     'confidence is how sure you are that this is a real, specific, future-facing date that affects the business.',
     '',
     'Open orders:',
@@ -234,6 +236,15 @@ export function candidateToEventInput(candidate: CalendarCandidate, message: Cal
       ...(candidate.relatedProductSlug ? { productSlug: candidate.relatedProductSlug } : {}),
     },
   };
+}
+
+/**
+ * A visit or a handover that names its order is not a calendar event at all:
+ * it is a date on that order, and it goes there.
+ */
+export function orderDateFromCandidate(candidate: CalendarCandidate): { kind: OrderDateKind; orderId: string; date: string; time: string } | null {
+  if (!isOrderDateKind(candidate.kind) || !candidate.relatedOrderId) return null;
+  return { kind: candidate.kind, orderId: candidate.relatedOrderId, date: candidate.date, time: candidate.allDay ? '' : candidate.startTime };
 }
 
 /**
