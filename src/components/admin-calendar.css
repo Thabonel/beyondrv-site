@@ -1,0 +1,118 @@
+/*
+ * FullCalendar ships a light theme. The admin is dark, and the GM reads it on a
+ * folding phone, so this recolours it through FullCalendar's own custom
+ * properties rather than fighting its internals, and gives the narrow state a
+ * layout that stays legible at about 340px.
+ */
+
+.admin-calendar-surface {
+  --fc-border-color: #262626;
+  --fc-page-bg-color: #111;
+  --fc-neutral-bg-color: #1a1a1a;
+  --fc-neutral-text-color: #aaa;
+  --fc-today-bg-color: rgba(232, 84, 10, 0.10);
+  --fc-list-event-hover-bg-color: #1c1c1c;
+  --fc-button-bg-color: #1a1a1a;
+  --fc-button-border-color: #333;
+  --fc-button-text-color: #ddd;
+  --fc-button-hover-bg-color: #262626;
+  --fc-button-hover-border-color: #444;
+  --fc-button-active-bg-color: #E8540A;
+  --fc-button-active-border-color: #E8540A;
+  color: #ddd;
+}
+
+.admin-calendar-surface .fc {
+  font-size: 0.78rem;
+}
+
+.admin-calendar-surface .fc .fc-toolbar-title {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.admin-calendar-surface .fc .fc-button {
+  font-size: 0.72rem;
+  padding: 0.28rem 0.6rem;
+  text-transform: capitalize;
+}
+
+.admin-calendar-surface .fc .fc-col-header-cell-cushion,
+.admin-calendar-surface .fc .fc-daygrid-day-number {
+  color: #999;
+  text-decoration: none;
+}
+
+.admin-calendar-surface .fc .fc-day-today .fc-daygrid-day-number {
+  color: #E8540A;
+  font-weight: 700;
+}
+
+/* Events are outlined rather than filled: eight colours as solid blocks turns a
+   busy month into noise, and the colour still reads on the left edge. */
+.admin-calendar-surface .fc .fc-daygrid-event {
+  background: #171717;
+  border-left-width: 3px;
+  border-radius: 3px;
+  padding: 1px 3px;
+  white-space: normal;
+}
+
+.admin-calendar-surface .fc .fc-daygrid-event .fc-event-title {
+  font-size: 0.68rem;
+  line-height: 1.25;
+}
+
+.admin-calendar-surface .fc .fc-list-day-cushion {
+  background: #1a1a1a;
+}
+
+.admin-calendar-surface .fc .fc-list-event:hover td {
+  background: #1c1c1c;
+}
+
+.admin-calendar-surface .fc .fc-list-event-title,
+.admin-calendar-surface .fc .fc-list-day-text,
+.admin-calendar-surface .fc .fc-list-day-side-text {
+  color: #ddd;
+}
+
+.admin-calendar-surface .fc .fc-list-empty {
+  background: #141414;
+  color: #777;
+}
+
+/* Folded: roughly 340px. The toolbar stacks, day numbers shrink, and the month
+   grid stops trying to show four events in a 45px cell. */
+@media (max-width: 619px) {
+  .admin-calendar-surface {
+    padding: 0.35rem;
+  }
+  .admin-calendar-surface .fc .fc-toolbar.fc-header-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+  }
+  .admin-calendar-surface .fc .fc-toolbar-title {
+    font-size: 0.9rem;
+    text-align: center;
+  }
+  .admin-calendar-surface .fc .fc-daygrid-event .fc-event-title {
+    font-size: 0.62rem;
+  }
+  .admin-calendar-surface .fc .fc-col-header-cell-cushion,
+  .admin-calendar-surface .fc .fc-daygrid-day-number {
+    font-size: 0.64rem;
+    padding: 2px 3px;
+  }
+}
+
+/* Unfolded: roughly 700-840px, which is a small tablet. The month grid is
+   comfortable here, so give the day cells room to breathe. */
+@media (min-width: 620px) {
+  .admin-calendar-surface .fc .fc-daygrid-day-frame {
+    min-height: 5.2rem;
+  }
+}

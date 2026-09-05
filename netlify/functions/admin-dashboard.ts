@@ -10,6 +10,7 @@ import {
 import { mapWithConcurrency, selectExistingKeys } from './blob-batch';
 import { connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 import { visitReadiness } from './visit-readiness-core';
+import { buildCalendarEvents, calendarClashes } from './calendar-events-core';
 import {
   buildLeadIntelligence,
   OWNER_COPILOT_TASK_STORE,
@@ -855,6 +856,13 @@ export const handler: Handler = async (event) => {
   // A customer travelling to a vehicle that is not here is the most expensive
   // mistake this dashboard can prevent, so it is computed from the same order
   // and product lists the rest of the page already has.
+  // The same records the dashboard already read, projected onto one timeline.
+  const calendarEvents = buildCalendarEvents({
+    orders: orders as unknown as Array<Record<string, unknown>>,
+    products: products as unknown as Array<Record<string, unknown>>,
+    enquiries: enquiries as unknown as Array<Record<string, unknown>>,
+  });
+
   const visitReadinessReport = visitReadiness(
     orders as unknown as Array<Record<string, unknown>>,
     products as unknown as Array<Record<string, unknown>>,
@@ -945,6 +953,7 @@ export const handler: Handler = async (event) => {
       lifecycle,
       tasks: taskSummary,
       visitReadiness: visitReadinessReport,
+      calendar: { events: calendarEvents, clashes: calendarClashes(calendarEvents) },
       productPerformance,
       productInterest: {
         unknownProductEnquiries,
