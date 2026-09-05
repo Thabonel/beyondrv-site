@@ -351,7 +351,13 @@ export default function AdminCalendar({ events, storedDetails, clashes = [], loa
       // A visit or a handover is a date on an order; write it there.
       result = await actions.moveRecord(values.kind, values.orderId, values.date, values.allDay ? '' : values.startTime);
     } else {
-      result = await actions.createStoreEvent({ title: values.title, kind: values.kind, start, end, allDay: values.allDay, notes: values.notes, source: 'gm' });
+      result = await actions.createStoreEvent({
+        title: values.title, kind: values.kind, start, end, allDay: values.allDay, notes: values.notes,
+        // Whoever was picked in the popup. Leaving this out dropped them on
+        // the way in, and the event came back saying nobody was assigned.
+        assigneeIds: values.assigneeIds,
+        source: 'gm',
+      });
     }
     setForm(null);
     setSnack({ message: [result.message ?? 'Saved.', result.warning].filter(Boolean).join(' ') });

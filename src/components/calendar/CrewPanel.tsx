@@ -31,11 +31,25 @@ async function call(method: string, body?: Record<string, unknown>) {
   return data;
 }
 
+/**
+ * Always the live site, never wherever admin happens to be open.
+ *
+ * A deploy preview is a frozen build at its own address. A link generated on
+ * one pins a phone to that build for good: it authenticates fine, because the
+ * data is shared, so nothing looks wrong — but it never receives another fix.
+ * This link goes on someone's home screen and is meant to outlive the session
+ * that made it, so it points at production.
+ */
+const LIVE_ORIGIN = 'https://beyondrv.com.au';
+
 function linkFor(key: string) {
-  const origin = typeof window === 'undefined' ? 'https://beyondrv.com.au' : window.location.origin;
   // The key goes after the hash so it is never sent to a server and never
   // lands in an access log.
-  return `${origin}/my-day/#k=${key}`;
+  return `${LIVE_ORIGIN}/my-day/#k=${key}`;
+}
+
+function onAPreview() {
+  return typeof window !== 'undefined' && window.location.origin !== LIVE_ORIGIN;
 }
 
 function whenSeen(value: string) {
@@ -150,6 +164,11 @@ export default function CrewPanel() {
         <div className="gcal-crew__issued" role="dialog" aria-label={`Link for ${issued.name}`} data-testid="crew-issued">
           <div className="gcal-crew__issued-head">{issued.name}&rsquo;s link</div>
           <p>Send it now. It cannot be shown again — if it is lost, make a new one.</p>
+          {onAPreview() && (
+            <p className="gcal-crew__preview-note">
+              You are not on the live site, but this link points at it, so it keeps working after today.
+            </p>
+          )}
           <code data-testid="crew-link">{issued.link}</code>
           <div className="gcal-crew__issued-actions">
             <a href={`sms:?&body=${encodeURIComponent(`Your Beyond RV day: ${issued.link}\n\nOpen it, then add it to your home screen.`)}`} data-testid="crew-sms">Text it</a>

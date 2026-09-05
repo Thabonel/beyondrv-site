@@ -188,3 +188,21 @@ test('a container report needs a vehicle and a real date', () => {
     decideCrewWrite({ action: 'report_container', productSlug: ' advent-2450 ', date: '2026-09-20', note: '  the shipping line  ' }),
     { ok: true, action: 'report_container', productSlug: 'advent-2450', date: '2026-09-20', note: 'the shipping line' });
 });
+
+test('a meeting assigned to them reaches their day, exactly as the calendar projects it', () => {
+  // Shaped the way toAdminCalendarEvent emits a stored meeting, so this fails
+  // if that projection ever stops carrying the owners through.
+  const projectedMeeting = {
+    id: 'calendar:cal-1', kind: 'meeting', date: '2026-09-05',
+    start: '2026-09-05T17:45', end: '2026-09-05T19:00', allDay: false,
+    title: 'twewjkadssda', detail: '', recordType: 'calendar', recordId: 'cal-1',
+    isCommitment: false, source: 'gm', assigneeIds: ['crew-thabo'],
+  };
+  const mine = crewAssignedItems([projectedMeeting], 'crew-thabo', '2026-09-05');
+  assert.equal(mine.length, 1);
+  assert.equal(mine[0].title, 'twewjkadssda');
+  assert.equal(mine[0].kind, 'meeting');
+  assert.equal(mine[0].time, '17:45');
+  assert.equal(mine[0].tickable, false);
+  assert.deepEqual(crewAssignedItems([projectedMeeting], 'crew-someone-else', '2026-09-05'), []);
+});
