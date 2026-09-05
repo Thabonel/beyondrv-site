@@ -179,3 +179,19 @@ test('a handover created from the popup picks an order and writes the date onto 
   expect(writes[0].body).toEqual({ kind: 'expected_handover', recordId: 'o2', date: today, time: '10:00' });
   await expect(page.getByTestId('calendar-status')).toContainText('Moved');
 });
+
+test('the header offers Calendar, Dashboard, Enquiries and Analytics one tap away', async ({ page }) => {
+  await mockCalendar(page);
+  await page.goto('/admin/');
+
+  const nav = page.getByRole('navigation', { name: 'Quick navigation' });
+  await expect(nav.getByRole('button', { name: 'Go to Calendar' })).toHaveAttribute('aria-current', 'page');
+  await expect(nav.getByRole('link', { name: 'Open analytics dashboard' })).toHaveAttribute('href', '/admin/analytics/');
+
+  await nav.getByRole('button', { name: 'Go to Enquiries' }).click();
+  await expect(nav.getByRole('button', { name: 'Go to Enquiries' })).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByTestId('admin-calendar')).toHaveCount(0);
+
+  await nav.getByRole('button', { name: 'Go to Calendar' }).click();
+  await expect(page.getByTestId('admin-calendar')).toBeVisible();
+});

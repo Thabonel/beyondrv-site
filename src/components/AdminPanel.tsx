@@ -4426,16 +4426,32 @@ export default function AdminPanel({ onOpenGmWorkspace, onSignOut }: { onOpenGmW
     <div style={{ height: 'calc(100vh - 60px)', padding: '1rem', fontFamily: 'inherit' }}>
       <div style={{ minWidth: 0, minHeight: 0, height: '100%', display: 'flex', flexDirection: 'column', background: '#111', borderRadius: '8px', border: '1px solid #333' }}>
         <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', flexWrap: 'wrap' }}>
-            <div style={{ color: '#fff', fontWeight: 800 }}>Admin Tools</div>
+          {/* The GM's four most-used places, one tap from anywhere. The full
+              list of sections stays in the Menu below. */}
+          <nav aria-label="Quick navigation" style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+            {(['calendar', 'dashboard', 'enquiries'] as const).map((tab) => {
+              const isActive = activeTab === tab;
+              return (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => selectTab(tab)}
+                  aria-label={`Go to ${tabLabel(tab)}`}
+                  aria-current={isActive ? 'page' : undefined}
+                  style={{ color: isActive ? '#111' : '#fff', background: isActive ? '#fff' : '#222', border: `1px solid ${isActive ? '#fff' : '#444'}`, borderRadius: '6px', padding: '0.42rem 0.65rem', fontSize: '0.9rem', fontWeight: 800, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                >
+                  {tabLabel(tab)}
+                </button>
+              );
+            })}
             <a
               href="/admin/analytics/"
               aria-label="Open analytics dashboard"
-              style={{ color: '#fff', textDecoration: 'none', border: '1px solid #444', background: '#222', borderRadius: '6px', padding: '0.42rem 0.65rem', fontSize: '0.9rem', fontWeight: 700, whiteSpace: 'nowrap' }}
+              style={{ color: '#fff', textDecoration: 'none', border: '1px solid #444', background: '#222', borderRadius: '6px', padding: '0.42rem 0.65rem', fontSize: '0.9rem', fontWeight: 800, whiteSpace: 'nowrap' }}
             >
               Analytics
             </a>
-          </div>
+          </nav>
           <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
             {onOpenGmWorkspace && (
               <button
