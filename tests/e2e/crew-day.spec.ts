@@ -150,6 +150,28 @@ test('the manifest has no start_url, so an installed icon keeps its key', async 
   expect(manifest.display).toBe('standalone');
 });
 
+test('the day fits every normal phone width without sideways scrolling', async ({ page }) => {
+  await mockCrew(page);
+  // The widths of the phones people actually carry, plus the folded width of
+  // Alex's. Nothing here may push the page sideways: a workshop phone held in
+  // one hand should never need panning to read a job.
+  for (const width of [320, 340, 375, 390, 393, 414, 430]) {
+    await page.setViewportSize({ width, height: 760 });
+    await page.goto(`/my-day/#k=${KEY}`);
+    await expect(page.getByTestId('myday-job').first()).toBeVisible();
+    const overflow = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+    }));
+    expect(overflow.scrollWidth, `${width}px pans sideways`).toBeLessThanOrEqual(overflow.clientWidth + 1);
+
+    // The tick is what they came to press, so it stays a comfortable target.
+    const tick = await page.getByRole('button', { name: /^Tick off/ }).first().boundingBox();
+    expect(tick!.height, `${width}px tick target`).toBeGreaterThanOrEqual(44);
+    expect(tick!.width, `${width}px tick target`).toBeGreaterThanOrEqual(40);
+  }
+});
+
 test('the page asks not to be indexed', async ({ page }) => {
   await page.goto('/my-day/');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);

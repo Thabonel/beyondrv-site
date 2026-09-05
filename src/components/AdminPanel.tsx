@@ -7240,7 +7240,7 @@ export default function AdminPanel({ onOpenGmWorkspace, onSignOut }: { onOpenGmW
           <div style={{ position: 'sticky', top: 0, background: '#111', borderBottom: '1px solid #333', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
             <div>
               <h2 style={{ margin: 0, fontSize: '1.15rem' }}>Admin Help</h2>
-              <div style={{ color: '#777', fontSize: '0.7rem', marginTop: '0.15rem' }}>Updated 29 July 2026</div>
+              <div style={{ color: '#777', fontSize: '0.7rem', marginTop: '0.15rem' }}>Updated 5 September 2026</div>
             </div>
             <button
               onClick={() => setShowHelp(false)}
@@ -7440,13 +7440,50 @@ export default function AdminPanel({ onOpenGmWorkspace, onSignOut }: { onOpenGmW
               </ul>
             </section>
             <section>
-              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Read the company calendar</h3>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Use the company calendar</h3>
+              <p style={{ margin: '0 0 0.5rem', color: '#ddd' }}>
+                Calendar is the first tab and opens by default. It works like Google Calendar. It shows every dated commitment the business holds on one timeline: customer visits, handovers, container ETAs, expected arrivals, factory orders, next actions, lead follow-ups, open tasks, meetings and reminders.
+              </p>
               <ul style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
-                <li>Calendar is the first tab and opens by default. It shows every dated commitment the business holds on one timeline: customer visits, container ETAs, expected arrivals, handovers, factory orders, next actions, lead follow-ups and open tasks.</li>
-                <li>Use the coloured chips to hide a type you are not interested in. The number on each chip is how many of that type exist in the loaded period.</li>
-                <li>On a phone the calendar opens as a list, because a month grid is unreadable at that width. Unfold the phone, or press Month, to get the grid. If you pick a view yourself it stays picked.</li>
-                <li>Click any entry to see which record it belongs to. Dates are changed on that record, not on the calendar, so the calendar can never disagree with the order or the enquiry.</li>
-                <li>A red "dates that disagree" panel means a customer visit falls before a container ETA for the same period. Resolve it before the customer travels.</li>
+                <li><strong>Move around:</strong> use Today, the arrows, and the Day, Week, Month or Schedule menu at the top right. Keyboard: <code>t</code> today, <code>d</code> <code>w</code> <code>m</code> <code>a</code> for the four views, <code>j</code> and <code>k</code> to step forward and back, <code>c</code> to create, <code>/</code> to search.</li>
+                <li><strong>Hide what you do not need:</strong> untick a calendar under My calendars in the sidebar. Your choice is remembered on that device.</li>
+                <li><strong>See the working day:</strong> Week and Day open at 8am and scroll for the rest of the 24 hours. Lunch is shaded, and Sunday is tinted green because the company works Sundays by arrangement rather than being closed.</li>
+                <li><strong>On a phone:</strong> the folded phone opens on Schedule, and Week shows three days. Open the phone, or pick a view yourself, and your choice stays.</li>
+                <li><strong>A sparkle (&#10022;) means the AI added it</strong> after reading the mailbox or a call note. Click it to see the email it came from, and Dismiss it if it is wrong. A dismissed item does not come back.</li>
+                <li><strong>&quot;Dates that disagree&quot;</strong> at the top means a customer visit falls before the container carrying that customer&rsquo;s vehicle is due. Resolve it before the customer travels.</li>
+              </ul>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Add something to the calendar</h3>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Click an empty slot, or drag across the hours you want, or press <strong>+ Create</strong>.</li>
+                <li>Pick what it is: <strong>Meeting</strong>, <strong>Reminder</strong>, <strong>Task</strong>, <strong>Customer visit</strong> or <strong>Handover</strong>.</li>
+                <li>For a customer visit or a handover, choose the order. The date is written onto that order, so Orders and the calendar can never disagree. You do not type a title: the order names it.</li>
+                <li>Set the day and the times, then Save. Changing the start time moves the end with it.</li>
+                <li><strong>To change a date, drag it.</strong> The record it belongs to is updated, and an Undo appears at the bottom left. A failed move puts the entry back and says why.</li>
+                <li><strong>Container ETAs cannot be dragged.</strong> They live on the product file and reach the site through Pending review. Change one in Products, then preview and deploy.</li>
+                <li>Expected arrivals, factory orders, next actions and lead follow-ups are set on the order or the enquiry. They appear here and can be dragged, but they are created where the record is.</li>
+              </ol>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Give someone a phone link, with no login</h3>
+              <p style={{ margin: '0 0 0.5rem', color: '#ddd' }}>
+                For people who will not sign in. They get an icon on their phone that opens straight onto their jobs for the day.
+              </p>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>In the calendar sidebar, open <strong>Crew</strong>.</li>
+                <li>Type their name. Choose <strong>Their jobs</strong> for someone like Li or Oscar, or <strong>Whole calendar</strong> for yourself. Click Add.</li>
+                <li>A link appears. <strong>Send it now: it is shown once and cannot be shown again.</strong> Tap <strong>Text it</strong> to open your messages with the link ready, or Copy on a computer.</li>
+                <li>Tell them to open the link, then add it to their home screen: on an iPhone, the Share button, then Add to Home Screen; on Android, the Chrome menu, then Install or Add to Home screen.</li>
+                <li>From then on they tap the icon and their day opens. There is no password and nothing to remember.</li>
+              </ol>
+              <p style={{ margin: '0.5rem 0 0', color: '#ddd' }}>
+                <strong>Assign work to them</strong> by giving a task an owner. A task with nobody assigned stays yours. They can tick their jobs off, add their own, move one to another day, and leave you a note. They can see the day&rsquo;s visits, handovers and arrivals so they know who is coming, but they cannot move any of them and they see no prices or order detail.
+              </p>
+              <ul style={{ margin: '0.5rem 0 0', paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li><strong>If someone loses their phone,</strong> click <strong>Revoke</strong> next to their name. Their link stops working immediately and nobody else is affected.</li>
+                <li><strong>If a link is lost,</strong> click <strong>Reissue</strong> and send the new one. The site only keeps a scrambled copy of a link, so it cannot be looked up again, only replaced. The old link stops working the moment you reissue.</li>
+                <li>Under each name you can see whether they have opened it, so you know if someone is not using it.</li>
               </ul>
             </section>
             <section>
