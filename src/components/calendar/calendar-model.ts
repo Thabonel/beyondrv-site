@@ -98,6 +98,31 @@ export function formatWhen(event: Pick<AdminCalendarEvent, 'start' | 'end' | 'al
   return `${day} · ${formatTime(event.start.slice(11))} – ${formatTime(event.end.slice(11))}`;
 }
 
+/**
+ * Moving the start moves the end with it, keeping the length, as Google
+ * Calendar does. Without this, dragging the start past the end leaves the
+ * form in a state it refuses to save, and the person has to fix a field they
+ * did not touch.
+ */
+export function endForNewStart(previousStart: string, previousEnd: string, nextStart: string) {
+  if (!nextStart) return previousEnd;
+  const minutes = (value: string) => {
+    const [h, m] = value.split(':').map(Number);
+    return Number.isFinite(h) && Number.isFinite(m) ? h * 60 + m : null;
+  };
+  const start = minutes(previousStart);
+  const end = minutes(previousEnd);
+  const next = minutes(nextStart);
+  if (next === null) return previousEnd;
+  // Keep whatever length the form had; an unreadable or missing end becomes an hour.
+  const length = start !== null && end !== null && end > start ? end - start : 60;
+  const total = next + length;
+  // A meeting that would run past midnight stops at midnight rather than
+  // wrapping to a time earlier in the day.
+  if (total >= 24 * 60) return '23:59';
+  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+}
+
 export function isTypingTarget(target: EventTarget | null) {
   if (!(target instanceof HTMLElement)) return false;
   return ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable;

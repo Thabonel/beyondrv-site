@@ -169,6 +169,9 @@ test('a handover created from the popup picks an order and writes the date onto 
   await order.selectOption('o2');
   await page.getByTestId('event-date').fill(`${today}`);
   await page.getByTestId('event-start').fill('10:00');
+  // Moving the start moves the end with it, so the form is never left in a
+  // state it refuses to save. This failed on CI, where Create opens at 08:00.
+  await expect(page.getByTestId('event-end')).toHaveValue('11:00');
   await page.getByTestId('event-save').click();
 
   await expect.poll(() => writes.length).toBe(1);

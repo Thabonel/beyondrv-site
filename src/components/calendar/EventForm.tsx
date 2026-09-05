@@ -3,7 +3,7 @@
  * first and focused, then when, then what kind of thing it is.
  */
 import React, { useEffect, useRef, useState } from 'react';
-import { CREATABLE_KINDS, EVENT_KIND_META, ORDER_DATE_KINDS, TIMED_RECORD_KINDS, type AdminCalendarEvent } from './calendar-model';
+import { CREATABLE_KINDS, endForNewStart, EVENT_KIND_META, ORDER_DATE_KINDS, TIMED_RECORD_KINDS, type AdminCalendarEvent } from './calendar-model';
 
 export interface EventFormValues {
   title: string;
@@ -122,7 +122,18 @@ export default function EventForm({ mode, initial, event, orders, onLoadOrders, 
         <input type="date" value={values.date} onChange={(e) => set('date', e.target.value)} aria-label="Date" data-testid="event-date" required />
         {!values.allDay && canHoldTime && (
           <>
-            <input type="time" step={900} value={values.startTime} onChange={(e) => set('startTime', e.target.value)} aria-label="Start time" data-testid="event-start" />
+            <input
+              type="time"
+              step={900}
+              value={values.startTime}
+              onChange={(e) => setValues((current) => ({
+                ...current,
+                startTime: e.target.value,
+                endTime: endForNewStart(current.startTime, current.endTime, e.target.value),
+              }))}
+              aria-label="Start time"
+              data-testid="event-start"
+            />
             <span>–</span>
             <input type="time" step={900} value={values.endTime} onChange={(e) => set('endTime', e.target.value)} aria-label="End time" data-testid="event-end" />
           </>
