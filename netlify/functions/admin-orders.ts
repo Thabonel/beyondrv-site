@@ -44,6 +44,10 @@ function isDateFieldValid(value: string) {
   return !value || /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
 
+function isTimeFieldValid(value: string) {
+  return !value || /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
+}
+
 function orderKey(id: string) {
   return `orders/${encodeURIComponent(id)}.json`;
 }
@@ -62,6 +66,10 @@ function normalizeOrder(body: Record<string, unknown>, existing: Record<string, 
   // The date a customer is travelling to see the vehicle. Recorded so something
   // can ask whether it will actually be here by then.
   const customerVisitDate = cleanWithFallback(body, existing, 'customerVisitDate', 40);
+  // Times of day, so a visit can sit at ten o'clock on the calendar rather than
+  // floating in the all-day row. Optional: a date without a time is all-day.
+  const customerVisitTime = cleanWithFallback(body, existing, 'customerVisitTime', 5);
+  const expectedHandoverTime = cleanWithFallback(body, existing, 'expectedHandoverTime', 5);
   const paymentType = cleanWithFallback(body, existing, 'paymentType', 20);
   const purchaseKind = cleanWithFallback(body, existing, 'purchaseKind', 20);
   const paymentStatus = cleanWithFallback(body, existing, 'paymentStatus', 40);
@@ -78,6 +86,9 @@ function normalizeOrder(body: Record<string, unknown>, existing: Record<string, 
   if (!productTitle) throw new Error('Missing product');
   if (![factoryOrderDate, expectedArrivalDate, expectedHandoverDate, nextActionDate, customerVisitDate].every(isDateFieldValid)) {
     throw new Error('Invalid date format');
+  }
+  if (![customerVisitTime, expectedHandoverTime].every(isTimeFieldValid)) {
+    throw new Error('Invalid time format');
   }
 
   return {
@@ -127,6 +138,8 @@ function normalizeOrder(body: Record<string, unknown>, existing: Record<string, 
     expectedHandoverDate,
     nextActionDate,
     customerVisitDate,
+    customerVisitTime,
+    expectedHandoverTime,
     notes: cleanWithFallback(body, existing, 'notes', 4000),
     statusHistory: Array.isArray(existing?.statusHistory)
       ? status !== clean(existing?.status, 40)

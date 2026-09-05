@@ -40,9 +40,29 @@ test('a new task needs a title and a real date', () => {
   assert.equal(decideNewTask({ title: '  ', date: '2026-09-10' }).ok, false);
   assert.equal(decideNewTask({ title: 'Ring the agent', date: 'soon' }).ok, false);
   const ok = decideNewTask({ title: '  Ring the agent  ', date: '2026-09-10' });
-  assert.deepEqual(ok, { ok: true, title: 'Ring the agent', dueDate: '2026-09-10' });
+  assert.deepEqual(ok, { ok: true, title: 'Ring the agent', dueDate: '2026-09-10', dueTime: '' });
 });
 
 test('an unknown kind is refused rather than guessed at', () => {
   assert.match(immovableReason('nonsense'), /not a date this calendar can move/);
+});
+
+test('a move with a time keeps it for kinds that can hold one and drops it for the rest', () => {
+  const visit = decideMove({ kind: 'customer_visit', recordId: 'o1', date: '2026-09-10', time: '10:00' });
+  assert.equal(visit.ok, true);
+  assert.equal((visit as any).time, '10:00');
+  assert.equal((visit as any).target.timeField, 'customerVisitTime');
+  const arrival = decideMove({ kind: 'expected_arrival', recordId: 'o1', date: '2026-09-10', time: '10:00' });
+  assert.equal(arrival.ok, true);
+  assert.equal((arrival as any).time, '', 'an arrival has nowhere to keep a time, so the day still moves');
+});
+
+test('a malformed time is refused rather than written', () => {
+  assert.equal(decideMove({ kind: 'task', recordId: 't1', date: '2026-09-10', time: '10am' }).ok, false);
+  assert.equal(decideNewTask({ title: 'x', date: '2026-09-10', time: '25:00' }).ok, false);
+  assert.deepEqual(decideNewTask({ title: 'x', date: '2026-09-10', time: '09:15' }), { ok: true, title: 'x', dueDate: '2026-09-10', dueTime: '09:15' });
+});
+
+test('meetings and reminders are not record dates, and the reason says where they move', () => {
+  assert.match(immovableReason('meeting'), /calendar events endpoint/);
 });

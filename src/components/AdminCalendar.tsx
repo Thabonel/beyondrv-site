@@ -1,226 +1,178 @@
 /**
- * The company on one timeline.
+ * The company on one timeline, laid out the way Google Calendar is so nobody
+ * needs telling how it works.
  *
- * Adapted from the FullCalendar wrapper in the wheels-wins project. Two things
- * changed for this business. Every date here is all-day: a container ETA, a
- * handover and a follow-up are days, not appointments, so the time grid and its
- * slot machinery are gone. And editing is off, because moving a date here has
- * to move it on the record that owns it, and each date type means something
- * different when it moves — a container ETA is a supplier's claim, a handover
- * is a promise to a customer. Until each of those has a rule, dragging would
- * quietly change commitments.
+ * Two kinds of event share the grid. Record-owned dates (visits, handovers,
+ * arrivals, follow-ups, tasks, container ETAs) are projected from the records
+ * that hold them, and dragging one writes the new date back onto that record.
+ * The calendar's own events (meetings, reminders, and what the AI read in the
+ * mailbox) live in their own store. The grid does not care which is which; the
+ * write path does.
  */
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import listPlugin from '@fullcalendar/list';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import type { DateSelectArg, EventChangeArg, EventClickArg } from '@fullcalendar/core';
+import type { DateSelectArg, DatesSetArg, EventChangeArg, EventClickArg, EventContentArg, DayHeaderContentArg } from '@fullcalendar/core';
+import CalendarTopBar from './calendar/CalendarTopBar';
+import CalendarSidebar from './calendar/CalendarSidebar';
+import EventDetail, { type StoredDetail } from './calendar/EventDetail';
+import EventForm, { type EventFormValues, type OrderOption } from './calendar/EventForm';
+import Popover from './calendar/Popover';
+import Snackbar, { type SnackbarState } from './calendar/Snackbar';
+import {
+  addDays,
+  EVENT_KIND_META,
+  formatTime,
+  isTypingTarget,
+  loadHiddenKinds,
+  matchesSearch,
+  MOVABLE_RECORD_KINDS,
+  parseWall,
+  PHONE_QUERY,
+  rectAt,
+  rectOf,
+  saveHiddenKinds,
+  toDay,
+  toWall,
+  toWallTime,
+  WIDE_QUERY,
+  type AdminCalendarEvent,
+  type AnchorRect,
+  type CalendarEventKind,
+  type CalendarView,
+} from './calendar/calendar-model';
 
-export type CalendarEventKind =
-  | 'customer_visit' | 'container_eta' | 'expected_arrival' | 'expected_handover'
-  | 'factory_order' | 'next_action' | 'follow_up' | 'task';
+export interface WriteResult { message?: string; warning?: string }
 
-export interface AdminCalendarEvent {
-  id: string;
-  kind: CalendarEventKind;
-  date: string;
-  title: string;
-  detail: string;
-  recordType: 'order' | 'enquiry' | 'task' | 'product';
-  recordId: string;
-  isCommitment: boolean;
+export interface CalendarActions {
+  createStoreEvent: (body: Record<string, unknown>) => Promise<WriteResult>;
+  updateStoreEvent: (id: string, body: Record<string, unknown>) => Promise<WriteResult>;
+  deleteStoreEvent: (id: string) => Promise<WriteResult>;
+  moveRecord: (kind: string, recordId: string, date: string, time: string) => Promise<WriteResult>;
+  createTask: (title: string, date: string, time: string) => Promise<WriteResult>;
+  loadOrders: () => Promise<OrderOption[]>;
+  refresh: () => Promise<void>;
 }
-
-const KIND_META: Record<CalendarEventKind, { label: string; colour: string }> = {
-  customer_visit:    { label: 'Customer visit',   colour: '#f87171' },
-  expected_handover: { label: 'Handover',         colour: '#4ade80' },
-  container_eta:     { label: 'Container ETA',    colour: '#fb923c' },
-  expected_arrival:  { label: 'Expected arrival', colour: '#fbbf24' },
-  factory_order:     { label: 'Factory order',    colour: '#a78bfa' },
-  next_action:       { label: 'Next action',      colour: '#60a5fa' },
-  follow_up:         { label: 'Lead follow-up',   colour: '#38bdf8' },
-  task:              { label: 'Task',             colour: '#c4a87a' },
-};
-
-const ALL_KINDS = Object.keys(KIND_META) as CalendarEventKind[];
-
-/** Monday to Saturday, 8 til 5. Sunday is handled separately below. */
-const BUSINESS_HOURS = [{ daysOfWeek: [1, 2, 3, 4, 5, 6], startTime: '08:00', endTime: '17:00' }];
-
-/**
- * Two shaded bands, drawn as background events.
- *
- * Lunch is midday to one, Monday to Saturday. Sunday is not closed: the company
- * works and receives customers when it is needed, so it is shaded as available
- * by arrangement rather than left dimmed like a day nobody works.
- */
-const BACKGROUND_BANDS = [
-  { daysOfWeek: [1, 2, 3, 4, 5, 6], startTime: '12:00', endTime: '13:00', display: 'background', color: '#e8eaed' },
-  { daysOfWeek: [0], startTime: '08:00', endTime: '17:00', display: 'background', color: '#e6f4ea' },
-];
-
-type CalendarViewName = 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay' | 'listMonth';
-
-/**
- * Week and day show the full working day as an hour grid. The dated records
- * themselves are all-day and sit in the row above the grid; the hours below are
- * the shape of the day, so the GM can see where a visit or a handover lands
- * against the hours the workshop is actually open.
- */
-const VIEW_OPTIONS: ReadonlyArray<readonly [CalendarViewName, string]> = [
-  ['dayGridMonth', 'Month'],
-  ['timeGridWeek', 'Week'],
-  ['timeGridDay', 'Day'],
-  ['listMonth', 'List'],
-];
 
 interface Props {
   events: AdminCalendarEvent[];
+  storedDetails: Record<string, StoredDetail>;
   clashes?: string[];
   loading?: boolean;
   error?: string;
-  onRefresh?: () => void;
+  actions: CalendarActions;
 }
 
-export default function AdminCalendar({ events, clashes = [], loading, error, onRefresh }: Props) {
-  const calendarRef = useRef<FullCalendar | null>(null);
-  // The GM works on a folding phone: roughly 340px folded, roughly double that
-  // open, and it changes while the app is running. A month grid is unreadable
-  // at 340px and fine at 700px, so the view follows the width until the GM
-  // picks one, after which their choice sticks.
-  const [wideScreen, setWideScreen] = useState(true);
-  const [chosenView, setChosenView] = useState<CalendarViewName | null>(null);
-  const view: CalendarViewName = chosenView ?? (wideScreen ? 'dayGridMonth' : 'listMonth');
-  const setView = (next: CalendarViewName) => setChosenView(next);
-  const [hidden, setHidden] = useState<Set<CalendarEventKind>>(new Set());
-  const [selected, setSelected] = useState<AdminCalendarEvent | null>(null);
-  const [status, setStatus] = useState('');
+/** Monday to Saturday, 8 til 5. Sunday is handled by the shaded band below. */
+const BUSINESS_HOURS = [{ daysOfWeek: [1, 2, 3, 4, 5, 6], startTime: '08:00', endTime: '17:00' }];
 
-  // A container ETA lives on the product file and ships through Pending review,
-  // so it cannot be written from a drag. Everything else owns its date directly.
-  const MOVABLE = new Set<CalendarEventKind>([
-    'customer_visit', 'expected_handover', 'expected_arrival',
-    'factory_order', 'next_action', 'follow_up', 'task',
-  ]);
+/**
+ * Lunch is shaded. Sunday is not closed: the company works and receives
+ * customers when it is needed, so its hours are tinted as available by
+ * arrangement rather than dimmed like a day nobody works.
+ */
+const BACKGROUND_BANDS = [
+  { daysOfWeek: [1, 2, 3, 4, 5, 6], startTime: '12:00', endTime: '13:00', display: 'background', color: '#eceff1', classNames: ['gcal-band-lunch'] },
+  { daysOfWeek: [0], startTime: '08:00', endTime: '17:00', display: 'background', color: '#e8f5e9', classNames: ['gcal-band-sunday'] },
+];
+
+function fcViewFor(view: CalendarView, phone: boolean) {
+  if (view === 'day') return 'timeGridDay';
+  if (view === 'week') return phone ? 'timeGridThreeDay' : 'timeGridWeek';
+  if (view === 'month') return 'dayGridMonth';
+  return 'listMonth';
+}
+
+function nextWholeHour(now: Date) {
+  const date = new Date(now);
+  date.setMinutes(0, 0, 0);
+  date.setHours(date.getHours() + 1);
+  const hour = date.getHours();
+  if (hour < 8 || hour >= 17) date.setHours(8, 0, 0, 0);
+  return date;
+}
+
+function emptyForm(date: string, startTime = '', endTime = ''): EventFormValues {
+  return { title: '', kind: 'meeting', date, startTime, endTime, allDay: !startTime, notes: '', orderId: '' };
+}
+
+function formFromEvent(event: AdminCalendarEvent, stored?: StoredDetail): EventFormValues {
+  return {
+    title: event.title,
+    kind: event.kind,
+    date: event.date,
+    startTime: event.allDay ? '' : event.start.slice(11),
+    endTime: event.allDay ? '' : event.end.slice(11),
+    allDay: event.allDay,
+    notes: stored?.notes ?? '',
+    orderId: '',
+  };
+}
+
+type FormState = { mode: 'create' | 'edit'; anchor: AnchorRect; values: EventFormValues; event?: AdminCalendarEvent | null };
+type DetailState = { event: AdminCalendarEvent; anchor: AnchorRect };
+
+export default function AdminCalendar({ events, storedDetails, clashes = [], loading, error, actions }: Props) {
+  const calendarRef = useRef<FullCalendar | null>(null);
+  const searchRef = useRef<HTMLInputElement | null>(null);
+  const today = toDay(new Date());
+
+  // The GM works on a folding phone: roughly 340px folded, roughly double that
+  // open, and it changes while the app is running. The layout follows the width
+  // until the GM picks a view, after which their choice sticks.
+  const [phone, setPhone] = useState(false);
+  const [wide, setWide] = useState(true);
+  const [chosenView, setChosenView] = useState<CalendarView | null>(null);
+  const [sidebarChoice, setSidebarChoice] = useState<boolean | null>(null);
+  const view: CalendarView = chosenView ?? (phone ? 'schedule' : 'week');
+  const sidebarOpen = sidebarChoice ?? wide;
+
+  const [title, setTitle] = useState('');
+  const [cursor, setCursor] = useState(today);
+  const [hidden, setHidden] = useState<Set<CalendarEventKind>>(new Set());
+  const [search, setSearch] = useState('');
+  const [detail, setDetail] = useState<DetailState | null>(null);
+  const [form, setForm] = useState<FormState | null>(null);
+  const [snack, setSnack] = useState<SnackbarState | null>(null);
+  const [orders, setOrders] = useState<OrderOption[]>([]);
+  const [clashesOpen, setClashesOpen] = useState(true);
+
+  useEffect(() => {
+    setHidden(loadHiddenKinds());
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const phoneQuery = window.matchMedia(PHONE_QUERY);
+    const wideQuery = window.matchMedia(WIDE_QUERY);
+    const sync = () => { setPhone(phoneQuery.matches); setWide(wideQuery.matches); };
+    sync();
+    // addEventListener over addListener: the fold fires this mid-session.
+    phoneQuery.addEventListener('change', sync);
+    wideQuery.addEventListener('change', sync);
+    return () => { phoneQuery.removeEventListener('change', sync); wideQuery.removeEventListener('change', sync); };
+  }, []);
+
+  const api = () => calendarRef.current?.getApi();
+
+  useEffect(() => {
+    const calendar = api();
+    if (!calendar) return;
+    const target = fcViewFor(view, phone);
+    if (calendar.view.type !== target) calendar.changeView(target);
+    // Re-measure after a fold changes the width or the sidebar toggles.
+    window.setTimeout(() => api()?.updateSize(), 0);
+  }, [view, phone, sidebarOpen]);
 
   const visible = useMemo(
     () => events.filter((event) => !hidden.has(event.kind)),
     [events, hidden],
   );
 
-  const fcEvents = useMemo(() => visible.map((event) => ({
-    id: event.id,
-    title: event.title,
-    start: event.date,
-    allDay: true,
-    backgroundColor: KIND_META[event.kind]?.colour ?? '#5f6368',
-    borderColor: KIND_META[event.kind]?.colour ?? '#5f6368',
-    textColor: '#fff',
-    editable: MOVABLE.has(event.kind),
-    extendedProps: { original: event },
-  })), [visible]);
-
-  const fcEventSources = useMemo(() => [...fcEvents, ...BACKGROUND_BANDS], [fcEvents]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
-    const query = window.matchMedia('(min-width: 620px)');
-    const sync = () => setWideScreen(query.matches);
-    sync();
-    // addEventListener over addListener: the fold fires this mid-session.
-    query.addEventListener('change', sync);
-    return () => query.removeEventListener('change', sync);
-  }, []);
-
-  useEffect(() => {
-    calendarRef.current?.getApi()?.changeView(view);
-    // The month grid needs to re-measure after a fold changes the width.
-    calendarRef.current?.getApi()?.updateSize();
-  }, [view, wideScreen]);
-
-  function toggleKind(kind: CalendarEventKind) {
-    setHidden((current) => {
-      const next = new Set(current);
-      if (next.has(kind)) next.delete(kind);
-      else next.add(kind);
-      return next;
-    });
-  }
-
-  async function write(payload: Record<string, unknown>) {
-    const response = await fetch('/.netlify/functions/admin-calendar-write', {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data?.error || `Save failed (${response.status})`);
-    return data as { message?: string; warning?: string };
-  }
-
-  /**
-   * eventChange, as the wheels-wins wrapper uses, rather than eventDrop: it
-   * fires for a move and for a resize, so one path writes both.
-   */
-  async function handleEventChange(info: EventChangeArg) {
-    const original = info.event.extendedProps.original as AdminCalendarEvent | undefined;
-    const date = info.event.startStr?.slice(0, 10);
-    if (!original || !date) { info.revert(); return; }
-    if (!MOVABLE.has(original.kind)) {
-      info.revert();
-      setStatus('A container ETA is changed in Products and deployed through Pending, not moved here.');
-      return;
-    }
-    try {
-      const result = await write({ kind: original.kind, recordId: original.recordId, date });
-      setStatus([result.message, result.warning].filter(Boolean).join(' '));
-      onRefresh?.();
-    } catch (err) {
-      // Put it back: a grid showing a date the record does not hold is worse
-      // than a move that failed loudly.
-      info.revert();
-      setStatus(err instanceof Error ? err.message : 'Could not move that date.');
-    }
-  }
-
-  /**
-   * Resizing is wired because their calendar has it, and it moves the start the
-   * same way a drag does. The span itself is not kept: these records hold one
-   * date, not a range, so there is no field for a length to live in.
-   */
-  function handleEventResize(info: { event: { startStr: string }; revert: () => void }) {
-    setStatus('These records hold a single date, so the length is not stored. The start date was kept.');
-  }
-
-  /** Dragging empty space creates a task, the one thing a day genuinely creates. */
-  async function handleSelect(info: DateSelectArg) {
-    const date = info.startStr.slice(0, 10);
-    const title = window.prompt(`New task for ${date}`)?.trim();
-    calendarRef.current?.getApi()?.unselect();
-    if (!title) return;
-    try {
-      const result = await write({ action: 'create_task', title, date });
-      setStatus(result.message ?? 'Task created.');
-      onRefresh?.();
-    } catch (err) {
-      setStatus(err instanceof Error ? err.message : 'Could not create that task.');
-    }
-  }
-
-  /** Their touch: a double click on a day drops into that day. */
-  function handleDateClick(info: { jsEvent: MouseEvent; date: Date }) {
-    if (info.jsEvent.detail !== 2) return;
-    setChosenView('timeGridDay');
-    calendarRef.current?.getApi()?.gotoDate(info.date);
-  }
-
-  function handleEventClick(info: EventClickArg) {
-    const original = info.event.extendedProps.original as AdminCalendarEvent | undefined;
-    if (original) setSelected(original);
-  }
+  const searchResults = useMemo(
+    () => (search.trim() ? events.filter((event) => matchesSearch(event, search)) : []),
+    [events, search],
+  );
 
   const counts = useMemo(() => {
     const map = new Map<CalendarEventKind, number>();
@@ -228,149 +180,384 @@ export default function AdminCalendar({ events, clashes = [], loading, error, on
     return map;
   }, [events]);
 
+  const fcEvents = useMemo(() => visible.map((event) => {
+    const isStore = event.recordType === 'calendar';
+    const colour = EVENT_KIND_META[event.kind].colour;
+    // FullCalendar's all-day end is exclusive, so a one-day event has no end
+    // and a multi-day event ends the day after its last day.
+    const end = event.allDay ? (event.end !== event.start ? addDays(event.end, 1) : undefined) : event.end;
+    return {
+      id: event.id,
+      title: event.title,
+      start: event.start,
+      end,
+      allDay: event.allDay,
+      backgroundColor: colour,
+      borderColor: colour,
+      textColor: '#fff',
+      editable: isStore || MOVABLE_RECORD_KINDS.has(event.kind),
+      durationEditable: isStore,
+      classNames: [`gcal-kind-${event.kind}`, event.source === 'ai' ? 'gcal-ai' : '', event.isCommitment ? 'gcal-commit' : ''].filter(Boolean),
+      extendedProps: { original: event },
+    };
+  }), [visible]);
+
+  const fcSources = useMemo(() => [...fcEvents, ...BACKGROUND_BANDS], [fcEvents]);
+
+  const closeSnack = useCallback(() => setSnack(null), []);
+  const closeForm = useCallback(() => setForm(null), []);
+  const closeDetail = useCallback(() => setDetail(null), []);
+
+  function toggleKind(kind: CalendarEventKind) {
+    setHidden((current) => {
+      const next = new Set(current);
+      if (next.has(kind)) next.delete(kind); else next.add(kind);
+      saveHiddenKinds(next);
+      return next;
+    });
+  }
+
+  function goto(day: string) {
+    api()?.gotoDate(day);
+    setCursor(day);
+  }
+
+  async function loadOrders() {
+    if (orders.length) return;
+    try { setOrders(await actions.loadOrders()); } catch (err) {
+      setSnack({ message: err instanceof Error ? err.message : 'Could not load orders.', tone: 'error' });
+    }
+  }
+
+  function openCreate(anchor: AnchorRect, date: string, startTime = '', endTime = '') {
+    setDetail(null);
+    setForm({ mode: 'create', anchor, values: emptyForm(date, startTime, endTime) });
+  }
+
+  function createFromButton() {
+    const start = nextWholeHour(new Date());
+    const end = new Date(start.getTime() + 3_600_000);
+    const anchor = rectOf(document.querySelector('[data-testid="calendar-create"]')) ?? rectAt(window.innerWidth / 2, 120);
+    openCreate(anchor, toDay(start), toWallTime(start), toWallTime(end));
+  }
+
+  /** A click or drag on empty grid opens quick-create for that slot. */
+  function handleSelect(info: DateSelectArg) {
+    const anchor = info.jsEvent ? rectAt(info.jsEvent.clientX, info.jsEvent.clientY) : rectAt(window.innerWidth / 2, 200);
+    if (info.allDay) {
+      openCreate(anchor, toDay(info.start));
+    } else {
+      // A bare click selects one 15-minute slot; a meeting is an hour by default.
+      const end = info.end.getTime() - info.start.getTime() <= 15 * 60_000
+        ? new Date(info.start.getTime() + 3_600_000)
+        : info.end;
+      openCreate(anchor, toDay(info.start), toWallTime(info.start), toWallTime(end));
+    }
+    api()?.unselect();
+  }
+
+  /** Google's touch: a double click on a day in Month opens that day. */
+  function handleDateClick(info: { jsEvent: MouseEvent; date: Date }) {
+    if (info.jsEvent.detail !== 2) return;
+    setChosenView('day');
+    goto(toDay(info.date));
+  }
+
+  function handleEventClick(info: EventClickArg) {
+    info.jsEvent.stopPropagation();
+    const original = info.event.extendedProps.original as AdminCalendarEvent | undefined;
+    if (!original) return;
+    setForm(null);
+    setDetail({ event: original, anchor: rectOf(info.el) ?? rectAt(info.jsEvent.clientX, info.jsEvent.clientY) });
+  }
+
+  async function writeMove(original: AdminCalendarEvent, start: Date, end: Date | null, allDay: boolean) {
+    if (original.recordType === 'calendar') {
+      const body = allDay
+        ? { start: toDay(start), end: end ? addDays(toDay(end), -1) : toDay(start), allDay: true }
+        : { start: toWall(start), end: end ? toWall(end) : '', allDay: false };
+      return actions.updateStoreEvent(original.recordId, body);
+    }
+    return actions.moveRecord(original.kind, original.recordId, toDay(start), allDay ? '' : toWallTime(start));
+  }
+
+  /**
+   * eventChange fires for a move and for a resize, so one path writes both.
+   * A failed write reverts the drag: a grid showing a date the record does not
+   * hold is worse than a move that failed loudly.
+   */
+  async function handleEventChange(info: EventChangeArg) {
+    const original = info.event.extendedProps.original as AdminCalendarEvent | undefined;
+    const start = info.event.start;
+    if (!original || !start) { info.revert(); return; }
+    if (original.recordType !== 'calendar' && !MOVABLE_RECORD_KINDS.has(original.kind)) {
+      info.revert();
+      setSnack({ message: 'A container ETA is changed in Products and deployed through Pending, not moved here.', tone: 'error' });
+      return;
+    }
+    const previous = { start: info.oldEvent.start, end: info.oldEvent.end, allDay: info.oldEvent.allDay };
+    try {
+      const result = await writeMove(original, start, info.event.end, info.event.allDay);
+      setSnack({
+        message: [result.message ?? 'Moved.', result.warning].filter(Boolean).join(' '),
+        undo: previous.start ? async () => {
+          try {
+            await writeMove(original, previous.start as Date, previous.end, previous.allDay);
+            await actions.refresh();
+          } catch (err) {
+            setSnack({ message: err instanceof Error ? err.message : 'Could not undo.', tone: 'error' });
+          }
+        } : undefined,
+      });
+      await actions.refresh();
+    } catch (err) {
+      info.revert();
+      setSnack({ message: err instanceof Error ? err.message : 'Could not move that.', tone: 'error' });
+    }
+  }
+
+  async function submitForm(values: EventFormValues) {
+    if (!form) return;
+    const start = values.allDay ? values.date : `${values.date}T${values.startTime || '08:00'}`;
+    const end = values.allDay ? values.date : values.endTime ? `${values.date}T${values.endTime}` : '';
+    let result: WriteResult;
+
+    if (form.mode === 'edit' && form.event) {
+      if (form.event.recordType === 'calendar') {
+        result = await actions.updateStoreEvent(form.event.recordId, { title: values.title, start, end, allDay: values.allDay, notes: values.notes });
+      } else {
+        result = await actions.moveRecord(form.event.kind, form.event.recordId, values.date, values.allDay ? '' : values.startTime);
+      }
+    } else if (values.kind === 'task') {
+      result = await actions.createTask(values.title, values.date, values.allDay ? '' : values.startTime);
+    } else if (values.kind === 'customer_visit') {
+      result = await actions.moveRecord('customer_visit', values.orderId, values.date, values.allDay ? '' : values.startTime);
+    } else {
+      result = await actions.createStoreEvent({ title: values.title, kind: values.kind, start, end, allDay: values.allDay, notes: values.notes, source: 'gm' });
+    }
+    setForm(null);
+    setSnack({ message: [result.message ?? 'Saved.', result.warning].filter(Boolean).join(' ') });
+    await actions.refresh();
+  }
+
+  async function deleteSelected() {
+    if (!detail || detail.event.recordType !== 'calendar') return;
+    const { event } = detail;
+    setDetail(null);
+    try {
+      const result = await actions.deleteStoreEvent(event.recordId);
+      setSnack({ message: result.message ?? 'Removed.' });
+      await actions.refresh();
+    } catch (err) {
+      setSnack({ message: err instanceof Error ? err.message : 'Could not remove that.', tone: 'error' });
+    }
+  }
+
+  function editSelected() {
+    if (!detail) return;
+    const stored = storedDetails[detail.event.recordId];
+    setForm({ mode: 'edit', anchor: detail.anchor, values: formFromEvent(detail.event, stored), event: detail.event });
+    setDetail(null);
+  }
+
+  // Google's keys: t today, d/w/m/a views, j/k move, c create, / search.
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if (event.metaKey || event.ctrlKey || event.altKey || isTypingTarget(event.target)) return;
+      if (form || detail) return;
+      const key = event.key.toLowerCase();
+      const views: Record<string, CalendarView> = { d: 'day', w: 'week', m: 'month', a: 'schedule' };
+      if (views[key]) { setChosenView(views[key]); event.preventDefault(); return; }
+      if (key === 't') { goto(today); event.preventDefault(); return; }
+      if (key === 'j' || key === 'n') { api()?.next(); event.preventDefault(); return; }
+      if (key === 'k' || key === 'p') { api()?.prev(); event.preventDefault(); return; }
+      if (key === 'c') { createFromButton(); event.preventDefault(); return; }
+      if (key === '/') { searchRef.current?.focus(); event.preventDefault(); }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, detail, today]);
+
+  function handleDatesSet(info: DatesSetArg) {
+    setTitle(info.view.title);
+    // The mini month follows the middle of what is shown, so a week that
+    // straddles two months highlights the month most of it is in.
+    const middle = new Date((info.view.currentStart.getTime() + info.view.currentEnd.getTime()) / 2);
+    setCursor(toDay(middle));
+  }
+
+  /** Google's column header: a small weekday over a large date, today circled. */
+  function renderDayHeader(arg: DayHeaderContentArg) {
+    if (arg.view.type === 'dayGridMonth' || arg.view.type.startsWith('list')) {
+      return <span className="gcal-dow">{arg.text}</span>;
+    }
+    return (
+      <span className={`gcal-dayhead${arg.isToday ? ' is-today' : ''}`}>
+        <span className="gcal-dow">{arg.date.toLocaleDateString('en-AU', { weekday: 'short' })}</span>
+        <span className="gcal-dom">{arg.date.getDate()}</span>
+      </span>
+    );
+  }
+
+  function renderEvent(arg: EventContentArg) {
+    const original = arg.event.extendedProps.original as AdminCalendarEvent | undefined;
+    if (!original) return undefined;
+    const time = !original.allDay && !arg.view.type.startsWith('list') ? formatTime(original.start.slice(11)) : '';
+    const isMonth = arg.view.type === 'dayGridMonth';
+    return (
+      <span className="gcal-event">
+        {original.isCommitment && <span className="gcal-event__dot" aria-hidden="true" />}
+        {isMonth && time && <span className="gcal-event__time">{time}</span>}
+        <span className="gcal-event__title">{original.title}</span>
+        {!isMonth && time && <span className="gcal-event__time"> {time}</span>}
+        {original.source === 'ai' && <span className="gcal-event__ai" title="Added by AI from the mailbox" aria-label="Added by AI">✦</span>}
+      </span>
+    );
+  }
+
   return (
-    <div
-      data-testid="admin-calendar"
-      className="admin-calendar-sheet"
-      style={{ background: '#fff', borderRadius: '12px', display: 'grid', gap: '0.7rem', padding: '1rem' }}
-    >
-      <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'space-between' }}>
-        <div>
-          <div style={{ color: '#202124', fontSize: '1.05rem', fontWeight: 700 }}>Company Calendar</div>
-          <div style={{ color: '#5f6368', fontSize: '0.76rem', marginTop: '0.18rem' }}>
-            Every dated commitment in one place: visits, containers, handovers, follow-ups and tasks
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: '0.3rem' }}>
-          {VIEW_OPTIONS.map(([value, label]) => (
-            <button
-              key={value}
-              onClick={() => setView(value)}
-              style={{
-                background: view === value ? '#E8540A' : '#fff',
-                border: `1px solid ${view === value ? '#E8540A' : '#dadce0'}`, borderRadius: '6px',
-                color: view === value ? '#fff' : '#3c4043',
-                cursor: 'pointer', fontSize: '0.74rem', padding: '0.35rem 0.7rem',
-              }}
-            >{label}</button>
-          ))}
-          {onRefresh && (
-            <button
-              onClick={onRefresh}
-              style={{ background: '#fff', border: '1px solid #dadce0', borderRadius: '6px', color: '#3c4043', cursor: 'pointer', fontSize: '0.74rem', padding: '0.35rem 0.7rem' }}
-            >Refresh</button>
-          )}
-        </div>
-      </div>
+    <div className={`gcal${phone ? ' is-phone' : ''}${sidebarOpen ? ' has-sidebar' : ''}`} data-testid="admin-calendar">
+      <CalendarTopBar
+        title={title}
+        view={view}
+        search={search}
+        loading={loading}
+        searchRef={searchRef}
+        onToggleSidebar={() => setSidebarChoice(!sidebarOpen)}
+        onToday={() => goto(today)}
+        onPrev={() => api()?.prev()}
+        onNext={() => api()?.next()}
+        onSearch={setSearch}
+        onView={setChosenView}
+        onRefresh={() => void actions.refresh()}
+      />
 
-      {clashes.length > 0 && (
-        <div data-testid="calendar-clashes" style={{ background: '#fce8e6', border: '1px solid #d93025', borderRadius: '8px', padding: '0.7rem 0.85rem' }}>
-          <div style={{ color: '#c5221f', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-            Dates that disagree
-          </div>
-          {clashes.map((clash) => (
-            <div key={clash} style={{ color: '#3c4043', fontSize: '0.78rem', marginTop: '0.25rem' }}>{clash}</div>
-          ))}
-        </div>
-      )}
+      <div className="gcal-body">
+        {sidebarOpen && (
+          <>
+            {phone && <div className="gcal-scrim" onClick={() => setSidebarChoice(false)} />}
+            <CalendarSidebar
+              month={cursor}
+              selected={cursor}
+              today={today}
+              hidden={hidden}
+              counts={counts}
+              onCreate={createFromButton}
+              onSelectDay={(day) => { goto(day); if (phone) setSidebarChoice(false); }}
+              onToggleKind={toggleKind}
+            />
+          </>
+        )}
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
-        {ALL_KINDS.map((kind) => {
-          const on = !hidden.has(kind);
-          return (
-            <button
-              key={kind}
-              onClick={() => toggleKind(kind)}
-              aria-pressed={on}
-              style={{
-                alignItems: 'center', background: on ? KIND_META[kind].colour : '#fff',
-                border: `1px solid ${on ? KIND_META[kind].colour : '#dadce0'}`,
-                borderRadius: '999px', color: on ? '#fff' : '#5f6368', cursor: 'pointer',
-                display: 'flex', fontSize: '0.68rem', gap: '0.35rem', padding: '0.2rem 0.6rem',
-              }}
-            >
-              <span style={{ background: on ? '#fff' : KIND_META[kind].colour, borderRadius: '50%', display: 'inline-block', height: '7px', opacity: on ? 0.9 : 0.6, width: '7px' }} />
-              {KIND_META[kind].label}
-              <span style={{ opacity: 0.75 }}>{counts.get(kind) ?? 0}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {error && <div style={{ color: '#d93025', fontSize: '0.8rem' }}>{error}</div>}
-      {status && (
-        <div data-testid="calendar-status" style={{ background: '#e8f0fe', border: '1px solid #d2e3fc', borderRadius: '6px', color: '#174ea6', fontSize: '0.76rem', padding: '0.5rem 0.7rem' }}>
-          {status}
-        </div>
-      )}
-      {loading && !events.length && <div style={{ color: '#5f6368', fontSize: '0.85rem', padding: '2rem 0', textAlign: 'center' }}>Loading calendar...</div>}
-
-      <div className="admin-calendar-surface" style={{ background: '#fff' }}>
-        <FullCalendar
-          ref={calendarRef}
-          plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
-          initialView="dayGridMonth"
-          headerToolbar={wideScreen
-            ? { left: 'prev,next today', center: 'title', right: '' }
-            : { left: 'prev,next', center: 'title', right: '' }}
-          events={fcEventSources}
-          eventClick={handleEventClick}
-          eventChange={(info) => { void handleEventChange(info); }}
-          eventResize={handleEventResize}
-          dateClick={handleDateClick}
-          select={(info) => { void handleSelect(info); }}
-          editable
-          selectable
-          selectMirror
-          dayMaxEvents
-          businessHours={BUSINESS_HOURS}
-          height="auto"
-          firstDay={1}
-          noEventsText="Nothing scheduled in this period"
-          eventDisplay="block"
-          allDaySlot
-          allDayText="All day"
-          slotMinTime="00:00:00"
-          slotMaxTime="24:00:00"
-          slotDuration="00:15:00"
-          slotLabelInterval="01:00:00"
-          slotLabelFormat={{ hour: 'numeric', minute: '2-digit', meridiem: 'short' }}
-          scrollTime="08:00:00"
-          expandRows
-          stickyHeaderDates
-          nowIndicator
-          dayHeaderFormat={{ weekday: 'short', day: 'numeric' }}
-          eventTimeFormat={{ hour: '2-digit', minute: '2-digit', meridiem: 'short' }}
-        />
-      </div>
-
-      <div style={{ color: '#5f6368', display: 'flex', flexWrap: 'wrap', fontSize: '0.68rem', gap: '0.9rem' }}>
-        <span><span style={{ background: '#fff', border: '1px solid #dadce0', display: 'inline-block', height: '9px', marginRight: '0.3rem', verticalAlign: '-1px', width: '14px' }} />Open 8am–5pm, Monday to Saturday</span>
-        <span><span style={{ background: '#e8eaed', display: 'inline-block', height: '9px', marginRight: '0.3rem', verticalAlign: '-1px', width: '14px' }} />Lunch 12–1</span>
-        <span><span style={{ background: '#e6f4ea', display: 'inline-block', height: '9px', marginRight: '0.3rem', verticalAlign: '-1px', width: '14px' }} />Sunday, by arrangement</span>
-        <span>Week and day open at 8am; scroll for the rest of the 24 hours.</span>
-      </div>
-
-      {selected && (
-        <div style={{ background: '#f8f9fa', borderLeft: `4px solid ${KIND_META[selected.kind].colour}`, border: '1px solid #dadce0', borderRadius: '8px', padding: '0.8rem 0.9rem' }}>
-          <div style={{ alignItems: 'start', display: 'flex', gap: '0.6rem', justifyContent: 'space-between' }}>
-            <div>
-              <div style={{ color: KIND_META[selected.kind].colour, fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                {KIND_META[selected.kind].label}{selected.isCommitment ? ' · commitment to a customer' : ''}
-              </div>
-              <div style={{ color: '#202124', fontSize: '0.95rem', fontWeight: 600, marginTop: '0.2rem' }}>{selected.title}</div>
-              <div style={{ color: '#5f6368', fontSize: '0.78rem', marginTop: '0.2rem' }}>{selected.date}{selected.detail ? ` · ${selected.detail}` : ''}</div>
-              <div style={{ color: '#80868b', fontSize: '0.72rem', marginTop: '0.35rem' }}>
-                Change this date on the {selected.recordType} it belongs to: {selected.recordId}
-              </div>
+        <main className="gcal-main">
+          {error && <div className="gcal-banner is-error" role="alert">{error}</div>}
+          {clashes.length > 0 && (
+            <div className="gcal-banner is-warning" data-testid="calendar-clashes">
+              <button type="button" className="gcal-banner__toggle" onClick={() => setClashesOpen((open) => !open)} aria-expanded={clashesOpen}>
+                ⚠ {clashes.length} date{clashes.length === 1 ? '' : 's'} that disagree
+              </button>
+              {clashesOpen && clashes.map((clash) => <div key={clash} className="gcal-banner__row">{clash}</div>)}
             </div>
-            <button
-              onClick={() => setSelected(null)}
-              style={{ background: '#fff', border: '1px solid #dadce0', borderRadius: '6px', color: '#5f6368', cursor: 'pointer', fontSize: '0.72rem', padding: '0.25rem 0.5rem' }}
-            >Close</button>
-          </div>
-        </div>
+          )}
+
+          {search.trim() ? (
+            <div className="gcal-results" data-testid="calendar-results">
+              {searchResults.length === 0 && <div className="gcal-muted" style={{ padding: '2rem', textAlign: 'center' }}>Nothing matches “{search}”.</div>}
+              {searchResults.map((event) => (
+                <button
+                  key={event.id}
+                  type="button"
+                  className="gcal-results__row"
+                  onClick={(e) => setDetail({ event, anchor: rectOf(e.currentTarget) ?? rectAt(e.clientX, e.clientY) })}
+                >
+                  <span className="gcal-results__date">{parseWall(event.date).toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
+                  <span className="gcal-results__swatch" style={{ background: EVENT_KIND_META[event.kind].colour }} />
+                  <span className="gcal-results__title">{event.title}</span>
+                  <span className="gcal-muted">{event.allDay ? 'All day' : formatTime(event.start.slice(11))}</span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="gcal-grid" data-testid="calendar-grid">
+              <FullCalendar
+                ref={calendarRef}
+                plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+                initialView={fcViewFor(view, phone)}
+                views={{
+                  timeGridThreeDay: { type: 'timeGrid', duration: { days: 3 }, buttonText: '3 days' },
+                  listMonth: { listDayFormat: { weekday: 'short', day: 'numeric', month: 'short' }, listDaySideFormat: false },
+                }}
+                headerToolbar={false}
+                events={fcSources}
+                datesSet={handleDatesSet}
+                eventClick={handleEventClick}
+                eventChange={(info) => { void handleEventChange(info); }}
+                dateClick={handleDateClick}
+                select={handleSelect}
+                dayHeaderContent={renderDayHeader}
+                eventContent={renderEvent}
+                editable
+                selectable
+                selectMirror
+                dayMaxEvents={3}
+                businessHours={BUSINESS_HOURS}
+                height="100%"
+                firstDay={1}
+                noEventsText="Nothing scheduled in this period"
+                allDaySlot
+                allDayText="All day"
+                slotMinTime="00:00:00"
+                slotMaxTime="24:00:00"
+                slotDuration="00:15:00"
+                slotLabelInterval="01:00:00"
+                slotLabelFormat={{ hour: 'numeric', meridiem: 'short' }}
+                // A quarter before eight, so the 8am label sits fully inside
+                // the scroller rather than clipped on its top edge.
+                scrollTime="07:45:00"
+                scrollTimeReset
+                expandRows={false}
+                stickyHeaderDates
+                nowIndicator
+                eventTimeFormat={{ hour: 'numeric', minute: '2-digit', meridiem: 'short' }}
+                displayEventTime={false}
+                eventDisplay="block"
+                moreLinkClick="popover"
+                longPressDelay={350}
+              />
+              {loading && !events.length && <div className="gcal-loading">Loading calendar…</div>}
+            </div>
+          )}
+        </main>
+      </div>
+
+      {detail && (
+        <Popover anchor={detail.anchor} onClose={closeDetail} label="Event details" width={420} testId="event-popover">
+          <EventDetail
+            event={detail.event}
+            stored={storedDetails[detail.event.recordId]}
+            onEdit={editSelected}
+            onDelete={() => void deleteSelected()}
+            onClose={closeDetail}
+          />
+        </Popover>
       )}
+
+      {form && (
+        <Popover anchor={form.anchor} onClose={closeForm} label={form.mode === 'edit' ? 'Edit event' : 'New event'} width={440} testId="event-form-popover">
+          <EventForm
+            mode={form.mode}
+            initial={form.values}
+            event={form.event}
+            orders={orders}
+            onLoadOrders={() => void loadOrders()}
+            onSubmit={submitForm}
+            onCancel={closeForm}
+          />
+        </Popover>
+      )}
+
+      <Snackbar state={snack} onClose={closeSnack} />
     </div>
   );
 }

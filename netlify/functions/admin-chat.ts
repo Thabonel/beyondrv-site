@@ -3,7 +3,11 @@ import type { Handler } from '@netlify/functions';
 import { randomUUID } from 'crypto';
 import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore } from './blob-store';
-import { buildCalendarEvents, calendarClashes } from './calendar-events-core';
+import { buildCalendarEvents, calendarClashes, sortCalendarEvents, type AdminCalendarEvent } from './calendar-events-core';
+import { CALENDAR_EVENT_STORE, calendarEventKey, toAdminCalendarEvent, validateEvent, type CompanyCalendarEvent } from './calendar-store-core';
+import { listCalendarEvents } from './admin-calendar-events';
+import { OWNER_COPILOT_TASK_STORE } from './owner-copilot-core';
+import { listJsonStore } from './owner-copilot-store-utils';
 import {
   applyExactTextReplacements,
   buildChangeEvidence,
@@ -208,9 +212,11 @@ ${proposal.proposed_action.grounding_evidence || 'No dedicated grounding lookup 
 
 const SYSTEM_PROMPT = `You are the Beyond RV admin assistant. You work for the General Manager and you are across the whole business, not only the website.
 
-You can read the company calendar with list_calendar: every dated commitment across orders, enquiries, tasks and container ETAs on one timeline. Use it whenever the GM asks what is happening, who is visiting, what is arriving, what is overdue, or what a day or week looks like. Lead with commitments to customers, because those are the ones that cost money when they are missed.
+You can read the company calendar with list_calendar: every dated commitment across orders, enquiries, tasks, container ETAs, meetings and reminders on one timeline, with times where they are known. Use it whenever the GM asks what is happening, who is visiting, what is arriving, what is overdue, or what a day or week looks like. Lead with commitments to customers, because those are the ones that cost money when they are missed. Business hours are Monday to Saturday 08:00 to 17:00, lunch 12:00 to 13:00; Sunday is worked by arrangement.
 
-You can put a date on the calendar with set_order_date. There is no separate calendar: a date reaches the calendar by being written onto the order that owns it, so the two can never disagree. Confirm which order and which date with the GM before writing, and never guess which order is meant.
+Dates that belong to a record are written onto that record with set_order_date, which takes an optional time of day for visits and handovers. Confirm which order and which date with the GM before writing a customer visit, and never guess which order is meant.
+
+Meetings, calls, reminders and anything else with no order to live on go on the calendar with create_calendar_event. When the GM mentions one in passing ("Li is calling at two tomorrow", "remind me to chase the rego Friday"), add it without asking, then say what you added. Use update_calendar_event and delete_calendar_event for changes. Items marked "AI" on the calendar were read from the mailbox by the scheduled sync; the GM can dismiss them.
 
 One rule matters more than the rest. A customer travelling to see a vehicle that has not arrived costs the company flights and goodwill. If the GM mentions a customer visiting, ask for the date and set it. If a visit is set on an order whose status does not mean the vehicle is physically here, say so plainly. A supplier saying a container arrives on a date is not the same as it arriving.
 
@@ -539,9 +545,61 @@ const tools = [
         order_id: { type: 'string', description: 'Exact order ID' },
         field: { type: 'string', description: 'One of: customer_visit, expected_handover, expected_arrival, next_action, factory_order' },
         date: { type: 'string', description: 'Date in YYYY-MM-DD, or blank to clear it' },
+        time: { type: 'string', description: 'Optional time of day in HH:MM (24-hour) for customer_visit and expected_handover. Blank makes it all-day.' },
       },
       additionalProperties: false,
       required: ['order_id', 'field'],
+    },
+  },
+  {
+    type: 'function' as const,
+    name: 'create_calendar_event',
+    description: 'Add a meeting, call, reminder or other dated item that does not belong to an order. Appears on the company calendar immediately. Use HH:MM 24-hour times; leave start_time blank for an all-day item.',
+    parameters: {
+      type: 'object' as const,
+      properties: {
+        title: { type: 'string', description: 'Short title as it should read on the calendar' },
+        kind: { type: 'string', description: 'meeting or reminder' },
+        date: { type: 'string', description: 'YYYY-MM-DD' },
+        start_time: { type: 'string', description: 'HH:MM, or blank for all-day' },
+        end_time: { type: 'string', description: 'HH:MM, or blank for one hour after the start' },
+        notes: { type: 'string', description: 'Optional detail' },
+        order_id: { type: 'string', description: 'Optional order this relates to' },
+        product_slug: { type: 'string', description: 'Optional product this relates to' },
+      },
+      additionalProperties: false,
+      required: ['title', 'date'],
+    },
+  },
+  {
+    type: 'function' as const,
+    name: 'update_calendar_event',
+    description: 'Change a calendar event created with create_calendar_event or read from email. Pass only the fields to change. Get the id from list_calendar (calendar:<id>).',
+    parameters: {
+      type: 'object' as const,
+      properties: {
+        id: { type: 'string', description: 'The event id, without the calendar: prefix' },
+        title: { type: 'string' },
+        date: { type: 'string', description: 'YYYY-MM-DD' },
+        start_time: { type: 'string', description: 'HH:MM, or blank to make it all-day' },
+        end_time: { type: 'string', description: 'HH:MM' },
+        notes: { type: 'string' },
+      },
+      additionalProperties: false,
+      required: ['id'],
+    },
+  },
+  {
+    type: 'function' as const,
+    name: 'delete_calendar_event',
+    description: 'Remove a calendar event. An event read from email is dismissed rather than deleted, so the same email cannot re-add it.',
+    parameters: {
+      type: 'object' as const,
+      properties: {
+        id: { type: 'string', description: 'The event id, without the calendar: prefix' },
+      },
+      additionalProperties: false,
+      required: ['id'],
     },
   },
 ];
@@ -569,14 +627,19 @@ async function readAllOrders(): Promise<Array<Record<string, unknown>>> {
   return rows.filter((row): row is Record<string, unknown> => Boolean(row));
 }
 
-/** Read-only. The calendar is a projection, so this never writes. */
+function eventWhen(event: AdminCalendarEvent) {
+  if (event.allDay) return `${event.date} all day`;
+  return `${event.date} ${event.start.slice(11)}–${event.end.slice(11)}`;
+}
+
+/** Read-only: record-owned dates and the calendar's own events, together. */
 async function listCalendarTool(input: Record<string, unknown>) {
   const from = clean(input.from, 10) || new Date().toISOString().slice(0, 10);
   const to = clean(input.to, 10)
     || new Date(Date.parse(`${from}T00:00:00Z`) + 60 * 86_400_000).toISOString().slice(0, 10);
   const kind = clean(input.kind, 40);
 
-  const [orders, enquiries] = await Promise.all([
+  const [orders, enquiries, tasks, stored] = await Promise.all([
     readAllOrders(),
     (async () => {
       const store = getBlobStore(ENQUIRY_STORE);
@@ -585,17 +648,22 @@ async function listCalendarTool(input: Record<string, unknown>) {
         store.get(blob.key, { type: 'json' }) as Promise<Record<string, unknown> | null>));
       return rows.filter((row): row is Record<string, unknown> => Boolean(row));
     })(),
+    listJsonStore(OWNER_COPILOT_TASK_STORE).catch(() => [] as Record<string, unknown>[]),
+    listCalendarEvents(from, to).catch(() => [] as CompanyCalendarEvent[]),
   ]);
 
-  const events = buildCalendarEvents({ orders, enquiries })
+  const events = sortCalendarEvents([
+    ...buildCalendarEvents({ orders, enquiries, tasks, products: catalogue as unknown as Record<string, unknown>[] }),
+    ...stored.map(toAdminCalendarEvent),
+  ])
     .filter((event) => event.date >= from && event.date <= to)
     .filter((event) => !kind || event.kind === kind);
 
   if (!events.length) return `No calendar entries between ${from} and ${to}${kind ? ` for ${kind}` : ''}.`;
 
   const clashes = calendarClashes(events);
-  const lines = events.slice(0, 60).map((event) =>
-    `${event.date} · ${event.kind}${event.isCommitment ? ' (commitment)' : ''} · ${event.title}${event.detail ? ` · ${event.detail}` : ''} · ${event.recordType}:${event.recordId}`);
+  const lines = events.slice(0, 80).map((event) =>
+    `${eventWhen(event)} · ${event.kind}${event.isCommitment ? ' (commitment)' : ''}${event.source === 'ai' ? ' (AI, from email)' : ''} · ${event.title}${event.detail ? ` · ${event.detail}` : ''} · ${event.recordType}:${event.recordId}`);
   return [
     `${events.length} calendar entr${events.length === 1 ? 'y' : 'ies'} between ${from} and ${to}:`,
     ...lines,
@@ -607,23 +675,43 @@ async function listCalendarTool(input: Record<string, unknown>) {
  * Writing a date onto the order that owns it is how a date reaches the
  * calendar. There is no separate calendar store to drift out of sync.
  */
+const ORDER_TIME_FIELDS: Record<string, string> = {
+  customer_visit: 'customerVisitTime',
+  expected_handover: 'expectedHandoverTime',
+};
+
 async function setOrderDateTool(input: Record<string, unknown>) {
   const orderId = clean(input.order_id, 240);
   const field = clean(input.field, 40);
   const date = clean(input.date, 10);
+  const time = clean(input.time, 5);
   const target = ORDER_DATE_FIELDS[field];
 
   if (!orderId) return 'Error: order_id is required.';
   if (!target) return `Error: field must be one of ${Object.keys(ORDER_DATE_FIELDS).join(', ')}.`;
   if (date && !isIsoDateString(date)) return `Error: "${date}" is not a YYYY-MM-DD date.`;
+  if (time && !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) return `Error: "${time}" is not an HH:MM time.`;
 
   const store = getBlobStore(ORDER_STORE);
-  const existing = await store.get(orderId, { type: 'json' }) as Record<string, unknown> | null;
+  // Orders are stored under orders/<id>.json; older records may sit at the bare id.
+  const keys = [`orders/${encodeURIComponent(orderId)}.json`, orderId];
+  let key = '';
+  let existing: Record<string, unknown> | null = null;
+  for (const candidate of keys) {
+    existing = await store.get(candidate, { type: 'json' }) as Record<string, unknown> | null;
+    if (existing) { key = candidate; break; }
+  }
   if (!existing) return `Error: no order found with id ${orderId}.`;
 
   const before = typeof existing[target] === 'string' ? existing[target] as string : '';
-  const updated = { ...existing, [target]: date, updatedAt: new Date().toISOString() };
-  await store.setJSON(orderId, updated);
+  const timeField = ORDER_TIME_FIELDS[field];
+  const updated = {
+    ...existing,
+    [target]: date,
+    ...(timeField ? { [timeField]: date ? time : '' } : {}),
+    updatedAt: new Date().toISOString(),
+  };
+  await store.setJSON(key, updated);
 
   const who = typeof existing.customerName === 'string' ? existing.customerName : orderId;
   const status = typeof existing.status === 'string' ? existing.status : 'unknown';
@@ -631,7 +719,70 @@ async function setOrderDateTool(input: Record<string, unknown>) {
     && !['arrived_mutdapilly', 'local_fitout', 'ready_for_handover', 'delivered'].includes(status)
     ? ` Warning: the order status is "${status}", so the vehicle is not marked as here. Confirm it has landed before the customer travels.`
     : '';
-  return `Set ${field} on order ${orderId} (${who}) ${before ? `from ${before} ` : ''}to ${date || '(cleared)'}.${warning}`;
+  return `Set ${field} on order ${orderId} (${who}) ${before ? `from ${before} ` : ''}to ${date ? `${date}${time ? ` ${time}` : ''}` : '(cleared)'}.${warning}`;
+}
+
+function eventInputFromTool(input: Record<string, unknown>, existing?: CompanyCalendarEvent | null): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  const has = (key: string) => typeof input[key] === 'string';
+  if (has('title')) out.title = clean(input.title, 180);
+  if (has('kind')) out.kind = clean(input.kind, 40);
+  if (has('notes')) out.notes = clean(input.notes, 4000);
+  const orderId = clean(input.order_id, 240);
+  const productSlug = clean(input.product_slug, 240);
+  if (orderId || productSlug) out.links = { ...(existing?.links ?? {}), ...(orderId ? { orderId } : {}), ...(productSlug ? { productSlug } : {}) };
+
+  const date = clean(input.date, 10) || existing?.start.slice(0, 10) || '';
+  const startTime = has('start_time') ? clean(input.start_time, 5) : existing && !existing.allDay ? existing.start.slice(11) : '';
+  const endTime = has('end_time') ? clean(input.end_time, 5) : existing && !existing.allDay ? existing.end.slice(11) : '';
+  if (has('date') || has('start_time') || has('end_time')) {
+    if (!date) return out;
+    if (startTime) {
+      out.allDay = false;
+      out.start = `${date}T${startTime}`;
+      out.end = endTime && endTime > startTime ? `${date}T${endTime}` : '';
+    } else {
+      out.allDay = true;
+      out.start = date;
+      out.end = date;
+    }
+  }
+  return out;
+}
+
+async function createCalendarEventTool(input: Record<string, unknown>) {
+  const kind = clean(input.kind, 40) || 'meeting';
+  const result = validateEvent({ ...eventInputFromTool({ ...input, kind }), source: 'chat' }, { actor: 'admin-assistant' });
+  if (!result.ok) return `Error: ${result.error}`;
+  const store = getBlobStore(CALENDAR_EVENT_STORE);
+  await store.setJSON(calendarEventKey(result.event.id), result.event);
+  return `Added ${result.event.kind} "${result.event.title}" on ${eventWhen(toAdminCalendarEvent(result.event))} (id ${result.event.id}).`;
+}
+
+async function updateCalendarEventTool(input: Record<string, unknown>) {
+  const id = clean(input.id, 240).replace(/^calendar:/, '');
+  if (!id) return 'Error: id is required.';
+  const store = getBlobStore(CALENDAR_EVENT_STORE);
+  const existing = await store.get(calendarEventKey(id), { type: 'json' }) as CompanyCalendarEvent | null;
+  if (!existing) return `Error: no calendar event with id ${id}.`;
+  const result = validateEvent(eventInputFromTool(input, existing), { actor: 'admin-assistant', existing });
+  if (!result.ok) return `Error: ${result.error}`;
+  await store.setJSON(calendarEventKey(id), result.event);
+  return `Updated "${result.event.title}" to ${eventWhen(toAdminCalendarEvent(result.event))}.`;
+}
+
+async function deleteCalendarEventTool(input: Record<string, unknown>) {
+  const id = clean(input.id, 240).replace(/^calendar:/, '');
+  if (!id) return 'Error: id is required.';
+  const store = getBlobStore(CALENDAR_EVENT_STORE);
+  const existing = await store.get(calendarEventKey(id), { type: 'json' }) as CompanyCalendarEvent | null;
+  if (!existing) return `Error: no calendar event with id ${id}.`;
+  if (existing.source === 'ai') {
+    await store.setJSON(calendarEventKey(id), { ...existing, dismissedAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+    return `Dismissed "${existing.title}". It came from an email, so it will not be added again.`;
+  }
+  await store.delete(calendarEventKey(id));
+  return `Deleted "${existing.title}".`;
 }
 
 function clean(value: unknown, max = 1000) {
@@ -1159,6 +1310,24 @@ CURRENT DATE:
             result = await setOrderDateTool(input);
           } catch (error) {
             result = `Error: could not set that date. ${blobStoreUserMessage(error)}`;
+          }
+        } else if (!result && call.name === 'create_calendar_event') {
+          try {
+            result = await createCalendarEventTool(input);
+          } catch (error) {
+            result = `Error: could not add that event. ${blobStoreUserMessage(error)}`;
+          }
+        } else if (!result && call.name === 'update_calendar_event') {
+          try {
+            result = await updateCalendarEventTool(input);
+          } catch (error) {
+            result = `Error: could not update that event. ${blobStoreUserMessage(error)}`;
+          }
+        } else if (!result && call.name === 'delete_calendar_event') {
+          try {
+            result = await deleteCalendarEventTool(input);
+          } catch (error) {
+            result = `Error: could not remove that event. ${blobStoreUserMessage(error)}`;
           }
         } else if (!result && call.name === 'get_seo_health') {
           try {

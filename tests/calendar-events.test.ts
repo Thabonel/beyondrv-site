@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  addMinutes,
   buildCalendarEvents,
   calendarClashes,
   EVENT_KIND_META,
@@ -143,4 +144,48 @@ test('a container arriving before the visit is not a clash', () => {
 test('empty sources produce an empty calendar rather than a crash', () => {
   assert.deepEqual(buildCalendarEvents({}), []);
   assert.deepEqual(calendarClashes([]), []);
+});
+
+test('a visit with a time is drawn at that time for an hour; without one it is all-day', () => {
+  const [timed] = buildCalendarEvents({ orders: [{ id: 'o1', customerName: 'A', customerVisitDate: '2026-09-10', customerVisitTime: '10:00' }] });
+  assert.deepEqual([timed.start, timed.end, timed.allDay], ['2026-09-10T10:00', '2026-09-10T11:00', false]);
+  const [allDay] = buildCalendarEvents({ orders: [{ id: 'o1', customerName: 'A', customerVisitDate: '2026-09-10' }] });
+  assert.deepEqual([allDay.start, allDay.end, allDay.allDay], ['2026-09-10', '2026-09-10', true]);
+});
+
+test('a malformed time falls back to all-day rather than a wrong hour', () => {
+  const [event] = buildCalendarEvents({ orders: [{ id: 'o1', customerName: 'A', customerVisitDate: '2026-09-10', customerVisitTime: '10am' }] });
+  assert.equal(event.allDay, true);
+});
+
+test('a task with a due time is timed; a handover with a time is timed', () => {
+  const events = buildCalendarEvents({
+    tasks: [{ id: 't1', title: 'Ring the agent', dueDate: '2026-09-08', dueTime: '09:30', status: 'open' }],
+    orders: [{ id: 'o1', customerName: 'A', expectedHandoverDate: '2026-09-09', expectedHandoverTime: '16:00' }],
+  });
+  assert.deepEqual(events.map((e) => e.start), ['2026-09-08T09:30', '2026-09-09T16:00']);
+});
+
+test('every projected event says it came from a record', () => {
+  const events = buildCalendarEvents({ orders: [{ id: 'o1', customerName: 'A', customerVisitDate: '2026-09-10' }] });
+  assert.equal(events[0].source, 'record');
+});
+
+test('an hour added at the end of a day rolls into the next day', () => {
+  assert.equal(addMinutes('2026-09-10T23:30', 60), '2026-09-11T00:30');
+  assert.equal(addMinutes('2026-12-31T23:30', 60), '2027-01-01T00:30');
+});
+
+test('a container ETA read from an email says so in the clash', () => {
+  const events = buildCalendarEvents({
+    orders: [{ id: 'o1', customerName: 'A', productSlug: 'advent-2450', customerVisitDate: '2026-09-10' }],
+  });
+  events.push({
+    id: 'calendar:c1', kind: 'container_eta', date: '2026-09-18', start: '2026-09-18', end: '2026-09-18', allDay: true,
+    title: 'Container ETA: Advent 2450', detail: '', recordType: 'calendar', recordId: 'c1', isCommitment: false,
+    source: 'ai', productSlug: 'advent-2450',
+  });
+  const clashes = calendarClashes(events);
+  assert.equal(clashes.length, 1);
+  assert.match(clashes[0], /according to an email/);
 });
