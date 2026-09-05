@@ -471,3 +471,45 @@
   .gcal .fc .fc-timegrid-slot-label-cushion { font-size: 9px; padding-right: 4px; }
   .gcal-results__row { grid-template-columns: 80px 10px 1fr auto; gap: 8px; }
 }
+
+/* ---------- Crew ---------- */
+.gcal-crew { display: grid; gap: 6px; }
+.gcal-crew__toggle {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font: inherit; font-size: 14px; font-weight: 500; color: var(--gcal-text); text-align: left;
+}
+.gcal-crew__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; }
+.gcal-crew__row.is-revoked { opacity: 0.5; }
+.gcal-crew__name { font-weight: 500; }
+.gcal-crew__meta { color: var(--gcal-muted); font-size: 11px; }
+.gcal-crew__actions { display: flex; gap: 4px; }
+.gcal-crew__actions button, .gcal-crew__add button {
+  background: var(--gcal-bg); border: 1px solid var(--gcal-line); border-radius: 4px;
+  color: var(--gcal-text); cursor: pointer; font: inherit; font-size: 11px; padding: 3px 7px;
+}
+.gcal-crew__add { display: grid; grid-template-columns: 1fr auto; gap: 4px; }
+.gcal-crew__add input, .gcal-crew__add select {
+  font: inherit; font-size: 12px; padding: 4px 6px;
+  border: 1px solid var(--gcal-line); border-radius: 4px; min-width: 0;
+  background: var(--gcal-bg); color: var(--gcal-text);
+}
+.gcal-crew__add select { grid-column: 1 / -1; }
+.gcal-crew__status { color: var(--gcal-muted); font-size: 11px; }
+.gcal-crew__issued {
+  position: fixed; inset: auto 16px 16px 16px; z-index: 60; max-width: 520px; margin: 0 auto;
+  background: var(--gcal-bg); border-radius: 8px; padding: 14px 16px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.35); font-size: 13px;
+}
+.gcal-crew__issued-head { font-weight: 700; font-size: 15px; }
+.gcal-crew__issued p { color: var(--gcal-muted); margin: 4px 0 8px; }
+.gcal-crew__issued code {
+  display: block; background: var(--gcal-hover); border-radius: 4px; padding: 8px;
+  font-size: 11px; word-break: break-all; user-select: all;
+}
+.gcal-crew__issued-actions { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+.gcal-crew__issued-actions a, .gcal-crew__issued-actions button {
+  background: var(--gcal-accent); border: 1px solid var(--gcal-accent); border-radius: 4px;
+  color: #fff; cursor: pointer; font: inherit; font-weight: 500; padding: 7px 12px; text-decoration: none;
+}
+.gcal-crew__issued-actions button { background: var(--gcal-bg); border-color: var(--gcal-line); color: var(--gcal-text); }
+.gcal-crew__how { font-size: 11px; margin-bottom: 0 !important; }

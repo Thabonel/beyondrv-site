@@ -109,6 +109,8 @@ export const handler: Handler = async (event) => {
       relatedDriveFileId: clean(body.relatedDriveFileId, 240),
       dueDate: clean(body.dueDate, 40),
       dueTime: clean(body.dueTime, 5),
+      // Whose job it is. Empty means Alex's.
+      assigneeId: clean(body.assigneeId, 240),
       priority,
       status: 'open',
       source: clean(body.source, 80) || 'manual',
@@ -166,6 +168,7 @@ export const handler: Handler = async (event) => {
     title: clean(body.title, 180) || existing.title,
     dueDate: clean(body.dueDate, 40) || existing.dueDate,
     dueTime: typeof body.dueTime === 'string' ? clean(body.dueTime, 5) : existing.dueTime || '',
+    assigneeId: typeof body.assigneeId === 'string' ? clean(body.assigneeId, 240) : existing.assigneeId || '',
     priority,
     status,
     notes: clean(body.notes, 2000) || existing.notes,

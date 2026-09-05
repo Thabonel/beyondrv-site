@@ -1,0 +1,199 @@
+/*
+ * Built for one hand on a phone in a workshop. Large type, big targets, high
+ * contrast, nothing decorative. It has to be readable at arm's length with
+ * dirty hands, so the tap targets are 48px and the type does not go below 15px.
+ */
+
+.myday {
+  --line: #e0e0e0;
+  --text: #1a1a1a;
+  --muted: #666;
+  --accent: #e8540a;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 12px 16px 96px;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--text);
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+.myday-loading { padding: 3rem; text-align: center; color: #666; font-size: 24px; }
+
+.myday--locked { text-align: center; padding-top: 20vh; }
+.myday--locked h1 { color: var(--accent); font-size: 24px; }
+.myday--locked p { color: var(--muted); font-size: 17px; line-height: 1.5; max-width: 22em; margin: 0 auto; }
+
+/* Header: the day, and a way to either side of it. */
+.myday__head {
+  display: grid;
+  grid-template-columns: 48px 1fr 48px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0 12px;
+  border-bottom: 2px solid var(--line);
+}
+.myday__head h1 { font-size: 21px; margin: 0; text-align: center; line-height: 1.2; }
+.myday__who { margin: 2px 0 0; text-align: center; color: var(--muted); font-size: 14px; }
+.myday__head button {
+  height: 48px;
+  width: 48px;
+  font-size: 30px;
+  line-height: 1;
+  background: #f4f4f4;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--text);
+  cursor: pointer;
+}
+.myday__today {
+  display: block;
+  width: 100%;
+  margin: 10px 0 0;
+  padding: 12px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.myday__section { margin-top: 26px; }
+.myday__section h2 {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 8px;
+}
+.myday__muted { color: var(--muted); font-size: 15px; margin: 4px 0; }
+.myday__sr {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Jobs. The tick is the biggest thing on the row, because it is the thing
+   they came to press. */
+.myday__jobs { list-style: none; margin: 0; padding: 0; }
+.myday__jobs li {
+  display: grid;
+  grid-template-columns: 48px 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 17px;
+  line-height: 1.35;
+}
+.myday__jobs li.is-done .myday__job-title { text-decoration: line-through; color: var(--muted); }
+.myday__tick {
+  height: 44px;
+  width: 44px;
+  border: 2px solid #bbb;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 22px;
+  line-height: 1;
+  color: #fff;
+  cursor: pointer;
+}
+.myday__jobs li.is-done .myday__tick { background: #0b8043; border-color: #0b8043; }
+.myday__job-title { min-width: 0; overflow-wrap: anywhere; }
+.myday__overdue {
+  display: block;
+  color: #c5221f;
+  font-size: 13px;
+  font-weight: 600;
+}
+.myday__time { color: var(--muted); font-size: 14px; white-space: nowrap; }
+.myday__move input {
+  width: 40px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f4f4f4;
+  color: transparent;
+  cursor: pointer;
+}
+
+.myday__addbtn, .myday__add button {
+  margin-top: 12px;
+  padding: 14px 16px;
+  width: 100%;
+  background: #fff;
+  border: 2px dashed #bbb;
+  border-radius: 12px;
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.myday__add { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; margin-top: 12px; align-items: center; }
+.myday__add input {
+  padding: 14px;
+  font: inherit;
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  min-width: 0;
+}
+.myday__add button { margin-top: 0; width: auto; border-style: solid; border-color: var(--line); }
+.myday__add button[type="submit"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* The yard: read-only on purpose, so nothing here looks like a control. */
+.myday__yard { list-style: none; margin: 0; padding: 0; }
+.myday__yard li {
+  display: grid;
+  grid-template-columns: 12px 68px 1fr;
+  gap: 10px;
+  align-items: baseline;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 16px;
+  line-height: 1.35;
+}
+.myday__dot { width: 12px; height: 12px; border-radius: 50%; align-self: center; }
+.myday__yard-when { color: var(--muted); font-size: 14px; white-space: nowrap; }
+.myday__yard-title { display: block; overflow-wrap: anywhere; }
+
+.myday textarea {
+  width: 100%;
+  padding: 12px;
+  font: inherit;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.myday__status {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  background: #323232;
+  color: #fff;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+@media (prefers-color-scheme: dark) {
+  .myday {
+    --line: #333;
+    --text: #f2f2f2;
+    --muted: #aaa;
+    background: #111;
+  }
+  .myday__head button, .myday__move input { background: #1e1e1e; }
+  .myday__tick { background: #1a1a1a; border-color: #555; }
+  .myday__addbtn, .myday__add input, .myday textarea { background: #1a1a1a; color: #f2f2f2; }
+  .myday__add button { background: #1e1e1e; color: #f2f2f2; }
+}
