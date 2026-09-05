@@ -85,3 +85,11 @@ unimog-hero.jpg
 
 # Unredacted ops inventory — private artifact only, never commit to a public repo
 docs/stack-inventory.html
+
+# Source photography and design resources. These are never served: nothing in
+# them reaches dist. Tracking them cost ~660MB in every clone and every build
+# cache, on a site whose pages build in four seconds. Earlier revisions still
+# hold them, so nothing is lost: git show <commit>:<path> recovers any file.
+/2150/
+/Beyond RV Sunpatch 15-XC/
+/docs/WEBSITE RESOURCES (READ ME!!!!!)/
