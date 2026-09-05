@@ -291,6 +291,7 @@ async function loadTaskSummary() {
     })).filter((task): task is Record<string, unknown> => Boolean(task?.id));
     const today = todayKey(new Date());
     return {
+      all: tasks,
       open: tasks.filter(task => task.status === 'open').length,
       dueToday: tasks.filter(task => task.status === 'open' && task.dueDate === today).length,
       overdue: tasks.filter(task => task.status === 'open' && typeof task.dueDate === 'string' && task.dueDate < today).length,
@@ -304,7 +305,7 @@ async function loadTaskSummary() {
       store: OWNER_COPILOT_TASK_STORE,
       error: safeBlobStoreError(error),
     });
-    return { open: 0, dueToday: 0, overdue: 0, recent: [] as Record<string, unknown>[] };
+    return { all: [] as Record<string, unknown>[], open: 0, dueToday: 0, overdue: 0, recent: [] as Record<string, unknown>[] };
   }
 }
 
@@ -857,10 +858,13 @@ export const handler: Handler = async (event) => {
   // mistake this dashboard can prevent, so it is computed from the same order
   // and product lists the rest of the page already has.
   // The same records the dashboard already read, projected onto one timeline.
+  // Tasks included: a task created from the calendar has to come back to it.
+  const { all: allTasks, ...taskSummaryForClient } = taskSummary;
   const calendarEvents = buildCalendarEvents({
     orders: orders as unknown as Array<Record<string, unknown>>,
     products: products as unknown as Array<Record<string, unknown>>,
     enquiries: enquiries as unknown as Array<Record<string, unknown>>,
+    tasks: allTasks,
   });
 
   const visitReadinessReport = visitReadiness(
@@ -951,7 +955,7 @@ export const handler: Handler = async (event) => {
         recent: recentOrders,
       },
       lifecycle,
-      tasks: taskSummary,
+      tasks: taskSummaryForClient,
       visitReadiness: visitReadinessReport,
       calendar: { events: calendarEvents, clashes: calendarClashes(calendarEvents) },
       productPerformance,
