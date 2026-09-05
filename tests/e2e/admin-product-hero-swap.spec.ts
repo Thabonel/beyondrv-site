@@ -26,7 +26,7 @@ test('setting a gallery photo as hero preserves the previous hero in that galler
     body: JSON.stringify({ orders: [] }),
   }));
 
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
   await page.getByRole('button', { name: /Menu Dashboard/i }).click();
   await page.getByRole('button', { name: /^Products$/i }).click();
   await expect(page.getByText('Test Slide-On', { exact: true })).toBeVisible();

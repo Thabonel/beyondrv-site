@@ -35,7 +35,7 @@ test('shop item queue button shows validation and queues a draft card', async ({
     })(),
   }));
 
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
   await page.getByRole('button', { name: /Menu Dashboard/i }).click();
   await page.getByRole('button', { name: /^Shop$/i }).click();
   await page.getByRole('button', { name: 'Add Shop Item' }).click();

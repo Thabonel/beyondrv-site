@@ -78,7 +78,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('GM lands on a focused mobile Today queue with usable touch targets', async ({ page }) => {
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
 
   await expect(page.getByTestId('gm-sales-workspace')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Today' })).toBeVisible();
@@ -128,7 +128,7 @@ test('GM converts a website enquiry once and lands in the editable draft with no
     body: JSON.stringify({ contracts: [convertedContract] }),
   }));
 
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
   await page.getByRole('button', { name: 'Create agreement' }).click();
 
   await expect(page.getByRole('heading', { name: 'Agreements' })).toBeVisible();
@@ -151,7 +151,7 @@ test('GM records outcomes with mobile controls and safely retries the same comma
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, summary: body.outcome === 'not_proceeding' ? 'Not proceeding' : 'Spoke — follow up scheduled' }) });
   });
 
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
   const action = page.getByTestId('gm-action-enquiry:enquiry-1');
 
   await action.getByRole('button', { name: 'Follow up' }).click();
@@ -182,7 +182,7 @@ test('GM records outcomes with mobile controls and safely retries the same comma
 
 test('GM starts a phone or walk-in agreement with non-contractual conversation context', async ({ page }) => {
   await page.route('**/.netlify/functions/admin-contracts', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ contracts: [] }) }));
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
   await page.getByRole('button', { name: 'New agreement' }).click();
   await expect(page.getByTestId('conversation-context')).toContainText('not yet contractual');
   await page.getByLabel('Conversation source').selectOption('visit');

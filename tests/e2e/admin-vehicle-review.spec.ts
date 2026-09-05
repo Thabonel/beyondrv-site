@@ -34,7 +34,7 @@ async function openDashboard(page: Page, body: typeof CANDIDATES = CANDIDATES) {
   await page.route('**/.netlify/functions/admin-vehicle-review**', (route) => route.fulfill({
     status: 200, contentType: 'application/json', body: JSON.stringify(body),
   }));
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
 }
 
 test('the panel lists candidates and ticks only the source-verified ones', async ({ page }) => {

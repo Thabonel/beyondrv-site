@@ -1,5 +1,6 @@
 import React, { Component, type ReactNode, useState, useRef, useEffect } from 'react';
 import AdminDashboard from './AdminDashboard';
+import AdminCalendarPanel from './AdminCalendarPanel';
 import ContractManager from './ContractManager';
 import ConfiguratorWorkspace from './ConfiguratorWorkspace';
 import initialRecentBuilds from '../data/homepage/recent-builds.json';
@@ -81,7 +82,9 @@ interface PendingChange {
 }
 
 type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
-type PanelTab = 'dashboard' | 'products' | 'archived-products' | 'shop' | 'orders' | 'configurator' | 'contracts' | 'settings' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'drafts' | 'audit' | 'knowledge' | 'google' | 'matches' | 'reports' | 'pending';
+const PANEL_TABS = ['calendar', 'dashboard', 'products', 'archived-products', 'shop', 'orders', 'configurator', 'contracts', 'settings', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'matches', 'reports', 'pending'] as const;
+
+type PanelTab = 'calendar' | 'dashboard' | 'products' | 'archived-products' | 'shop' | 'orders' | 'configurator' | 'contracts' | 'settings' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'drafts' | 'audit' | 'knowledge' | 'google' | 'matches' | 'reports' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
 type CommerceAvailability = 'available_in_australia' | 'coming_next_container' | 'made_to_order' | 'ask_availability' | 'unavailable';
@@ -1652,7 +1655,18 @@ export default function AdminPanel({ onOpenGmWorkspace, onSignOut }: { onOpenGmW
   const [voiceStatus, setVoiceStatus] = useState('');
   const [readAloudSupported, setReadAloudSupported] = useState<boolean | null>(null);
   const [readAloudEnabled, setReadAloudEnabled] = useState(false);
-  const [activeTab, setActiveTab] = useState<PanelTab>('dashboard');
+  /**
+   * The calendar opens first: the GM's day starts with what is happening, not
+   * with stock counts. ?tab= overrides it, so a link can point at one tab and a
+   * test can pin the one it exercises rather than depending on the default.
+   */
+  const [activeTab, setActiveTab] = useState<PanelTab>(() => {
+    if (typeof window === 'undefined') return 'calendar';
+    const requested = new URLSearchParams(window.location.search).get('tab');
+    return requested && (PANEL_TABS as readonly string[]).includes(requested)
+      ? requested as PanelTab
+      : 'calendar';
+  });
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [knowledgeInput, setKnowledgeInput] = useState('');
   const [knowledgeSearch, setKnowledgeSearch] = useState('');
@@ -4395,7 +4409,7 @@ export default function AdminPanel({ onOpenGmWorkspace, onSignOut }: { onOpenGmW
   };
   const pendingGmailSuggestions = gmailThreads.reduce((count, thread) => count + (!thread.matchDecision ? (thread.suggestions?.length || 0) : 0), 0);
   const pendingDriveSuggestions = driveFiles.reduce((count, file) => count + (!file.matchDecision ? (file.suggestions?.length || 0) : 0), 0);
-  const panelTabs: PanelTab[] = ['dashboard', 'products', 'archived-products', 'shop', 'orders', 'configurator', 'contracts', 'settings', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'matches', 'reports', 'pending'];
+  const panelTabs: PanelTab[] = PANEL_TABS as unknown as PanelTab[];
 
   function tabLabel(tab: PanelTab) {
     if (tab === 'pending') return `Pending (${pending.length})`;
@@ -4548,6 +4562,12 @@ export default function AdminPanel({ onOpenGmWorkspace, onSignOut }: { onOpenGmW
             </div>
           )}
         </div>
+
+        {activeTab === 'calendar' && (
+          <AdminSectionBoundary>
+            <AdminCalendarPanel />
+          </AdminSectionBoundary>
+        )}
 
         {activeTab === 'dashboard' && (
           <AdminSectionBoundary>
@@ -7401,6 +7421,25 @@ export default function AdminPanel({ onOpenGmWorkspace, onSignOut }: { onOpenGmW
                 <li>Audit records important owner and system actions. Use it to check what was approved, prepared, sent, or accepted.</li>
                 <li>Reports generates a saved weekly summary with recommended owner actions. Treat it as an operating summary, not accounting or legal advice.</li>
                 <li>A daily lead summary is produced automatically. Use it to catch a new enquiry you have not yet actioned, not as a replacement for the Enquiries tab.</li>
+              </ul>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Read the company calendar</h3>
+              <ul style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Calendar is the first tab and opens by default. It shows every dated commitment the business holds on one timeline: customer visits, container ETAs, expected arrivals, handovers, factory orders, next actions, lead follow-ups and open tasks.</li>
+                <li>Use the coloured chips to hide a type you are not interested in. The number on each chip is how many of that type exist in the loaded period.</li>
+                <li>On a phone the calendar opens as a list, because a month grid is unreadable at that width. Unfold the phone, or press Month, to get the grid. If you pick a view yourself it stays picked.</li>
+                <li>Click any entry to see which record it belongs to. Dates are changed on that record, not on the calendar, so the calendar can never disagree with the order or the enquiry.</li>
+                <li>A red "dates that disagree" panel means a customer visit falls before a container ETA for the same period. Resolve it before the customer travels.</li>
+              </ul>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Ask the assistant about the business</h3>
+              <ul style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Admin Chat can now read the whole calendar. Ask what is happening this week, who is visiting, what is arriving, or what is overdue.</li>
+                <li>It can also set a date on an order: a customer visit, an expected handover or arrival, a next action, or a factory order date. Tell it which order and which date, and confirm before it writes.</li>
+                <li>Setting a customer visit on an order whose vehicle is not marked as arrived makes the assistant warn you. Treat that warning as the reason to ring the shipping agent, not as a formality.</li>
+                <li>The assistant still cannot set prices, approve documents, send email, or record acceptance. Those stay with you.</li>
               </ul>
             </section>
             <section>

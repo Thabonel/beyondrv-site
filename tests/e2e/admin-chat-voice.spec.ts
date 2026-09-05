@@ -79,7 +79,7 @@ test('voice input appends an editable transcript without sending it', async ({ p
     });
   });
 
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
   await page.getByRole('button', { name: 'Chat' }).click();
   const input = page.getByTestId('admin-chat-input');
   await input.fill('Please');
@@ -102,7 +102,7 @@ test('voice input appends an editable transcript without sending it', async ({ p
 
 test('voice input explains microphone permission denial and keeps typing available', async ({ page }) => {
   await installSpeechRecognitionStub(page);
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
   await page.getByRole('button', { name: 'Chat' }).click();
   await page.getByTestId('admin-chat-voice-button').click();
 
@@ -123,7 +123,7 @@ test('unsupported browsers show a clear typing fallback', async ({ page }) => {
     Object.defineProperty(window, 'webkitSpeechRecognition', { configurable: true, value: undefined });
   });
 
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
   await page.getByRole('button', { name: 'Chat' }).click();
 
   await expect(page.getByTestId('admin-chat-voice-button')).toBeDisabled();

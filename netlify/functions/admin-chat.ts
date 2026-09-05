@@ -3,6 +3,7 @@ import type { Handler } from '@netlify/functions';
 import { randomUUID } from 'crypto';
 import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedResponse } from './admin-auth';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore } from './blob-store';
+import { buildCalendarEvents, calendarClashes } from './calendar-events-core';
 import {
   applyExactTextReplacements,
   buildChangeEvidence,
@@ -205,7 +206,15 @@ ${proposal.proposed_action.grounding_evidence || 'No dedicated grounding lookup 
 
 // ─── System prompt & tools ────────────────────────────────────────────────────
 
-const SYSTEM_PROMPT = `You are the Beyond RV site admin assistant. You help the owner update their Astro website by reading and proposing changes to files.
+const SYSTEM_PROMPT = `You are the Beyond RV admin assistant. You work for the General Manager and you are across the whole business, not only the website.
+
+You can read the company calendar with list_calendar: every dated commitment across orders, enquiries, tasks and container ETAs on one timeline. Use it whenever the GM asks what is happening, who is visiting, what is arriving, what is overdue, or what a day or week looks like. Lead with commitments to customers, because those are the ones that cost money when they are missed.
+
+You can put a date on the calendar with set_order_date. There is no separate calendar: a date reaches the calendar by being written onto the order that owns it, so the two can never disagree. Confirm which order and which date with the GM before writing, and never guess which order is meant.
+
+One rule matters more than the rest. A customer travelling to see a vehicle that has not arrived costs the company flights and goodwill. If the GM mentions a customer visiting, ask for the date and set it. If a visit is set on an order whose status does not mean the vehicle is physically here, say so plainly. A supplier saying a container arrives on a date is not the same as it arriving.
+
+You also help the owner update their Astro website by reading and proposing changes to files.
 
 SITE STRUCTURE:
 - Product content: src/content/products/*.md (frontmatter: title, price, status, onSale, featured, heroImage, gallery, keySpecs, specs, features, relatedSlugs, youtubeVideo, description)
@@ -505,7 +514,125 @@ const tools = [
       required: [],
     },
   },
+  {
+    type: 'function' as const,
+    name: 'list_calendar',
+    description: 'Read the company calendar: every dated commitment across orders, enquiries, tasks and container ETAs, on one timeline. Use this to answer what is happening on a day or in a period, who is visiting, what is arriving, and what is overdue. Read-only.',
+    parameters: {
+      type: 'object' as const,
+      properties: {
+        from: { type: 'string', description: 'Start date in YYYY-MM-DD. Defaults to today.' },
+        to: { type: 'string', description: 'End date in YYYY-MM-DD. Defaults to 60 days after the start.' },
+        kind: { type: 'string', description: 'Optional filter: customer_visit, container_eta, expected_arrival, expected_handover, factory_order, next_action, follow_up or task.' },
+      },
+      additionalProperties: false,
+      required: [],
+    },
+  },
+  {
+    type: 'function' as const,
+    name: 'set_order_date',
+    description: 'Set a date on an order, which is how a date reaches the company calendar. customer_visit is when a customer is travelling to see the vehicle; expected_handover is a promise to a customer. Confirm the order and the date with the owner before calling this, and never guess which order is meant.',
+    parameters: {
+      type: 'object' as const,
+      properties: {
+        order_id: { type: 'string', description: 'Exact order ID' },
+        field: { type: 'string', description: 'One of: customer_visit, expected_handover, expected_arrival, next_action, factory_order' },
+        date: { type: 'string', description: 'Date in YYYY-MM-DD, or blank to clear it' },
+      },
+      additionalProperties: false,
+      required: ['order_id', 'field'],
+    },
+  },
 ];
+
+const ORDER_STORE = 'customer-orders';
+
+/** Which order field each calendar-facing name writes to. */
+const ORDER_DATE_FIELDS: Record<string, string> = {
+  customer_visit: 'customerVisitDate',
+  expected_handover: 'expectedHandoverDate',
+  expected_arrival: 'expectedArrivalDate',
+  next_action: 'nextActionDate',
+  factory_order: 'factoryOrderDate',
+};
+
+function isIsoDateString(value: string) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(value));
+}
+
+async function readAllOrders(): Promise<Array<Record<string, unknown>>> {
+  const store = getBlobStore(ORDER_STORE);
+  const { blobs } = await store.list();
+  const rows = await Promise.all(blobs.map((blob: { key: string }) =>
+    store.get(blob.key, { type: 'json' }) as Promise<Record<string, unknown> | null>));
+  return rows.filter((row): row is Record<string, unknown> => Boolean(row));
+}
+
+/** Read-only. The calendar is a projection, so this never writes. */
+async function listCalendarTool(input: Record<string, unknown>) {
+  const from = clean(input.from, 10) || new Date().toISOString().slice(0, 10);
+  const to = clean(input.to, 10)
+    || new Date(Date.parse(`${from}T00:00:00Z`) + 60 * 86_400_000).toISOString().slice(0, 10);
+  const kind = clean(input.kind, 40);
+
+  const [orders, enquiries] = await Promise.all([
+    readAllOrders(),
+    (async () => {
+      const store = getBlobStore(ENQUIRY_STORE);
+      const { blobs } = await store.list();
+      const rows = await Promise.all(blobs.map((blob: { key: string }) =>
+        store.get(blob.key, { type: 'json' }) as Promise<Record<string, unknown> | null>));
+      return rows.filter((row): row is Record<string, unknown> => Boolean(row));
+    })(),
+  ]);
+
+  const events = buildCalendarEvents({ orders, enquiries })
+    .filter((event) => event.date >= from && event.date <= to)
+    .filter((event) => !kind || event.kind === kind);
+
+  if (!events.length) return `No calendar entries between ${from} and ${to}${kind ? ` for ${kind}` : ''}.`;
+
+  const clashes = calendarClashes(events);
+  const lines = events.slice(0, 60).map((event) =>
+    `${event.date} · ${event.kind}${event.isCommitment ? ' (commitment)' : ''} · ${event.title}${event.detail ? ` · ${event.detail}` : ''} · ${event.recordType}:${event.recordId}`);
+  return [
+    `${events.length} calendar entr${events.length === 1 ? 'y' : 'ies'} between ${from} and ${to}:`,
+    ...lines,
+    ...(clashes.length ? ['', 'Dates that disagree:', ...clashes] : []),
+  ].join('\n');
+}
+
+/**
+ * Writing a date onto the order that owns it is how a date reaches the
+ * calendar. There is no separate calendar store to drift out of sync.
+ */
+async function setOrderDateTool(input: Record<string, unknown>) {
+  const orderId = clean(input.order_id, 240);
+  const field = clean(input.field, 40);
+  const date = clean(input.date, 10);
+  const target = ORDER_DATE_FIELDS[field];
+
+  if (!orderId) return 'Error: order_id is required.';
+  if (!target) return `Error: field must be one of ${Object.keys(ORDER_DATE_FIELDS).join(', ')}.`;
+  if (date && !isIsoDateString(date)) return `Error: "${date}" is not a YYYY-MM-DD date.`;
+
+  const store = getBlobStore(ORDER_STORE);
+  const existing = await store.get(orderId, { type: 'json' }) as Record<string, unknown> | null;
+  if (!existing) return `Error: no order found with id ${orderId}.`;
+
+  const before = typeof existing[target] === 'string' ? existing[target] as string : '';
+  const updated = { ...existing, [target]: date, updatedAt: new Date().toISOString() };
+  await store.setJSON(orderId, updated);
+
+  const who = typeof existing.customerName === 'string' ? existing.customerName : orderId;
+  const status = typeof existing.status === 'string' ? existing.status : 'unknown';
+  const warning = field === 'customer_visit' && date
+    && !['arrived_mutdapilly', 'local_fitout', 'ready_for_handover', 'delivered'].includes(status)
+    ? ` Warning: the order status is "${status}", so the vehicle is not marked as here. Confirm it has landed before the customer travels.`
+    : '';
+  return `Set ${field} on order ${orderId} (${who}) ${before ? `from ${before} ` : ''}to ${date || '(cleared)'}.${warning}`;
+}
 
 function clean(value: unknown, max = 1000) {
   return typeof value === 'string' ? value.trim().slice(0, max) : '';
@@ -1020,6 +1147,18 @@ CURRENT DATE:
             result = await updateLeadStatusTool(input);
           } catch (error) {
             result = `Error: could not update lead. ${blobStoreUserMessage(error)}`;
+          }
+        } else if (!result && call.name === 'list_calendar') {
+          try {
+            result = await listCalendarTool(input);
+          } catch (error) {
+            result = `Error: could not read the calendar. ${blobStoreUserMessage(error)}`;
+          }
+        } else if (!result && call.name === 'set_order_date') {
+          try {
+            result = await setOrderDateTool(input);
+          } catch (error) {
+            result = `Error: could not set that date. ${blobStoreUserMessage(error)}`;
           }
         } else if (!result && call.name === 'get_seo_health') {
           try {

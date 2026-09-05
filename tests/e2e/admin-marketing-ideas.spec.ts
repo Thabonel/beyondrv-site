@@ -79,7 +79,7 @@ test('a dashboard marketing insight can be saved and moved through its review st
     });
   });
 
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
 
   // The insight starts unsaved, and the saved list is empty.
   const insightCard = page.getByTestId('marketing-insight').filter({ hasText: insight.title });
@@ -157,7 +157,7 @@ test('refreshing an idea saved under the old id format updates it rather than du
     });
   });
 
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
 
   const insightCard = page.getByTestId('marketing-insight').filter({ hasText: insight.title });
   const button = insightCard.getByRole('button');
@@ -198,7 +198,7 @@ test('saving before the stored ideas have loaded cannot duplicate a reviewed rec
     });
   });
 
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
 
   const insightCard = page.getByTestId('marketing-insight').filter({ hasText: insight.title });
   const button = insightCard.getByRole('button');

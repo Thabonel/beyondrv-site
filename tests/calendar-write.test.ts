@@ -1,0 +1,48 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import {
+  decideMove, decideNewTask, immovableReason, isMovableKind, moveWarning, WRITE_TARGETS,
+} from '../netlify/functions/calendar-write-core.ts';
+
+test('a container ETA cannot be dragged, and says why', () => {
+  assert.equal(isMovableKind('container_eta'), false);
+  const decision = decideMove({ kind: 'container_eta', recordId: 'p1', date: '2026-09-20' });
+  assert.equal(decision.ok, false);
+  assert.match((decision as { error: string }).error, /Pending review/);
+});
+
+test('every movable kind writes to a real field on a real store', () => {
+  for (const [kind, target] of Object.entries(WRITE_TARGETS)) {
+    assert.ok(['orders', 'leads', 'tasks'].includes(target.store), `${kind} store`);
+    assert.ok(target.field.length > 0, `${kind} field`);
+  }
+});
+
+test('only visits and handovers are treated as commitments', () => {
+  const commitments = Object.entries(WRITE_TARGETS).filter(([, t]) => t.commitment).map(([k]) => k).sort();
+  assert.deepEqual(commitments, ['customer_visit', 'expected_handover']);
+});
+
+test('a move needs a record, a kind and a real date', () => {
+  assert.equal(decideMove({ kind: 'task', date: '2026-09-10' }).ok, false);
+  assert.equal(decideMove({ recordId: 't1', date: '2026-09-10' }).ok, false);
+  assert.equal(decideMove({ kind: 'task', recordId: 't1', date: 'Friday' }).ok, false);
+  assert.equal(decideMove({ kind: 'task', recordId: 't1', date: '2026-09-10' }).ok, true);
+});
+
+test('moving a visit onto a vehicle that is not here returns a warning', () => {
+  assert.match(moveWarning('customer_visit', 'in_transit'), /not marked as here/);
+  assert.equal(moveWarning('customer_visit', 'arrived_mutdapilly'), '');
+  assert.equal(moveWarning('task', 'in_transit'), '', 'only a visit carries this risk');
+});
+
+test('a new task needs a title and a real date', () => {
+  assert.equal(decideNewTask({ title: '  ', date: '2026-09-10' }).ok, false);
+  assert.equal(decideNewTask({ title: 'Ring the agent', date: 'soon' }).ok, false);
+  const ok = decideNewTask({ title: '  Ring the agent  ', date: '2026-09-10' });
+  assert.deepEqual(ok, { ok: true, title: 'Ring the agent', dueDate: '2026-09-10' });
+});
+
+test('an unknown kind is refused rather than guessed at', () => {
+  assert.match(immovableReason('nonsense'), /not a date this calendar can move/);
+});

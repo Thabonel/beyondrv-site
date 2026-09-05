@@ -9,7 +9,7 @@ test('admin chat message box grows as a multiline message is entered', async ({ 
     body: JSON.stringify({ products: [] }),
   }));
 
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
   await page.getByRole('button', { name: 'Chat' }).click();
 
   const messageBox = page.getByTestId('admin-chat-input');
