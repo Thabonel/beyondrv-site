@@ -148,6 +148,28 @@ interface DashboardData {
     followUpQueue: LeadRecord[];
     recent: LeadRecord[];
   };
+  visitReadiness?: {
+    visits: {
+      orderId: string;
+      customerName: string;
+      productTitle: string;
+      visitDate: string;
+      status: string;
+      severity: 'critical' | 'warning' | 'ok';
+      daysUntilVisit: number;
+      message: string;
+    }[];
+    etas: {
+      slug: string;
+      title: string;
+      etaDate: string;
+      state: string;
+      daysOverdue: number;
+      message: string;
+    }[];
+    criticalCount: number;
+    warningCount: number;
+  };
   tasks: {
     open: number;
     dueToday: number;
@@ -663,6 +685,50 @@ export default function AdminDashboard({ pendingCount = 0 }: { pendingCount?: nu
 
       {data && (
         <>
+          {/* Above the stat cards on purpose: a customer travelling to a vehicle
+              that has not landed costs real money, and it is the one thing on
+              this page that cannot be fixed after the fact. */}
+          {data.visitReadiness && (data.visitReadiness.visits.length > 0 || data.visitReadiness.etas.length > 0) && (
+            <div data-testid="visit-readiness" style={{ display: 'grid', gap: '0.4rem', marginBottom: '0.6rem' }}>
+              {data.visitReadiness.visits.map((visit) => (
+                <div
+                  key={visit.orderId}
+                  data-testid={`visit-risk-${visit.severity}`}
+                  style={{
+                    background: visit.severity === 'critical' ? '#3a1010' : '#3a2010',
+                    border: `1px solid ${visit.severity === 'critical' ? '#f87171' : '#fb923c'}`,
+                    borderRadius: '8px',
+                    padding: '0.7rem 0.85rem',
+                  }}
+                >
+                  <div style={{ color: visit.severity === 'critical' ? '#f87171' : '#fb923c', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                    {visit.severity === 'critical' ? 'Customer arriving — vehicle not here' : 'Visit booked — vehicle not here yet'}
+                  </div>
+                  <div style={{ color: '#fff', fontSize: '0.88rem', fontWeight: 600, marginTop: '0.25rem' }}>
+                    {visit.customerName}{visit.productTitle ? ` · ${visit.productTitle}` : ''}
+                  </div>
+                  <div style={{ color: '#ddd', fontSize: '0.76rem', marginTop: '0.2rem' }}>
+                    Visit {visit.visitDate} · order status {visit.status.replace(/_/g, ' ')}. {visit.message}
+                  </div>
+                </div>
+              ))}
+              {data.visitReadiness.etas.map((eta) => (
+                <div
+                  key={eta.slug}
+                  data-testid="eta-risk"
+                  style={{ background: '#3a2010', border: '1px solid #fb923c', borderRadius: '8px', padding: '0.7rem 0.85rem' }}
+                >
+                  <div style={{ color: '#fb923c', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                    Container ETA needs confirming
+                  </div>
+                  <div style={{ color: '#fff', fontSize: '0.88rem', fontWeight: 600, marginTop: '0.25rem' }}>{eta.title}</div>
+                  <div style={{ color: '#ddd', fontSize: '0.76rem', marginTop: '0.2rem' }}>
+                    ETA {eta.etaDate}. {eta.message}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.55rem' }}>
             <StatCard label="Products" value={data.inventory.totalProducts} sub={`${data.inventory.available} available`} />
             <StatCard label="Listed Value" value={money(data.inventory.estimatedListedValue)} sub="Estimate only" tone="warning" />

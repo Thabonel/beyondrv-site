@@ -413,6 +413,7 @@ interface OrderRecord {
   expectedArrivalDate: string;
   expectedHandoverDate: string;
   nextActionDate: string;
+  customerVisitDate: string;
   notes: string;
   createdAt: string;
   updatedAt: string;
@@ -994,6 +995,7 @@ function emptyOrderForm(): OrderForm {
     expectedArrivalDate: '',
     expectedHandoverDate: '',
     nextActionDate: '',
+    customerVisitDate: '',
     notes: '',
     shippingName: '',
     shippingAddressLine1: '',
@@ -1046,6 +1048,7 @@ function orderFormFromEnquiry(enquiry: EnquiryRecord, products: ProductRecord[])
     status: enquiry.leadStatus?.status === 'won' ? 'deposit_received' : 'enquiry',
     depositPaid: enquiry.leadStatus?.status === 'won',
     nextActionDate: enquiry.leadStatus?.nextFollowUpDate ?? '',
+    customerVisitDate: '',
     notes: enquiry.leadStatus?.notes ?? '',
     shippingCountry: 'Australia',
     shippingMethod: 'australia_post',
@@ -1072,6 +1075,7 @@ function orderFormFromRecord(order: OrderRecord): OrderForm {
     expectedArrivalDate: order.expectedArrivalDate ?? '',
     expectedHandoverDate: order.expectedHandoverDate ?? '',
     nextActionDate: order.nextActionDate ?? '',
+    customerVisitDate: order.customerVisitDate ?? '',
     notes: order.notes ?? '',
     shippingName: order.shippingName ?? '',
     shippingAddressLine1: order.shippingAddressLine1 ?? '',
@@ -7171,6 +7175,11 @@ export default function AdminPanel({ onOpenGmWorkspace, onSignOut }: { onOpenGmW
                 Next action
                 <input type="date" value={orderForm.nextActionDate} onChange={e => setOrderForm(p => p && ({ ...p, nextActionDate: e.target.value }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
               </label>
+              <label style={{ display: 'grid', gap: '0.25rem', color: '#888', fontSize: '0.7rem' }}>
+                Customer visiting on
+                <input type="date" value={orderForm.customerVisitDate} onChange={e => setOrderForm(p => p && ({ ...p, customerVisitDate: e.target.value }))} style={{ background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem' }} />
+                <span style={{ color: '#666', fontSize: '0.64rem' }}>Set this whenever a customer is travelling to see the vehicle. The dashboard warns if it has not arrived.</span>
+              </label>
             </div>
             <textarea value={orderForm.notes} onChange={e => setOrderForm(p => p && ({ ...p, notes: e.target.value }))} placeholder="Short notes: factory order number, fitout tasks, customer preferences, delivery constraints" rows={4} style={{ resize: 'vertical', background: '#1a1a1a', border: '1px solid #444', color: '#fff', borderRadius: '6px', padding: '0.55rem', fontSize: '0.82rem', lineHeight: 1.4 }} />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
@@ -7393,6 +7402,17 @@ export default function AdminPanel({ onOpenGmWorkspace, onSignOut }: { onOpenGmW
                 <li>Reports generates a saved weekly summary with recommended owner actions. Treat it as an operating summary, not accounting or legal advice.</li>
                 <li>A daily lead summary is produced automatically. Use it to catch a new enquiry you have not yet actioned, not as a replacement for the Enquiries tab.</li>
               </ul>
+            </section>
+            <section>
+              <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Stop a customer travelling to a vehicle that is not here</h3>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', color: '#ddd' }}>
+                <li>Whenever a customer says they are coming to see their vehicle, open Orders, edit that order, and set <strong>Customer visiting on</strong>. Do this the moment the date is agreed, not the day before.</li>
+                <li>Keep the order status honest. The dashboard treats arrived at Mutdapilly, local fitout, ready for handover, and delivered as "the vehicle is here". Every other status means it is not.</li>
+                <li>Set the container ETA on the product in Products whenever the factory or the shipping agent gives you one, and change it the moment it moves.</li>
+                <li>Read the top of Dashboard first each morning. A red banner means a customer is arriving within two days and the vehicle is not marked as arrived. An orange banner means a visit is booked further out, or a container ETA has passed without the vehicle being marked arrived.</li>
+                <li>Clear a red banner by confirming the vehicle is physically on the ground and moving the order status, or by moving the visit date. Do not clear it by deleting the visit date.</li>
+              </ol>
+              <p style={{ margin: '0.4rem 0 0', color: '#aaa' }}>A supplier saying a container arrives on a date is not the same as it arriving. Treat an ETA as a claim to verify, and confirm customs clearance before you tell a customer to book a flight.</p>
             </section>
             <section>
               <h3 style={{ margin: '0 0 0.4rem', color: '#E8540A', fontSize: '1rem' }}>Price and approve a configuration</h3>
