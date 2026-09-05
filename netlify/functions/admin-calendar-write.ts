@@ -9,6 +9,7 @@ import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreErro
 import { decideMove, decideNewTask, moveWarning } from './calendar-write-core';
 import { newOwnerCopilotId, OWNER_COPILOT_TASK_STORE, taskKey } from './owner-copilot-core';
 import { ASSIGNMENT_STORE, assignmentKey, assignmentTarget, cleanAssignees } from './calendar-assignment-core';
+import { CALENDAR_EVENT_STORE, calendarEventKey, validateEvent, type CompanyCalendarEvent } from './calendar-store-core';
 
 const ORDER_STORE = 'customer-orders';
 const LEAD_STATUS_STORE = 'customer-lead-status';
@@ -76,13 +77,22 @@ export const handler: Handler = async (event) => {
     // order has nowhere to say who is handling a visit.
     if (body.action === 'assign') {
       const recordId = typeof body.recordId === 'string' ? body.recordId.trim().slice(0, 240) : '';
+      const eventId = typeof body.eventId === 'string' ? body.eventId.trim().slice(0, 300) : '';
       const kind = typeof body.kind === 'string' ? body.kind.trim() : 'task';
       const assigneeIds = cleanAssignees(body.assigneeIds);
       if (!recordId) return json(400, { error: 'recordId is required.' });
       const now = new Date().toISOString();
-      const target = assignmentTarget(kind, recordId);
+      const target = assignmentTarget(kind, eventId || `${kind}:${recordId}`, recordId);
 
-      if (target.store === 'task') {
+      if (target.store === 'event') {
+        // A meeting or a reminder keeps its owners on its own record.
+        const store = getBlobStore(CALENDAR_EVENT_STORE);
+        const existing = await store.get(calendarEventKey(target.id), { type: 'json' }) as CompanyCalendarEvent | null;
+        if (!existing) return json(404, { error: 'That event no longer exists.' });
+        const result = validateEvent({ assigneeIds }, { actor: 'admin', existing });
+        if (!result.ok) return json(400, { error: result.error });
+        await store.setJSON(calendarEventKey(target.id), result.event);
+      } else if (target.store === 'task') {
         const store = getBlobStore(OWNER_COPILOT_TASK_STORE);
         const existing = await store.get(taskKey(target.id), { type: 'json' }) as Record<string, unknown> | null;
         if (!existing) return json(404, { error: `No task found with id ${target.id}.` });

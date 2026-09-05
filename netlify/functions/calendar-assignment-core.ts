@@ -26,11 +26,19 @@ export interface CalendarAssignment {
   updatedAt: string;
 }
 
-/** A task owns its assignees; anything else is looked up by event id. */
-export function assignmentTarget(kind: string, recordId: string) {
-  return kind === 'task'
-    ? { store: 'task' as const, id: recordId }
-    : { store: 'assignment' as const, id: `${kind}:${recordId}` };
+/**
+ * Where the owners of a thing live.
+ *
+ * A task and a calendar event each have their own record with a field for
+ * them. Everything else is projected from an order, an enquiry or a product,
+ * and gets an assignment record keyed by the event's own id — the same id the
+ * calendar looks it up by, which is the whole point: keying it any other way
+ * files the answer where nobody looks for it.
+ */
+export function assignmentTarget(kind: string, eventId: string, recordId: string) {
+  if (kind === 'task') return { store: 'task' as const, id: recordId };
+  if (eventId.startsWith('calendar:')) return { store: 'event' as const, id: recordId };
+  return { store: 'assignment' as const, id: eventId };
 }
 
 /**

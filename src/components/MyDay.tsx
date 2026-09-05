@@ -32,6 +32,12 @@ interface CrewPayload {
 }
 
 const YARD_LABEL: Record<string, string> = {
+  task: 'Job',
+  meeting: 'Meeting',
+  reminder: 'Reminder',
+  next_action: 'Next action',
+  follow_up: 'Follow up',
+  factory_order: 'Factory order',
   customer_visit: 'Customer visiting',
   expected_handover: 'Handover',
   expected_arrival: 'Arriving',
@@ -98,6 +104,50 @@ function formatTime(time: string) {
   const suffix = h < 12 ? 'am' : 'pm';
   const hour = h % 12 === 0 ? 12 : h % 12;
   return m ? `${hour}:${String(m).padStart(2, '0')}${suffix}` : `${hour}${suffix}`;
+}
+
+interface CalendarEventLike {
+  id: string; kind: string; date: string; start: string; end: string; allDay: boolean;
+  title: string; detail: string; isCommitment: boolean; source: string;
+}
+
+/**
+ * Alex's own phone view: the whole calendar for one day, read only. The full
+ * grid belongs on a desktop; on a phone what is wanted is what is on today,
+ * in order, which is what this is.
+ */
+function GmDay({ date, payload }: { date: string; payload: CrewPayload }) {
+  const events = ((payload.calendar?.events ?? []) as CalendarEventLike[])
+    .filter((event) => event.date === date)
+    .sort((a, b) => (a.allDay === b.allDay ? a.start.localeCompare(b.start) : a.allDay ? -1 : 1));
+  const clashes = payload.calendar?.clashes ?? [];
+
+  return (
+    <>
+      {clashes.length > 0 && (
+        <section className="myday__section" data-testid="myday-clashes">
+          <h2>Dates that disagree</h2>
+          {clashes.map((clash) => <p key={clash} className="myday__clash">{clash}</p>)}
+        </section>
+      )}
+      <section className="myday__section">
+        <h2>On today</h2>
+        {!events.length && <p className="myday__muted">Nothing on this day.</p>}
+        <ul className="myday__yard">
+          {events.map((event) => (
+            <li key={event.id} data-testid="myday-gm-item">
+              <span className="myday__dot" style={{ background: YARD_COLOUR[event.kind] ?? '#7986cb' }} />
+              <span className="myday__yard-when">{event.allDay ? 'All day' : formatTime(event.start.slice(11))}</span>
+              <span>
+                <strong>{YARD_LABEL[event.kind] ?? event.kind.replace(/_/g, ' ')}</strong>
+                <span className="myday__yard-title">{event.title}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </>
+  );
 }
 
 export default function MyDay() {
@@ -180,6 +230,28 @@ export default function MyDay() {
       <main className="myday myday--locked">
         <h1>Beyond RV</h1>
         <p>{error || 'This link is not working. Ask Alex to send you a new one.'}</p>
+      </main>
+    );
+  }
+
+  // A "whole calendar" link is Alex's own phone view. Without this it fell
+  // through to the crew layout, which reads a jobs list a gm payload does not
+  // have, and showed an empty day.
+  if (payload?.scope === 'gm') {
+    return (
+      <main className="myday" data-testid="my-day">
+        <header className="myday__head">
+          <button type="button" aria-label="Previous day" onClick={() => setDate(addDays(date, -1))}>‹</button>
+          <div>
+            <h1 data-testid="myday-date">{longDate(date)}</h1>
+            <p className="myday__who">{payload.name} · whole calendar</p>
+          </div>
+          <button type="button" aria-label="Next day" onClick={() => setDate(addDays(date, 1))}>›</button>
+        </header>
+        {date !== payload.today && (
+          <button type="button" className="myday__today" onClick={() => setDate(payload.today)}>Back to today</button>
+        )}
+        <GmDay date={date} payload={payload} />
       </main>
     );
   }

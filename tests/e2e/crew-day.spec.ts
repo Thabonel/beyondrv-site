@@ -204,3 +204,28 @@ test('Li can tell Alex when a container is landing, without changing the website
   });
   expect(writes[0].key).toBe(KEY);
 });
+
+test('a whole-calendar link shows the day rather than an empty page', async ({ page }) => {
+  // The gm payload has no jobs list. The page used to fall through to the crew
+  // layout, read a jobs array that was not there, and show "nothing on".
+  await page.route('**/.netlify/functions/crew-day**', (route) => route.fulfill({
+    status: 200, contentType: 'application/json',
+    body: JSON.stringify({
+      scope: 'gm', name: 'Alex', today, date: today,
+      calendar: {
+        events: [
+          { id: 'customer_visit:o1', kind: 'customer_visit', date: today, start: `${today}T10:00`, end: `${today}T11:00`, allDay: false, title: 'Tasmanian customer visiting', detail: '', isCommitment: true, source: 'record' },
+          { id: 'calendar:c1', kind: 'meeting', date: today, start: `${today}T14:00`, end: `${today}T14:30`, allDay: false, title: 'Call with Li', detail: '', isCommitment: false, source: 'ai' },
+        ],
+        clashes: ['Tasmanian customer visiting on ' + today + ', but the container is not due until later.'],
+      },
+    }),
+  }));
+  await page.goto(`/my-day/#k=${KEY}`);
+
+  await expect(page.getByTestId('my-day')).toBeVisible();
+  await expect(page.getByText('whole calendar')).toBeVisible();
+  await expect(page.getByTestId('myday-gm-item')).toHaveCount(2);
+  await expect(page.getByTestId('myday-clashes')).toContainText('not due until');
+  await expect(page.getByText('Nothing on for this day.')).toHaveCount(0);
+});

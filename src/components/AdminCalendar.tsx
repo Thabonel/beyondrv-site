@@ -54,7 +54,7 @@ export interface CalendarActions {
   deleteStoreEvent: (id: string) => Promise<WriteResult>;
   moveRecord: (kind: string, recordId: string, date: string, time: string) => Promise<WriteResult>;
   createTask: (title: string, date: string, time: string, assigneeIds: string[]) => Promise<WriteResult>;
-  assign: (kind: string, recordId: string, assigneeIds: string[]) => Promise<WriteResult>;
+  assign: (kind: string, recordId: string, eventId: string, assigneeIds: string[]) => Promise<WriteResult>;
   loadOrders: () => Promise<OrderOption[]>;
   crew: CrewOption[];
   refresh: () => Promise<void>;
@@ -342,7 +342,7 @@ export default function AdminCalendar({ events, storedDetails, clashes = [], loa
       // Who is on it can change at the same time as when it is, and works for
       // every kind, including the ones whose date is set elsewhere.
       if (sameSet(values.assigneeIds, form.values.assigneeIds) === false) {
-        const assigned = await actions.assign(form.event.kind, form.event.recordId, values.assigneeIds);
+        const assigned = await actions.assign(form.event.kind, form.event.recordId, form.event.id, values.assigneeIds);
         result = { message: [result.message, assigned.message].filter(Boolean).join(' '), warning: result.warning };
       }
     } else if (values.kind === 'task') {

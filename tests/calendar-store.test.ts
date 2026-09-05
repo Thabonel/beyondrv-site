@@ -15,7 +15,7 @@ const now = '2026-09-05T00:00:00.000Z';
 function stored(overrides: Partial<CompanyCalendarEvent> = {}): CompanyCalendarEvent {
   return {
     id: 'cal-1', title: 'Supplier call', kind: 'meeting', start: '2026-09-10T14:00', end: '2026-09-10T15:00',
-    allDay: false, notes: '', location: '', source: 'gm', links: {}, createdBy: actor, createdAt: now, updatedAt: now,
+    allDay: false, notes: '', location: '', source: 'gm', links: {}, assigneeIds: [], createdBy: actor, createdAt: now, updatedAt: now,
     ...overrides,
   };
 }
@@ -129,4 +129,23 @@ test('store keys are namespaced so a listing can tell events from anything else'
 test('a handover can live in the store when its order is not yet known', () => {
   const result = validateEvent({ title: 'Handover: someone', kind: 'expected_handover', allDay: true, start: '2026-09-20' }, { actor });
   assert.equal(result.ok, true);
+});
+
+test('a meeting keeps its owners on its own record, and an update does not lose them', () => {
+  const created = validateEvent({ title: 'Supplier call', kind: 'meeting', start: '2026-09-10T14:00', assigneeIds: ['crew-li', 'crew-oscar'] }, { actor, now });
+  assert.equal(created.ok, true);
+  assert.deepEqual((created as any).event.assigneeIds, ['crew-li', 'crew-oscar']);
+
+  // Editing the time must not silently drop who is on it.
+  const moved = validateEvent({ start: '2026-09-10T15:00' }, { actor, existing: (created as any).event });
+  assert.deepEqual((moved as any).event.assigneeIds, ['crew-li', 'crew-oscar']);
+
+  const cleared = validateEvent({ assigneeIds: [] }, { actor, existing: (created as any).event });
+  assert.deepEqual((cleared as any).event.assigneeIds, []);
+});
+
+test('a stored event carries its owners onto the grid', () => {
+  const event = toAdminCalendarEvent(stored({ assigneeIds: ['crew-li'] } as Partial<CompanyCalendarEvent>));
+  assert.deepEqual(event.assigneeIds, ['crew-li']);
+  assert.equal(toAdminCalendarEvent(stored()).assigneeIds, undefined);
 });

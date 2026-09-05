@@ -20,6 +20,7 @@ import {
   type CalendarEventKind,
   type CalendarEventSource,
 } from './calendar-events-core.ts';
+import { cleanAssignees } from './calendar-assignment-core.ts';
 
 export const CALENDAR_EVENT_STORE = 'company-calendar-events';
 
@@ -61,6 +62,8 @@ export interface CompanyCalendarEvent {
   source: Exclude<CalendarEventSource, 'record'>;
   sourceEmail?: CalendarSourceEmail;
   links: { orderId?: string; enquiryId?: string; productSlug?: string };
+  /** Who is on it. Empty means the GM's own. */
+  assigneeIds: string[];
   createdBy: string;
   createdAt: string;
   updatedAt: string;
@@ -150,6 +153,7 @@ export function validateEvent(input: Record<string, unknown>, options: ValidateO
   const source = (['gm', 'ai', 'chat', 'crew'] as const).find((item) => item === sourceRaw) ?? 'gm';
   const sourceEmail = has('sourceEmail') ? cleanSourceEmail(input.sourceEmail) : existing?.sourceEmail;
   const links = has('links') ? cleanLinks(input.links) : existing?.links ?? {};
+  const assigneeIds = has('assigneeIds') ? cleanAssignees(input.assigneeIds) : existing?.assigneeIds ?? [];
 
   const event: CompanyCalendarEvent = {
     id: existing?.id ?? clean(options.id, LIMITS.id) ?? '',
@@ -163,6 +167,7 @@ export function validateEvent(input: Record<string, unknown>, options: ValidateO
     source,
     ...(sourceEmail ? { sourceEmail } : {}),
     links,
+    assigneeIds,
     createdBy: existing?.createdBy ?? options.actor,
     createdAt: existing?.createdAt ?? now,
     updatedAt: now,
@@ -217,6 +222,7 @@ export function toAdminCalendarEvent(event: CompanyCalendarEvent): AdminCalendar
     recordId: event.id,
     isCommitment: EVENT_KIND_META[kind].commitment,
     source: event.source,
+    ...(event.assigneeIds?.length ? { assigneeIds: event.assigneeIds } : {}),
     ...(event.links.productSlug ? { productSlug: event.links.productSlug } : {}),
   };
 }

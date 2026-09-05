@@ -318,3 +318,65 @@ test('a container ETA can be given to someone even though its date cannot move h
   await expect.poll(() => writes.map((w) => (w.body as Record<string, unknown>).action ?? 'move')).toEqual(['assign']);
   expect(writes[0].body).toMatchObject({ kind: 'container_eta', recordId: 'advent-2450', assigneeIds: ['crew-li'] });
 });
+
+test('a created event appears even when the listing has not caught up yet', async ({ page, isMobile }) => {
+  test.skip(Boolean(isMobile));
+  // Netlify Blobs guarantees a read of a key you just wrote, but a listing is
+  // eventually consistent. The GM created something, it did not appear, they
+  // created it again, and then both appeared. This reproduces that listing lag.
+  const created: Array<Record<string, unknown>> = [];
+  let listingIsStale = true;
+
+  await page.route('**/.netlify/functions/admin-dashboard?range=90', (route) => route.fulfill({
+    status: 200, contentType: 'application/json',
+    body: JSON.stringify({ calendar: { events: [], clashes: [] } }),
+  }));
+  await page.route('**/.netlify/functions/admin-crew', (route) => route.fulfill({
+    status: 200, contentType: 'application/json', body: JSON.stringify({ crew: [] }),
+  }));
+  await page.route('**/.netlify/functions/admin-calendar-events**', async (route) => {
+    if (route.request().method() === 'GET') {
+      // The lag: the first listing after a write does not include it.
+      const events = listingIsStale ? [] : created;
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ events }) });
+      return;
+    }
+    const body = route.request().postDataJSON() as Record<string, unknown>;
+    const event = {
+      id: `cal-${created.length + 1}`, notes: '', location: '', links: {}, assigneeIds: [],
+      source: 'gm', createdBy: 'owner', createdAt: today, updatedAt: today, ...body,
+    };
+    created.push(event);
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, event, message: 'Saved.' }) });
+  });
+
+  await page.goto('/admin/');
+  await page.getByTestId('calendar-create').click();
+  await page.getByTestId('event-title').fill('Yard walk');
+  await page.getByTestId('event-save').click();
+
+  // Visible immediately, from what the write returned, not from the listing.
+  await expect(page.locator('.fc-event', { hasText: 'Yard walk' })).toHaveCount(1);
+
+  // And still exactly one once the listing catches up: no duplicate.
+  listingIsStale = false;
+  await page.getByRole('button', { name: 'Refresh' }).click();
+  await expect(page.locator('.fc-event', { hasText: 'Yard walk' })).toHaveCount(1);
+});
+
+test('assigning a meeting sticks, because it is filed where the calendar looks', async ({ page, isMobile }) => {
+  test.skip(Boolean(isMobile));
+  const { writes } = await mockCalendar(page);
+  await page.goto('/admin/');
+
+  await page.locator('.fc-event.gcal-ai').click();
+  await page.getByTestId('event-detail').getByRole('button', { name: 'Edit' }).click();
+  await page.getByTestId('event-assignee-crew-li').click();
+  await page.getByTestId('event-save').click();
+
+  await expect.poll(() => writes.map((w) => (w.body as Record<string, unknown>).action ?? 'other')).toContain('assign');
+  const assign = writes.find((w) => (w.body as Record<string, unknown>).action === 'assign')!;
+  // The event id has to travel, so the server files the owners under the same
+  // id the grid reads them back by.
+  expect(assign.body).toMatchObject({ kind: 'meeting', recordId: 'cal-ai-1', eventId: 'calendar:cal-ai-1', assigneeIds: ['crew-li'] });
+});
