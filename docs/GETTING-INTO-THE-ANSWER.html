@@ -1,0 +1,341 @@
+<!doctype html>
+<!--
+  Saved from the Artifact at
+  https://claude.ai/code/artifact/f1f805e5-3af6-453e-9f3f-2be81a4191c8
+  5 September 2026. Open this file in a browser, or share the link above with
+  anyone who does not have the repository.
+
+  Companion to WHY-NOBODY-NAMES-BEYOND-RV.html, which is the diagnosis; this
+  is the plan. The site audit in it was taken against the live site on
+  5 September 2026 and will go stale — re-check before acting on the
+  "already done" list.
+
+  The Artifact host supplies the document wrapper, so it is added here: this
+  file has to stand on its own.
+-->
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Getting Into The Answer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground: #fbfaf8;
+    --surface: #ffffff;
+    --sunk: #f4f1ed;
+    --ink: #23201d;
+    --muted: #6e665e;
+    --rule: #e2ddd6;
+    --accent: #e8540a;
+    --accent-soft: rgba(232, 84, 10, 0.10);
+    --gap: #b3261e;
+    --gap-soft: rgba(179, 38, 30, 0.09);
+    --have: #2e6e4e;
+    --have-soft: rgba(46, 110, 78, 0.10);
+    --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --body: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #16130f; --surface: #1e1a16; --sunk: #241f1a;
+      --ink: #f2ede7; --muted: #a39a90; --rule: #352f28;
+      --accent: #ff7a3d; --accent-soft: rgba(255,122,61,0.14);
+      --gap: #ff8a80; --gap-soft: rgba(255,138,128,0.12);
+      --have: #7ac89b; --have-soft: rgba(122,200,155,0.12);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #16130f; --surface: #1e1a16; --sunk: #241f1a;
+    --ink: #f2ede7; --muted: #a39a90; --rule: #352f28;
+    --accent: #ff7a3d; --accent-soft: rgba(255,122,61,0.14);
+    --gap: #ff8a80; --gap-soft: rgba(255,138,128,0.12);
+    --have: #7ac89b; --have-soft: rgba(122,200,155,0.12);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: var(--body); font-size: 18px; line-height: 1.6;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  .column { max-width: 62ch; }
+
+  header.top { border-bottom: 2px solid var(--ink); padding: 40px 0 22px; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 14px;
+  }
+  h1 {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(34px, 6vw, 58px); line-height: 1.02;
+    letter-spacing: -0.02em; margin: 0 0 16px; text-wrap: balance;
+  }
+  .standfirst { font-size: 20px; color: var(--muted); margin: 0; max-width: 58ch; }
+
+  h2 {
+    font-family: var(--display); font-weight: 700; font-size: 27px;
+    letter-spacing: -0.01em; margin: 52px 0 6px; text-wrap: balance;
+  }
+  h2 + .sub { color: var(--muted); margin: 0 0 20px; font-size: 17px; }
+  p { margin: 0 0 16px; }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  em.q { font-style: italic; }
+
+  /* Already in place — a checklist, because the point is that it is done */
+  .done { display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin: 22px 0 10px; }
+  .done-row {
+    background: var(--surface); padding: 13px 18px;
+    display: grid; grid-template-columns: 26px 1fr auto; gap: 14px; align-items: baseline;
+  }
+  .tick { color: var(--have); font-family: var(--display); font-weight: 700; }
+  .cross { color: var(--gap); font-family: var(--display); font-weight: 700; }
+  .done-row p { margin: 0; font-size: 16px; }
+  .done-row .note { font-family: var(--mono); font-size: 11px; color: var(--muted); text-align: right; }
+  @media (max-width: 620px) {
+    .done-row { grid-template-columns: 26px 1fr; }
+    .done-row .note { grid-column: 2; text-align: left; }
+  }
+
+  /* Evidence callouts */
+  .ev {
+    margin: 20px 0; padding: 20px 24px;
+    background: var(--surface); border: 1px solid var(--rule); border-left: 4px solid var(--accent);
+  }
+  .ev p { margin: 0; font-size: 17px; }
+  .ev p + p { margin-top: 10px; }
+  .ev cite {
+    display: block; font-family: var(--mono); font-style: normal;
+    font-size: 11px; color: var(--muted); margin-top: 12px;
+  }
+  .ev b { font-family: var(--display); font-weight: 700; }
+
+  /* Phases: a real sequence, so they are numbered */
+  .phase {
+    margin: 26px 0; background: var(--surface); border: 1px solid var(--rule);
+  }
+  .phase-head {
+    display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap;
+    padding: 20px 24px 0;
+  }
+  .phase-when {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent);
+  }
+  .phase-head h3 { font-family: var(--display); font-weight: 700; font-size: 22px; margin: 0; }
+  .phase-body { padding: 12px 24px 22px; }
+  .phase-body p { margin: 0 0 14px; }
+  .phase-body p:last-child { margin-bottom: 0; }
+  .phase-body ol, .phase-body ul { margin: 0 0 14px; padding-left: 22px; }
+  .phase-body li { margin-bottom: 9px; }
+  .owner {
+    display: flex; gap: 1px; background: var(--rule);
+    border-top: 1px solid var(--rule);
+  }
+  .owner div { background: var(--sunk); padding: 11px 24px 13px; flex: 1; }
+  .owner dt {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 3px;
+  }
+  .owner dd { margin: 0; font-family: var(--display); font-weight: 600; font-size: 15px; }
+  @media (max-width: 620px) { .owner { flex-direction: column; } }
+
+  .warn {
+    margin: 40px 0 10px; padding: 24px 26px;
+    border: 1px solid var(--rule); background: var(--sunk);
+  }
+  .warn h2 { margin-top: 0; font-size: 21px; }
+  .warn p:last-child { margin-bottom: 0; }
+  .warn strong { font-family: var(--display); font-weight: 600; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 16px; margin: 18px 0 8px; }
+  .scroll { overflow-x: auto; }
+  th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted); font-weight: 400;
+  }
+  td.num { font-variant-numeric: tabular-nums; font-family: var(--display); font-weight: 600; }
+
+  footer {
+    margin-top: 56px; border-top: 1px solid var(--rule); padding: 22px 0 60px;
+    font-family: var(--mono); font-size: 12px; color: var(--muted);
+  }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="top">
+    <p class="eyebrow">Beyond RV · Ninety-day plan · 5 September 2026</p>
+    <h1>Getting into the answer</h1>
+    <p class="standfirst">A plan to make Beyond RV one of the companies an AI names, and one of the sources Google quotes. Built on what the site already has, which is more than expected, and on what the 2026 research says actually earns a citation.</p>
+  </header>
+
+  <h2>Start here: most of the groundwork is done</h2>
+  <p class="sub column">Checked against the live site today. Do not let anyone sell you this work twice.</p>
+
+  <div class="done">
+    <div class="done-row"><span class="tick">✓</span><p>Every AI crawler explicitly allowed — GPTBot, OAI-SearchBot, ChatGPT-User, Claude-SearchBot, Claude-User, PerplexityBot, Applebot-Extended, CCBot</p><span class="note">robots.txt</span></div>
+    <div class="done-row"><span class="tick">✓</span><p>A site map written for language models, listing the pages that matter</p><span class="note">llms.txt</span></div>
+    <div class="done-row"><span class="tick">✓</span><p>Product schema with price and brand; question-and-answer schema on the calculator and camper pages</p><span class="note">JSON-LD</span></div>
+    <div class="done-row"><span class="tick">✓</span><p>Pages served as plain HTML, so a crawler reads them without running scripts</p><span class="note">Astro, static</span></div>
+    <div class="done-row"><span class="tick">✓</span><p>Two real guides already published, on ute suitability and on GVM, GCM, ATM and GTM</p><span class="note">/guides/</span></div>
+    <div class="done-row"><span class="cross">✕</span><p>No page anywhere for a specific ute — no Ranger page, no HiLux page, no Triton page</p><span class="note">0 of 52</span></div>
+    <div class="done-row"><span class="cross">✕</span><p>No rating or review markup, because there are no reviews to mark up</p><span class="note">0 reviews</span></div>
+    <div class="done-row"><span class="cross">✕</span><p>Nothing written about Beyond RV by anyone other than Beyond RV</p><span class="note">0 mentions</span></div>
+    <div class="done-row"><span class="cross">✕</span><p>Thirty-six pages in total, against competitors publishing buyer guides weekly</p><span class="note">36 URLs</span></div>
+  </div>
+
+  <div class="column">
+    <p>That pattern is worth reading carefully. Everything a developer can do has been done. Everything that requires writing, or requires another human being, has not. No amount of further technical work will change the answer you got.</p>
+  </div>
+
+  <h2>What the research says earns a citation</h2>
+  <p class="sub column">Three findings that decide where the ninety days go.</p>
+
+  <div class="ev">
+    <p><b>Fact density is the lever a small company can actually pull.</b> Work from Princeton, Georgia Tech and the Allen Institute found that adding citations to primary sources, attributed statistics and quotes from named people lifted how often AI engines quoted a page by <b>30 to 40%</b> — and that it lifted <em class="q">lower-ranked</em> sites most.</p>
+    <p>You will not out-rank Trayon on domain authority this year. You can out-cite them on specifics.</p>
+    <cite>Princeton / Georgia Tech / Allen Institute for AI, via 2026 GEO research summaries</cite>
+  </div>
+
+  <div class="ev">
+    <p><b>Reddit and YouTube are where AI reads.</b> Across ChatGPT, Perplexity, Gemini, Copilot and Google AI Overviews, Reddit is the single most-cited social source, at <b>53.6–62.8%</b> of social citations. Reddit and YouTube together account for <b>78.2%</b> of all social citations. Wikipedia and Reddit alone drive over a quarter of ChatGPT's US citations.</p>
+    <p>Platform matters: Google AI Overviews and Perplexity cite YouTube heavily — <b>36.6%</b> and <b>38.7%</b> of YouTube citations respectively — while ChatGPT cites it far less, at 9.5%.</p>
+    <cite>Search Engine Land, Otterly.ai, Wellows — 2026 citation studies</cite>
+  </div>
+
+  <div class="ev">
+    <p><b>llms.txt does not influence citations.</b> Google likened it to the old keywords meta tag. You already have one, correctly written. That is the right amount of effort to spend on it: no more.</p>
+    <cite>Google, via 2026 llms.txt guidance</cite>
+  </div>
+
+  <h2>The plan</h2>
+  <p class="sub column">Four phases. They overlap, but they are ordered by dependency: earlier ones create the material the later ones need.</p>
+
+  <div class="phase">
+    <div class="phase-head">
+      <span class="phase-when">Weeks 1–4</span>
+      <h3>Build the 52 pages nobody else can write</h3>
+    </div>
+    <div class="phase-body">
+      <p>One page per vehicle, generated from the data already in the catalogue. <em class="q">Slide-on campers for the Ford Ranger</em>, and the same for HiLux, Triton, Amarok, D-Max, BT-50, Navara, the Unimogs, the trucks.</p>
+      <p>Each page answers, with real numbers: what this ute's GVM and kerb mass are, what payload is left, which Beyond RV campers fit within it, which do not and by how much, and what a GVM upgrade changes. Cite the manufacturer document each figure came from — that is the fact density the research describes, and you already hold the sources.</p>
+      <p>This is the fast path. <em class="q">“What is the best slide-on camper for a Ranger with 900 kg of payload?”</em> cannot be answered from a model's memory; the figures are too specific. It has to fetch a page, and yours would be the only one that has them.</p>
+      <ul>
+        <li>Generate from the existing 168 variants and 52 models — the data exists, this is a template and a build.</li>
+        <li>Put the answer in the first paragraph, before any sales copy.</li>
+        <li>Mark up each page as a question and answer, as the calculator page already is.</li>
+        <li>Link each to the calculator so a reader can change the numbers.</li>
+      </ul>
+      <dl class="owner">
+        <div><dt>Who</dt><dd>Developer, one sprint</dd></div>
+        <div><dt>Depends on</dt><dd>Nothing</dd></div>
+        <div><dt>First effect</dt><dd>2–6 weeks</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head">
+      <span class="phase-when">Weeks 2–12, then forever</span>
+      <h3>Be useful on Reddit, where the models read</h3>
+    </div>
+    <div class="phase-body">
+      <p>Reddit is the most-cited source in AI answers, because it is where real people argue about real purchases. Australian touring subreddits carry the exact question you can answer better than anyone: will this fit, and is it legal loaded.</p>
+      <p>The rule that decides whether this works: <strong>answer the question fully in the comment</strong>. Give the payload figure, the maths and the verdict. Link the calculator only as the place to check their own numbers. A comment that answers gets quoted; a comment that says “great question, see our website” gets downvoted and, increasingly, ignored by the models too.</p>
+      <ul>
+        <li>Use a named account that says who you are. Undisclosed promotion gets banned, and a ban is public and permanent.</li>
+        <li>Read each subreddit's self-promotion rule before the first comment, not after.</li>
+        <li>Twenty minutes a day, genuinely helping. This is the one part of the plan that cannot be delegated to a contractor.</li>
+      </ul>
+      <dl class="owner">
+        <div><dt>Who</dt><dd>Someone who knows campers</dd></div>
+        <div><dt>Depends on</dt><dd>Phase 1, for something to link</dd></div>
+        <div><dt>First effect</dt><dd>Weeks, small; compounds</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head">
+      <span class="phase-when">Weeks 1–12, at every handover</span>
+      <h3>Collect the reviews that do not exist</h3>
+    </div>
+    <div class="phase-body">
+      <p>There is no rating signal anywhere, because there is nothing to mark up. For a <em class="q">best in Australia</em> question that is the strongest missing input, and customers give it free if asked at the right moment.</p>
+      <p>Ask at handover, while they are standing next to the camper and pleased with it. Not by email a fortnight later. Then mark the reviews up on the site so they are machine-readable as well as human-readable.</p>
+      <p>Ten genuine Google reviews changes what a search shows. Fifty changes what an AI believes about you.</p>
+      <dl class="owner">
+        <div><dt>Who</dt><dd>Whoever hands over</dd></div>
+        <div><dt>Depends on</dt><dd>Asking, every single time</dd></div>
+        <div><dt>First effect</dt><dd>Weeks in search; months in AI</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head">
+      <span class="phase-when">Weeks 4–24</span>
+      <h3>Get onto YouTube and into the awards</h3>
+    </div>
+    <div class="phase-body">
+      <p>YouTube is the second most-cited social source, and Google's own AI Overviews lean on it hardest. A review by an Australian touring channel is watched, quoted, transcribed and cited — one good one outperforms everything else on this list.</p>
+      <p>Lend a unit for a fortnight. Ask for an honest review, not a favourable one; an obviously sponsored puff piece is worth less to you than a review that names a real drawback and still recommends the camper.</p>
+      <p>In parallel, enter the awards. Wedgetail is named in the search results specifically because <em>Camper Trailer Australia</em> put it in Camper Trailer of the Year. Award coverage is written by editors, indexed for years, and quoted long afterwards.</p>
+      <dl class="owner">
+        <div><dt>Who</dt><dd>A reviewer, an editor</dd></div>
+        <div><dt>Depends on</dt><dd>A unit you can spare</dd></div>
+        <div><dt>First effect</dt><dd>3–6 months</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <h2>How you will know it is working</h2>
+  <p class="sub column">Check monthly. Write the answers down, because the change is gradual and memory is unreliable.</p>
+
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr><th>What to check</th><th>How</th><th>Today</th><th>Good at 90 days</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Named in an AI answer</td><td>Ask ChatGPT, Gemini and Perplexity “best slide-on campers in Australia”, and “which slide-on fits a Ranger”</td><td class="num">No</td><td class="num">Named on the fit question</td></tr>
+        <tr><td>Cited with a link</td><td>Same questions — does any answer link beyondrv.com.au</td><td class="num">No</td><td class="num">Yes, on fit questions</td></tr>
+        <tr><td>Third-party mentions</td><td>Search “Beyond RV slide-on review” and count results not owned by you</td><td class="num">0</td><td class="num">3–5</td></tr>
+        <tr><td>Google reviews</td><td>The business profile</td><td class="num">0</td><td class="num">15+</td></tr>
+        <tr><td>Pages indexed</td><td>Search Console</td><td class="num">36</td><td class="num">85+</td></tr>
+        <tr><td>AI referral visits</td><td>Analytics, traffic from chatgpt.com, perplexity.ai, gemini</td><td class="num">≈0</td><td class="num">Measurable</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="warn column">
+    <h2>What not to spend money on</h2>
+    <p><strong>More technical AI-readiness work.</strong> The crawler permissions, the llms.txt, the schema and the static rendering are all in place and verified. Google has said llms.txt does not influence citations. Anyone quoting for this is quoting for work already done.</p>
+    <p><strong>Anything promising fast results on “best camper” questions.</strong> That answer comes from what models already learnt, which cannot be edited. The questions you can win quickly are the specific ones — a ute, a payload, a fit — because those must be looked up.</p>
+    <p><strong>Buying reviews, or posting on Reddit without saying who you are.</strong> Both are detectable, both get punished, and a public ban is a permanent third-party mention of exactly the wrong kind.</p>
+    <p><strong>Volume for its own sake.</strong> Thirty-six pages is few, but the answer is not three hundred thin ones. It is fifty-two pages that each hold a number nobody else has.</p>
+  </div>
+
+  <footer>
+    Companion to <em>Why Nobody Names Beyond RV</em>. Site audit performed against beyondrv.com.au on 5 September 2026.<br><br>
+    Research:
+    <a href="https://searchengineland.com/ai-search-engines-cite-reddit-youtube-and-linkedin-most-study-473138">Search Engine Land, AI search engines cite Reddit, YouTube and LinkedIn most</a> ·
+    <a href="https://otterly.ai/blog/youtube-ai-citation-study-2026/">Otterly.ai, YouTube AI citation study 2026</a> ·
+    <a href="https://wellows.com/blog/social-media-ai-citations-report-2026/">Wellows, social media in AI citations 2026</a> ·
+    <a href="https://www.enrichlabs.ai/blog/generative-engine-optimization-geo-complete-guide-2026">Enrich Labs, GEO complete guide 2026</a> ·
+    <a href="https://seeklab.io/blog/what-is-llmstxt-the-honest-2026-guide/">SeekLab, the honest llms.txt guide</a> ·
+    <a href="https://sparktoro.com/blog/in-2026-less-than-one-third-of-google-searches-still-send-a-click/">SparkToro, less than a third of searches send a click</a> ·
+    <a href="https://campertraileraustralia.com.au/blogs/reviews/best-slide-on-campers-wedgetail-slide-on-review">Camper Trailer Australia, Camper Trailer of the Year</a>
+  </footer>
+</div>
+
+</body>
+</html>
