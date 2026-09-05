@@ -174,8 +174,28 @@
   <header class="top">
     <p class="eyebrow">Beyond RV · Ninety-day plan · 5 September 2026</p>
     <h1>Getting into the answer</h1>
-    <p class="standfirst">A plan to make Beyond RV one of the companies an AI names, and one of the sources Google quotes. Built on what the site already has, which is more than expected, and on what the 2026 research says actually earns a citation.</p>
+    <p class="standfirst">Beyond RV is already being fetched and cited by AI. What it is not doing is giving the citation anything to quote. This is the plan to fix that, and then to widen it.</p>
   </header>
+
+  <h2>The problem has changed since the first look</h2>
+  <p class="sub column">A second, better-researched AI answer cited Beyond RV twice, with links. That is the retrieved path working. The trouble is what it found there.</p>
+
+  <div class="ev">
+    <p><b>You were ranked fourth of five, and described in adjectives while everyone else got numbers.</b></p>
+    <p>The model quoted Wedgetail at 517 kg and $54,199 with a 12-year structural warranty; Trayon at 390–410 kg, family-owned since 1994, 10-year structural off-road warranty; Active Campers at 530–550 kg.</p>
+    <p>Beyond RV got prices — $72,000 to $77,800 — and then <em class="q">“heavier class”</em>. No weight. No warranty term. No year the company started.</p>
+  </div>
+
+  <div class="column">
+    <p>This is not a model overlooking you. It read your pages, took what was quotable, and where it found a number it printed the number. Where it found <em class="q">“Confirm with Beyond RV”</em> — which is what the Advent pages say under dry weight — it wrote an adjective. In a comparison table an adjective beside four numbers reads as a weakness whether or not it is one.</p>
+    <p>The same happened with the warranty. The warranty page sets out what is covered in careful detail and states no term. Competitors publishing “12 years” and “10 years” got those figures printed as a reason to choose them.</p>
+    <p>That is the whole gap, and it is unusually cheap to close.</p>
+  </div>
+
+  <div class="ev">
+    <p><b>The model also handed you your positioning, unprompted.</b> It concluded that Wedgetail and Trayon maximise off-road mobility, while the Advent maximises living comfort — and recommended it for an older couple touring for months, wanting instant access without raising a roof or unfolding canvas.</p>
+    <p>That is a better description of the difference than most marketing copy manages, and it is worth adopting rather than arguing with. Trying to beat Trayon at 390 kg is a fight with the laws of physics. Owning <em class="q">the hard-wall alternative</em> is a fight you have already won on the product.</p>
+  </div>
 
   <h2>Start here: most of the groundwork is done</h2>
   <p class="sub column">Checked against the live site today. Do not let anyone sell you this work twice.</p>
@@ -190,10 +210,12 @@
     <div class="done-row"><span class="cross">✕</span><p>No rating or review markup, because there are no reviews to mark up</p><span class="note">0 reviews</span></div>
     <div class="done-row"><span class="cross">✕</span><p>Nothing written about Beyond RV by anyone other than Beyond RV</p><span class="note">0 mentions</span></div>
     <div class="done-row"><span class="cross">✕</span><p>Thirty-six pages in total, against competitors publishing buyer guides weekly</p><span class="note">36 URLs</span></div>
+    <div class="done-row"><span class="cross">✕</span><p>No dry weight published for any camper — the pages say “Confirm with Beyond RV”, and there is no weight in the schema either</p><span class="note">0 of 4 models</span></div>
+    <div class="done-row"><span class="cross">✕</span><p>No warranty term stated, while competitors advertise 10 and 12 years and get those figures quoted</p><span class="note">warranty page</span></div>
   </div>
 
   <div class="column">
-    <p>That pattern is worth reading carefully. Everything a developer can do has been done. Everything that requires writing, or requires another human being, has not. No amount of further technical work will change the answer you got.</p>
+    <p>That pattern is worth reading carefully. Everything a developer can do has been done. Everything that requires a decision — what a camper weighs, how long it is warranted — has not. No amount of further technical work will change what an AI can say about you, because the missing pieces are facts, not markup.</p>
   </div>
 
   <h2>What the research says earns a citation</h2>
@@ -218,6 +240,29 @@
 
   <h2>The plan</h2>
   <p class="sub column">Four phases. They overlap, but they are ordered by dependency: earlier ones create the material the later ones need.</p>
+
+  <div class="phase">
+    <div class="phase-head">
+      <span class="phase-when">Week 1</span>
+      <h3>Publish the numbers you are being marked down for</h3>
+    </div>
+    <div class="phase-body">
+      <p>The cheapest and fastest item on this list. Four facts, on every camper page, as plain text and in the product schema so they are machine-readable:</p>
+      <ol>
+        <li><strong>Dry weight in kilograms</strong>, per model. This is the single figure the comparison turned on.</li>
+        <li><strong>Warranty term in years.</strong> Whatever it genuinely is. The page already describes the cover well; it needs the number.</li>
+        <li><strong>Construction</strong> — composite panel, hard wall — in the words a buyer would search.</li>
+        <li><strong>Where it is built, honestly.</strong> Imported shell, completed and certified in Mutdapilly. Said plainly it is a fact; left vague it looks like something being avoided.</li>
+      </ol>
+      <p>Add the year the business started, on the About page, for the same reason Trayon's “since 1994” got quoted.</p>
+      <p><strong>One caution.</strong> If “Confirm with Beyond RV” is deliberate — because units vary by fitout, or because nobody wants to be held to a figure — then say <em class="q">that</em>, with a range and what moves it. A published range beats an invitation to phone. What cannot continue is being the only entry in the table without a number.</p>
+      <dl class="owner">
+        <div><dt>Who</dt><dd>You, one decision</dd></div>
+        <div><dt>Depends on</dt><dd>Weighing the campers</dd></div>
+        <div><dt>First effect</dt><dd>Days to weeks</dd></div>
+      </dl>
+    </div>
+  </div>
 
   <div class="phase">
     <div class="phase-head">
@@ -265,6 +310,23 @@
 
   <div class="phase">
     <div class="phase-head">
+      <span class="phase-when">Weeks 2–6</span>
+      <h3>Write the comparison from your own side</h3>
+    </div>
+    <div class="phase-body">
+      <p>The model placed you fourth on a list sorted by weight and off-road ability. On a list sorted by <em class="q">living in it for three months in the rain</em>, the order changes, and nobody has written that list.</p>
+      <p>Write it. Hard wall against canvas: setup time, weather, warmth, noise, security, what it costs in kilograms. Name Wedgetail and Trayon, quote their real weights, and concede the point honestly — they are lighter, and for the Canning Stock Route that matters more. Then make the case where yours wins.</p>
+      <p>A comparison that concedes gets cited. One that does not, does not — and readers can tell the difference as quickly as models can.</p>
+      <dl class="owner">
+        <div><dt>Who</dt><dd>Someone who knows both</dd></div>
+        <div><dt>Depends on</dt><dd>Phase 1, for the numbers</dd></div>
+        <div><dt>First effect</dt><dd>Weeks</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head">
       <span class="phase-when">Weeks 1–12, at every handover</span>
       <h3>Collect the reviews that do not exist</h3>
     </div>
@@ -306,8 +368,9 @@
         <tr><th>What to check</th><th>How</th><th>Today</th><th>Good at 90 days</th></tr>
       </thead>
       <tbody>
-        <tr><td>Named in an AI answer</td><td>Ask ChatGPT, Gemini and Perplexity “best slide-on campers in Australia”, and “which slide-on fits a Ranger”</td><td class="num">No</td><td class="num">Named on the fit question</td></tr>
-        <tr><td>Cited with a link</td><td>Same questions — does any answer link beyondrv.com.au</td><td class="num">No</td><td class="num">Yes, on fit questions</td></tr>
+        <tr><td>Named in an AI answer</td><td>Ask ChatGPT, Gemini and Perplexity “best slide-on campers in Australia”, and “which slide-on fits a Ranger”</td><td class="num">4th of 5, when researched</td><td class="num">Top 3, and first on hard-wall</td></tr>
+        <tr><td>Cited with a link</td><td>Same questions — does any answer link beyondrv.com.au</td><td class="num">Yes, 2 links</td><td class="num">Yes, with figures quoted</td></tr>
+        <tr><td>Weight quoted, not guessed</td><td>Does the answer give a kg figure for an Advent, or an adjective</td><td class="num">“heavier class”</td><td class="num">A number</td></tr>
         <tr><td>Third-party mentions</td><td>Search “Beyond RV slide-on review” and count results not owned by you</td><td class="num">0</td><td class="num">3–5</td></tr>
         <tr><td>Google reviews</td><td>The business profile</td><td class="num">0</td><td class="num">15+</td></tr>
         <tr><td>Pages indexed</td><td>Search Console</td><td class="num">36</td><td class="num">85+</td></tr>
@@ -318,6 +381,7 @@
 
   <div class="warn column">
     <h2>What not to spend money on</h2>
+    <p><strong>Anything sold as “getting you into AI answers”.</strong> You are already in them. What you are missing is quotable facts about your own campers, and no agency can supply those — only a set of scales and a decision about the warranty.</p>
     <p><strong>More technical AI-readiness work.</strong> The crawler permissions, the llms.txt, the schema and the static rendering are all in place and verified. Google has said llms.txt does not influence citations. Anyone quoting for this is quoting for work already done.</p>
     <p><strong>Anything promising fast results on “best camper” questions.</strong> That answer comes from what models already learnt, which cannot be edited. The questions you can win quickly are the specific ones — a ute, a payload, a fit — because those must be looked up.</p>
     <p><strong>Buying reviews, or posting on Reddit without saying who you are.</strong> Both are detectable, both get punished, and a public ban is a permanent third-party mention of exactly the wrong kind.</p>
