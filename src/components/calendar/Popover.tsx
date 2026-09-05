@@ -27,18 +27,32 @@ export default function Popover({ anchor, width = 400, onClose, children, label,
     if (phone) { setStyle({}); return; }
     const element = ref.current;
     if (!element) return;
-    const height = element.offsetHeight;
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    let left = anchor.left + anchor.width + GAP;
-    if (left + width > vw - MARGIN) left = anchor.left - width - GAP;
-    let top = anchor.top;
-    if (left < MARGIN) {
-      left = Math.max(MARGIN, Math.min(anchor.left, vw - width - MARGIN));
-      top = anchor.top + anchor.height + GAP;
+
+    function place() {
+      const height = element!.offsetHeight;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const available = vh - MARGIN * 2;
+      let left = anchor.left + anchor.width + GAP;
+      if (left + width > vw - MARGIN) left = anchor.left - width - GAP;
+      let top = anchor.top;
+      if (left < MARGIN) {
+        left = Math.max(MARGIN, Math.min(anchor.left, vw - width - MARGIN));
+        top = anchor.top + anchor.height + GAP;
+      }
+      if (top + height > vh - MARGIN) top = Math.max(MARGIN, vh - height - MARGIN);
+      // Taller than the window: pin it to the top and let it scroll inside
+      // itself, so Save is always reachable.
+      setStyle({ top, left, width, maxHeight: available, overflowY: height > available ? 'auto' : undefined });
     }
-    if (top + height > vh - MARGIN) top = Math.max(MARGIN, vh - height - MARGIN);
-    setStyle({ top, left, width });
+
+    place();
+    // The card grows when a kind is picked, an order list loads, or an error
+    // appears. Measuring only on open left Save off the bottom of the screen.
+    const observer = new ResizeObserver(place);
+    observer.observe(element);
+    window.addEventListener('resize', place);
+    return () => { observer.disconnect(); window.removeEventListener('resize', place); };
   }, [anchor, width, phone]);
 
   useEffect(() => {

@@ -372,6 +372,14 @@
   max-height: 85vh;
   overflow-y: auto;
 }
+/* Save must stay reachable when the card scrolls. */
+.gcal-popover .gcal-form__actions {
+  position: sticky;
+  bottom: -16px;
+  background: var(--gcal-bg);
+  padding: 8px 0 0;
+  margin-bottom: -8px;
+}
 
 /* Detail card. */
 .gcal-detail__actions { display: flex; justify-content: flex-end; gap: 2px; margin: 0 -8px 4px 0; }

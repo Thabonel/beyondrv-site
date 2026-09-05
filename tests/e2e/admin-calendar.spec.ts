@@ -249,3 +249,31 @@ test('the popup only asks whose job it is for a task', async ({ page, isMobile }
   await form.getByRole('radio', { name: 'Meeting' }).click();
   await expect(page.getByTestId('event-assignee')).toHaveCount(0);
 });
+
+test('Save stays reachable when the popup grows past the bottom of the window', async ({ page, isMobile }) => {
+  test.skip(Boolean(isMobile), 'the phone sheet is anchored to the bottom already');
+  await mockCalendar(page);
+  // A short window, as a laptop with the browser chrome and the admin header
+  // above the calendar gives you.
+  await page.setViewportSize({ width: 1280, height: 620 });
+  await page.goto('/admin/');
+
+  await page.getByTestId('calendar-create').click();
+  const save = page.getByTestId('event-save');
+  await expect(save).toBeInViewport();
+
+  // Picking Task adds "Whose job", and a failed save adds an error line. The
+  // card measured itself once on open, so it used to grow off the bottom and
+  // Save became unclickable.
+  await page.getByTestId('event-form').getByRole('radio', { name: 'Task' }).click();
+  await expect(page.getByTestId('event-assignee')).toBeVisible();
+  await expect(save).toBeInViewport();
+
+  await save.click();
+  await expect(page.getByText('Give it a title.')).toBeVisible();
+  await expect(save).toBeInViewport();
+  // And it is genuinely clickable, not merely within the viewport rectangle.
+  await page.getByTestId('event-title').fill('Fit the Advent tray');
+  await save.click();
+  await expect(page.getByTestId('event-form')).toHaveCount(0);
+});
