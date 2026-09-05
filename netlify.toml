@@ -176,3 +176,14 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+
+# The Lighthouse report was installed as an extension through the Netlify UI,
+# which means every build had to retrieve the site's extension list from
+# Netlify's app before it could parse this file at all. On 4 September 2026 that
+# call started failing — "Failed retrieving extensions for site: fetch failed" —
+# and no build could reach its build command, including commits that had already
+# deployed successfully. Declaring the plugin here installs it from npm as part
+# of the build instead, so the build owns it and the repository says what runs.
+# Remove the UI-installed copy so it is configured in exactly one place.
+[[plugins]]
+  package = "@netlify/plugin-lighthouse"
