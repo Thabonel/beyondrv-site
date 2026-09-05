@@ -15,6 +15,7 @@
  */
 
 import { isIsoDate, isWallTime } from './calendar-events-core.ts';
+import { cleanAssignees } from './calendar-assignment-core.ts';
 
 export type WritableKind =
   | 'customer_visit' | 'expected_handover' | 'expected_arrival'
@@ -97,12 +98,12 @@ export interface NewTaskRequest {
   title?: unknown;
   date?: unknown;
   time?: unknown;
-  /** Whose job it is. Empty means the GM's own. */
-  assigneeId?: unknown;
+  /** Who it belongs to. Empty means the GM's own. */
+  assigneeIds?: unknown;
 }
 
 export type TaskDecision =
-  | { ok: true; title: string; dueDate: string; dueTime: string; assigneeId: string }
+  | { ok: true; title: string; dueDate: string; dueTime: string; assigneeIds: string[] }
   | { ok: false; error: string };
 
 /**
@@ -113,11 +114,11 @@ export function decideNewTask(body: NewTaskRequest): TaskDecision {
   const title = typeof body.title === 'string' ? body.title.trim().slice(0, 180) : '';
   const dueDate = typeof body.date === 'string' ? body.date.trim() : '';
   const dueTime = typeof body.time === 'string' ? body.time.trim() : '';
-  const assigneeId = typeof body.assigneeId === 'string' ? body.assigneeId.trim().slice(0, 240) : '';
+  const assigneeIds = cleanAssignees(body.assigneeIds);
   if (!title) return { ok: false, error: 'A task needs a title.' };
   if (!isIsoDate(dueDate)) return { ok: false, error: `"${dueDate}" is not a YYYY-MM-DD date.` };
   if (dueTime && !isWallTime(dueTime)) return { ok: false, error: `"${dueTime}" is not an HH:MM time.` };
-  return { ok: true, title, dueDate, dueTime, assigneeId };
+  return { ok: true, title, dueDate, dueTime, assigneeIds };
 }
 
 /** Warns when a visit is moved onto a vehicle that is not marked as here. */

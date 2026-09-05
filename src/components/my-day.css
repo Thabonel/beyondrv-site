@@ -197,3 +197,63 @@
   .myday__addbtn, .myday__add input, .myday textarea { background: #1a1a1a; color: #f2f2f2; }
   .myday__add button { background: #1e1e1e; color: #f2f2f2; }
 }
+
+/* An item that is theirs to turn up to, not theirs to move. */
+.myday__dot--job { justify-self: center; width: 14px; height: 14px; }
+.myday__kind {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.myday__shared { display: block; color: var(--muted); font-size: 13px; }
+
+/* Reporting a container. Three questions, each on its own line, because this
+   gets filled in one-handed on a phone. */
+.myday__container { display: grid; gap: 12px; margin-top: 12px; }
+.myday__container label { display: grid; gap: 4px; font-size: 14px; color: var(--muted); }
+.myday__container select, .myday__container input {
+  font: inherit;
+  font-size: 16px;
+  color: var(--text);
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  min-height: 48px;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+.myday__container-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.myday__container-actions button {
+  padding: 12px 18px;
+  font: inherit;
+  font-weight: 700;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--text);
+  cursor: pointer;
+  min-height: 48px;
+}
+.myday__container-actions button[type="submit"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+@media (prefers-color-scheme: dark) {
+  .myday__container select, .myday__container input, .myday__container-actions button { background: #1a1a1a; color: #f2f2f2; }
+  .myday__container-actions button[type="submit"] { background: var(--accent); color: #fff; }
+}
+
+.myday__clash {
+  margin: 0 0 6px;
+  padding: 10px 12px;
+  background: #fef7e0;
+  border-radius: 10px;
+  color: #6b4b00;
+  font-size: 15px;
+  line-height: 1.4;
+}
+@media (prefers-color-scheme: dark) {
+  .myday__clash { background: #3a2f10; color: #ffd98a; }
+}

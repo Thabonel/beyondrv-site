@@ -4,6 +4,7 @@ import {
   addMinutes,
   buildCalendarEvents,
   calendarClashes,
+  containerDisagreements,
   EVENT_KIND_META,
 } from '../netlify/functions/calendar-events-core.ts';
 
@@ -186,6 +187,60 @@ test('a container ETA read from an email says so in the clash', () => {
     source: 'ai', productSlug: 'advent-2450',
   });
   const clashes = calendarClashes(events);
-  assert.equal(clashes.length, 1);
-  assert.match(clashes[0], /according to an email/);
+  assert.match(clashes.join('\n'), /according to an email/);
+  // And the report itself is flagged, because the product file has no ETA to
+  // compare it with: a date nobody published is still a date somebody should see.
+  assert.match(clashes.join('\n'), /The product file has no ETA/);
+});
+
+test('a reported container date that differs from the product file is named, not merged', () => {
+  const events = buildCalendarEvents({
+    products: [{ slug: 'advent-2450', title: 'Advent 2450', containerEtaDate: '2026-09-20' }],
+  });
+  events.push({
+    id: 'calendar:c1', kind: 'container_eta', date: '2026-09-27', start: '2026-09-27', end: '2026-09-27', allDay: true,
+    title: 'Container ETA: Advent 2450', detail: '', recordType: 'calendar', recordId: 'c1', isCommitment: false,
+    source: 'crew', productSlug: 'advent-2450',
+  });
+  const notes = containerDisagreements(events);
+  assert.equal(notes.length, 1);
+  assert.match(notes[0], /Reported on a phone/);
+  assert.match(notes[0], /2026-09-27/);
+  assert.match(notes[0], /product file says 2026-09-20/);
+  // Both dates stay on the calendar: neither source overwrites the other.
+  assert.equal(events.filter((e) => e.kind === 'container_eta').length, 2);
+});
+
+test('a report that agrees with the product file is not worth mentioning', () => {
+  const events = buildCalendarEvents({
+    products: [{ slug: 'advent-2450', title: 'Advent 2450', containerEtaDate: '2026-09-20' }],
+  });
+  events.push({
+    id: 'calendar:c1', kind: 'container_eta', date: '2026-09-20', start: '2026-09-20', end: '2026-09-20', allDay: true,
+    title: 'Container ETA: Advent 2450', detail: '', recordType: 'calendar', recordId: 'c1', isCommitment: false,
+    source: 'crew', productSlug: 'advent-2450',
+  });
+  assert.deepEqual(containerDisagreements(events), []);
+});
+
+test('a report for a vehicle the product file has no date for still reaches Alex', () => {
+  const notes = containerDisagreements([{
+    id: 'calendar:c1', kind: 'container_eta', date: '2026-09-27', start: '2026-09-27', end: '2026-09-27', allDay: true,
+    title: 'Container ETA: Sunpatch 21', detail: '', recordType: 'calendar', recordId: 'c1', isCommitment: false,
+    source: 'crew', productSlug: 'sunpatch-21',
+  }]);
+  assert.equal(notes.length, 1);
+  assert.match(notes[0], /no ETA/);
+});
+
+test('an emailed date and a phoned date are attributed differently', () => {
+  const base = {
+    date: '2026-09-27', start: '2026-09-27', end: '2026-09-27', allDay: true, detail: '',
+    recordType: 'calendar' as const, isCommitment: false, productSlug: 'advent-2450',
+    kind: 'container_eta' as const, title: 'Container ETA: Advent 2450',
+  };
+  const fromEmail = containerDisagreements([{ ...base, id: 'a', recordId: 'a', source: 'ai' }]);
+  const fromPhone = containerDisagreements([{ ...base, id: 'b', recordId: 'b', source: 'crew' }]);
+  assert.match(fromEmail[0], /An email says/);
+  assert.match(fromPhone[0], /Reported on a phone/);
 });

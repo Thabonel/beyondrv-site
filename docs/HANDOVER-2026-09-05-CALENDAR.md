@@ -1,0 +1,195 @@
+# Handover: the calendar, 5 September 2026
+
+Continues [HANDOVER-2026-09-05.md](HANDOVER-2026-09-05.md), which covers the
+Netlify deploy failure, the vehicle data, and the state of the site generally.
+This one covers only the calendar and the phone views, which is all that
+changed since.
+
+Repo `Thabonel/beyondrv-site`, production
+[beyondrv.com.au](https://beyondrv.com.au).
+
+---
+
+## Read this first
+
+**The working checkout is still stale.** `/Users/thabonel/Code/Byond_RV` sits on
+`vehicle-selector-prefill`. Work from a `git worktree` created from
+`origin/main`.
+
+**`browsers` takes about 16 minutes and it earns it.** The Playwright job runs
+five projects; `quality` finishes long before it. It has caught three real
+defects in this work that local runs missed, so do not merge around it. Every
+push restarts it.
+
+**Run the browser tests with `TZ=UTC`.** CI runs in UTC, this machine is
+Brisbane, and one bug only appeared outside business hours. `TZ=UTC npx
+playwright test …` reproduces CI's clock.
+
+**Netlify Blobs listings are eventually consistent.** A read of a key you just
+wrote is reliable; a `list()` that should contain it is not. Anything that
+writes then immediately re-lists will intermittently miss its own write. This
+caused a real bug (below) and will cause more.
+
+---
+
+## Merged
+
+| PR | What |
+|---|---|
+| #94 | The calendar rebuilt as Google Calendar, with the Gmail sync |
+| #95 | Handovers from the calendar, and visits and handovers from email and call notes |
+| #96 | Calendar · Dashboard · Enquiries · Analytics in the admin header |
+| #97 | The phone day view for people who will not log in |
+| #98 | Assign anyone, or several people, to anything; container reports from a phone (open at the time of writing) |
+
+Production after #97: `generatedAt` 06:0x, 168 published variants, 52 known
+models, `/admin/` 302 unauthenticated. Unchanged, which is correct: everything
+here is behind a gate.
+
+---
+
+## What exists now
+
+### The calendar
+
+Google Calendar's layout, in admin, first tab. Top bar with Today, arrows,
+period, search and a Day/Week/Month/Schedule menu; a sidebar with **+ Create**,
+a mini month, **Crew phone links**, and a checkbox per event kind; a fixed
+grid that scrolls inside itself and opens at 8am.
+
+Ten kinds. Six are projected from records that own their dates (orders,
+enquiries, products); meetings and reminders live in the calendar's own store;
+tasks are their own records.
+
+**The rule the whole thing rests on: a date has one home.** Dragging an event
+writes the new date onto the record that owns it. Nothing keeps a second copy.
+A container ETA cannot be dragged, because it lives on the product content file
+and reaches the site through Pending review.
+
+### The Gmail sync
+
+`google-gmail-calendar-sync` runs every 15 minutes. It reads unprocessed
+messages from the existing Gmail thread store, asks a nano-tier model for dated
+items against a strict schema, validates confidence and links against real
+orders and products, de-duplicates, and writes. A visit or handover that names
+its order is written **onto that order**; anything else becomes a calendar
+event carrying the email it came from.
+
+**It does nothing until the ByondRV mailbox is connected** in the Google tab.
+That is still the main outstanding action.
+
+### The phone views
+
+`/my-day/`, no login. Alex adds a person under **Crew phone links**, the site
+shows a link once, **Text it** opens the SMS app, they add it to their home
+screen.
+
+- **The key is in the URL fragment.** Browsers never send the part after `#` to
+  a server, so it stays out of Netlify's access log, the `Referer` header and
+  the CDN. Requests carry it in `X-Crew-Key`.
+- **Only a hash is stored**, compared in constant time. A lost link is
+  *replaced*, not re-sent: **Reissue** kills the old one instantly.
+- **The manifest deliberately has no `start_url`**, so the launch URL defaults
+  to the document URL with its fragment. On iPhone a home-screen web app has
+  its own storage and cannot read what Safari cached; without this the icon
+  opens to nothing. A test asserts it stays absent.
+
+A `crew` link shows their jobs, anything else assigned to them, the day's yard
+read-only, a note, and container reporting. A `gm` link shows the whole day.
+
+### Container reports
+
+Li hears when a container lands before anyone else, and his wife tracks them.
+On their phone: **A container is arriving** — vehicle, date, who told them.
+
+**It does not touch the product file.** That date is what the website
+publishes. A report sits beside it; when they differ, both are on the calendar
+and "dates that disagree" names the difference, attributed to a phone or an
+email. A report for a vehicle with no published ETA is flagged too.
+
+---
+
+## Defects found by using it, and their causes
+
+Worth reading: each was invisible to the tests that existed, and each says
+something about where to look next.
+
+**A new item sometimes did not appear, and creating it again made two.**
+Netlify Blobs listing lag, as above. The panel now holds what it just wrote and
+merges it into the listing until the listing catches up. Anything else in this
+codebase that writes then re-lists has the same bug waiting.
+
+**Assigning a meeting did not stick.** Its owners were filed under
+`meeting:cal-1` while the grid reads that event as `calendar:cal-1`. The answer
+went where nobody looks. Meetings and reminders now keep their owners on their
+own record; only projected dates use an assignment record, keyed by the event
+id the grid actually reads, and that id travels with the request so the two
+cannot drift apart.
+
+**A "whole calendar" link opened an empty day.** The endpoint returned a `gm`
+payload; the page only knew the crew layout, read a `jobs` array that was not
+there, and said nothing was on. Half a feature shipped because the endpoint and
+the view were built in different sittings.
+
+**Save fell off the bottom of the screen.** The popup measured its height once
+on open; picking Task or hitting a validation error made it taller. It now
+re-measures with a `ResizeObserver` and scrolls internally.
+
+**Moving the start time did not move the end.** Found by CI, not locally,
+because the default times depend on the hour you run at: Brisbane afternoon hid
+it, UTC morning exposed it.
+
+**The Crew section was unfindable.** It sat below ten calendar rows, under the
+fold. Now orange and above the list, with a test pinning it there.
+
+---
+
+## Decisions that should not be undone casually
+
+**A date has one home.** Dragging writes to the owning record. Anything else
+creates a second version of the truth, which is the failure that cost the
+flights.
+
+**A supplier's date is a claim, not an arrival.** Email and phone reports sit
+beside the published ETA and are compared to it. Nothing publishes without
+Alex.
+
+**Container ETAs cannot be dragged.** Not caution: the data. The ETA lives on
+the product content file and ships through Pending review.
+
+**Dependencies match on product, not dates.** Comparing every visit against
+every container would fire whenever any vehicle anywhere was late, and an alarm
+that is usually wrong gets ignored — which is how the first one was missed.
+
+**Only a hash of a phone key is stored.** So a lost link is replaced, not
+recovered. That is the point: it makes a stolen phone survivable.
+
+**Crew see no prices and no order state.** The yard list is stripped in
+`crew-core`, not in the view, so a change to the view cannot start leaking.
+
+---
+
+## Outstanding
+
+1. **Connect the ByondRV mailbox** in the Google tab. Everything AI-facing on
+   the calendar is inert until then. Read-only scopes; the redirect URI must be
+   exactly `https://beyondrv.com.au/.netlify/functions/google-oauth-callback`.
+2. **Try the home-screen install on a real iPhone.** The manifest reasoning is
+   sound and tested, but no test can prove that Safari's *Add to Home Screen*
+   keeps the fragment. If the icon opens to "ask Alex for a new link", that
+   assumption failed and iOS needs another route.
+3. **Audit the rest of the codebase for write-then-list.** The listing lag is
+   general; the calendar is simply where it was noticed.
+4. The `.ics` subscription feed, if the phone views turn out not to be enough.
+5. Resize on the calendar, once records carry an end date.
+6. The truck model-year decision; sixteen researched rows still wait on it.
+
+---
+
+## Conventions
+
+`npm run check`, `npm test`, `npm run audit:repository` locally; CI runs
+`quality` then `browsers`. Pure logic lives in `*-core.ts` files and is tested
+without constructing a Netlify event — follow that when adding anything.
+
+Writing style: Google developer documentation style.

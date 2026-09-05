@@ -53,8 +53,8 @@ export interface CalendarActions {
   updateStoreEvent: (id: string, body: Record<string, unknown>) => Promise<WriteResult>;
   deleteStoreEvent: (id: string) => Promise<WriteResult>;
   moveRecord: (kind: string, recordId: string, date: string, time: string) => Promise<WriteResult>;
-  createTask: (title: string, date: string, time: string, assigneeId: string) => Promise<WriteResult>;
-  assignTask: (recordId: string, assigneeId: string) => Promise<WriteResult>;
+  createTask: (title: string, date: string, time: string, assigneeIds: string[]) => Promise<WriteResult>;
+  assign: (kind: string, recordId: string, eventId: string, assigneeIds: string[]) => Promise<WriteResult>;
   loadOrders: () => Promise<OrderOption[]>;
   crew: CrewOption[];
   refresh: () => Promise<void>;
@@ -99,10 +99,10 @@ function nextWholeHour(now: Date) {
 }
 
 function emptyForm(date: string, startTime = '', endTime = ''): EventFormValues {
-  return { title: '', kind: 'meeting', date, startTime, endTime, allDay: !startTime, notes: '', orderId: '', assigneeId: '' };
+  return { title: '', kind: 'meeting', date, startTime, endTime, allDay: !startTime, notes: '', orderId: '', assigneeIds: [] };
 }
 
-function formFromEvent(event: AdminCalendarEvent, stored?: StoredDetail, assigneeId = ''): EventFormValues {
+function formFromEvent(event: AdminCalendarEvent, stored?: StoredDetail): EventFormValues {
   return {
     title: event.title,
     kind: event.kind,
@@ -112,8 +112,12 @@ function formFromEvent(event: AdminCalendarEvent, stored?: StoredDetail, assigne
     allDay: event.allDay,
     notes: stored?.notes ?? '',
     orderId: '',
-    assigneeId,
+    assigneeIds: event.assigneeIds ?? [],
   };
+}
+
+function sameSet(a: string[], b: string[]) {
+  return a.length === b.length && a.every((id) => b.includes(id));
 }
 
 type FormState = { mode: 'create' | 'edit'; anchor: AnchorRect; values: EventFormValues; event?: AdminCalendarEvent | null };
@@ -329,15 +333,20 @@ export default function AdminCalendar({ events, storedDetails, clashes = [], loa
     if (form.mode === 'edit' && form.event) {
       if (form.event.recordType === 'calendar') {
         result = await actions.updateStoreEvent(form.event.recordId, { title: values.title, start, end, allDay: values.allDay, notes: values.notes });
-      } else {
+      } else if (MOVABLE_RECORD_KINDS.has(form.event.kind)) {
         result = await actions.moveRecord(form.event.kind, form.event.recordId, values.date, values.allDay ? '' : values.startTime);
-        // A job can change hands at the same time as its day.
-        if (form.event.kind === 'task' && values.assigneeId !== form.values.assigneeId) {
-          await actions.assignTask(form.event.recordId, values.assigneeId);
-        }
+      } else {
+        // A container ETA cannot move, but it can still be given to someone.
+        result = { message: '' };
+      }
+      // Who is on it can change at the same time as when it is, and works for
+      // every kind, including the ones whose date is set elsewhere.
+      if (sameSet(values.assigneeIds, form.values.assigneeIds) === false) {
+        const assigned = await actions.assign(form.event.kind, form.event.recordId, form.event.id, values.assigneeIds);
+        result = { message: [result.message, assigned.message].filter(Boolean).join(' '), warning: result.warning };
       }
     } else if (values.kind === 'task') {
-      result = await actions.createTask(values.title, values.date, values.allDay ? '' : values.startTime, values.assigneeId);
+      result = await actions.createTask(values.title, values.date, values.allDay ? '' : values.startTime, values.assigneeIds);
     } else if (ORDER_DATE_KINDS.has(values.kind)) {
       // A visit or a handover is a date on an order; write it there.
       result = await actions.moveRecord(values.kind, values.orderId, values.date, values.allDay ? '' : values.startTime);
@@ -365,7 +374,7 @@ export default function AdminCalendar({ events, storedDetails, clashes = [], loa
   function editSelected() {
     if (!detail) return;
     const stored = storedDetails[detail.event.recordId];
-    setForm({ mode: 'edit', anchor: detail.anchor, values: formFromEvent(detail.event, stored, detail.event.assigneeId ?? ''), event: detail.event });
+    setForm({ mode: 'edit', anchor: detail.anchor, values: formFromEvent(detail.event, stored), event: detail.event });
     setDetail(null);
   }
 
@@ -544,7 +553,7 @@ export default function AdminCalendar({ events, storedDetails, clashes = [], loa
         <Popover anchor={detail.anchor} onClose={closeDetail} label="Event details" width={420} testId="event-popover">
           <EventDetail
             event={detail.event}
-            assigneeName={actions.crew.find((person) => person.id === detail.event.assigneeId)?.name}
+            assigneeNames={(detail.event.assigneeIds ?? []).map((id) => actions.crew.find((person) => person.id === id)?.name ?? 'someone')}
             stored={storedDetails[detail.event.recordId]}
             onEdit={editSelected}
             onDelete={() => void deleteSelected()}

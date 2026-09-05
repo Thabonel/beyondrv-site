@@ -27,7 +27,9 @@ export type CalendarEventKind =
   | 'meeting'
   | 'reminder';
 
-export type CalendarEventSource = 'record' | 'gm' | 'ai' | 'chat';
+export type CalendarEventSource = 'record' | 'gm' | 'ai' | 'chat' | 'crew';
+
+import { readAssignees } from './calendar-assignment-core.ts';
 
 export interface AdminCalendarEvent {
   id: string;
@@ -46,8 +48,8 @@ export interface AdminCalendarEvent {
   /** Set when the date is one someone promised a customer. */
   isCommitment: boolean;
   source: CalendarEventSource;
-  /** For a task: whose job it is. Empty means the GM's own. */
-  assigneeId?: string;
+  /** Who is on the hook for this. Empty means the GM's own. */
+  assigneeIds?: string[];
   /**
    * The product this date is about, when there is one. A customer visit and a
    * container ETA are only related if they concern the same vehicle: without
@@ -188,11 +190,11 @@ export function buildCalendarEvents(sources: CalendarSources): AdminCalendarEven
   for (const task of sources.tasks ?? []) {
     const id = text(task.id);
     if (text(task.status, 'open') !== 'open') continue;
-    const taskEvents = events.length;
+    const before = events.length;
     push(events, 'task', task.dueDate, 'task', id,
       text(task.title, 'Task'), text(task.priority, 'medium'), '', task.dueTime);
-    const assigneeId = text(task.assigneeId);
-    if (assigneeId && events.length > taskEvents) events[events.length - 1].assigneeId = assigneeId;
+    const assignees = readAssignees(task);
+    if (assignees.length && events.length > before) events[events.length - 1].assigneeIds = assignees;
   }
 
   for (const product of sources.products ?? []) {
@@ -249,5 +251,41 @@ export function calendarClashes(events: ReadonlyArray<AdminCalendarEvent>): stri
         `${visit.title} on ${visit.date}, but ${what} for that vehicle is not due until ${blocker.date}.`);
     }
   }
+  notes.push(...containerDisagreements(events));
   return [...new Set(notes)];
+}
+
+/**
+ * Two sources giving different dates for the same container.
+ *
+ * The product file carries what the website publishes. Li, or an email from
+ * the shipping line, may say something else. Neither overwrites the other:
+ * both sit on the calendar and the difference is named here, because the
+ * whole point is that somebody looks at it. A supplier saying a container
+ * arrives on a date is not the same as it arriving.
+ */
+export function containerDisagreements(events: ReadonlyArray<AdminCalendarEvent>): string[] {
+  const byProduct = new Map<string, AdminCalendarEvent[]>();
+  for (const event of events) {
+    if (event.kind !== 'container_eta' || !event.productSlug) continue;
+    const list = byProduct.get(event.productSlug) ?? [];
+    list.push(event);
+    byProduct.set(event.productSlug, list);
+  }
+
+  const notes: string[] = [];
+  for (const list of byProduct.values()) {
+    const published = list.find((event) => event.source === 'record');
+    for (const reported of list) {
+      if (reported === published || reported.source === 'record') continue;
+      const who = reported.source === 'ai' ? 'An email says' : 'Reported on a phone:';
+      if (!published) {
+        notes.push(`${who} ${reported.title.replace(/^Container ETA: /, '')} lands ${reported.date}. The product file has no ETA.`);
+        continue;
+      }
+      if (published.date === reported.date) continue;
+      notes.push(`${who} ${reported.title.replace(/^Container ETA: /, '')} lands ${reported.date}, but the product file says ${published.date}.`);
+    }
+  }
+  return notes;
 }

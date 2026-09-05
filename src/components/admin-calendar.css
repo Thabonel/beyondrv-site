@@ -372,6 +372,14 @@
   max-height: 85vh;
   overflow-y: auto;
 }
+/* Save must stay reachable when the card scrolls. */
+.gcal-popover .gcal-form__actions {
+  position: sticky;
+  bottom: -16px;
+  background: var(--gcal-bg);
+  padding: 8px 0 0;
+  margin-bottom: -8px;
+}
 
 /* Detail card. */
 .gcal-detail__actions { display: flex; justify-content: flex-end; gap: 2px; margin: 0 -8px 4px 0; }
@@ -424,6 +432,8 @@
   padding: 6px 8px;
 }
 .gcal-form__when { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+/* A class-based display beats the browser's [hidden] rule, so say it here. */
+.gcal-form__when[hidden] { display: none; }
 .gcal-form__allday { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
 .gcal-form__notes { width: 100%; resize: vertical; box-sizing: border-box; }
 .gcal-form__error { color: #c5221f; font-size: 12px; }
@@ -525,3 +535,22 @@
 }
 .gcal-crew__issued-actions button { background: var(--gcal-bg); border-color: var(--gcal-line); color: var(--gcal-text); }
 .gcal-crew__how { font-size: 11px; margin-bottom: 0 !important; }
+
+/* Who is on a job: one chip per person, several may be lit. */
+.gcal-form__people { display: flex; flex-wrap: wrap; gap: 6px; }
+.gcal-form__people button {
+  background: var(--gcal-bg);
+  border: 1px solid var(--gcal-line);
+  border-radius: 16px;
+  color: var(--gcal-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  padding: 4px 12px;
+}
+.gcal-form__people button.is-on {
+  background: var(--gcal-accent);
+  border-color: var(--gcal-accent);
+  color: #fff;
+  font-weight: 500;
+}

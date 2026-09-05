@@ -11,7 +11,7 @@ export interface StoredDetail {
 
 interface Props {
   event: AdminCalendarEvent;
-  assigneeName?: string;
+  assigneeNames?: string[];
   stored?: StoredDetail | null;
   onEdit: () => void;
   onDelete: () => void;
@@ -22,7 +22,7 @@ const RECORD_HOME: Record<AdminCalendarEvent['recordType'], string> = {
   order: 'Orders', enquiry: 'Enquiries', task: 'Tasks', product: 'Products', calendar: 'the calendar',
 };
 
-export default function EventDetail({ event, assigneeName, stored, onEdit, onDelete, onClose }: Props) {
+export default function EventDetail({ event, assigneeNames = [], stored, onEdit, onDelete, onClose }: Props) {
   const meta = EVENT_KIND_META[event.kind];
   const isStore = event.recordType === 'calendar';
   const movable = isStore || MOVABLE_RECORD_KINDS.has(event.kind);
@@ -31,7 +31,9 @@ export default function EventDetail({ event, assigneeName, stored, onEdit, onDel
   return (
     <div className="gcal-detail" data-testid="event-detail">
       <div className="gcal-detail__actions">
-        {movable && <button type="button" className="gcal-icon-btn" aria-label="Edit" title="Edit" onClick={onEdit}>✎</button>}
+        {/* Every kind is editable: even one whose date is set elsewhere can
+            have someone put on it. */}
+        <button type="button" className="gcal-icon-btn" aria-label="Edit" title="Edit" onClick={onEdit}>✎</button>
         {isStore && (
           <button type="button" className="gcal-icon-btn" aria-label={event.source === 'ai' ? 'Dismiss' : 'Delete'} title={event.source === 'ai' ? 'Dismiss' : 'Delete'} onClick={onDelete}>🗑</button>
         )}
@@ -46,9 +48,9 @@ export default function EventDetail({ event, assigneeName, stored, onEdit, onDel
       </div>
       <div className="gcal-detail__rows">
         <div><span className="gcal-detail__chip" style={{ background: meta.colour }}>{meta.label}</span>{event.isCommitment && <span className="gcal-detail__commit">Commitment to a customer</span>}</div>
-        {event.kind === 'task' && (
-          <div data-testid="event-assignee-name">{assigneeName ? `${assigneeName}'s job` : 'Your job'}</div>
-        )}
+        <div data-testid="event-assignee-name">
+          {assigneeNames.length ? `On it: ${assigneeNames.join(', ')}` : 'Nobody assigned — it is yours'}
+        </div>
         {event.detail && <div>{event.detail}</div>}
         {stored?.notes && <div className="gcal-detail__notes">{stored.notes}</div>}
         {stored?.location && <div>📍 {stored.location}</div>}

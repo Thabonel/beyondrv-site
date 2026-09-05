@@ -12,8 +12,12 @@ const KEY_STORAGE = 'beyondrv.crew.key';
 const DAY = '/.netlify/functions/crew-day';
 const WRITE = '/.netlify/functions/crew-write';
 
-interface Job { id: string; title: string; date: string; time: string; done: boolean; overdue: boolean }
+interface Job {
+  id: string; title: string; date: string; time: string; done: boolean; overdue: boolean;
+  kind?: string; tickable?: boolean; withOthers?: boolean;
+}
 interface YardItem { kind: string; title: string; time: string }
+interface ContainerOption { slug: string; title: string; publishedEta: string }
 
 interface CrewPayload {
   scope: 'crew' | 'gm';
@@ -23,10 +27,17 @@ interface CrewPayload {
   jobs?: Job[];
   yard?: YardItem[];
   note?: string;
+  containers?: ContainerOption[];
   calendar?: { events: unknown[]; clashes: string[] };
 }
 
 const YARD_LABEL: Record<string, string> = {
+  task: 'Job',
+  meeting: 'Meeting',
+  reminder: 'Reminder',
+  next_action: 'Next action',
+  follow_up: 'Follow up',
+  factory_order: 'Factory order',
   customer_visit: 'Customer visiting',
   expected_handover: 'Handover',
   expected_arrival: 'Arriving',
@@ -95,6 +106,50 @@ function formatTime(time: string) {
   return m ? `${hour}:${String(m).padStart(2, '0')}${suffix}` : `${hour}${suffix}`;
 }
 
+interface CalendarEventLike {
+  id: string; kind: string; date: string; start: string; end: string; allDay: boolean;
+  title: string; detail: string; isCommitment: boolean; source: string;
+}
+
+/**
+ * Alex's own phone view: the whole calendar for one day, read only. The full
+ * grid belongs on a desktop; on a phone what is wanted is what is on today,
+ * in order, which is what this is.
+ */
+function GmDay({ date, payload }: { date: string; payload: CrewPayload }) {
+  const events = ((payload.calendar?.events ?? []) as CalendarEventLike[])
+    .filter((event) => event.date === date)
+    .sort((a, b) => (a.allDay === b.allDay ? a.start.localeCompare(b.start) : a.allDay ? -1 : 1));
+  const clashes = payload.calendar?.clashes ?? [];
+
+  return (
+    <>
+      {clashes.length > 0 && (
+        <section className="myday__section" data-testid="myday-clashes">
+          <h2>Dates that disagree</h2>
+          {clashes.map((clash) => <p key={clash} className="myday__clash">{clash}</p>)}
+        </section>
+      )}
+      <section className="myday__section">
+        <h2>On today</h2>
+        {!events.length && <p className="myday__muted">Nothing on this day.</p>}
+        <ul className="myday__yard">
+          {events.map((event) => (
+            <li key={event.id} data-testid="myday-gm-item">
+              <span className="myday__dot" style={{ background: YARD_COLOUR[event.kind] ?? '#7986cb' }} />
+              <span className="myday__yard-when">{event.allDay ? 'All day' : formatTime(event.start.slice(11))}</span>
+              <span>
+                <strong>{YARD_LABEL[event.kind] ?? event.kind.replace(/_/g, ' ')}</strong>
+                <span className="myday__yard-title">{event.title}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </>
+  );
+}
+
 export default function MyDay() {
   const [key, setKey] = useState<string | null>(null);
   const [date, setDate] = useState(todayLocal());
@@ -105,6 +160,8 @@ export default function MyDay() {
   const [newJob, setNewJob] = useState('');
   const [note, setNote] = useState('');
   const [status, setStatus] = useState('');
+  const [reporting, setReporting] = useState(false);
+  const [container, setContainer] = useState({ slug: '', date: '', note: '' });
   const noteSaved = useRef('');
 
   useEffect(() => { setKey(readKey()); }, []);
@@ -177,6 +234,28 @@ export default function MyDay() {
     );
   }
 
+  // A "whole calendar" link is Alex's own phone view. Without this it fell
+  // through to the crew layout, which reads a jobs list a gm payload does not
+  // have, and showed an empty day.
+  if (payload?.scope === 'gm') {
+    return (
+      <main className="myday" data-testid="my-day">
+        <header className="myday__head">
+          <button type="button" aria-label="Previous day" onClick={() => setDate(addDays(date, -1))}>‹</button>
+          <div>
+            <h1 data-testid="myday-date">{longDate(date)}</h1>
+            <p className="myday__who">{payload.name} · whole calendar</p>
+          </div>
+          <button type="button" aria-label="Next day" onClick={() => setDate(addDays(date, 1))}>›</button>
+        </header>
+        {date !== payload.today && (
+          <button type="button" className="myday__today" onClick={() => setDate(payload.today)}>Back to today</button>
+        )}
+        <GmDay date={date} payload={payload} />
+      </main>
+    );
+  }
+
   const isToday = date === (payload?.today ?? todayLocal());
   const jobs = payload?.jobs ?? [];
   const yard = payload?.yard ?? [];
@@ -197,27 +276,35 @@ export default function MyDay() {
       )}
 
       <section className="myday__section">
-        <h2>Your jobs</h2>
+        <h2>Your day</h2>
         {busy && !jobs.length && <p className="myday__muted">Loading…</p>}
         {!busy && !jobs.length && <p className="myday__muted">Nothing on for this day.</p>}
         <ul className="myday__jobs">
           {jobs.map((job) => (
             <li key={job.id} className={job.done ? 'is-done' : ''} data-testid="myday-job">
-              <button
-                type="button"
-                className="myday__tick"
-                aria-label={job.done ? `Put "${job.title}" back on the list` : `Tick off "${job.title}"`}
-                aria-pressed={job.done}
-                onClick={() => void write({ action: 'complete_task', taskId: job.id })}
-              >
-                {job.done ? '✓' : ''}
-              </button>
+              {job.tickable === false ? (
+                // A visit or a handover: theirs to turn up to, not theirs to
+                // move, because the date lives on the customer's order.
+                <span className="myday__dot myday__dot--job" style={{ background: YARD_COLOUR[job.kind ?? ''] ?? '#616161' }} aria-hidden="true" />
+              ) : (
+                <button
+                  type="button"
+                  className="myday__tick"
+                  aria-label={job.done ? `Put "${job.title}" back on the list` : `Tick off "${job.title}"`}
+                  aria-pressed={job.done}
+                  onClick={() => void write({ action: 'complete_task', taskId: job.id })}
+                >
+                  {job.done ? '✓' : ''}
+                </button>
+              )}
               <span className="myday__job-title">
+                {job.tickable === false && <span className="myday__kind">{YARD_LABEL[job.kind ?? ''] ?? 'On'}</span>}
                 {job.title}
                 {job.overdue && <span className="myday__overdue">from {longDate(job.date)}</span>}
+                {job.withOthers && <span className="myday__shared">with someone else</span>}
               </span>
               {job.time && <span className="myday__time">{formatTime(job.time)}</span>}
-              {!job.done && (
+              {!job.done && job.tickable !== false && (
                 <label className="myday__move">
                   <span className="myday__sr">Move "{job.title}" to another day</span>
                   <input
@@ -275,6 +362,66 @@ export default function MyDay() {
           ))}
         </ul>
       </section>
+
+      {(payload?.containers?.length ?? 0) > 0 && (
+        <section className="myday__section">
+          <h2>Containers</h2>
+          {reporting ? (
+            <form
+              className="myday__container"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!container.slug || !container.date) return;
+                const body = { action: 'report_container', productSlug: container.slug, date: container.date, note: container.note };
+                setReporting(false);
+                setContainer({ slug: '', date: '', note: '' });
+                void write(body);
+              }}
+            >
+              <label>
+                Which vehicle
+                <select
+                  value={container.slug}
+                  onChange={(e) => setContainer((c) => ({ ...c, slug: e.target.value }))}
+                  data-testid="container-vehicle"
+                  required
+                >
+                  <option value="">Choose…</option>
+                  {payload!.containers!.map((item) => (
+                    <option key={item.slug} value={item.slug}>
+                      {item.title}{item.publishedEta ? ` — currently ${item.publishedEta}` : ''}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                When is it landing
+                <input type="date" value={container.date} onChange={(e) => setContainer((c) => ({ ...c, date: e.target.value }))} data-testid="container-date" required />
+              </label>
+              <label>
+                Who told you
+                <input
+                  value={container.note}
+                  onChange={(e) => setContainer((c) => ({ ...c, note: e.target.value }))}
+                  placeholder="the shipping line, the factory…"
+                  data-testid="container-note"
+                />
+              </label>
+              <div className="myday__container-actions">
+                <button type="button" onClick={() => setReporting(false)}>Cancel</button>
+                <button type="submit" data-testid="container-save">Tell Alex</button>
+              </div>
+            </form>
+          ) : (
+            <button type="button" className="myday__addbtn" onClick={() => setReporting(true)} data-testid="container-report">
+              + A container is arriving
+            </button>
+          )}
+          <p className="myday__muted">
+            This tells Alex what you have been told. It does not change the website.
+          </p>
+        </section>
+      )}
 
       <section className="myday__section">
         <h2>Note for this day</h2>
