@@ -417,3 +417,31 @@ test('an event created with someone on it says so when reopened', async ({ page,
   // The symptom the GM reported: it came back saying nobody was assigned.
   await expect(page.getByTestId('event-assignee-name')).toHaveText('On it: Li');
 });
+
+test('a crew link always points at the live site, never at wherever admin is open', async ({ page, isMobile }) => {
+  test.skip(Boolean(isMobile));
+  await mockCalendar(page);
+  await page.route('**/.netlify/functions/admin-crew', async (route) => {
+    if (route.request().method() === 'GET') {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ crew: [] }) });
+      return;
+    }
+    await route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify({ ok: true, key: 'k'.repeat(43), member: { id: 'c1', name: 'Li', scope: 'crew', keyIssuedAt: '', revokedAt: '', lastSeenAt: '' } }),
+    });
+  });
+  await page.goto('/admin/');
+
+  await page.getByRole('button', { name: /Crew phone links/ }).click();
+  await page.getByTestId('crew-name').fill('Li');
+  await page.getByTestId('crew-add').click();
+
+  // This test runs on 127.0.0.1. A link built from the current origin pinned
+  // the phone to whatever build admin was open on — a deploy preview is
+  // frozen, so the icon never received another fix.
+  const link = await page.getByTestId('crew-link').textContent();
+  expect(link).toBe(`https://beyondrv.com.au/my-day/#k=${'k'.repeat(43)}`);
+  expect(link).not.toContain('127.0.0.1');
+  await expect(page.getByText('this link points at it')).toBeVisible();
+});

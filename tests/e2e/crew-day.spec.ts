@@ -72,14 +72,15 @@ test('with no key the page says to ask Alex, and shows nothing else', async ({ p
   await expect(page.getByTestId('myday-job')).toHaveCount(0);
 });
 
-test('the key travels in the fragment and is cleared from the address bar', async ({ page }) => {
+test('in a browser tab the key stays in the URL, so Add to Home Screen captures it', async ({ page }) => {
   await mockCrew(page);
   await page.goto(`/my-day/#k=${KEY}`);
-
   await expect(page.getByTestId('my-day')).toBeVisible();
-  // The fragment is gone once it has been read, so the key is not sitting in
-  // the address bar or in a screenshot of it.
-  await expect.poll(() => page.evaluate(() => window.location.hash)).toBe('');
+
+  // Add to Home Screen captures the URL as it stands. On an iPhone the
+  // installed app cannot read what the Safari tab cached, so stripping the
+  // fragment here left the icon with no key and it opened to nothing.
+  await expect.poll(() => page.evaluate(() => window.location.hash)).toBe(`#k=${KEY}`);
   await expect.poll(() => page.evaluate(() => window.localStorage.getItem('beyondrv.crew.key'))).toBe(KEY);
 
   // A reload with no fragment still works, from the cached key.
@@ -87,11 +88,33 @@ test('the key travels in the fragment and is cleared from the address bar', asyn
   await expect(page.getByTestId('my-day')).toBeVisible();
 });
 
+test('once installed the key is cleared from the address bar', async ({ page }) => {
+  await mockCrew(page);
+  // Standalone: what the home-screen icon launches into. There is no address
+  // bar to show a key, and the app's own storage keeps it.
+  await page.emulateMedia({ media: 'screen', reducedMotion: null, forcedColors: null });
+  await page.addInitScript(() => {
+    const real = window.matchMedia.bind(window);
+    window.matchMedia = ((query: string) => (
+      query.includes('display-mode: standalone')
+        ? { matches: true, media: query, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {}, onchange: null, dispatchEvent: () => false }
+        : real(query)
+    )) as typeof window.matchMedia;
+  });
+  await page.goto(`/my-day/#k=${KEY}`);
+
+  await expect(page.getByTestId('my-day')).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.location.hash)).toBe('');
+  await expect.poll(() => page.evaluate(() => window.localStorage.getItem('beyondrv.crew.key'))).toBe(KEY);
+});
+
 test('their day shows their jobs, overdue ones, and the yard read-only', async ({ page }) => {
   await mockCrew(page);
   await page.goto(`/my-day/#k=${KEY}`);
 
   await expect(page.getByTestId('myday-date')).toContainText(new Date().toLocaleDateString('en-AU', { weekday: 'long' }));
+  // Whose day it is, so a link on the wrong person's phone is obvious.
+  await expect(page.getByTestId('myday-whose')).toContainText('Li');
   await expect(page.getByTestId('myday-job')).toHaveCount(3);
   await expect(page.getByText('Fit the Advent tray', { exact: true })).toBeVisible();
   await expect(page.getByTestId('myday-job').filter({ hasText: 'Chase the shipping agent' })).toContainText('from');
@@ -228,4 +251,49 @@ test('a whole-calendar link shows the day rather than an empty page', async ({ p
   await expect(page.getByTestId('myday-gm-item')).toHaveCount(2);
   await expect(page.getByTestId('myday-clashes')).toContainText('not due until');
   await expect(page.getByText('Nothing on for this day.')).toHaveCount(0);
+});
+
+test('the day refreshes when they come back to the app, and on request', async ({ page }) => {
+  // The page loaded once and never looked again, so a job given to someone
+  // after they opened it never appeared until they closed the app.
+  let jobCount = 1;
+  await page.route('**/.netlify/functions/crew-day**', (route) => route.fulfill({
+    status: 200, contentType: 'application/json',
+    body: JSON.stringify({
+      scope: 'crew', name: 'Li', today, date: today,
+      jobs: Array.from({ length: jobCount }, (_, i) => ({
+        id: `t${i}`, title: `Job ${i + 1}`, date: today, time: '', done: false, overdue: false, kind: 'task', tickable: true, withOthers: false,
+      })),
+      yard: [], note: '', containers: [],
+    }),
+  }));
+
+  await page.goto(`/my-day/#k=${KEY}`);
+  await expect(page.getByTestId('myday-job')).toHaveCount(1);
+
+  // Alex assigns another one while the phone sits in a pocket.
+  jobCount = 2;
+  await expect(page.getByTestId('myday-job')).toHaveCount(1, { timeout: 1000 });
+
+  // Coming back to the app picks it up.
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true });
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await expect(page.getByTestId('myday-job')).toHaveCount(2);
+
+  // And there is a way to ask on demand.
+  jobCount = 3;
+  await page.getByTestId('myday-refresh').click();
+  await expect(page.getByTestId('myday-job')).toHaveCount(3);
+});
+
+test('a whole-calendar link names the person too', async ({ page }) => {
+  await page.route('**/.netlify/functions/crew-day**', (route) => route.fulfill({
+    status: 200, contentType: 'application/json',
+    body: JSON.stringify({ scope: 'gm', name: 'Alex', today, date: today, calendar: { events: [], clashes: [] } }),
+  }));
+  await page.goto(`/my-day/#k=${KEY}`);
+  await expect(page.getByTestId('myday-whose')).toContainText('Alex');
+  await expect(page.getByTestId('myday-whose')).toContainText('whole calendar');
 });

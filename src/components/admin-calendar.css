@@ -554,3 +554,4 @@
   color: #fff;
   font-weight: 500;
 }
+.gcal-crew__preview-note { color: var(--gcal-accent) !important; font-size: 12px; }

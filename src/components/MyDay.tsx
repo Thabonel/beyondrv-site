@@ -57,20 +57,36 @@ const YARD_COLOUR: Record<string, string> = {
  * the address bar on the way past; an installed home-screen app relaunches
  * with the fragment, so both routes work.
  */
+/** True once the page is running from a home-screen icon rather than a tab. */
+function isInstalled() {
+  return window.matchMedia?.('(display-mode: standalone)').matches
+    || (window.navigator as { standalone?: boolean }).standalone === true;
+}
+
 function readKey(): string {
-  let key = '';
   if (typeof window === 'undefined') return '';
   const fragment = window.location.hash.match(/(?:^#|&)k=([A-Za-z0-9_-]{43})/);
   if (fragment) {
-    key = fragment[1];
+    const key = fragment[1];
     try {
       window.localStorage.setItem(KEY_STORAGE, key);
     } catch {
       // Private mode: the key lasts as long as the tab, which is enough.
     }
-    // Not history.replaceState with an empty hash, which leaves a bare "#":
-    // this restores a clean address without adding a history entry.
-    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    // Only clear it once the app is installed.
+    //
+    // Add to Home Screen captures the URL as it stands at that moment. On an
+    // iPhone the installed app also gets its own storage and cannot read what
+    // the Safari tab saved, so the key has to be in that captured URL or the
+    // icon opens to nothing. Stripping the fragment on first load — to keep it
+    // out of a screenshot of the address bar — quietly removed the one copy
+    // the install had to capture.
+    //
+    // Once installed there is no address bar to strip it from, and the app's
+    // own storage has it, so clearing it there is free.
+    if (isInstalled()) {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
     return key;
   }
   try {
@@ -203,6 +219,28 @@ export default function MyDay() {
 
   useEffect(() => { if (key) void load(date); }, [key, date, load]);
 
+  /**
+   * Reload when they come back to it.
+   *
+   * The page loaded once and never looked again, so a job Alex gave someone
+   * after they opened it simply never appeared, and the only cure was closing
+   * the app. A home-screen app is opened and left open for hours, so the
+   * moment it becomes visible again is exactly when its day is stale.
+   */
+  useEffect(() => {
+    if (!key) return;
+    const refresh = () => { if (document.visibilityState === 'visible') void load(date); };
+    document.addEventListener('visibilitychange', refresh);
+    window.addEventListener('focus', refresh);
+    // A quiet backstop for a phone left awake on the bench all afternoon.
+    const timer = window.setInterval(refresh, 120_000);
+    return () => {
+      document.removeEventListener('visibilitychange', refresh);
+      window.removeEventListener('focus', refresh);
+      window.clearInterval(timer);
+    };
+  }, [key, date, load]);
+
   async function write(body: Record<string, unknown>) {
     try {
       const result = await call(WRITE, {
@@ -244,7 +282,7 @@ export default function MyDay() {
           <button type="button" aria-label="Previous day" onClick={() => setDate(addDays(date, -1))}>‹</button>
           <div>
             <h1 data-testid="myday-date">{longDate(date)}</h1>
-            <p className="myday__who">{payload.name} · whole calendar</p>
+            <p className="myday__who" data-testid="myday-whose"><strong>{payload.name}</strong> · whole calendar</p>
           </div>
           <button type="button" aria-label="Next day" onClick={() => setDate(addDays(date, 1))}>›</button>
         </header>
@@ -267,10 +305,23 @@ export default function MyDay() {
         <button type="button" aria-label="Previous day" onClick={() => setDate(addDays(date, -1))}>‹</button>
         <div>
           <h1 data-testid="myday-date">{longDate(date)}</h1>
-          <p className="myday__who">{payload?.name ? `${payload.name} · ` : ''}{open.length} job{open.length === 1 ? '' : 's'} to do</p>
+          {/* Whose day this is, said plainly. Without it there was no way to
+              tell which link was on a phone when work went to the wrong one. */}
+          <p className="myday__who" data-testid="myday-whose">
+            {payload?.name ? <strong>{payload.name}</strong> : 'Your day'}
+            {' · '}{open.length} job{open.length === 1 ? '' : 's'} to do
+          </p>
         </div>
         <button type="button" aria-label="Next day" onClick={() => setDate(addDays(date, 1))}>›</button>
       </header>
+      <button
+        type="button"
+        className="myday__refresh"
+        onClick={() => void load(date)}
+        data-testid="myday-refresh"
+      >
+        {busy ? 'Checking…' : 'Check for anything new'}
+      </button>
       {!isToday && (
         <button type="button" className="myday__today" onClick={() => setDate(payload?.today ?? todayLocal())}>Back to today</button>
       )}
