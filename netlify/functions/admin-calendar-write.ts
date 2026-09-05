@@ -8,6 +8,7 @@ import { forbiddenResponse, getAdminActor, hasAdminCapability, unauthorizedRespo
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 import { decideMove, decideNewTask, moveWarning } from './calendar-write-core';
 import { newOwnerCopilotId, OWNER_COPILOT_TASK_STORE, taskKey } from './owner-copilot-core';
+import { ASSIGNMENT_STORE, assignmentKey, assignmentTarget, cleanAssignees } from './calendar-assignment-core';
 
 const ORDER_STORE = 'customer-orders';
 const LEAD_STATUS_STORE = 'customer-lead-status';
@@ -58,7 +59,7 @@ export const handler: Handler = async (event) => {
         title: decision.title,
         dueDate: decision.dueDate,
         dueTime: decision.dueTime,
-        assigneeId: decision.assigneeId,
+        assigneeIds: decision.assigneeIds,
         status: 'open',
         priority: 'medium',
         source: 'calendar',
@@ -68,6 +69,32 @@ export const handler: Handler = async (event) => {
         createdBy: actor.displayName || actor.id || 'admin',
       });
       return json(200, { ok: true, id, message: `Task "${decision.title}" created for ${decision.dueDate}.` });
+    }
+
+    // Putting names on anything, or taking them off. A task keeps its owners
+    // on the record; every other kind gets an assignment record, because an
+    // order has nowhere to say who is handling a visit.
+    if (body.action === 'assign') {
+      const recordId = typeof body.recordId === 'string' ? body.recordId.trim().slice(0, 240) : '';
+      const kind = typeof body.kind === 'string' ? body.kind.trim() : 'task';
+      const assigneeIds = cleanAssignees(body.assigneeIds);
+      if (!recordId) return json(400, { error: 'recordId is required.' });
+      const now = new Date().toISOString();
+      const target = assignmentTarget(kind, recordId);
+
+      if (target.store === 'task') {
+        const store = getBlobStore(OWNER_COPILOT_TASK_STORE);
+        const existing = await store.get(taskKey(target.id), { type: 'json' }) as Record<string, unknown> | null;
+        if (!existing) return json(404, { error: `No task found with id ${target.id}.` });
+        const { assigneeId: _legacy, ...rest } = existing;
+        await store.setJSON(taskKey(target.id), { ...rest, assigneeIds, updatedAt: now });
+      } else {
+        const store = getBlobStore(ASSIGNMENT_STORE);
+        if (assigneeIds.length) await store.setJSON(assignmentKey(target.id), { eventId: target.id, assigneeIds, updatedAt: now });
+        else await store.delete(assignmentKey(target.id)).catch(() => undefined);
+      }
+      const count = assigneeIds.length;
+      return json(200, { ok: true, message: count ? `Given to ${count} ${count === 1 ? 'person' : 'people'}.` : 'Taken back.' });
     }
 
     // Giving an existing job to someone, or taking it back.

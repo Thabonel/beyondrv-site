@@ -12,7 +12,10 @@ const KEY_STORAGE = 'beyondrv.crew.key';
 const DAY = '/.netlify/functions/crew-day';
 const WRITE = '/.netlify/functions/crew-write';
 
-interface Job { id: string; title: string; date: string; time: string; done: boolean; overdue: boolean }
+interface Job {
+  id: string; title: string; date: string; time: string; done: boolean; overdue: boolean;
+  kind?: string; tickable?: boolean; withOthers?: boolean;
+}
 interface YardItem { kind: string; title: string; time: string }
 
 interface CrewPayload {
@@ -197,27 +200,35 @@ export default function MyDay() {
       )}
 
       <section className="myday__section">
-        <h2>Your jobs</h2>
+        <h2>Your day</h2>
         {busy && !jobs.length && <p className="myday__muted">Loading…</p>}
         {!busy && !jobs.length && <p className="myday__muted">Nothing on for this day.</p>}
         <ul className="myday__jobs">
           {jobs.map((job) => (
             <li key={job.id} className={job.done ? 'is-done' : ''} data-testid="myday-job">
-              <button
-                type="button"
-                className="myday__tick"
-                aria-label={job.done ? `Put "${job.title}" back on the list` : `Tick off "${job.title}"`}
-                aria-pressed={job.done}
-                onClick={() => void write({ action: 'complete_task', taskId: job.id })}
-              >
-                {job.done ? '✓' : ''}
-              </button>
+              {job.tickable === false ? (
+                // A visit or a handover: theirs to turn up to, not theirs to
+                // move, because the date lives on the customer's order.
+                <span className="myday__dot myday__dot--job" style={{ background: YARD_COLOUR[job.kind ?? ''] ?? '#616161' }} aria-hidden="true" />
+              ) : (
+                <button
+                  type="button"
+                  className="myday__tick"
+                  aria-label={job.done ? `Put "${job.title}" back on the list` : `Tick off "${job.title}"`}
+                  aria-pressed={job.done}
+                  onClick={() => void write({ action: 'complete_task', taskId: job.id })}
+                >
+                  {job.done ? '✓' : ''}
+                </button>
+              )}
               <span className="myday__job-title">
+                {job.tickable === false && <span className="myday__kind">{YARD_LABEL[job.kind ?? ''] ?? 'On'}</span>}
                 {job.title}
                 {job.overdue && <span className="myday__overdue">from {longDate(job.date)}</span>}
+                {job.withOthers && <span className="myday__shared">with someone else</span>}
               </span>
               {job.time && <span className="myday__time">{formatTime(job.time)}</span>}
-              {!job.done && (
+              {!job.done && job.tickable !== false && (
                 <label className="myday__move">
                   <span className="myday__sr">Move "{job.title}" to another day</span>
                   <input

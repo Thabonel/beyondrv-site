@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  crewAssignedItems,
   crewJobsFor,
   crewKeyMatches,
   decideCrewWrite,
@@ -82,8 +83,10 @@ test('a person needs a name and a known scope', () => {
 
 test('a crew member may act only on a task assigned to them', () => {
   const li = { id: 'crew-li', scope: 'crew' as const };
-  assert.equal(mayActOnTask(li, { id: 't1', assigneeId: 'crew-li' }), true);
-  assert.equal(mayActOnTask(li, { id: 't2', assigneeId: 'crew-oscar' }), false);
+  assert.equal(mayActOnTask(li, { id: 't1', assigneeIds: ['crew-li'] }), true);
+  assert.equal(mayActOnTask(li, { id: 't1b', assigneeIds: ['crew-oscar', 'crew-li'] }), true, 'a shared job is still theirs');
+  assert.equal(mayActOnTask(li, { id: 't1c', assigneeId: 'crew-li' }), true, 'a task written before the change still works');
+  assert.equal(mayActOnTask(li, { id: 't2', assigneeIds: ['crew-oscar'] }), false);
   assert.equal(mayActOnTask(li, { id: 't3' }), false, 'an unassigned task belongs to Alex');
   assert.equal(mayActOnTask(li, null), false);
   assert.equal(mayActOnTask({ id: 'crew-alex', scope: 'gm' }, { id: 't3' }), true);
@@ -108,17 +111,17 @@ test('the yard shows what and when, and nothing about money or order state', () 
 
 test('their jobs are their own, for the day being looked at', () => {
   const tasks = [
-    { id: 't1', title: 'Fit the tray', assigneeId: 'crew-li', dueDate: '2026-09-05', status: 'open' },
-    { id: 't2', title: 'Oscar\'s job', assigneeId: 'crew-oscar', dueDate: '2026-09-05', status: 'open' },
+    { id: 't1', title: 'Fit the tray', assigneeIds: ['crew-li'], dueDate: '2026-09-05', status: 'open' },
+    { id: 't2', title: 'Oscar\'s job', assigneeIds: ['crew-oscar'], dueDate: '2026-09-05', status: 'open' },
     { id: 't3', title: 'Unassigned', dueDate: '2026-09-05', status: 'open' },
-    { id: 't4', title: 'Another day', assigneeId: 'crew-li', dueDate: '2026-09-08', status: 'open' },
+    { id: 't4', title: 'Another day', assigneeIds: ['crew-li'], dueDate: '2026-09-08', status: 'open' },
   ];
   const jobs = crewJobsFor(tasks, 'crew-li', '2026-09-05', '2026-09-05');
   assert.deepEqual(jobs.map((job) => job.id), ['t1']);
 });
 
 test('an overdue job follows them to today, but does not appear on a day in the past', () => {
-  const tasks = [{ id: 't1', title: 'Late', assigneeId: 'crew-li', dueDate: '2026-09-01', status: 'open' }];
+  const tasks = [{ id: 't1', title: 'Late', assigneeIds: ['crew-li'], dueDate: '2026-09-01', status: 'open' }];
   const onToday = crewJobsFor(tasks, 'crew-li', '2026-09-05', '2026-09-05');
   assert.deepEqual(onToday.map((job) => [job.id, job.overdue]), [['t1', true]]);
   assert.deepEqual(crewJobsFor(tasks, 'crew-li', '2026-09-03', '2026-09-05'), [],
@@ -129,8 +132,8 @@ test('an overdue job follows them to today, but does not appear on a day in the 
 
 test('done jobs sort below open ones and are still shown', () => {
   const tasks = [
-    { id: 'done', title: 'Finished', assigneeId: 'crew-li', dueDate: '2026-09-05', status: 'completed' },
-    { id: 'open', title: 'To do', assigneeId: 'crew-li', dueDate: '2026-09-05', status: 'open', dueTime: '09:00' },
+    { id: 'done', title: 'Finished', assigneeIds: ['crew-li'], dueDate: '2026-09-05', status: 'completed' },
+    { id: 'open', title: 'To do', assigneeIds: ['crew-li'], dueDate: '2026-09-05', status: 'open', dueTime: '09:00' },
   ];
   const jobs = crewJobsFor(tasks, 'crew-li', '2026-09-05', '2026-09-05');
   assert.deepEqual(jobs.map((job) => [job.id, job.done]), [['open', false], ['done', true]]);
@@ -160,4 +163,20 @@ test('repeated bad keys lock the address out, and a quiet gap clears the count',
   assert.equal(isLockedOut(record, later), false, 'the lockout expires');
   const afterGap = registerFailedAttempt(record, later);
   assert.equal(afterGap.failures.length, 1, 'attempts outside the window are forgotten');
+});
+
+test('anything with their name on it appears on their day, not only tasks', () => {
+  const events = [
+    { id: 'expected_handover:o1', kind: 'expected_handover', date: '2026-09-05', title: 'Handover · Ben', allDay: false, start: '2026-09-05T14:00', assigneeIds: ['crew-li'] },
+    { id: 'customer_visit:o2', kind: 'customer_visit', date: '2026-09-05', title: 'Visit · Ann', allDay: true, start: '2026-09-05', assigneeIds: ['crew-li', 'crew-oscar'] },
+    { id: 'customer_visit:o3', kind: 'customer_visit', date: '2026-09-05', title: 'Not theirs', allDay: true, start: '2026-09-05', assigneeIds: ['crew-oscar'] },
+    { id: 'task:t1', kind: 'task', date: '2026-09-05', title: 'A task', allDay: true, start: '2026-09-05', assigneeIds: ['crew-li'] },
+    { id: 'customer_visit:o4', kind: 'customer_visit', date: '2026-09-06', title: 'Another day', allDay: true, start: '2026-09-06', assigneeIds: ['crew-li'] },
+  ];
+  const mine = crewAssignedItems(events, 'crew-li', '2026-09-05');
+  assert.deepEqual(mine.map((item) => item.title), ['Handover · Ben', 'Visit · Ann'],
+    'tasks come from crewJobsFor, so they are not doubled up here');
+  assert.equal(mine[0].tickable, false, 'the date belongs to the order, so it is not theirs to move');
+  assert.equal(mine[1].withOthers, true, 'two people are on the visit');
+  assert.equal(mine[0].withOthers, false);
 });

@@ -215,39 +215,59 @@ test('the crew phone links section is visible without scrolling the sidebar', as
   expect(crewBox!.y).toBeLessThan(calendarsBox!.y);
 });
 
-test('a job can be given to a crew member when it is created', async ({ page, isMobile }) => {
+test('any item can be given to several people', async ({ page, isMobile }) => {
   test.skip(Boolean(isMobile));
   const { writes } = await mockCalendar(page);
   await page.goto('/admin/');
 
   await page.getByTestId('calendar-create').click();
-  await page.getByTestId('event-form').getByRole('radio', { name: 'Task' }).click();
+  const form = page.getByTestId('event-form');
+  // The picker is there for every kind, not just tasks: two people may be on
+  // a handover, and both need it on their phone.
+  await expect(page.getByTestId('event-assignees')).toBeVisible();
+  await form.getByRole('radio', { name: 'Task' }).click();
+  await expect(page.getByTestId('event-assignees')).toBeVisible();
 
-  const who = page.getByTestId('event-assignee');
-  await expect(who).toBeVisible();
-  // Someone whose link was revoked is not offered a job.
-  await expect(who.locator('option')).toHaveText(['Mine', 'Li', 'Oscar']);
+  // Someone whose link was revoked is not offered work.
+  await expect(page.getByTestId('event-assignee-crew-gone')).toHaveCount(0);
 
   await page.getByTestId('event-title').fill('Fit the Advent tray');
-  await who.selectOption('crew-li');
+  await page.getByTestId('event-assignee-crew-li').click();
+  await page.getByTestId('event-assignee-crew-oscar').click();
+  await expect(page.getByTestId('event-assignee-crew-li')).toHaveAttribute('aria-pressed', 'true');
   await page.getByTestId('event-save').click();
 
   await expect.poll(() => writes.length).toBe(1);
-  expect(writes[0].body).toMatchObject({ action: 'create_task', title: 'Fit the Advent tray', assigneeId: 'crew-li' });
+  expect(writes[0].body).toMatchObject({ action: 'create_task', title: 'Fit the Advent tray', assigneeIds: ['crew-li', 'crew-oscar'] });
 });
 
-test('the popup only asks whose job it is for a task', async ({ page, isMobile }) => {
+test('a person can be taken off an item again', async ({ page, isMobile }) => {
   test.skip(Boolean(isMobile));
   await mockCalendar(page);
   await page.goto('/admin/');
-
   await page.getByTestId('calendar-create').click();
-  const form = page.getByTestId('event-form');
-  await expect(page.getByTestId('event-assignee')).toHaveCount(0);
-  await form.getByRole('radio', { name: 'Task' }).click();
-  await expect(page.getByTestId('event-assignee')).toBeVisible();
-  await form.getByRole('radio', { name: 'Meeting' }).click();
-  await expect(page.getByTestId('event-assignee')).toHaveCount(0);
+
+  const li = page.getByTestId('event-assignee-crew-li');
+  await li.click();
+  await expect(li).toHaveAttribute('aria-pressed', 'true');
+  await li.click();
+  await expect(li).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.getByText('Nobody picked: it stays yours.')).toBeVisible();
+});
+
+test('a customer visit can be handed to someone even though its date lives on the order', async ({ page, isMobile }) => {
+  test.skip(Boolean(isMobile));
+  const { writes } = await mockCalendar(page);
+  await page.goto('/admin/');
+
+  await page.locator('.fc-event.gcal-kind-customer_visit').click();
+  await page.getByTestId('event-detail').getByRole('button', { name: 'Edit' }).click();
+  await page.getByTestId('event-assignee-crew-oscar').click();
+  await page.getByTestId('event-save').click();
+
+  await expect.poll(() => writes.map((w) => (w.body as Record<string, unknown>).action ?? 'move')).toContain('assign');
+  const assign = writes.find((write) => (write.body as Record<string, unknown>).action === 'assign');
+  expect(assign?.body).toMatchObject({ action: 'assign', kind: 'customer_visit', recordId: 'o1', assigneeIds: ['crew-oscar'] });
 });
 
 test('Save stays reachable when the popup grows past the bottom of the window', async ({ page, isMobile }) => {
@@ -266,7 +286,7 @@ test('Save stays reachable when the popup grows past the bottom of the window', 
   // card measured itself once on open, so it used to grow off the bottom and
   // Save became unclickable.
   await page.getByTestId('event-form').getByRole('radio', { name: 'Task' }).click();
-  await expect(page.getByTestId('event-assignee')).toBeVisible();
+  await expect(page.getByTestId('event-assignees')).toBeVisible();
   await expect(save).toBeInViewport();
 
   await save.click();
@@ -276,4 +296,25 @@ test('Save stays reachable when the popup grows past the bottom of the window', 
   await page.getByTestId('event-title').fill('Fit the Advent tray');
   await save.click();
   await expect(page.getByTestId('event-form')).toHaveCount(0);
+});
+
+test('a container ETA can be given to someone even though its date cannot move here', async ({ page, isMobile }) => {
+  test.skip(Boolean(isMobile));
+  const { writes } = await mockCalendar(page);
+  await page.goto('/admin/');
+  // The ETA is a few days out, so show the month to reach it.
+  await page.getByTestId('calendar-view').selectOption('month');
+
+  await page.locator('.fc-event.gcal-kind-container_eta').first().click();
+  await page.getByTestId('event-detail').getByRole('button', { name: 'Edit' }).click();
+  // Its date lives on the product file and ships through Pending review, so
+  // the date controls are not offered.
+  await expect(page.getByTestId('event-date')).toBeHidden();
+  await expect(page.getByText('Its date is set where the record is.')).toBeVisible();
+
+  await page.getByTestId('event-assignee-crew-li').click();
+  await page.getByTestId('event-save').click();
+
+  await expect.poll(() => writes.map((w) => (w.body as Record<string, unknown>).action ?? 'move')).toEqual(['assign']);
+  expect(writes[0].body).toMatchObject({ kind: 'container_eta', recordId: 'advent-2450', assigneeIds: ['crew-li'] });
 });

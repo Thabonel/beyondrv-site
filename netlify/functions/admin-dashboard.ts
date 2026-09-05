@@ -11,6 +11,7 @@ import { mapWithConcurrency, selectExistingKeys } from './blob-batch';
 import { connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 import { visitReadiness } from './visit-readiness-core';
 import { buildCalendarEvents, calendarClashes } from './calendar-events-core';
+import { applyAssignments, ASSIGNMENT_STORE } from './calendar-assignment-core';
 import {
   buildLeadIntelligence,
   OWNER_COPILOT_TASK_STORE,
@@ -275,6 +276,26 @@ async function getLeadStatuses(enquiries: EnquiryRecord[]) {
       error: safeBlobStoreError(error),
     });
     return new Map<string, LeadStatusRecord | null>();
+  }
+}
+
+/** Who is on the hook for each dated thing. Missing is not an error: the
+ *  calendar simply shows nobody's name. */
+async function listAssignments(): Promise<Array<Record<string, unknown>>> {
+  try {
+    const store = getBlobStore(ASSIGNMENT_STORE);
+    const { blobs } = await store.list({ prefix: 'assignments/' });
+    const rows = await mapWithConcurrency(blobs, BLOB_READ_CONCURRENCY, async (blob) => {
+      try {
+        return await store.get(blob.key, { type: 'json' }) as Record<string, unknown> | null;
+      } catch {
+        return null;
+      }
+    });
+    return rows.filter((row): row is Record<string, unknown> => Boolean(row));
+  } catch (error) {
+    console.warn('admin-dashboard: calendar assignments unavailable', { error: safeBlobStoreError(error) });
+    return [];
   }
 }
 
@@ -860,12 +881,13 @@ export const handler: Handler = async (event) => {
   // The same records the dashboard already read, projected onto one timeline.
   // Tasks included: a task created from the calendar has to come back to it.
   const { all: allTasks, ...taskSummaryForClient } = taskSummary;
-  const calendarEvents = buildCalendarEvents({
+  const calendarAssignments = await listAssignments();
+  const calendarEvents = applyAssignments(buildCalendarEvents({
     orders: orders as unknown as Array<Record<string, unknown>>,
     products: products as unknown as Array<Record<string, unknown>>,
     enquiries: enquiries as unknown as Array<Record<string, unknown>>,
     tasks: allTasks,
-  });
+  }), calendarAssignments);
 
   const visitReadinessReport = visitReadiness(
     orders as unknown as Array<Record<string, unknown>>,

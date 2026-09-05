@@ -93,8 +93,8 @@ export default function AdminCalendarPanel() {
     updateStoreEvent: (id, body) => post(EVENTS, 'PATCH', { id, ...body }),
     deleteStoreEvent: (id) => post(EVENTS, 'DELETE', { id }),
     moveRecord: (kind, recordId, date, time) => post(WRITE, 'POST', { kind, recordId, date, time }),
-    createTask: (title, date, time, assigneeId) => post(WRITE, 'POST', { action: 'create_task', title, date, time, assigneeId }),
-    assignTask: (recordId, assigneeId) => post(WRITE, 'POST', { action: 'assign_task', recordId, assigneeId }),
+    createTask: (title, date, time, assigneeIds) => post(WRITE, 'POST', { action: 'create_task', title, date, time, assigneeIds }),
+    assign: (kind, recordId, assigneeIds) => post(WRITE, 'POST', { action: 'assign', kind, recordId, assigneeIds }),
     crew,
     loadOrders: async () => {
       const data = await call<{ orders?: Array<Record<string, unknown>> }>(ORDERS);

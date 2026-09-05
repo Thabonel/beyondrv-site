@@ -3,7 +3,7 @@
  * first and focused, then when, then what kind of thing it is.
  */
 import React, { useEffect, useRef, useState } from 'react';
-import { CREATABLE_KINDS, endForNewStart, EVENT_KIND_META, ORDER_DATE_KINDS, TIMED_RECORD_KINDS, type AdminCalendarEvent } from './calendar-model';
+import { CREATABLE_KINDS, endForNewStart, EVENT_KIND_META, MOVABLE_RECORD_KINDS, ORDER_DATE_KINDS, TIMED_RECORD_KINDS, type AdminCalendarEvent } from './calendar-model';
 
 export interface EventFormValues {
   title: string;
@@ -14,7 +14,7 @@ export interface EventFormValues {
   allDay: boolean;
   notes: string;
   orderId: string;
-  assigneeId: string;
+  assigneeIds: string[];
 }
 
 export interface OrderOption { id: string; label: string }
@@ -40,6 +40,7 @@ export default function EventForm({ mode, initial, event, orders, crew, onLoadOr
 
   const editingRecord = mode === 'edit' && event?.recordType !== 'calendar';
   const canHoldTime = !editingRecord || (event ? TIMED_RECORD_KINDS.has(event.kind) : true);
+  const canMove = !editingRecord || (event ? MOVABLE_RECORD_KINDS.has(event.kind) : true);
   const kindLabel = event ? EVENT_KIND_META[event.kind].label : '';
 
   useEffect(() => { titleRef.current?.focus(); }, []);
@@ -76,7 +77,11 @@ export default function EventForm({ mode, initial, event, orders, crew, onLoadOr
         <div className="gcal-form__record">
           <span className="gcal-form__chip" style={{ background: event ? EVENT_KIND_META[event.kind].colour : '#616161' }}>{kindLabel}</span>
           <strong>{event?.title}</strong>
-          <span className="gcal-muted">Lives on the {event?.recordType} {event?.recordId}. Only the date{canHoldTime ? ' and time' : ''} can change here.</span>
+          <span className="gcal-muted">
+            Lives on the {event?.recordType} {event?.recordId}.
+            {' '}Change who is on it here{canMove ? `, and the date${canHoldTime ? ' and time' : ''}` : ''}.
+            {!canMove && ' Its date is set where the record is.'}
+          </span>
         </div>
       ) : ORDER_DATE_KINDS.has(values.kind) && mode === 'create' ? (
         <div className="gcal-form__title gcal-muted" data-testid="event-title-from-order">
@@ -110,16 +115,35 @@ export default function EventForm({ mode, initial, event, orders, crew, onLoadOr
         </div>
       )}
 
-      {(values.kind === 'task' || event?.kind === 'task') && (
-        <label className="gcal-form__field">
-          <span>Whose job</span>
-          <select value={values.assigneeId} onChange={(e) => set('assigneeId', e.target.value)} data-testid="event-assignee">
-            <option value="">Mine</option>
-            {crew.map((person) => <option key={person.id} value={person.id}>{person.name}</option>)}
-          </select>
-          {!crew.length && <span className="gcal-muted">Add people under Crew phone links to give them jobs.</span>}
-        </label>
-      )}
+      {/* Any kind can be given to anyone: two people fit a tray, and a
+          handover may need both of them there. */}
+      <div className="gcal-form__field" data-testid="event-assignees">
+        <span>Who is on it</span>
+        {crew.length ? (
+          <div className="gcal-form__people" role="group" aria-label="Who is on it">
+            {crew.map((person) => {
+              const on = values.assigneeIds.includes(person.id);
+              return (
+                <button
+                  key={person.id}
+                  type="button"
+                  aria-pressed={on}
+                  className={on ? 'is-on' : ''}
+                  data-testid={`event-assignee-${person.id}`}
+                  onClick={() => set('assigneeIds', on
+                    ? values.assigneeIds.filter((id) => id !== person.id)
+                    : [...values.assigneeIds, person.id])}
+                >
+                  {on ? '\u2713 ' : ''}{person.name}
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <span className="gcal-muted">Add people under Crew phone links to give them work.</span>
+        )}
+        {crew.length > 0 && !values.assigneeIds.length && <span className="gcal-muted">Nobody picked: it stays yours.</span>}
+      </div>
 
       {ORDER_DATE_KINDS.has(values.kind) && mode === 'create' && (
         <label className="gcal-form__field">
@@ -131,9 +155,9 @@ export default function EventForm({ mode, initial, event, orders, crew, onLoadOr
         </label>
       )}
 
-      <div className="gcal-form__when">
+      <div className="gcal-form__when" hidden={!canMove}>
         <span aria-hidden="true">🕒</span>
-        <input type="date" value={values.date} onChange={(e) => set('date', e.target.value)} aria-label="Date" data-testid="event-date" required />
+        <input type="date" value={values.date} onChange={(e) => set('date', e.target.value)} aria-label="Date" data-testid="event-date" required={canMove} />
         {!values.allDay && canHoldTime && (
           <>
             <input
@@ -153,7 +177,7 @@ export default function EventForm({ mode, initial, event, orders, crew, onLoadOr
           </>
         )}
       </div>
-      {canHoldTime && (
+      {canHoldTime && canMove && (
         <label className="gcal-form__allday">
           <input type="checkbox" checked={values.allDay} onChange={(e) => set('allDay', e.target.checked)} /> All day
         </label>

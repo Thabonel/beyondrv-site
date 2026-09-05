@@ -29,6 +29,8 @@ export type CalendarEventKind =
 
 export type CalendarEventSource = 'record' | 'gm' | 'ai' | 'chat';
 
+import { readAssignees } from './calendar-assignment-core.ts';
+
 export interface AdminCalendarEvent {
   id: string;
   kind: CalendarEventKind;
@@ -46,8 +48,8 @@ export interface AdminCalendarEvent {
   /** Set when the date is one someone promised a customer. */
   isCommitment: boolean;
   source: CalendarEventSource;
-  /** For a task: whose job it is. Empty means the GM's own. */
-  assigneeId?: string;
+  /** Who is on the hook for this. Empty means the GM's own. */
+  assigneeIds?: string[];
   /**
    * The product this date is about, when there is one. A customer visit and a
    * container ETA are only related if they concern the same vehicle: without
@@ -188,11 +190,11 @@ export function buildCalendarEvents(sources: CalendarSources): AdminCalendarEven
   for (const task of sources.tasks ?? []) {
     const id = text(task.id);
     if (text(task.status, 'open') !== 'open') continue;
-    const taskEvents = events.length;
+    const before = events.length;
     push(events, 'task', task.dueDate, 'task', id,
       text(task.title, 'Task'), text(task.priority, 'medium'), '', task.dueTime);
-    const assigneeId = text(task.assigneeId);
-    if (assigneeId && events.length > taskEvents) events[events.length - 1].assigneeId = assigneeId;
+    const assignees = readAssignees(task);
+    if (assignees.length && events.length > before) events[events.length - 1].assigneeIds = assignees;
   }
 
   for (const product of sources.products ?? []) {

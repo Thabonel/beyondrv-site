@@ -18,6 +18,7 @@
  */
 
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
+import { readAssignees } from './calendar-assignment-core.ts';
 
 export const CREW_STORE = 'calendar-crew';
 export const DAY_NOTE_STORE = 'calendar-day-notes';
@@ -119,7 +120,8 @@ export function validateCrewMember(input: Record<string, unknown>): CrewValidati
 export function mayActOnTask(member: Pick<CrewMember, 'id' | 'scope'>, task: Record<string, unknown> | null): boolean {
   if (!task) return false;
   if (member.scope === 'gm') return true;
-  return typeof task.assigneeId === 'string' && task.assigneeId === member.id;
+  // A job shared with someone else is still theirs to tick off.
+  return readAssignees(task).includes(member.id);
 }
 
 export interface CrewWriteRequest {
@@ -165,6 +167,33 @@ export function decideCrewWrite(body: CrewWriteRequest): CrewWriteDecision {
   return { ok: false, error: `"${action}" is not something this page can do.` };
 }
 
+/**
+ * Anything other than a task that has this person's name on it: a handover
+ * they are doing, a visit they are meeting. Shown on their day but not
+ * tickable, because the date belongs to an order and is not theirs to move.
+ */
+export function crewAssignedItems(
+  events: ReadonlyArray<Record<string, unknown>>,
+  crewId: string,
+  date: string,
+): CrewJob[] {
+  return events
+    .filter((event) => event.date === date && String(event.kind) !== 'task')
+    .filter((event) => Array.isArray(event.assigneeIds) && (event.assigneeIds as string[]).includes(crewId))
+    .map((event) => ({
+      id: String(event.id ?? ''),
+      title: String(event.title ?? '').slice(0, 180),
+      date,
+      time: event.allDay === false && typeof event.start === 'string' ? event.start.slice(11, 16) : '',
+      done: false,
+      overdue: false,
+      kind: String(event.kind),
+      tickable: false,
+      withOthers: (event.assigneeIds as string[]).length > 1,
+    }))
+    .sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99') || a.title.localeCompare(b.title));
+}
+
 /** What a crew member sees of the yard: the shape of the day, and nothing about money. */
 export interface YardItem {
   kind: string;
@@ -198,6 +227,12 @@ export interface CrewJob {
   time: string;
   done: boolean;
   overdue: boolean;
+  /** The event kind, so the phone can show what sort of thing it is. */
+  kind: string;
+  /** Only a task can be ticked off or moved; the rest are shown, not touched. */
+  tickable: boolean;
+  /** Named when more than one person is on it, so nobody assumes they are alone. */
+  withOthers: boolean;
 }
 
 /**
@@ -211,7 +246,7 @@ export function crewJobsFor(
   date: string,
   today: string,
 ): CrewJob[] {
-  const mine = tasks.filter((task) => task.assigneeId === crewId && typeof task.id === 'string');
+  const mine = tasks.filter((task) => readAssignees(task).includes(crewId) && typeof task.id === 'string');
   const jobs: CrewJob[] = [];
   for (const task of mine) {
     const due = typeof task.dueDate === 'string' ? task.dueDate : '';
@@ -227,6 +262,9 @@ export function crewJobsFor(
       time: typeof task.dueTime === 'string' ? task.dueTime : '',
       done,
       overdue: showAsOverdue && !onThisDay,
+      kind: 'task',
+      tickable: true,
+      withOthers: readAssignees(task).length > 1,
     });
   }
   return jobs.sort((a, b) =>

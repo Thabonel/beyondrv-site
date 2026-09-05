@@ -197,3 +197,15 @@
   .myday__addbtn, .myday__add input, .myday textarea { background: #1a1a1a; color: #f2f2f2; }
   .myday__add button { background: #1e1e1e; color: #f2f2f2; }
 }
+
+/* An item that is theirs to turn up to, not theirs to move. */
+.myday__dot--job { justify-self: center; width: 14px; height: 14px; }
+.myday__kind {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.myday__shared { display: block; color: var(--muted); font-size: 13px; }

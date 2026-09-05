@@ -9,7 +9,8 @@ import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreErro
 import { buildCalendarEvents, calendarClashes } from './calendar-events-core';
 import { toAdminCalendarEvent, type CompanyCalendarEvent } from './calendar-store-core';
 import { listCalendarEvents } from './admin-calendar-events';
-import { crewJobsFor, DAY_NOTE_STORE, dayNoteKey, isIsoDate, toYardItems } from './crew-core';
+import { crewAssignedItems, crewJobsFor, DAY_NOTE_STORE, dayNoteKey, isIsoDate, toYardItems } from './crew-core';
+import { applyAssignments, ASSIGNMENT_STORE } from './calendar-assignment-core';
 import { authenticateCrew, json, refusal } from './crew-auth';
 import { OWNER_COPILOT_TASK_STORE } from './owner-copilot-core';
 import { listJsonStore } from './owner-copilot-store-utils';
@@ -17,6 +18,24 @@ import catalogue from './product-catalogue.json';
 
 const ORDER_STORE = 'customer-orders';
 const ENQUIRY_STORE = 'customer-enquiries';
+
+/** An assignment store that has never been written is not an error. */
+async function listJsonStoreLoose(store: string): Promise<Array<Record<string, unknown>>> {
+  try {
+    const blobStore = getBlobStore(store);
+    const { blobs } = await blobStore.list({ prefix: 'assignments/' });
+    const rows = await Promise.all(blobs.map(async (blob) => {
+      try {
+        return await blobStore.get(blob.key, { type: 'json' }) as Record<string, unknown> | null;
+      } catch {
+        return null;
+      }
+    }));
+    return rows.filter((row): row is Record<string, unknown> => Boolean(row));
+  } catch {
+    return [];
+  }
+}
 
 function brisbaneToday() {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Australia/Brisbane', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
@@ -50,10 +69,11 @@ export const handler: Handler = async (event) => {
       listJsonStore(OWNER_COPILOT_TASK_STORE).catch(() => [] as Record<string, unknown>[]),
       listCalendarEvents(addDays(date, -1), addDays(date, 1)).catch(() => [] as CompanyCalendarEvent[]),
     ]);
-    const events = [
+    const assignments = await listJsonStoreLoose(ASSIGNMENT_STORE);
+    const events = applyAssignments([
       ...buildCalendarEvents({ orders, enquiries, tasks, products: catalogue as unknown as Record<string, unknown>[] }),
       ...stored.map(toAdminCalendarEvent),
-    ];
+    ], assignments);
 
     if (member.scope === 'gm') {
       // Alex's own phone link: the calendar as the admin page builds it, for a
@@ -85,7 +105,10 @@ export const handler: Handler = async (event) => {
       name: member.name,
       today,
       date,
-      jobs: crewJobsFor(tasks, member.id, date, today),
+      jobs: [
+        ...crewJobsFor(tasks, member.id, date, today),
+        ...crewAssignedItems(events as unknown as Record<string, unknown>[], member.id, date),
+      ],
       yard: toYardItems(events as unknown as Record<string, unknown>[], date),
       note,
     });
