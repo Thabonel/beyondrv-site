@@ -33,6 +33,12 @@ export interface AdminCalendarEvent {
   recordId: string;
   /** Set when the date is one someone promised a customer. */
   isCommitment: boolean;
+  /**
+   * The product this date is about, when there is one. A customer visit and a
+   * container ETA are only related if they concern the same vehicle: without
+   * this, every visit would appear to depend on every container in the yard.
+   */
+  productSlug?: string;
 }
 
 /** Colour is meaning here, so it lives with the kind rather than in the view. */
@@ -63,6 +69,7 @@ function push(
   recordId: string,
   title: string,
   detail: string,
+  productSlug = '',
 ) {
   if (!isIsoDate(date) || !recordId) return;
   events.push({
@@ -74,6 +81,7 @@ function push(
     recordType,
     recordId,
     isCommitment: EVENT_KIND_META[kind].commitment,
+    ...(productSlug ? { productSlug } : {}),
   });
 }
 
@@ -93,12 +101,13 @@ export function buildCalendarEvents(sources: CalendarSources): AdminCalendarEven
     const what = text(order.productTitle);
     const suffix = what ? ` · ${what}` : '';
     const status = text(order.status).replace(/_/g, ' ');
+    const slug = text(order.productSlug);
     push(events, 'customer_visit', order.customerVisitDate, 'order', id,
-      `${who} visiting${suffix}`, `Order status: ${status || 'unknown'}`);
+      `${who} visiting${suffix}`, `Order status: ${status || 'unknown'}`, slug);
     push(events, 'expected_handover', order.expectedHandoverDate, 'order', id,
       `Handover${suffix ? ':' + suffix : ''} · ${who}`, `Order status: ${status || 'unknown'}`);
     push(events, 'expected_arrival', order.expectedArrivalDate, 'order', id,
-      `Arrival due${suffix} · ${who}`, `Order status: ${status || 'unknown'}`);
+      `Arrival due${suffix} · ${who}`, `Order status: ${status || 'unknown'}`, slug);
     push(events, 'factory_order', order.factoryOrderDate, 'order', id,
       `Factory order${suffix}`, who);
     push(events, 'next_action', order.nextActionDate, 'order', id,
@@ -125,7 +134,7 @@ export function buildCalendarEvents(sources: CalendarSources): AdminCalendarEven
     const slug = text(product.slug);
     push(events, 'container_eta', product.containerEtaDate, 'product', slug,
       `Container ETA: ${text(product.title, slug)}`,
-      text(product.containerEtaText, 'Confirm before promising a viewing'));
+      text(product.containerEtaText, 'Confirm before promising a viewing'), slug);
   }
 
   // Soonest first, then commitments ahead of everything else on the same day:
@@ -137,19 +146,29 @@ export function buildCalendarEvents(sources: CalendarSources): AdminCalendarEven
 }
 
 /**
- * A visit and a container ETA on the same order that disagree. Surfaced on the
- * calendar as well as the dashboard, because the whole point of one timeline is
- * that a clash is visible without anyone going looking for it.
+ * What a customer visit depends on: the vehicle being here.
+ *
+ * Matched on the product, not on the dates alone. A visit is only threatened by
+ * the container carrying that customer's vehicle, and by the arrival date on
+ * that customer's own order. Comparing every visit against every container
+ * would raise an alarm every time any vehicle anywhere was late, and an alarm
+ * that is usually wrong gets ignored, which is how the first one was missed.
  */
 export function calendarClashes(events: ReadonlyArray<AdminCalendarEvent>): string[] {
   const visits = events.filter((event) => event.kind === 'customer_visit');
-  const etas = events.filter((event) => event.kind === 'container_eta');
+  const blockers = events.filter((event) =>
+    event.kind === 'container_eta' || event.kind === 'expected_arrival');
   const notes: string[] = [];
+
   for (const visit of visits) {
-    for (const eta of etas) {
-      if (eta.date > visit.date) {
-        notes.push(`${visit.title} on ${visit.date}, but a container ETA falls later on ${eta.date}.`);
-      }
+    for (const blocker of blockers) {
+      const sameVehicle = Boolean(visit.productSlug) && visit.productSlug === blocker.productSlug;
+      const sameOrder = blocker.kind === 'expected_arrival' && blocker.recordId === visit.recordId;
+      if (!sameVehicle && !sameOrder) continue;
+      if (blocker.date <= visit.date) continue;
+      const what = blocker.kind === 'container_eta' ? 'the container' : 'the expected arrival';
+      notes.push(
+        `${visit.title} on ${visit.date}, but ${what} for that vehicle is not due until ${blocker.date}.`);
     }
   }
   return notes;

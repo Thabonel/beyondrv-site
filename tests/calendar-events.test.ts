@@ -105,13 +105,31 @@ test('event ids are unique per record and date type, so two dates on one order d
 
 test('a container arriving after the customer does is reported as a clash', () => {
   const events = buildCalendarEvents({
-    orders: [{ id: 'o1', customerName: 'Tasmanian customer', customerVisitDate: '2026-09-10' }],
+    orders: [{ id: 'o1', customerName: 'Tasmanian customer', productSlug: 'advent-2450', customerVisitDate: '2026-09-10' }],
     products: [{ slug: 'advent-2450', title: 'Advent 2450', containerEtaDate: '2026-09-20' }],
   });
   const clashes = calendarClashes(events);
   assert.equal(clashes.length, 1);
   assert.match(clashes[0], /2026-09-10/);
   assert.match(clashes[0], /2026-09-20/);
+});
+
+test('a late container for a DIFFERENT vehicle is not the customer\'s problem', () => {
+  const events = buildCalendarEvents({
+    orders: [{ id: 'o1', customerName: 'A', productSlug: 'advent-2450', customerVisitDate: '2026-09-10' }],
+    products: [{ slug: 'sunpatch-15xc', title: 'Sunpatch', containerEtaDate: '2026-09-20' }],
+  });
+  assert.deepEqual(calendarClashes(events), [],
+    'matching on dates alone would fire every time any vehicle anywhere was late');
+});
+
+test('a late arrival on the customer own order is a clash even without a product link', () => {
+  const events = buildCalendarEvents({
+    orders: [{ id: 'o1', customerName: 'A', customerVisitDate: '2026-09-10', expectedArrivalDate: '2026-09-18' }],
+  });
+  const clashes = calendarClashes(events);
+  assert.equal(clashes.length, 1);
+  assert.match(clashes[0], /expected arrival/);
 });
 
 test('a container arriving before the visit is not a clash', () => {

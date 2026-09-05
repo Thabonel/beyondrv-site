@@ -182,3 +182,78 @@
     min-height: 5.4rem;
   }
 }
+
+/* ---- Week and day: the working day as an hour grid ---------------------- */
+
+/* All 24 hours are rendered; the view is sized to the working day and scrolls.
+   Hours outside 8-5, and Sunday, are shaded rather than hidden. */
+.admin-calendar-surface .fc .fc-timegrid-slot {
+  height: 2.1rem;
+}
+
+.admin-calendar-surface .fc .fc-timegrid-slot-label {
+  border-color: transparent;
+}
+
+.admin-calendar-surface .fc .fc-timegrid-slot-label-cushion {
+  color: #70757a;
+  font-size: 0.66rem;
+  padding-right: 0.5rem;
+}
+
+.admin-calendar-surface .fc .fc-timegrid-slot-minor {
+  border-top-style: dotted;
+  border-top-color: #edeef0;
+}
+
+.admin-calendar-surface .fc .fc-non-business {
+  background: #f8f9fa;
+}
+
+.admin-calendar-surface .fc .fc-timegrid-now-indicator-line {
+  border-color: #E8540A;
+}
+
+.admin-calendar-surface .fc .fc-timegrid-now-indicator-arrow {
+  border-color: #E8540A;
+  color: #E8540A;
+}
+
+/* The all-day row carries every dated record, so give it room and set it off
+   from the hours below. */
+.admin-calendar-surface .fc .fc-timegrid-axis-cushion,
+.admin-calendar-surface .fc .fc-timegrid-axis {
+  color: #70757a;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+}
+
+.admin-calendar-surface .fc .fc-daygrid-body-natural .fc-daygrid-day-events {
+  margin-bottom: 0.3rem;
+}
+
+.admin-calendar-surface .fc .fc-timegrid-event {
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+  font-size: 0.68rem;
+  padding: 1px 4px;
+}
+
+/* Folded: the week's seven hour-columns do not fit at 340px, so let the grid
+   scroll sideways inside its own box rather than squeezing the page. */
+@media (max-width: 619px) {
+  .admin-calendar-surface .fc-timeGridWeek-view .fc-scroller-harness {
+    overflow-x: auto;
+  }
+  .admin-calendar-surface .fc-timeGridWeek-view table {
+    min-width: 34rem;
+  }
+  .admin-calendar-surface .fc .fc-timegrid-slot {
+    height: 1.8rem;
+  }
+  .admin-calendar-surface .fc .fc-timegrid-slot-label-cushion {
+    font-size: 0.6rem;
+    padding-right: 0.3rem;
+  }
+}
