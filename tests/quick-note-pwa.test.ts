@@ -32,3 +32,35 @@ test('every manifest in public is linked by a page, so no superseded one is left
   );
   for (const name of manifests) assert.ok(linked.has(name), `public/${name} is not linked by any page`);
 });
+
+test('the sales workspace installs standalone and its manifest is reachable without signing in', () => {
+  const manifest = JSON.parse(readFileSync(file('public/sales-workspace.webmanifest'), 'utf8')) as {
+    id?: string; start_url?: string; scope?: string; display?: string; icons?: Array<{ src?: string; purpose?: string }>;
+  };
+  assert.equal(manifest.display, 'standalone');
+  assert.equal(manifest.start_url, '/admin/');
+  assert.equal(manifest.id, '/admin/', 'a distinct id keeps this separate from the call logger');
+  // Sign-in lives at /.netlify/functions/admin-login, outside /admin/. A scope
+  // of /admin/ would push the sign-in round trip out of the installed app.
+  assert.equal(manifest.scope, '/');
+  assert.ok(manifest.icons?.some(icon => icon.purpose === 'maskable'), 'Android needs a maskable icon');
+
+  // The admin gate matches /admin, /admin/ and /admin/*. A manifest under any
+  // of those would be answered with a redirect to sign in, and the install
+  // would fail with nothing to explain why.
+  const gate = readFileSync(file('netlify/edge-functions/admin-gate.ts'), 'utf8');
+  const paths = [...gate.matchAll(/'(\/admin[^']*)'/g)].map(match => match[1]);
+  assert.ok(paths.length > 0, 'could not read the gate paths');
+  for (const path of paths) {
+    const prefix = path.replace(/\*$/, '');
+    assert.equal('/sales-workspace.webmanifest'.startsWith(prefix) && prefix !== '/', false, `manifest sits behind the gate rule ${path}`);
+  }
+
+  const page = readFileSync(file('src/pages/admin.astro'), 'utf8');
+  for (const tag of [
+    '<link rel="manifest" href="/sales-workspace.webmanifest" />',
+    'apple-mobile-web-app-capable',
+    'apple-mobile-web-app-title" content="Workspace"',
+    'viewport-fit=cover',
+  ]) assert.match(page, new RegExp(tag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+});
