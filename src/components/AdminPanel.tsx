@@ -82,6 +82,8 @@ interface PendingChange {
 }
 
 type DeployStatus = 'idle' | 'deploying' | 'done' | 'error';
+const PANEL_TABS = ['calendar', 'dashboard', 'products', 'archived-products', 'shop', 'orders', 'configurator', 'contracts', 'settings', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'matches', 'reports', 'pending'] as const;
+
 type PanelTab = 'calendar' | 'dashboard' | 'products' | 'archived-products' | 'shop' | 'orders' | 'configurator' | 'contracts' | 'settings' | 'media' | 'homepage' | 'enquiries' | 'customers' | 'leads' | 'drafts' | 'audit' | 'knowledge' | 'google' | 'matches' | 'reports' | 'pending';
 type ProductCategory = 'slide-on' | 'caravan' | 'expedition';
 type ProductStatus = 'available' | 'on-sale' | 'coming-soon';
@@ -1653,9 +1655,18 @@ export default function AdminPanel({ onOpenGmWorkspace, onSignOut }: { onOpenGmW
   const [voiceStatus, setVoiceStatus] = useState('');
   const [readAloudSupported, setReadAloudSupported] = useState<boolean | null>(null);
   const [readAloudEnabled, setReadAloudEnabled] = useState(false);
-  // The calendar opens first: the GM's day starts with what is happening, not
-  // with stock counts.
-  const [activeTab, setActiveTab] = useState<PanelTab>('calendar');
+  /**
+   * The calendar opens first: the GM's day starts with what is happening, not
+   * with stock counts. ?tab= overrides it, so a link can point at one tab and a
+   * test can pin the one it exercises rather than depending on the default.
+   */
+  const [activeTab, setActiveTab] = useState<PanelTab>(() => {
+    if (typeof window === 'undefined') return 'calendar';
+    const requested = new URLSearchParams(window.location.search).get('tab');
+    return requested && (PANEL_TABS as readonly string[]).includes(requested)
+      ? requested as PanelTab
+      : 'calendar';
+  });
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [knowledgeInput, setKnowledgeInput] = useState('');
   const [knowledgeSearch, setKnowledgeSearch] = useState('');
@@ -4398,7 +4409,7 @@ export default function AdminPanel({ onOpenGmWorkspace, onSignOut }: { onOpenGmW
   };
   const pendingGmailSuggestions = gmailThreads.reduce((count, thread) => count + (!thread.matchDecision ? (thread.suggestions?.length || 0) : 0), 0);
   const pendingDriveSuggestions = driveFiles.reduce((count, file) => count + (!file.matchDecision ? (file.suggestions?.length || 0) : 0), 0);
-  const panelTabs: PanelTab[] = ['calendar', 'dashboard', 'products', 'archived-products', 'shop', 'orders', 'configurator', 'contracts', 'settings', 'media', 'homepage', 'enquiries', 'customers', 'leads', 'drafts', 'audit', 'knowledge', 'google', 'matches', 'reports', 'pending'];
+  const panelTabs: PanelTab[] = PANEL_TABS as unknown as PanelTab[];
 
   function tabLabel(tab: PanelTab) {
     if (tab === 'pending') return `Pending (${pending.length})`;

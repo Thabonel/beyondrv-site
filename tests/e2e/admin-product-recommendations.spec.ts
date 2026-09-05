@@ -79,7 +79,7 @@ test('AI product analysis merges alerts and renders grounded recommendations', a
     });
   });
 
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
   const card = page.getByTestId(`attention-product-${product.slug}`);
   await expect(card).toHaveCount(1);
   await expect(card.getByText('Fewer than three gallery images')).toBeVisible();

@@ -27,7 +27,7 @@ test('recent builds refreshes products before using a product hero image', async
     });
   });
 
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
   await expect.poll(() => productRequests).toBeGreaterThanOrEqual(1);
   const initialProductRequests = productRequests;
   await page.getByRole('button', { name: /Menu Dashboard/i }).click();

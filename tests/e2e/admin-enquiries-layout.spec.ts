@@ -41,7 +41,7 @@ test('enquiries and reminders share one scroll container', async ({ page }) => {
     body: JSON.stringify({ ready: true, toEmail: 'test@example.com', missing: [] }),
   }));
 
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
   await openEnquiries(page);
 
   const scrollContainer = page.getByTestId('enquiries-scroll-container');
@@ -95,7 +95,7 @@ test('an enquiry can be archived and restored without deletion', async ({ page }
     });
   });
 
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
   await openEnquiries(page);
 
   await page.getByTestId('archive-enquiry-enquiry-1').click();

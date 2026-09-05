@@ -63,7 +63,7 @@ test('reported tray sizes are listed with their counts and can be deleted', asyn
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
   });
 
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
 
   // The owner sees the vehicle, not a database id.
   await expect(page.getByText('Ford Ranger XL double cab cab chassis', { exact: false })).toBeVisible();
@@ -88,7 +88,7 @@ test('a vehicle with no reports says so rather than showing an empty panel', asy
   await page.route('**/.netlify/functions/admin-tray-sizes', route =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ records: [] }) }));
 
-  await page.goto('/admin/');
+  await page.goto('/admin/?tab=dashboard');
 
   await expect(page.getByText('No tray sizes reported yet', { exact: false })).toBeVisible();
 });
