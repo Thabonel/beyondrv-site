@@ -1,24 +1,22 @@
 /*
- * The calendar is a light sheet inside a dark admin, the way Google Calendar
- * looks, because a month grid of thin lines and small numbers is hard to read
- * as light-on-dark and this is the screen the GM starts the day on.
+ * Ported from the wheels-wins calendar stylesheet, which works, rather than
+ * written from scratch. Their file drives colour from shadcn CSS variables that
+ * do not exist in this admin, so those are the only substitutions: literal
+ * values in the same roles, with the Beyond RV orange where they used blue.
  *
- * Colours are Google's own greys: #dadce0 rules, #3c4043 primary text, #70757a
- * secondary. Today keeps the Beyond RV orange rather than Google's blue, so the
- * structure is familiar but the product is still ours.
+ * The proportions are theirs, and they are the part that matters: a 3rem slot
+ * height with a fifteen-minute slotDuration and hourly labels is what makes the
+ * hour grid read as a working day rather than a squashed ruler.
  */
 
-.admin-calendar-sheet {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
-}
+.admin-calendar-sheet { box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28); }
 
-.admin-calendar-surface {
+.admin-calendar-surface .fc {
   --fc-border-color: #dadce0;
   --fc-page-bg-color: #ffffff;
   --fc-neutral-bg-color: #f1f3f4;
-  --fc-neutral-text-color: #70757a;
-  --fc-today-bg-color: #fef7f2;
   --fc-list-event-hover-bg-color: #f1f3f4;
+  --fc-today-bg-color: rgba(232, 84, 10, 0.05);
   --fc-button-bg-color: #ffffff;
   --fc-button-border-color: #dadce0;
   --fc-button-text-color: #3c4043;
@@ -26,234 +24,92 @@
   --fc-button-hover-border-color: #dadce0;
   --fc-button-active-bg-color: #E8540A;
   --fc-button-active-border-color: #E8540A;
+  background-color: #ffffff;
+  border: 1px solid #dadce0;
+  border-radius: 0.5rem;
   color: #3c4043;
-}
-
-.admin-calendar-surface .fc {
   font-family: inherit;
-  font-size: 0.8rem;
 }
 
-.admin-calendar-surface .fc .fc-toolbar-title {
-  color: #3c4043;
-  font-size: 1.15rem;
-  font-weight: 500;
-}
-
+.admin-calendar-surface .fc .fc-toolbar-title { font-size: 1.25rem; font-weight: 600; }
 .admin-calendar-surface .fc .fc-button {
-  border-radius: 6px;
-  box-shadow: none;
-  font-size: 0.74rem;
-  font-weight: 500;
-  padding: 0.3rem 0.7rem;
-  text-transform: capitalize;
+  border-radius: 6px; box-shadow: none; font-size: 0.74rem;
+  font-weight: 500; padding: 0.3rem 0.7rem; text-transform: capitalize;
 }
 
-.admin-calendar-surface .fc .fc-button:focus-visible {
-  outline: 2px solid #E8540A;
-  outline-offset: 2px;
-}
-
-/* Weekday header: small, uppercase, quiet — Google's treatment. */
 .admin-calendar-surface .fc .fc-col-header-cell {
-  background: #ffffff;
-  border-bottom: 1px solid #dadce0;
-  padding: 0.4rem 0;
+  background-color: #f1f3f4; font-weight: 600; padding: 0.5rem;
 }
-
 .admin-calendar-surface .fc .fc-col-header-cell-cushion {
-  color: #70757a;
-  font-size: 0.66rem;
-  font-weight: 600;
-  letter-spacing: 0.07em;
-  text-decoration: none;
-  text-transform: uppercase;
+  color: #3c4043; padding: 0.5rem; text-decoration: none !important;
 }
 
-.admin-calendar-surface .fc .fc-daygrid-day-number {
-  color: #3c4043;
-  font-size: 0.74rem;
-  padding: 0.3rem 0.4rem;
-  text-decoration: none;
+/* Today, made obvious, exactly as theirs does it. */
+.admin-calendar-surface .fc .fc-day-today {
+  background-color: rgba(232, 84, 10, 0.12) !important;
+  border: 2px solid #E8540A !important;
+  position: relative;
 }
-
-/* Today is a filled circle on the number, as Google does it. */
+.admin-calendar-surface .fc .fc-day-today .fc-daygrid-day-top::after {
+  background: rgba(255, 255, 255, 0.9); border-radius: 2px; color: #E8540A;
+  content: "TODAY"; font-size: 0.6rem; font-weight: bold; padding: 1px 3px;
+  position: absolute; right: 4px; top: 2px; z-index: 1;
+}
 .admin-calendar-surface .fc .fc-day-today .fc-daygrid-day-number {
-  align-items: center;
-  background: #E8540A;
-  border-radius: 50%;
-  color: #ffffff;
-  display: inline-flex;
-  font-weight: 600;
-  height: 1.55rem;
-  justify-content: center;
-  margin: 0.2rem;
-  padding: 0;
-  width: 1.55rem;
+  align-items: center; background: #E8540A; border-radius: 50%;
+  color: white !important; display: flex !important; font-weight: bold;
+  height: 24px; justify-content: center; margin: 2px; width: 24px;
+}
+.admin-calendar-surface .fc .fc-timegrid-col.fc-day-today {
+  background-color: rgba(232, 84, 10, 0.08) !important;
+}
+.admin-calendar-surface .fc .fc-col-header-cell.fc-day-today {
+  background-color: #E8540A !important; color: white !important;
+}
+.admin-calendar-surface .fc .fc-col-header-cell.fc-day-today .fc-col-header-cell-cushion {
+  color: white !important; font-weight: bold;
 }
 
-.admin-calendar-surface .fc .fc-day-other .fc-daygrid-day-number {
-  color: #bdc1c6;
+.admin-calendar-surface .fc .fc-event {
+  border-radius: 0.25rem; cursor: pointer; font-size: 0.8rem; margin: 1px 0;
+}
+.admin-calendar-surface .fc .fc-event .fc-event-time { font-weight: 500; margin-right: 0.25rem; }
+.admin-calendar-surface .fc .fc-event .fc-event-title {
+  font-weight: 500; overflow: hidden; text-overflow: ellipsis;
 }
 
-/* Solid chips with white text, rounded, tight — Google's event style. */
-.admin-calendar-surface .fc .fc-daygrid-event {
-  border: none;
-  border-radius: 4px;
-  font-weight: 500;
-  margin: 1px 4px;
-  padding: 2px 6px;
-  white-space: normal;
-}
-
-.admin-calendar-surface .fc .fc-daygrid-event .fc-event-title {
-  font-size: 0.7rem;
-  line-height: 1.3;
-}
-
-.admin-calendar-surface .fc .fc-daygrid-more-link {
-  color: #5f6368;
-  font-size: 0.68rem;
-  font-weight: 500;
-}
-
-/* List view reads as rows of a table, not as cards. */
-.admin-calendar-surface .fc .fc-list {
-  border-color: #dadce0;
-}
-
-.admin-calendar-surface .fc .fc-list-day-cushion {
-  background: #f1f3f4;
-}
-
-.admin-calendar-surface .fc .fc-list-day-text,
-.admin-calendar-surface .fc .fc-list-day-side-text {
-  color: #3c4043;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.admin-calendar-surface .fc .fc-list-event-title,
-.admin-calendar-surface .fc .fc-list-event-title a {
-  color: #3c4043;
-  text-decoration: none;
-}
-
-.admin-calendar-surface .fc .fc-list-empty {
-  background: #ffffff;
-  color: #70757a;
-}
-
-/* Folded, about 340px: the toolbar stacks and the grid stops trying to fit
-   four events into a cell the width of a thumb. */
-@media (max-width: 619px) {
-  .admin-calendar-sheet {
-    padding: 0.7rem !important;
-  }
-  .admin-calendar-surface .fc .fc-toolbar.fc-header-toolbar {
-    align-items: stretch;
-    flex-direction: column;
-    gap: 0.4rem;
-    margin-bottom: 0.5rem;
-  }
-  .admin-calendar-surface .fc .fc-toolbar-title {
-    font-size: 1rem;
-    text-align: center;
-  }
-  .admin-calendar-surface .fc .fc-daygrid-event .fc-event-title {
-    font-size: 0.64rem;
-  }
-  .admin-calendar-surface .fc .fc-col-header-cell-cushion {
-    font-size: 0.6rem;
-    letter-spacing: 0.04em;
-  }
-  .admin-calendar-surface .fc .fc-daygrid-day-number {
-    font-size: 0.68rem;
-  }
-  .admin-calendar-surface .fc .fc-day-today .fc-daygrid-day-number {
-    height: 1.35rem;
-    width: 1.35rem;
-  }
-}
-
-/* Unfolded, about 700-840px: a small tablet, so let the cells breathe. */
-@media (min-width: 620px) {
-  .admin-calendar-surface .fc .fc-daygrid-day-frame {
-    min-height: 5.4rem;
-  }
-}
-
-/* ---- Week and day: the working day as an hour grid ---------------------- */
-
-/* All 24 hours are rendered; the view is sized to the working day and scrolls.
-   Hours outside 8-5, and Sunday, are shaded rather than hidden. */
-.admin-calendar-surface .fc .fc-timegrid-slot {
-  height: 2.1rem;
-}
-
-.admin-calendar-surface .fc .fc-timegrid-slot-label {
-  border-color: transparent;
-}
-
-.admin-calendar-surface .fc .fc-timegrid-slot-label-cushion {
-  color: #70757a;
-  font-size: 0.66rem;
-  padding-right: 0.5rem;
-}
-
-.admin-calendar-surface .fc .fc-timegrid-slot-minor {
-  border-top-style: dotted;
-  border-top-color: #edeef0;
-}
-
-.admin-calendar-surface .fc .fc-non-business {
-  background: #f8f9fa;
-}
-
-.admin-calendar-surface .fc .fc-timegrid-now-indicator-line {
-  border-color: #E8540A;
-}
-
-.admin-calendar-surface .fc .fc-timegrid-now-indicator-arrow {
-  border-color: #E8540A;
-  color: #E8540A;
-}
-
-/* The all-day row carries every dated record, so give it room and set it off
-   from the hours below. */
+/* The proportions that make the hour grid readable. */
+.admin-calendar-surface .fc .fc-timegrid-slot { height: 3rem; }
+.admin-calendar-surface .fc .fc-timegrid-slot-lane { border-bottom: 1px solid var(--fc-border-color); }
 .admin-calendar-surface .fc .fc-timegrid-axis-cushion,
-.admin-calendar-surface .fc .fc-timegrid-axis {
-  color: #70757a;
-  font-size: 0.62rem;
-  text-transform: uppercase;
-}
+.admin-calendar-surface .fc .fc-timegrid-slot-label-cushion { color: #70757a; font-size: 0.75rem; }
 
-.admin-calendar-surface .fc .fc-daygrid-body-natural .fc-daygrid-day-events {
-  margin-bottom: 0.3rem;
-}
+/* Outside Monday to Saturday, 8 til 5, and the lunch band. */
+.admin-calendar-surface .fc .fc-non-business { background: #f8f9fa; }
+.admin-calendar-surface .fc .fc-timegrid-now-indicator-line,
+.admin-calendar-surface .fc .fc-timegrid-now-indicator-arrow { border-color: #E8540A; color: #E8540A; }
 
-.admin-calendar-surface .fc .fc-timegrid-event {
-  border: none;
-  border-radius: 4px;
-  box-shadow: none;
-  font-size: 0.68rem;
-  padding: 1px 4px;
-}
+/* Drag, resize and range-select feedback. */
+.admin-calendar-surface .fc .fc-event-dragging,
+.admin-calendar-surface .fc .fc-event-resizing { opacity: 0.75; }
+.admin-calendar-surface .fc .fc-highlight { background-color: rgba(232, 84, 10, 0.2); }
+.admin-calendar-surface .fc .fc-daygrid-day-bottom { color: #E8540A; font-size: 0.75rem; }
 
-/* Folded: the week's seven hour-columns do not fit at 340px, so let the grid
-   scroll sideways inside its own box rather than squeezing the page. */
-@media (max-width: 619px) {
-  .admin-calendar-surface .fc-timeGridWeek-view .fc-scroller-harness {
-    overflow-x: auto;
+.admin-calendar-surface .fc .fc-list-day-cushion { background: #f1f3f4; }
+.admin-calendar-surface .fc .fc-list-day-text,
+.admin-calendar-surface .fc .fc-list-day-side-text,
+.admin-calendar-surface .fc .fc-list-event-title,
+.admin-calendar-surface .fc .fc-list-event-title a { color: #3c4043; text-decoration: none; }
+.admin-calendar-surface .fc .fc-list-empty { background: #ffffff; color: #70757a; }
+
+/* Their mobile breakpoint, plus the toolbar stacking the folded phone needs. */
+@media (max-width: 640px) {
+  .admin-calendar-sheet { padding: 0.7rem !important; }
+  .admin-calendar-surface .fc { font-size: 0.75rem; }
+  .admin-calendar-surface .fc .fc-timegrid-slot { height: 2rem; }
+  .admin-calendar-surface .fc .fc-event { font-size: 0.7rem; }
+  .admin-calendar-surface .fc .fc-toolbar.fc-header-toolbar {
+    align-items: stretch; flex-direction: column; gap: 0.4rem; margin-bottom: 0.5rem;
   }
-  .admin-calendar-surface .fc-timeGridWeek-view table {
-    min-width: 34rem;
-  }
-  .admin-calendar-surface .fc .fc-timegrid-slot {
-    height: 1.8rem;
-  }
-  .admin-calendar-surface .fc .fc-timegrid-slot-label-cushion {
-    font-size: 0.6rem;
-    padding-right: 0.3rem;
-  }
+  .admin-calendar-surface .fc .fc-toolbar-title { font-size: 1rem; text-align: center; }
 }

@@ -16,7 +16,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import listPlugin from '@fullcalendar/list';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
+import type { DateSelectArg, EventChangeArg, EventClickArg } from '@fullcalendar/core';
 
 export type CalendarEventKind =
   | 'customer_visit' | 'container_eta' | 'expected_arrival' | 'expected_handover'
@@ -123,7 +123,6 @@ export default function AdminCalendar({ events, clashes = [], loading, error, on
   })), [visible]);
 
   const fcEventSources = useMemo(() => [...fcEvents, ...BACKGROUND_BANDS], [fcEvents]);
-  const isTimeGrid = view === 'timeGridWeek' || view === 'timeGridDay';
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
@@ -162,8 +161,11 @@ export default function AdminCalendar({ events, clashes = [], loading, error, on
     return data as { message?: string; warning?: string };
   }
 
-  /** Dragging an event moves the date on the record that owns it. */
-  async function handleEventDrop(info: EventDropArg) {
+  /**
+   * eventChange, as the wheels-wins wrapper uses, rather than eventDrop: it
+   * fires for a move and for a resize, so one path writes both.
+   */
+  async function handleEventChange(info: EventChangeArg) {
     const original = info.event.extendedProps.original as AdminCalendarEvent | undefined;
     const date = info.event.startStr?.slice(0, 10);
     if (!original || !date) { info.revert(); return; }
@@ -177,10 +179,20 @@ export default function AdminCalendar({ events, clashes = [], loading, error, on
       setStatus([result.message, result.warning].filter(Boolean).join(' '));
       onRefresh?.();
     } catch (err) {
-      // Put it back where it was: a half-saved calendar is worse than no move.
+      // Put it back: a grid showing a date the record does not hold is worse
+      // than a move that failed loudly.
       info.revert();
       setStatus(err instanceof Error ? err.message : 'Could not move that date.');
     }
+  }
+
+  /**
+   * Resizing is wired because their calendar has it, and it moves the start the
+   * same way a drag does. The span itself is not kept: these records hold one
+   * date, not a range, so there is no field for a length to live in.
+   */
+  function handleEventResize(info: { event: { startStr: string }; revert: () => void }) {
+    setStatus('These records hold a single date, so the length is not stored. The start date was kept.');
   }
 
   /** Dragging empty space creates a task, the one thing a day genuinely creates. */
@@ -196,6 +208,13 @@ export default function AdminCalendar({ events, clashes = [], loading, error, on
     } catch (err) {
       setStatus(err instanceof Error ? err.message : 'Could not create that task.');
     }
+  }
+
+  /** Their touch: a double click on a day drops into that day. */
+  function handleDateClick(info: { jsEvent: MouseEvent; date: Date }) {
+    if (info.jsEvent.detail !== 2) return;
+    setChosenView('timeGridDay');
+    calendarRef.current?.getApi()?.gotoDate(info.date);
   }
 
   function handleEventClick(info: EventClickArg) {
@@ -296,33 +315,32 @@ export default function AdminCalendar({ events, clashes = [], loading, error, on
             : { left: 'prev,next', center: 'title', right: '' }}
           events={fcEventSources}
           eventClick={handleEventClick}
+          eventChange={(info) => { void handleEventChange(info); }}
+          eventResize={handleEventResize}
+          dateClick={handleDateClick}
+          select={(info) => { void handleSelect(info); }}
           editable
           selectable
           selectMirror
-          eventDrop={(info) => { void handleEventDrop(info); }}
-          select={(info) => { void handleSelect(info); }}
-          dayMaxEvents={wideScreen ? 4 : 2}
+          dayMaxEvents
+          businessHours={BUSINESS_HOURS}
           height="auto"
           firstDay={1}
           noEventsText="Nothing scheduled in this period"
           eventDisplay="block"
-          businessHours={BUSINESS_HOURS}
-          // The whole 24 hours exist, because a ship clears at 3am and a handover
-          // can run late. The view opens on the working day and scrolls to the
-          // rest, rather than pretending the other hours are not there.
-          slotMinTime="00:00:00"
-          slotMaxTime="24:00:00"
-          scrollTime="08:00:00"
-          slotDuration="00:30:00"
-          slotLabelInterval="01:00:00"
-          slotLabelFormat={{ hour: 'numeric', minute: '2-digit', hour12: true }}
           allDaySlot
           allDayText="All day"
+          slotMinTime="00:00:00"
+          slotMaxTime="24:00:00"
+          slotDuration="00:15:00"
+          slotLabelInterval="01:00:00"
+          slotLabelFormat={{ hour: 'numeric', minute: '2-digit', meridiem: 'short' }}
+          scrollTime="08:00:00"
+          expandRows
+          stickyHeaderDates
           nowIndicator
-          // Month and list size to their content. The hour grid gets a fixed
-          // height instead, because that is what makes it scroll: at "auto" it
-          // would render all 24 hours down the page and never scroll at all.
-          height={isTimeGrid ? (wideScreen ? 640 : 460) : 'auto'}
+          dayHeaderFormat={{ weekday: 'short', day: 'numeric' }}
+          eventTimeFormat={{ hour: '2-digit', minute: '2-digit', meridiem: 'short' }}
         />
       </div>
 
