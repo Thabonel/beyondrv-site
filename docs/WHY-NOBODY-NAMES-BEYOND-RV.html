@@ -209,6 +209,71 @@
     .meta { grid-template-columns: 1fr; margin: 4px -24px -20px; }
   }
 
+  /* ---------- Two paths ---------- */
+  .paths {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin: 24px 0 10px;
+  }
+  .path { background: var(--surface); padding: 22px 24px 24px; }
+  .path-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 0 0 4px;
+  }
+  .path.slow .path-name { color: var(--gap); }
+  .path.fast .path-name { color: var(--have); }
+  .path h3 { margin: 0 0 10px; font-size: 20px; }
+  .path p { margin: 0 0 12px; font-size: 16px; }
+  .path p:last-child { margin-bottom: 0; }
+  .path .speed {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 15px;
+    display: inline-block;
+    padding: 3px 10px;
+    margin-bottom: 12px;
+  }
+  .path.slow .speed { background: var(--gap-soft); color: var(--gap); }
+  .path.fast .speed { background: var(--have-soft); color: var(--have); }
+  @media (max-width: 720px) { .paths { grid-template-columns: 1fr; } }
+
+  .tell {
+    margin: 18px 0 8px;
+    padding: 18px 22px;
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--accent);
+    background: var(--surface);
+  }
+  .tell p { margin: 0; font-size: 17px; }
+
+  /* ---------- Numbers ---------- */
+  .numbers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin: 22px 0 10px;
+  }
+  .num { background: var(--surface); padding: 18px 20px 20px; }
+  .num b {
+    display: block;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 34px;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.05;
+  }
+  .num span { display: block; font-size: 15px; color: var(--muted); margin-top: 6px; }
+  .num cite { display: block; font-family: var(--mono); font-style: normal; font-size: 11px; color: var(--muted); margin-top: 10px; }
+
   /* ---------- Caution ---------- */
   .caution {
     margin: 44px 0 12px;
@@ -291,6 +356,63 @@
     </div>
   </div>
 
+  <h2>Two ways into an answer, at very different speeds</h2>
+  <p class="sub column">This distinction decides which of the moves below pays off quickly, and it is the thing most advice on the subject leaves out.</p>
+
+  <div class="paths">
+    <div class="path slow">
+      <p class="path-name">Recalled</p>
+      <h3>What the model already learnt</h3>
+      <span class="speed">Months to years</span>
+      <p>Absorbed from the open web long before the question was asked, and unchangeable once absorbed. Answers arrive with no citations and no links.</p>
+      <p>The answer you were given naming six companies was this kind. Nothing published now can alter it for a good while, which is why nobody can sell you a quick fix for it.</p>
+    </div>
+    <div class="path fast">
+      <p class="path-name">Retrieved</p>
+      <h3>What it looks up at the time</h3>
+      <span class="speed">Days to weeks</span>
+      <p>Google’s AI Overviews, ChatGPT search and Gemini grounding fetch live pages when the question is asked. Answers cite their sources and link out.</p>
+      <p>A page published today can be quoted this week — if it is findable, and if it holds a fact the answer needs.</p>
+    </div>
+  </div>
+
+  <div class="tell column">
+    <p><strong>How to tell which you are looking at:</strong> if the answer links its sources, it retrieved and you can influence it now. If it answers from memory with no links, it recalled, and that is the slow one.</p>
+  </div>
+
+  <div class="column">
+    <p>This changes the priority rather than the plan. The moves that feed the retrieved path — writing the buyer’s questions, giving every vehicle a page with real figures — work on a timescale of weeks. The moves that feed the recalled path, and reputation generally, still take a year and are still worth starting today.</p>
+    <p>It also raises the stakes on being cited rather than merely ranked. Roughly two-thirds of Google searches now end without anyone clicking anything, so a first-place listing that nobody visits is worth much less than being the source an answer is assembled from.</p>
+  </div>
+
+  <div class="numbers">
+    <div class="num">
+      <b>68%</b>
+      <span>of US Google searches end with no click, up from 60.5% in 2024</span>
+      <cite>SparkToro, Similarweb clickstream</cite>
+    </div>
+    <div class="num">
+      <b>40%</b>
+      <span>of US searches now return an AI Overview</span>
+      <cite>Similarweb</cite>
+    </div>
+    <div class="num">
+      <b>58%</b>
+      <span>of Australians 14+ used an AI tool in a four-week period</span>
+      <cite>Roy Morgan, March 2026</cite>
+    </div>
+    <div class="num">
+      <b>87.6%</b>
+      <span>Australian search share still held by Google</span>
+      <cite>StatCounter, August 2026</cite>
+    </div>
+  </div>
+
+  <div class="column">
+    <p>Two of those need care. AI referral traffic is growing quickly — Similarweb counts around 771 million visits a month worldwide, up 117% — but that is a small base beside Google’s volume: fast, not yet large. And “used an AI tool in four weeks” is a low bar that says nothing about how many researched a ninety-thousand-dollar purchase that way.</p>
+    <p>Google itself is not going anywhere. Its search volume is at record levels and its Australian share is steady. What has broken is the old journey of ten blue links, a click, and a website visit.</p>
+  </div>
+
   <h2>What to do, in order of leverage</h2>
   <p class="sub column">Ordered by how much of it is within your control. The first three need nobody’s agreement but your own.</p>
 
@@ -314,12 +436,13 @@
         <span class="move-rank">02</span>
         <h3 class="move-title">Make the calculator the thing people link to</h3>
       </div>
-      <p>“Will a slide-on fit my Ranger, and is it legal loaded?” is asked far more often than “who is the best”, and you can answer it better than anyone in the country. Right now it is a tool on a page. It should be the resource a forum reply points at.</p>
+      <p>“What is the best slide-on camper for a Ranger with 900 kg of payload?” is a question no model can answer well from memory — the figures are too specific. It has to look them up, which puts it squarely on the fast path, and you hold the only numbers that answer it.</p>
+      <p>It is asked far more often than “who is the best”. Right now it is a tool on a page. It should be the resource a forum reply and an AI answer both point at.</p>
       <p>Give every vehicle its own findable page — Ranger, HiLux, Triton, Amarok, the lot — each answering the question for that ute with your real figures. That is 52 pages nobody else can write.</p>
       <dl class="meta">
         <div><dt>Who does it</dt><dd class="you">You, alone</dd></div>
         <div><dt>Cost</dt><dd>Build work</dd></div>
-        <div><dt>Shows in</dt><dd>3–6 months</dd></div>
+        <div><dt>Shows in</dt><dd>Weeks, if retrieved</dd></div>
       </dl>
     </article>
 
@@ -396,7 +519,7 @@
 
   <div class="caution column">
     <h2>Three things to be honest about</h2>
-    <p><strong>None of this is fast.</strong> A language model’s answer reflects what was written months to years ago. Even a strong run of coverage would not change that answer for a good while. Anyone offering to fix it quickly is selling something that does not exist.</p>
+    <p><strong>Half of it is slow, and it is worth knowing which half.</strong> Anything that depends on what a model already learnt takes months to years, and no amount of spending shortens it. Anything a model looks up at the time can move in weeks. An earlier draft of this page said none of it was fast; that was wrong about the retrieved half.</p>
     <p><strong>The question was answered on an axis you are on the other side of.</strong> The reasoning given was “proudly Australian-made”. Your campers arrive by container and are completed at Mutdapilly. That is a real difference, arguably better value, and it is a positioning decision rather than a marketing one — decide what you claim and say it consistently.</p>
     <p><strong>“Best” was hedged anyway.</strong> The answer opened by saying there is no single best, and closed by asking what ute the person drives and what their budget is. That question — which camper suits <em>this</em> ute — is the one you are equipped to win.</p>
   </div>
@@ -407,7 +530,16 @@
     <a href="https://campertraileraustralia.com.au/blogs/reviews/best-slide-on-campers-wedgetail-slide-on-review">Camper Trailer Australia, Wedgetail review</a> ·
     <a href="https://outbacktravelaustralia.com.au/camping-slide-on-campers/be-sure-your-slide-on-is-legal/">Outback Travel Australia, Be sure your slide-on is legal</a> ·
     <a href="https://www.knowmytow.com.au/calculator">Know My Tow calculator</a> ·
-    <a href="https://autoscore360.com/ute-payload-towing-calculator.html">AutoScore360 payload calculator</a>
+    <a href="https://autoscore360.com/ute-payload-towing-calculator.html">AutoScore360 payload calculator</a><br><br>
+    On search and AI behaviour:
+    <a href="https://sparktoro.com/blog/in-2026-less-than-one-third-of-google-searches-still-send-a-click/">SparkToro, less than a third of searches send a click</a> ·
+    <a href="https://www.similarweb.com/corp/reports/2026-generative-ai-landscape/">Similarweb, 2026 Generative AI Landscape</a> ·
+    <a href="https://aisearch.similarweb.com/blog/ai-referral-traffic-by-industry/">Similarweb, AI referral traffic by industry</a> ·
+    <a href="https://www.roymorgan.com/findings/10248-artificial-intelligence-ai-tools-usage-march-2026">Roy Morgan, AI tool usage in Australia</a> ·
+    <a href="https://gs.statcounter.com/search-engine-market-share/all/australia">StatCounter, Australian search share</a> ·
+    <a href="https://www.semrush.com/blog/google-usage-after-chatgpt-adoption/">Semrush, ChatGPT is not replacing Google</a> ·
+    <a href="https://www.pewresearch.org/internet/2026/06/17/americans-and-ai-2026-chatbots-smart-devices-and-views-on-impact/">Pew, Americans and AI 2026</a> ·
+    <a href="https://yougov.com/reports/55102-au-websearch-ai-report-2026">YouGov, how AI is changing online discovery in Australia</a>
   </footer>
 </div>
 
