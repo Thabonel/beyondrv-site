@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import modelPages from '../../data/vehicle-selector/model-pages.json';
 import { ESTIMATE_DISCLAIMER } from '../../lib/vehicleSuitabilityCalculator.js';
 
 const pageUrl = 'https://beyondrv.com.au/vehicle-suitability-checker/';
@@ -181,4 +182,17 @@ const schema = [
       </div>
     </div>
   </section>
+  <section class="container authority-section">
+    <div class="authority-copy">
+      <h2>Payload figures by vehicle model</h2>
+      <p>Compare recorded variants, manufacturer sources and the allowance left for a slide-on camper.</p>
+      <ul class="vehicle-model-links">
+        {modelPages.models.map(model => <li><a href={`/slide-on-campers/${model.slug}/`}>{model.make} {model.model}</a></li>)}
+      </ul>
+    </div>
+  </section>
 </BaseLayout>
+<style>
+  .vehicle-model-links { display: flex; flex-wrap: wrap; gap: 12px 24px; list-style: none; padding: 0; margin-top: 20px; }
+  .vehicle-model-links a { text-decoration: underline; text-underline-offset: 3px; }
+</style>

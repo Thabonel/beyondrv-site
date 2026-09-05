@@ -1,3 +1,5 @@
+import modelPages from './vehicle-selector/model-pages.json' with { type: 'json' };
+
 // Change these dates only when the page's primary content, structured data,
 // or important internal links materially change. Unknown dates are omitted.
 export const SITEMAP_LASTMOD = Object.freeze({
@@ -13,8 +15,8 @@ export const SITEMAP_LASTMOD = Object.freeze({
   '/expedition/': '2026-09-01',
   '/our-caravans/': '2026-08-09',
   '/our-slide-on-campers/': '2026-09-02',
-  '/vehicle-suitability-checker/': '2026-09-03',
-  '/slide-on-camper-weight-calculator/': '2026-09-03',
+  '/vehicle-suitability-checker/': '2026-09-05',
+  '/slide-on-camper-weight-calculator/': '2026-09-05',
   '/caravan-towing-calculator/': '2026-09-03',
   '/3-5m-diy-camper-box-with-cabover-and-underfloor-storage/': '2026-08-31',
   '/3-5m-poptop-truck-camper/': '2026-08-09',
@@ -29,5 +31,6 @@ export const SITEMAP_LASTMOD = Object.freeze({
 
 export function sitemapLastmodFor(url) {
   const pathname = new URL(url).pathname;
+  if (modelPages.models.some(model => pathname === `/slide-on-campers/${model.slug}/`)) return '2026-09-05';
   return SITEMAP_LASTMOD[pathname];
 }

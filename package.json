@@ -21,7 +21,8 @@
     "authority:indexnow": "node SCRIPTS/submit-indexnow.mjs",
     "images:optimize": "node SCRIPTS/optimize-product-images.mjs --write",
     "configurator:prepare-glb": "node SCRIPTS/prepare-configurator-glb.mjs",
-    "catalogue:build": "node --experimental-strip-types SCRIPTS/build-vehicle-catalogue.mjs"
+    "catalogue:build": "node --experimental-strip-types SCRIPTS/build-vehicle-catalogue.mjs",
+    "model-pages:build": "node --experimental-strip-types SCRIPTS/build-vehicle-model-pages.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.2",

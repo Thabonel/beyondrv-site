@@ -417,6 +417,7 @@ const schema = [
 </BaseLayout>
 
 <script>
+  import { queryPrefill } from '../../lib/vehicleModelPages/fitment';
   import { calculateSlideOnSuitability } from '../../lib/vehicleSuitabilityCalculator.js';
   import { isTrayMassRequired, resolveCurrentVehicleWeight } from '../../lib/slideOnVehicleWeight';
   import { emptyVehicleCatalogue, validateVehicleCatalogue } from '../../lib/vehicleCatalogue/validate';
@@ -455,6 +456,11 @@ const schema = [
   const byId = (id: string) => document.getElementById(id);
   const inputById = (id: string) => document.getElementById(id) as HTMLInputElement | null;
   const value = (id: string) => inputById(id)?.value ?? '';
+  // Assign values without input events so the existing started gate stays closed.
+  for (const [id, value] of Object.entries(queryPrefill(window.location.search))) {
+    const input = inputById(id);
+    if (input) input.value = value;
+  }
   const fmt = (value: number) => `${Math.round(value).toLocaleString()} kg`;
   const fmtMm = (value: number) => `${Math.round(value).toLocaleString()} mm`;
 
