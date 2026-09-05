@@ -22,12 +22,20 @@ export const VIEW_LABELS: Record<CalendarView, string> = {
 export const VIEW_SHORTCUTS: Record<CalendarView, string> = { day: 'D', week: 'W', month: 'M', schedule: 'A' };
 
 /** Kinds the GM can pick when creating from the grid. */
-export const CREATABLE_KINDS: ReadonlyArray<{ value: 'meeting' | 'reminder' | 'task' | 'customer_visit'; label: string }> = [
+export const CREATABLE_KINDS: ReadonlyArray<{ value: 'meeting' | 'reminder' | 'task' | 'customer_visit' | 'expected_handover'; label: string }> = [
   { value: 'meeting', label: 'Meeting' },
   { value: 'reminder', label: 'Reminder' },
   { value: 'task', label: 'Task' },
   { value: 'customer_visit', label: 'Customer visit' },
+  { value: 'expected_handover', label: 'Handover' },
 ];
+
+/**
+ * Kinds created from the grid that are really a date on an order. The popup
+ * asks which order, and the date is written there rather than into the
+ * calendar's own store, so the order stays the one place the date lives.
+ */
+export const ORDER_DATE_KINDS = new Set<string>(['customer_visit', 'expected_handover']);
 
 /** Record-owned kinds that can be dragged. Mirrors WRITE_TARGETS on the server. */
 export const MOVABLE_RECORD_KINDS = new Set<CalendarEventKind>([
@@ -88,6 +96,31 @@ export function formatWhen(event: Pick<AdminCalendarEvent, 'start' | 'end' | 'al
     return day;
   }
   return `${day} · ${formatTime(event.start.slice(11))} – ${formatTime(event.end.slice(11))}`;
+}
+
+/**
+ * Moving the start moves the end with it, keeping the length, as Google
+ * Calendar does. Without this, dragging the start past the end leaves the
+ * form in a state it refuses to save, and the person has to fix a field they
+ * did not touch.
+ */
+export function endForNewStart(previousStart: string, previousEnd: string, nextStart: string) {
+  if (!nextStart) return previousEnd;
+  const minutes = (value: string) => {
+    const [h, m] = value.split(':').map(Number);
+    return Number.isFinite(h) && Number.isFinite(m) ? h * 60 + m : null;
+  };
+  const start = minutes(previousStart);
+  const end = minutes(previousEnd);
+  const next = minutes(nextStart);
+  if (next === null) return previousEnd;
+  // Keep whatever length the form had; an unreadable or missing end becomes an hour.
+  const length = start !== null && end !== null && end > start ? end - start : 60;
+  const total = next + length;
+  // A meeting that would run past midnight stops at midnight rather than
+  // wrapping to a time earlier in the day.
+  if (total >= 24 * 60) return '23:59';
+  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
 }
 
 export function isTypingTarget(target: EventTarget | null) {

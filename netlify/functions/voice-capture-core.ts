@@ -13,6 +13,10 @@ export interface VoiceProposal {
   followUpDate: string;
   followUpReason: string;
   appointmentDateTime: string;
+  /** When the call fixed a visit or a handover: what, which day, what time. */
+  appointmentKind: '' | 'customer_visit' | 'expected_handover';
+  appointmentDate: string;
+  appointmentTime: string;
   moneyMentions: VoiceMoneyMention[];
   discussedItems: string[];
   unresolvedItems: string[];
@@ -55,6 +59,16 @@ function dateOnly(value: unknown) {
   return /^\d{4}-\d{2}-\d{2}$/.test(candidate) ? candidate : '';
 }
 
+function timeOnly(value: unknown) {
+  const candidate = clean(value, 5);
+  return /^([01]\d|2[0-3]):[0-5]\d$/.test(candidate) ? candidate : '';
+}
+
+function appointmentKindOf(value: unknown): VoiceProposal['appointmentKind'] {
+  const kind = clean(value, 40);
+  return kind === 'customer_visit' || kind === 'expected_handover' ? kind : '';
+}
+
 export function voiceCaptureKey(id: string) {
   return `captures/${encodeURIComponent(clean(id, 240))}.json`;
 }
@@ -83,6 +97,9 @@ export function normaliseVoiceProposal(input: unknown): VoiceProposal {
     followUpDate: dateOnly(value.followUpDate),
     followUpReason: clean(value.followUpReason, 500),
     appointmentDateTime: clean(value.appointmentDateTime, 80),
+    appointmentKind: appointmentKindOf(value.appointmentKind),
+    appointmentDate: dateOnly(value.appointmentDate),
+    appointmentTime: timeOnly(value.appointmentTime),
     moneyMentions,
     discussedItems: cleanList(value.discussedItems),
     unresolvedItems: cleanList(value.unresolvedItems),
@@ -94,7 +111,12 @@ export function normaliseVoiceProposal(input: unknown): VoiceProposal {
 export function voiceCaptureSummary(proposal: VoiceProposal) {
   const parts = [proposal.summary];
   if (proposal.followUpDate) parts.push(`Follow-up: ${proposal.followUpDate}${proposal.followUpReason ? ` — ${proposal.followUpReason}` : ''}.`);
-  if (proposal.appointmentDateTime) parts.push(`Appointment discussed: ${proposal.appointmentDateTime}.`);
+  if (proposal.appointmentDate) {
+    const what = proposal.appointmentKind === 'expected_handover' ? 'Handover' : 'Visit';
+    parts.push(`${what} agreed: ${proposal.appointmentDate}${proposal.appointmentTime ? ` ${proposal.appointmentTime}` : ''}.`);
+  } else if (proposal.appointmentDateTime) {
+    parts.push(`Appointment discussed: ${proposal.appointmentDateTime}.`);
+  }
   if (proposal.unresolvedItems.length) parts.push(`Still to confirm: ${proposal.unresolvedItems.join('; ')}.`);
   return parts.filter(Boolean).join('\n\n').slice(0, 4000);
 }

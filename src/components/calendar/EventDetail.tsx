@@ -50,7 +50,7 @@ export default function EventDetail({ event, stored, onEdit, onDelete, onClose }
         {stored?.location && <div>📍 {stored.location}</div>}
         {event.source === 'ai' && (
           <div className="gcal-detail__ai">
-            <div><span className="gcal-ai-badge">✦ Added by AI</span> from the mailbox</div>
+            <div><span className="gcal-ai-badge">✦ Added by AI</span> {stored?.sourceEmail ? 'from the mailbox' : 'from a call note'}</div>
             {stored?.sourceEmail && (
               <>
                 <div><strong>{stored.sourceEmail.subject}</strong> · {stored.sourceEmail.from}</div>

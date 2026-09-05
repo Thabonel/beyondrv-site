@@ -57,6 +57,13 @@ export async function mockCalendar(page: Page) {
     }
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, message: 'Done.' }) });
   });
+  await page.route('**/.netlify/functions/admin-orders', (route) => route.fulfill({
+    status: 200, contentType: 'application/json',
+    body: JSON.stringify({ orders: [
+      { id: 'o1', customerName: 'Tasmanian customer', productTitle: 'Advent 2450', status: 'in_transit' },
+      { id: 'o2', customerName: 'Ben', productTitle: 'Sunpatch 15', status: 'ready_for_handover' },
+    ] }),
+  }));
   await page.route('**/.netlify/functions/admin-calendar-write', async (route) => {
     const body = route.request().postDataJSON() as Record<string, unknown>;
     writes.push({ method: 'POST', url: route.request().url(), body });
