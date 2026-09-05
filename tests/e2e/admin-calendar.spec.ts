@@ -149,3 +149,19 @@ test('a phone opens on Schedule with the sidebar hidden, and Week shows three da
   await page.getByRole('button', { name: 'Main menu' }).click();
   await expect(page.getByTestId('calendar-sidebar')).toBeVisible();
 });
+
+test('the header offers Calendar, Dashboard, Enquiries and Analytics one tap away', async ({ page }) => {
+  await mockCalendar(page);
+  await page.goto('/admin/');
+
+  const nav = page.getByRole('navigation', { name: 'Quick navigation' });
+  await expect(nav.getByRole('button', { name: 'Go to Calendar' })).toHaveAttribute('aria-current', 'page');
+  await expect(nav.getByRole('link', { name: 'Open analytics dashboard' })).toHaveAttribute('href', '/admin/analytics/');
+
+  await nav.getByRole('button', { name: 'Go to Enquiries' }).click();
+  await expect(nav.getByRole('button', { name: 'Go to Enquiries' })).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByTestId('admin-calendar')).toHaveCount(0);
+
+  await nav.getByRole('button', { name: 'Go to Calendar' }).click();
+  await expect(page.getByTestId('admin-calendar')).toBeVisible();
+});
