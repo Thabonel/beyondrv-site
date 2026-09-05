@@ -11,7 +11,9 @@ export function validateModelPages(data: ModelPages): string[] {
     if (!model.coverageId || !model.platform || !model.fitmentMode || !model.variants.length) errors.push(`Missing coverage or variants: ${model.slug}`);
     const sources = new Set(model.sources.map(s => s.id));
     for (const source of model.sources) {
-      if (!/^https?:\/\//.test(source.url) || !source.title || !/^\d{4}-\d{2}-\d{2}$/.test(source.accessedDate)) errors.push(`Invalid source: ${source.id}`);
+      const offline = source.sourceType === 'manufacturer_manual';
+      const urlOk = offline ? source.url === '' : /^https?:\/\//.test(source.url);
+      if (!urlOk || !source.title || !/^\d{4}-\d{2}-\d{2}$/.test(source.accessedDate)) errors.push(`Invalid source: ${source.id}`);
     }
     for (const v of model.variants) {
       count++;

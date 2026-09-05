@@ -26,7 +26,7 @@ function parseCsv(text) {
   return rows.filter(r => r.length > 1).map(r => Object.fromEntries(headers.map((h, i) => [h, r[i]])));
 }
 const coverage = new Map(parseCsv(readFileSync(resolve(root, 'data/vehicle-selector/model-coverage.csv'), 'utf8')).map(r => [r.id, r]));
-const sources = new Map(query('SELECT * FROM sources ORDER BY id').map(s => [s.id, { id: s.id, manufacturer: s.manufacturer, title: s.title, url: s.url, accessedDate: s.accessed_date, notes: s.notes }]));
+const sources = new Map(query('SELECT * FROM sources ORDER BY id').map(s => [s.id, { id: s.id, manufacturer: s.manufacturer, title: s.title, url: s.url, accessedDate: s.accessed_date, sourceType: s.source_type, notes: s.notes }]));
 const rows = [...query('SELECT * FROM vehicle_variants ORDER BY id').map(r => ({ ...r, kind: 'light' })), ...query('SELECT * FROM heavy_overland_chassis ORDER BY id').map(r => ({ ...r, kind: 'heavy' }))];
 const models = new Map();
 for (const r of rows) {

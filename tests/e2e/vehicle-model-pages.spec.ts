@@ -30,8 +30,14 @@ test('invalid query fields stay empty and valid dimensions are accepted', async 
 });
 test('heavy pages distinguish missing masses and chassis rear axle headroom', async ({ page }) => {
   await page.goto('/slide-on-campers/mercedes-benz-unimog/');
-  await expect(page.getByTestId('model-answer')).toContainText('unavailable');
+  // A missing mass must say the arithmetic cannot be done, not report its result as "unavailable".
+  await expect(page.getByTestId('model-answer')).toContainText('cannot be calculated from it');
+  await expect(page.getByTestId('model-answer')).not.toContainText('minus that mass is unavailable');
   await expect(page.locator('#variants')).toContainText('Not published');
+  await page.goto('/slide-on-campers/mercedes-benz-unimog-u1700l/');
+  await expect(page.getByTestId('model-answer')).toContainText('12,000 kg');
+  await expect(page.getByTestId('model-answer')).toContainText('5,200 kg to 5,400 kg');
+  await expect(page.locator('#sources-heading + p + ol')).toContainText('Offline document, not web-retrievable');
   await page.goto('/slide-on-campers/iveco-daily-4x4/');
   await expect(page.locator('#variants')).toContainText('3,967 kg');
 });

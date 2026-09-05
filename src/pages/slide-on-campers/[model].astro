@@ -2,24 +2,16 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import data from '../../data/vehicle-selector/model-pages.json';
 import type { ModelPage } from '../../lib/vehicleModelPages/types';
-import { calculatorUrl, loadAllowance, rearAxleHeadroom, towingAtGvm } from '../../lib/vehicleModelPages/fitment';
+import { answerParagraph, calculatorUrl, kgLabel, loadAllowance, rangeLabel, rearAxleHeadroom, towingAtGvm } from '../../lib/vehicleModelPages/fitment';
 import { ESTIMATE_DISCLAIMER } from '../../lib/vehicleSuitabilityCalculator.js';
 export function getStaticPaths() { return data.models.map(model => ({ params: { model: model.slug }, props: { model } })); }
 interface Props { model: ModelPage }
 const { model } = Astro.props;
 const name = `${model.make} ${model.model}`;
 const heavy = model.variants[0].kind === 'heavy';
-const kg = (value: number | null) => value === null ? 'Not published' : `${value.toLocaleString('en-AU')} kg`;
-const range = (values: (number | null)[]) => {
-  const known = values.filter((v): v is number => v !== null);
-  if (!known.length) return 'unavailable';
-  const min = Math.min(...known), max = Math.max(...known);
-  return min === max ? kg(min) : `${kg(min)} to ${kg(max)}`;
-};
-const massRange = range(model.variants.map(v => v.kerbKg));
-const payloadRange = range(model.variants.map(v => v.calculatedPayloadKg));
-const allowanceRange = range(model.variants.map(v => loadAllowance(v.calculatedPayloadKg)));
-const answer = `${name} has a recorded GVM of ${range(model.variants.map(v => v.gvmKg))}. ${heavy ? 'Chassis-cab mass' : 'Kerb mass'} is ${massRange}; payload calculated as GVM minus that mass is ${payloadRange} across ${model.variants.length} recorded variants. After a stated 390 kg allowance for occupants, accessories and gear, the remaining ${heavy ? 'body and camper' : 'camper'} load allowance is ${allowanceRange}.`;
+const kg = kgLabel;
+const allowanceRange = rangeLabel(model.variants.map(v => loadAllowance(v.calculatedPayloadKg)));
+const answer = answerParagraph(model);
 const pageUrl = `https://beyondrv.com.au/slide-on-campers/${model.slug}/`;
 const towingAnswer = `If GCM stays unchanged, each extra kilogram of loaded vehicle mass leaves one kilogram less under GCM for a trailer. The ${name} table uses published GCM minus hypothetical GVM; it does not certify an upgrade or override the published towing limit.`;
 const faqs = [
@@ -35,7 +27,7 @@ const schema = [
     { '@type': 'ListItem', position: 2, name: 'Vehicle Suitability Checker', item: 'https://beyondrv.com.au/vehicle-suitability-checker/' },
     { '@type': 'ListItem', position: 3, name, item: pageUrl },
   ] },
-  { '@context': 'https://schema.org', '@type': 'Dataset', name: `${name} Australian vehicle mass and payload records`, description: answer, url: pageUrl, creator: { '@type': 'Organization', name: 'Beyond RV', url: 'https://beyondrv.com.au/' }, citation: model.sources.map(s => ({ '@type': 'CreativeWork', name: s.title, url: s.url })), variableMeasured: ['GVM (kg)', heavy ? 'Chassis-cab mass (kg)' : 'Kerb mass (kg)', 'Payload (kg)', 'GCM (kg)'], spatialCoverage: 'Australia' },
+  { '@context': 'https://schema.org', '@type': 'Dataset', name: `${name} Australian vehicle mass and payload records`, description: answer, url: pageUrl, creator: { '@type': 'Organization', name: 'Beyond RV', url: 'https://beyondrv.com.au/' }, citation: model.sources.map(s => s.url ? { '@type': 'CreativeWork', name: s.title, url: s.url } : { '@type': 'CreativeWork', name: s.title }), variableMeasured: ['GVM (kg)', heavy ? 'Chassis-cab mass (kg)' : 'Kerb mass (kg)', 'Payload (kg)', 'GCM (kg)'], spatialCoverage: 'Australia' },
 ];
 const sourceFor = (id: string) => model.sources.find(s => s.id === id)!;
 const sourceNumber = (id: string) => model.sources.findIndex(s => s.id === id) + 1;
@@ -88,7 +80,7 @@ const towingVariants = model.variants.filter(v => v.gcmKg !== null);
     <section aria-labelledby="sources-heading">
       <h2 id="sources-heading">Manufacturer sources and currency</h2>
       <p>These are stored research figures, not a live check of current specifications. Access dates below identify when each source was recorded.</p>
-      <ol class="sources">{model.sources.map(s => <li id={`source-${s.id}`}><a href={s.url}>{s.title}</a> — {s.manufacturer}. Accessed {s.accessedDate}.{s.notes && <p class="source-note">{s.notes}</p>}</li>)}</ol>
+      <ol class="sources">{model.sources.map(s => <li id={`source-${s.id}`}>{s.url ? <a href={s.url}>{s.title}</a> : <span>{s.title}</span>} — {s.manufacturer}.{!s.url && <span> Offline document, not web-retrievable.</span>} Accessed {s.accessedDate}.{s.notes && <p class="source-note">{s.notes}</p>}</li>)}</ol>
       {reviewCount > 0 && <p class="caveat">Secondary review required: {model.variants.filter(v => v.verificationStatus === 'needs_secondary_review').map(v => `${v.grade} (${v.modelYear ?? 'year unspecified'}, ${v.cabType.replaceAll('_', ' ')}, ${v.drivetrain})`).join('; ')}.</p>}
     </section>
     <section aria-labelledby="faq-heading"><h2 id="faq-heading">{name} payload questions</h2>{faqs.map(f => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}</section>
