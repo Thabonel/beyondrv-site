@@ -9,6 +9,7 @@ import {
 } from './admin-auth';
 import { mapWithConcurrency, selectExistingKeys } from './blob-batch';
 import { connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
+import { visitReadiness } from './visit-readiness-core';
 import {
   buildLeadIntelligence,
   OWNER_COPILOT_TASK_STORE,
@@ -851,6 +852,15 @@ export const handler: Handler = async (event) => {
     }))
     .slice(0, 12);
 
+  // A customer travelling to a vehicle that is not here is the most expensive
+  // mistake this dashboard can prevent, so it is computed from the same order
+  // and product lists the rest of the page already has.
+  const visitReadinessReport = visitReadiness(
+    orders as unknown as Array<Record<string, unknown>>,
+    products as unknown as Array<Record<string, unknown>>,
+    todayKey(new Date()),
+  );
+
   const orderStatuses = ['enquiry', 'deposit_received', 'ordered_from_factory', 'in_china_production', 'awaiting_shipping', 'in_transit', 'arrived_mutdapilly', 'local_fitout', 'ready_for_handover', 'delivered', 'cancelled']
     .map((status) => ({
       status,
@@ -934,6 +944,7 @@ export const handler: Handler = async (event) => {
       },
       lifecycle,
       tasks: taskSummary,
+      visitReadiness: visitReadinessReport,
       productPerformance,
       productInterest: {
         unknownProductEnquiries,

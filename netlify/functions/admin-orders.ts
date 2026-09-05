@@ -59,6 +59,9 @@ function normalizeOrder(body: Record<string, unknown>, existing: Record<string, 
   const expectedArrivalDate = cleanWithFallback(body, existing, 'expectedArrivalDate', 40);
   const expectedHandoverDate = cleanWithFallback(body, existing, 'expectedHandoverDate', 40);
   const nextActionDate = cleanWithFallback(body, existing, 'nextActionDate', 40);
+  // The date a customer is travelling to see the vehicle. Recorded so something
+  // can ask whether it will actually be here by then.
+  const customerVisitDate = cleanWithFallback(body, existing, 'customerVisitDate', 40);
   const paymentType = cleanWithFallback(body, existing, 'paymentType', 20);
   const purchaseKind = cleanWithFallback(body, existing, 'purchaseKind', 20);
   const paymentStatus = cleanWithFallback(body, existing, 'paymentStatus', 40);
@@ -73,7 +76,7 @@ function normalizeOrder(body: Record<string, unknown>, existing: Record<string, 
   if (shippingStatus && !VALID_SHIPPING_STATUSES.has(shippingStatus)) throw new Error('Invalid shipping status');
   if (!customerName) throw new Error('Missing customer name');
   if (!productTitle) throw new Error('Missing product');
-  if (![factoryOrderDate, expectedArrivalDate, expectedHandoverDate, nextActionDate].every(isDateFieldValid)) {
+  if (![factoryOrderDate, expectedArrivalDate, expectedHandoverDate, nextActionDate, customerVisitDate].every(isDateFieldValid)) {
     throw new Error('Invalid date format');
   }
 
@@ -123,6 +126,7 @@ function normalizeOrder(body: Record<string, unknown>, existing: Record<string, 
     expectedArrivalDate,
     expectedHandoverDate,
     nextActionDate,
+    customerVisitDate,
     notes: cleanWithFallback(body, existing, 'notes', 4000),
     statusHistory: Array.isArray(existing?.statusHistory)
       ? status !== clean(existing?.status, 40)
