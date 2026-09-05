@@ -57,6 +57,14 @@ export async function mockCalendar(page: Page) {
     }
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, message: 'Done.' }) });
   });
+  await page.route('**/.netlify/functions/admin-crew', (route) => route.fulfill({
+    status: 200, contentType: 'application/json',
+    body: JSON.stringify({ crew: [
+      { id: 'crew-li', name: 'Li', scope: 'crew', keyIssuedAt: '', revokedAt: '', lastSeenAt: '' },
+      { id: 'crew-oscar', name: 'Oscar', scope: 'crew', keyIssuedAt: '', revokedAt: '', lastSeenAt: '' },
+      { id: 'crew-gone', name: 'Someone who left', scope: 'crew', keyIssuedAt: '', revokedAt: '2026-09-01T00:00:00.000Z', lastSeenAt: '' },
+    ] }),
+  }));
   await page.route('**/.netlify/functions/admin-orders', (route) => route.fulfill({
     status: 200, contentType: 'application/json',
     body: JSON.stringify({ orders: [

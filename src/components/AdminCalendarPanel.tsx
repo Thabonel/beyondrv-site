@@ -10,7 +10,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import AdminCalendar, { type CalendarActions } from './AdminCalendar';
 import type { StoredDetail } from './calendar/EventDetail';
-import type { OrderOption } from './calendar/EventForm';
+import type { CrewOption, OrderOption } from './calendar/EventForm';
 import { addDays, toDay, type AdminCalendarEvent } from './calendar/calendar-model';
 import { calendarClashes, sortCalendarEvents } from '../../netlify/functions/calendar-events-core.ts';
 import { toAdminCalendarEvent, type CompanyCalendarEvent } from '../../netlify/functions/calendar-store-core.ts';
@@ -20,6 +20,7 @@ const DASHBOARD = '/.netlify/functions/admin-dashboard?range=90';
 const EVENTS = '/.netlify/functions/admin-calendar-events';
 const WRITE = '/.netlify/functions/admin-calendar-write';
 const ORDERS = '/.netlify/functions/admin-orders';
+const CREW = '/.netlify/functions/admin-crew';
 
 async function call<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, { credentials: 'same-origin', ...init });
@@ -39,8 +40,17 @@ function post(url: string, method: string, body: Record<string, unknown>) {
 export default function AdminCalendarPanel() {
   const [projected, setProjected] = useState<AdminCalendarEvent[]>([]);
   const [stored, setStored] = useState<CompanyCalendarEvent[]>([]);
+  const [crew, setCrew] = useState<CrewOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Who a job can be given to. A failure here is not worth an error banner:
+  // the calendar still works, the picker just offers nobody.
+  useEffect(() => {
+    void call<{ crew?: Array<{ id: string; name: string; revokedAt: string }> }>(CREW)
+      .then((data) => setCrew((data.crew ?? []).filter((person) => !person.revokedAt).map((person) => ({ id: person.id, name: person.name }))))
+      .catch(() => setCrew([]));
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -83,7 +93,9 @@ export default function AdminCalendarPanel() {
     updateStoreEvent: (id, body) => post(EVENTS, 'PATCH', { id, ...body }),
     deleteStoreEvent: (id) => post(EVENTS, 'DELETE', { id }),
     moveRecord: (kind, recordId, date, time) => post(WRITE, 'POST', { kind, recordId, date, time }),
-    createTask: (title, date, time) => post(WRITE, 'POST', { action: 'create_task', title, date, time }),
+    createTask: (title, date, time, assigneeId) => post(WRITE, 'POST', { action: 'create_task', title, date, time, assigneeId }),
+    assignTask: (recordId, assigneeId) => post(WRITE, 'POST', { action: 'assign_task', recordId, assigneeId }),
+    crew,
     loadOrders: async () => {
       const data = await call<{ orders?: Array<Record<string, unknown>> }>(ORDERS);
       return (data.orders ?? [])
@@ -94,7 +106,7 @@ export default function AdminCalendarPanel() {
         }));
     },
     refresh: load,
-  }), [load]);
+  }), [load, crew]);
 
   return (
     <AdminCalendar

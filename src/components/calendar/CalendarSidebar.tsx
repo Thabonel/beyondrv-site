@@ -1,6 +1,7 @@
 /** Create, the mini month, and the list of calendars, as Google lays them out. */
 import React from 'react';
 import MiniMonth from './MiniMonth';
+import CrewPanel from './CrewPanel';
 import { ALL_EVENT_KINDS, EVENT_KIND_META, type CalendarEventKind } from './calendar-model';
 
 interface Props {
@@ -21,6 +22,9 @@ export default function CalendarSidebar({ month, selected, today, hidden, counts
         <span className="gcal-create__plus" aria-hidden="true">+</span> Create
       </button>
       <MiniMonth month={month} selected={selected} today={today} onSelect={onSelectDay} onMonthChange={onSelectDay} />
+      {/* Above the calendar list on purpose: below it, Crew fell under the
+          fold behind ten rows and nobody found it. */}
+      <CrewPanel />
       <div className="gcal-calendars">
         <div className="gcal-calendars__title">My calendars</div>
         {ALL_EVENT_KINDS.map((kind) => {

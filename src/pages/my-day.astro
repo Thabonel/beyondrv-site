@@ -1,0 +1,27 @@
+---
+import MyDay from '../components/MyDay';
+---
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- Not a public page. It is reachable only with a key, and no crawler
+         should ever have it in an index. -->
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <!-- Referrer would otherwise carry the address of this page to anything it
+         links to. It carries no key, but there is no reason to send it. -->
+    <meta name="referrer" content="no-referrer" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="My Day" />
+    <link rel="manifest" href="/my-day.webmanifest" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <title>My Day | Beyond RV</title>
+  </head>
+  <body style="margin:0;background:#fff;">
+    <MyDay client:only="react" />
+  </body>
+</html>

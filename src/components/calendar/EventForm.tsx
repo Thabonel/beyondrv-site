@@ -14,9 +14,11 @@ export interface EventFormValues {
   allDay: boolean;
   notes: string;
   orderId: string;
+  assigneeId: string;
 }
 
 export interface OrderOption { id: string; label: string }
+export interface CrewOption { id: string; name: string }
 
 interface Props {
   mode: 'create' | 'edit';
@@ -24,12 +26,13 @@ interface Props {
   /** The event being edited, when mode is edit. */
   event?: AdminCalendarEvent | null;
   orders: OrderOption[];
+  crew: CrewOption[];
   onLoadOrders: () => void;
   onSubmit: (values: EventFormValues) => Promise<void>;
   onCancel: () => void;
 }
 
-export default function EventForm({ mode, initial, event, orders, onLoadOrders, onSubmit, onCancel }: Props) {
+export default function EventForm({ mode, initial, event, orders, crew, onLoadOrders, onSubmit, onCancel }: Props) {
   const [values, setValues] = useState<EventFormValues>(initial);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -105,6 +108,17 @@ export default function EventForm({ mode, initial, event, orders, onLoadOrders, 
             >{option.label}</button>
           ))}
         </div>
+      )}
+
+      {(values.kind === 'task' || event?.kind === 'task') && (
+        <label className="gcal-form__field">
+          <span>Whose job</span>
+          <select value={values.assigneeId} onChange={(e) => set('assigneeId', e.target.value)} data-testid="event-assignee">
+            <option value="">Mine</option>
+            {crew.map((person) => <option key={person.id} value={person.id}>{person.name}</option>)}
+          </select>
+          {!crew.length && <span className="gcal-muted">Add people under Crew phone links to give them jobs.</span>}
+        </label>
       )}
 
       {ORDER_DATE_KINDS.has(values.kind) && mode === 'create' && (

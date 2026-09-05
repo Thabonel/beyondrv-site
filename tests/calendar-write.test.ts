@@ -40,7 +40,7 @@ test('a new task needs a title and a real date', () => {
   assert.equal(decideNewTask({ title: '  ', date: '2026-09-10' }).ok, false);
   assert.equal(decideNewTask({ title: 'Ring the agent', date: 'soon' }).ok, false);
   const ok = decideNewTask({ title: '  Ring the agent  ', date: '2026-09-10' });
-  assert.deepEqual(ok, { ok: true, title: 'Ring the agent', dueDate: '2026-09-10', dueTime: '' });
+  assert.deepEqual(ok, { ok: true, title: 'Ring the agent', dueDate: '2026-09-10', dueTime: '', assigneeId: '' });
 });
 
 test('an unknown kind is refused rather than guessed at', () => {
@@ -60,9 +60,16 @@ test('a move with a time keeps it for kinds that can hold one and drops it for t
 test('a malformed time is refused rather than written', () => {
   assert.equal(decideMove({ kind: 'task', recordId: 't1', date: '2026-09-10', time: '10am' }).ok, false);
   assert.equal(decideNewTask({ title: 'x', date: '2026-09-10', time: '25:00' }).ok, false);
-  assert.deepEqual(decideNewTask({ title: 'x', date: '2026-09-10', time: '09:15' }), { ok: true, title: 'x', dueDate: '2026-09-10', dueTime: '09:15' });
+  assert.deepEqual(decideNewTask({ title: 'x', date: '2026-09-10', time: '09:15' }), { ok: true, title: 'x', dueDate: '2026-09-10', dueTime: '09:15', assigneeId: '' });
 });
 
 test('meetings and reminders are not record dates, and the reason says where they move', () => {
   assert.match(immovableReason('meeting'), /calendar events endpoint/);
+});
+
+test('a new task can be given to someone, and defaults to nobody', () => {
+  assert.deepEqual(decideNewTask({ title: 'Fit the tray', date: '2026-09-10', assigneeId: 'crew-li' }),
+    { ok: true, title: 'Fit the tray', dueDate: '2026-09-10', dueTime: '', assigneeId: 'crew-li' });
+  assert.equal((decideNewTask({ title: 'x', date: '2026-09-10' }) as { assigneeId: string }).assigneeId, '',
+    'unassigned means it is the GM\'s own');
 });
