@@ -1,0 +1,127 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import data from '../../data/vehicle-selector/model-pages.json';
+import type { ModelPage } from '../../lib/vehicleModelPages/types';
+import { calculatorUrl, loadAllowance, rearAxleHeadroom, towingAtGvm } from '../../lib/vehicleModelPages/fitment';
+import { ESTIMATE_DISCLAIMER } from '../../lib/vehicleSuitabilityCalculator.js';
+export function getStaticPaths() { return data.models.map(model => ({ params: { model: model.slug }, props: { model } })); }
+interface Props { model: ModelPage }
+const { model } = Astro.props;
+const name = `${model.make} ${model.model}`;
+const heavy = model.variants[0].kind === 'heavy';
+const kg = (value: number | null) => value === null ? 'Not published' : `${value.toLocaleString('en-AU')} kg`;
+const range = (values: (number | null)[]) => {
+  const known = values.filter((v): v is number => v !== null);
+  if (!known.length) return 'unavailable';
+  const min = Math.min(...known), max = Math.max(...known);
+  return min === max ? kg(min) : `${kg(min)} to ${kg(max)}`;
+};
+const massRange = range(model.variants.map(v => v.kerbKg));
+const payloadRange = range(model.variants.map(v => v.calculatedPayloadKg));
+const allowanceRange = range(model.variants.map(v => loadAllowance(v.calculatedPayloadKg)));
+const answer = `${name} has a recorded GVM of ${range(model.variants.map(v => v.gvmKg))}. ${heavy ? 'Chassis-cab mass' : 'Kerb mass'} is ${massRange}; payload calculated as GVM minus that mass is ${payloadRange} across ${model.variants.length} recorded variants. After a stated 390 kg allowance for occupants, accessories and gear, the remaining ${heavy ? 'body and camper' : 'camper'} load allowance is ${allowanceRange}.`;
+const pageUrl = `https://beyondrv.com.au/slide-on-campers/${model.slug}/`;
+const towingAnswer = `If GCM stays unchanged, each extra kilogram of loaded vehicle mass leaves one kilogram less under GCM for a trailer. The ${name} table uses published GCM minus hypothetical GVM; it does not certify an upgrade or override the published towing limit.`;
+const faqs = [
+  { q: `What is the payload of a ${name}?`, a: answer },
+  { q: `How much can a ${name} carry with a slide-on camper?`, a: `The calculated allowance is ${allowanceRange} after 160 kg for occupants, 150 kg for accessories and 80 kg for gear. Any tray or body excluded from the recorded mass, camper water and camper equipment still have to be allowed for. This is not a camper fitment verdict.` },
+  { q: `Does a GVM upgrade reduce a ${name}'s towing capacity?`, a: towingAnswer },
+];
+const schema = [
+  { '@context': 'https://schema.org', '@type': 'WebPage', name: `${name} slide-on camper payload`, url: pageUrl, description: answer },
+  { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
+  { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://beyondrv.com.au/' },
+    { '@type': 'ListItem', position: 2, name: 'Vehicle Suitability Checker', item: 'https://beyondrv.com.au/vehicle-suitability-checker/' },
+    { '@type': 'ListItem', position: 3, name, item: pageUrl },
+  ] },
+  { '@context': 'https://schema.org', '@type': 'Dataset', name: `${name} Australian vehicle mass and payload records`, description: answer, url: pageUrl, creator: { '@type': 'Organization', name: 'Beyond RV', url: 'https://beyondrv.com.au/' }, citation: model.sources.map(s => ({ '@type': 'CreativeWork', name: s.title, url: s.url })), variableMeasured: ['GVM (kg)', heavy ? 'Chassis-cab mass (kg)' : 'Kerb mass (kg)', 'Payload (kg)', 'GCM (kg)'], spatialCoverage: 'Australia' },
+];
+const sourceFor = (id: string) => model.sources.find(s => s.id === id)!;
+const sourceNumber = (id: string) => model.sources.findIndex(s => s.id === id) + 1;
+const trayText = { included: 'Standard tray included in kerb mass.', excluded: 'Tray excluded: subtract its actual mass as well. A steel tray can use 150–250 kg.', not_applicable: 'Pickup tub; a tray conversion needs new mass and dimensions.', unknown: 'Tray inclusion unknown: confirm actual tray/body mass before using the allowance.' };
+const reviewCount = model.variants.filter(v => v.verificationStatus === 'needs_secondary_review').length;
+const upgradeLevels = heavy ? [500, 1000, 1500] : [150, 300, 500];
+const towingVariants = model.variants.filter(v => v.gcmKg !== null);
+---
+<BaseLayout title={`${name} Slide-On Camper Payload & GVM | Beyond RV`} description={answer} canonicalUrl={pageUrl} structuredData={schema} activePath="/vehicle-suitability-checker/">
+  <article class="container model-page">
+    <h1>{name}: slide-on camper payload</h1>
+    <p class="answer" data-testid="model-answer">{answer} <span class="citations">{model.sources.map((s, i) => <a href={`#source-${s.id}`} aria-label={`Source ${i + 1}: ${s.title}`}>[{i + 1}] </a>)}</span></p>
+    <section aria-labelledby="assumptions">
+      <h2 id="assumptions">What the allowance assumes</h2>
+      <p>We subtract 160 kg for occupants, 150 kg for accessories and 80 kg for luggage and gear: 390 kg total. These are assumptions, not measured weights. Published mass bases differ; some already include a driver or fuel. Avoid counting those twice when entering your actual weights.</p>
+      <p>This is remaining mass allowance, not an approved camper dry weight. Allow for any excluded tray or body, mounting frame, water and camper equipment. No camper fitment verdict is available without verified camper mass, dimensions and centre of gravity.</p>
+      <p><a href={calculatorUrl(model.variants[0])}>Change the assumptions in the weight calculator</a>. Enter your occupant, accessory and gear weights there; these assumptions are not automatically filled.</p>
+      {reviewCount > 0 && <p class="caveat">{reviewCount} of {model.variants.length} records need secondary review. Read the warnings beside their figures before using them.</p>}
+      {model.variants.some(v => v.kerbKg === null) && <p class="caveat">Some chassis masses are not published in this dataset. Their payload and remaining allowance are unavailable; limits alone cannot establish camper suitability.</p>}
+    </section>
+    <section id="variants" aria-labelledby="variant-heading">
+      <h2 id="variant-heading">Recorded variants, highest calculated payload first</h2>
+      <p>Model years: {model.modelYears.length ? model.modelYears.join(', ') : 'not specified in the source'}. Match your exact variant and mass basis. “Verified” describes the research record, not approval for a camper.</p>
+      <div class="table-scroll" role="region" aria-label="Vehicle variant figures" tabindex="0">
+        <table>
+          <caption>All figures in kilograms unless stated. Sources and review status apply to each row.</caption>
+          <thead><tr><th scope="col">Variant / year</th><th scope="col">GVM / GCM</th><th scope="col">{heavy ? 'Chassis-cab mass' : 'Kerb mass'}</th><th scope="col">Payload / allowance</th><th scope="col">Tray / axle limits</th><th scope="col">Source and caveats</th></tr></thead>
+          <tbody>{model.variants.map(v => <tr id={v.id}>
+            <th scope="row">{v.grade}<small>{v.modelYear ?? 'Year not specified'}{v.modelYearEnd ? `–${v.modelYearEnd}` : ''} · {v.cabType.replaceAll('_', ' ')} · {v.drivetrain}</small><a class="calculator-link" href={calculatorUrl(v)}>Calculate {v.grade} {v.modelYear ?? ''}</a></th>
+            <td>{kg(v.gvmKg)}<small>GCM: {kg(v.gcmKg)}</small></td>
+            <td>{kg(v.kerbKg)}<small>{v.kerbBasis}</small>{v.kind === 'heavy' && <small>Front: {kg(v.chassisCabFrontMassKg)}<br />Rear: {kg(v.chassisCabRearMassKg)}</small>}</td>
+            <td>Calculated: <strong>{kg(v.calculatedPayloadKg)}</strong><small>Published {heavy ? 'body payload' : 'payload'}: {kg(v.payloadKg)}</small><small>After 390 kg: {v.calculatedPayloadKg === null ? 'Unavailable' : kg(loadAllowance(v.calculatedPayloadKg))}</small><small class:list={{ caveat: v.payloadArithmeticMatches === false }}>Arithmetic: {v.payloadArithmeticMatches === null ? 'cannot cross-check' : v.payloadArithmeticMatches ? 'matches published payload' : 'DISCREPANCY — confirm both figures with manufacturer'}</small></td>
+            <td>{trayText[v.trayState]}<small>Front axle limit: {kg(v.frontGawrKg)}<br />Rear axle limit: {kg(v.rearGawrKg)}</small>{v.kind === 'heavy' && <small>Rear axle headroom before body and loads: {rearAxleHeadroom(v.rearGawrKg, v.chassisCabRearMassKg) === null ? 'Unavailable' : kg(rearAxleHeadroom(v.rearGawrKg, v.chassisCabRearMassKg))}</small>}{v.kind === 'heavy' && <small>{v.mountingArchitectureNote}</small>}</td>
+            <td><a href={`#source-${v.sourceId}`}>[{sourceNumber(v.sourceId)}] {sourceFor(v.sourceId).title}</a><small>{v.sourceLocator}</small><small class:list={{ caveat: v.verificationStatus === 'needs_secondary_review' }}>{v.verificationStatus.replaceAll('_', ' ')}</small>{v.notes && <small>{v.notes}</small>}{sourceFor(v.sourceId).notes && <small class="source-note">{sourceFor(v.sourceId).notes}</small>}</td>
+          </tr>)}</tbody>
+        </table>
+      </div>
+      <p>{heavy ? 'Rear axle headroom is the published limit minus the recorded chassis-cab rear mass, where both exist. The body, subframe and loaded camper consume this margin; front axle, tyres and load distribution still need checking.' : 'Rear axle headroom cannot be calculated from these records: the rear GAWR is a limit, but the kerb front/rear axle split is not recorded. A weighbridge measurement of each axle is needed.'}</p>
+    </section>
+    <section aria-labelledby="upgrade-heading">
+      <h2 id="upgrade-heading">GVM upgrade arithmetic</h2>
+      <p>{towingAnswer} No certified upgrade figures are recorded. The increments below are illustrative scenarios, not available or approved upgrades. They assume the vehicle is loaded to the stated hypothetical GVM and GCM stays unchanged.</p>
+      {towingVariants.length ? <div class="table-scroll" role="region" aria-label="GCM minus hypothetical GVM" tabindex="0"><table>
+        <caption>Combination-mass allowance for a trailer at full GVM, before towing and other limits</caption>
+        <thead><tr><th scope="col">Variant</th><th scope="col">Published GCM</th><th scope="col">At stock GVM</th>{upgradeLevels.map(increase => <th scope="col">GVM +{increase} kg</th>)}<th scope="col">Published braked towing limit</th></tr></thead>
+        <tbody>{towingVariants.map(v => <tr><th scope="row">{v.grade} · {v.modelYear ?? 'year unspecified'} · {v.cabType.replaceAll('_', ' ')} · {v.drivetrain}<small><a href={`#${v.id}`}>Variant and source [{sourceNumber(v.sourceId)}]</a></small></th><td>{kg(v.gcmKg)}</td><td>{kg(towingAtGvm(v.gcmKg, v.gvmKg))}<small>GVM {kg(v.gvmKg)}</small></td>{upgradeLevels.map(increase => <td>{kg(towingAtGvm(v.gcmKg, v.gvmKg + increase))}<small>Hypothetical GVM {kg(v.gvmKg + increase)}</small></td>)}<td>{kg(v.brakedTowingKg)}</td></tr>)}</tbody>
+      </table></div> : <p>GCM is not recorded for this model, so no towing arithmetic is available.</p>}
+      <p>A negative result means the hypothetical vehicle mass already exceeds GCM. A positive result is not permission to tow that mass: the manufacturer's towing rating, towbar, towball load, axle limits and actual certification also apply.</p>
+    </section>
+    <section aria-labelledby="sources-heading">
+      <h2 id="sources-heading">Manufacturer sources and currency</h2>
+      <p>These are stored research figures, not a live check of current specifications. Access dates below identify when each source was recorded.</p>
+      <ol class="sources">{model.sources.map(s => <li id={`source-${s.id}`}><a href={s.url}>{s.title}</a> — {s.manufacturer}. Accessed {s.accessedDate}.{s.notes && <p class="source-note">{s.notes}</p>}</li>)}</ol>
+      {reviewCount > 0 && <p class="caveat">Secondary review required: {model.variants.filter(v => v.verificationStatus === 'needs_secondary_review').map(v => `${v.grade} (${v.modelYear ?? 'year unspecified'}, ${v.cabType.replaceAll('_', ' ')}, ${v.drivetrain})`).join('; ')}.</p>}
+    </section>
+    <section aria-labelledby="faq-heading"><h2 id="faq-heading">{name} payload questions</h2>{faqs.map(f => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}</section>
+    <p><a href="/slide-on-camper-weight-calculator/">Check your actual weights in the calculator</a></p>
+    <p class="disclaimer">{ESTIMATE_DISCLAIMER}</p>
+    <section aria-label="Other vehicle payload pages"><h2>Other vehicle models</h2><ul class="model-links">{data.models.filter(m => m.slug !== model.slug).map(m => <li><a href={`/slide-on-campers/${m.slug}/`}>{m.make} {m.model}</a></li>)}</ul></section>
+  </article>
+</BaseLayout>
+<style>
+  .model-page { padding-top: 130px; padding-bottom: 70px; max-width: 1400px; }
+  h1 { font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1.12; margin-bottom: 22px; }
+  h2 { font-size: 1.55rem; margin-bottom: 16px; }
+  p { line-height: 1.7; margin: 14px 0; }
+  .answer { font-size: 1.15rem; max-width: 1000px; }
+  section { margin-top: 36px; }
+  a { color: var(--orange2); text-decoration: underline; text-underline-offset: 3px; }
+  .table-scroll { overflow-x: auto; border: 1px solid #3b3b3b; border-radius: 8px; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; min-width: 1000px; }
+  caption { text-align: left; padding: 16px; background: #202020; }
+  th, td { padding: 16px; text-align: left; vertical-align: top; border-bottom: 1px solid #3b3b3b; min-width: 120px; }
+  thead { background: #242b25; color: white; }
+  tbody th { min-width: 180px; }
+  tbody tr:nth-child(even) { background: #161616; }
+  td:last-child { min-width: 270px; }
+  small { display: block; margin-top: 9px; font-size: .82rem; font-weight: 400; line-height: 1.5; }
+  .calculator-link { display: block; margin-top: 12px; font-weight: 500; }
+  .caveat, .source-note { padding: 10px 12px; background: #fff0d6; color: #58360d; border-left: 3px solid #b8781b; }
+  .sources { padding-left: 24px; }
+  .sources li { margin: 20px 0; line-height: 1.6; scroll-margin-top: 120px; }
+  details { border-bottom: 1px solid #3b3b3b; padding: 18px 0; }
+  summary { cursor: pointer; font-weight: 600; }
+  .disclaimer { font-size: .9rem; color: #aaa; }
+  .model-links { display: flex; flex-wrap: wrap; gap: 12px 24px; padding: 0; list-style: none; }
+  tr { scroll-margin-top: 120px; }
+  @media (max-width: 600px) { .model-page { padding-top: 105px; } h1 { font-size: 1.85rem; } .answer { font-size: 1rem; } }
+</style>
