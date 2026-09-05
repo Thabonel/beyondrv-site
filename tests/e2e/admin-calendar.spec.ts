@@ -195,3 +195,22 @@ test('the header offers Calendar, Dashboard, Enquiries and Analytics one tap awa
   await nav.getByRole('button', { name: 'Go to Calendar' }).click();
   await expect(page.getByTestId('admin-calendar')).toBeVisible();
 });
+
+test('the crew phone links section is visible without scrolling the sidebar', async ({ page, isMobile }) => {
+  test.skip(Boolean(isMobile), 'the sidebar is behind the menu on a phone');
+  await mockCalendar(page);
+  await page.route('**/.netlify/functions/admin-crew', (route) => route.fulfill({
+    status: 200, contentType: 'application/json', body: JSON.stringify({ crew: [] }),
+  }));
+  await page.goto('/admin/');
+
+  // It sat below ten calendar rows and nobody found it, so it now has to be
+  // in view when the sidebar opens.
+  const crew = page.getByRole('button', { name: /Crew phone links/ });
+  await expect(crew).toBeInViewport();
+
+  // Above the ten calendar rows, which is where it was hidden before.
+  const crewBox = await crew.boundingBox();
+  const calendarsBox = await page.getByText('My calendars').boundingBox();
+  expect(crewBox!.y).toBeLessThan(calendarsBox!.y);
+});

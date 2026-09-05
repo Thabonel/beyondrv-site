@@ -22,6 +22,9 @@ export default function CalendarSidebar({ month, selected, today, hidden, counts
         <span className="gcal-create__plus" aria-hidden="true">+</span> Create
       </button>
       <MiniMonth month={month} selected={selected} today={today} onSelect={onSelectDay} onMonthChange={onSelectDay} />
+      {/* Above the calendar list on purpose: below it, Crew fell under the
+          fold behind ten rows and nobody found it. */}
+      <CrewPanel />
       <div className="gcal-calendars">
         <div className="gcal-calendars__title">My calendars</div>
         {ALL_EVENT_KINDS.map((kind) => {
@@ -43,7 +46,6 @@ export default function CalendarSidebar({ month, selected, today, hidden, counts
           );
         })}
       </div>
-      <CrewPanel />
       <div className="gcal-legend">
         <div><span className="gcal-legend__swatch" style={{ background: '#fff', border: '1px solid #dadce0' }} />Open 8am–5pm, Mon–Sat</div>
         <div><span className="gcal-legend__swatch" style={{ background: '#eceff1' }} />Lunch 12–1</div>

@@ -474,10 +474,22 @@
 
 /* ---------- Crew ---------- */
 .gcal-crew { display: grid; gap: 6px; }
+/* Orange and bold: this was below the fold under ten calendar rows and nobody
+   found it, so it now has to carry itself. */
 .gcal-crew__toggle {
-  background: none; border: none; padding: 0; cursor: pointer;
-  font: inherit; font-size: 14px; font-weight: 500; color: var(--gcal-text); text-align: left;
+  display: flex; align-items: center; gap: 6px; width: 100%;
+  background: rgba(232, 84, 10, 0.08);
+  border: 1px solid var(--gcal-accent);
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font: inherit; font-size: 14px; font-weight: 700;
+  color: var(--gcal-accent);
+  text-align: left;
 }
+.gcal-crew__toggle:hover { background: rgba(232, 84, 10, 0.16); }
+.gcal-crew__chevron { font-size: 10px; }
+.gcal-crew__hint { margin: 2px 0 0 2px; color: var(--gcal-muted); font-size: 11px; line-height: 1.4; }
 .gcal-crew__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; }
 .gcal-crew__row.is-revoked { opacity: 0.5; }
 .gcal-crew__name { font-weight: 500; }

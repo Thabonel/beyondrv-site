@@ -105,8 +105,12 @@ export default function CrewPanel() {
   return (
     <div className="gcal-crew" data-testid="crew-panel">
       <button type="button" className="gcal-crew__toggle" onClick={() => setOpen((value) => !value)} aria-expanded={open}>
-        Crew {crew.length ? `(${crew.filter((member) => !member.revokedAt).length})` : ''}
+        <span className="gcal-crew__chevron" aria-hidden="true">{open ? '▾' : '▸'}</span>
+        Crew phone links{crew.length ? ` (${crew.filter((member) => !member.revokedAt).length})` : ''}
       </button>
+      {!open && !crew.length && (
+        <p className="gcal-crew__hint">Give someone their jobs on their phone, with no login.</p>
+      )}
 
       {open && (
         <>
