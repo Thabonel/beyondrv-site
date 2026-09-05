@@ -45,6 +45,20 @@ const KIND_META: Record<CalendarEventKind, { label: string; colour: string }> = 
 
 const ALL_KINDS = Object.keys(KIND_META) as CalendarEventKind[];
 
+type CalendarViewName = 'dayGridMonth' | 'dayGridWeek' | 'dayGridDay' | 'listMonth';
+
+/**
+ * Week and day use the day-grid rather than the time-grid. Every date in this
+ * business is all-day, so an hour column would be an empty ruler down the side
+ * of every screen.
+ */
+const VIEW_OPTIONS: ReadonlyArray<readonly [CalendarViewName, string]> = [
+  ['dayGridMonth', 'Month'],
+  ['dayGridWeek', 'Week'],
+  ['dayGridDay', 'Day'],
+  ['listMonth', 'List'],
+];
+
 interface Props {
   events: AdminCalendarEvent[];
   clashes?: string[];
@@ -60,9 +74,9 @@ export default function AdminCalendar({ events, clashes = [], loading, error, on
   // at 340px and fine at 700px, so the view follows the width until the GM
   // picks one, after which their choice sticks.
   const [wideScreen, setWideScreen] = useState(true);
-  const [chosenView, setChosenView] = useState<'dayGridMonth' | 'listMonth' | null>(null);
-  const view = chosenView ?? (wideScreen ? 'dayGridMonth' : 'listMonth');
-  const setView = (next: 'dayGridMonth' | 'listMonth') => setChosenView(next);
+  const [chosenView, setChosenView] = useState<CalendarViewName | null>(null);
+  const view: CalendarViewName = chosenView ?? (wideScreen ? 'dayGridMonth' : 'listMonth');
+  const setView = (next: CalendarViewName) => setChosenView(next);
   const [hidden, setHidden] = useState<Set<CalendarEventKind>>(new Set());
   const [selected, setSelected] = useState<AdminCalendarEvent | null>(null);
 
@@ -76,9 +90,9 @@ export default function AdminCalendar({ events, clashes = [], loading, error, on
     title: event.title,
     start: event.date,
     allDay: true,
-    backgroundColor: 'transparent',
-    borderColor: KIND_META[event.kind]?.colour ?? '#888',
-    textColor: '#eee',
+    backgroundColor: KIND_META[event.kind]?.colour ?? '#5f6368',
+    borderColor: KIND_META[event.kind]?.colour ?? '#5f6368',
+    textColor: '#fff',
     extendedProps: { original: event },
   })), [visible]);
 
@@ -119,23 +133,27 @@ export default function AdminCalendar({ events, clashes = [], loading, error, on
   }, [events]);
 
   return (
-    <div data-testid="admin-calendar" style={{ display: 'grid', gap: '0.7rem' }}>
+    <div
+      data-testid="admin-calendar"
+      className="admin-calendar-sheet"
+      style={{ background: '#fff', borderRadius: '12px', display: 'grid', gap: '0.7rem', padding: '1rem' }}
+    >
       <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'space-between' }}>
         <div>
-          <div style={{ color: '#fff', fontWeight: 800 }}>Company Calendar</div>
-          <div style={{ color: '#888', fontSize: '0.74rem', marginTop: '0.18rem' }}>
+          <div style={{ color: '#202124', fontSize: '1.05rem', fontWeight: 700 }}>Company Calendar</div>
+          <div style={{ color: '#5f6368', fontSize: '0.76rem', marginTop: '0.18rem' }}>
             Every dated commitment in one place: visits, containers, handovers, follow-ups and tasks
           </div>
         </div>
         <div style={{ display: 'flex', gap: '0.3rem' }}>
-          {([['dayGridMonth', 'Month'], ['listMonth', 'List']] as const).map(([value, label]) => (
+          {VIEW_OPTIONS.map(([value, label]) => (
             <button
               key={value}
               onClick={() => setView(value)}
               style={{
-                background: view === value ? '#E8540A' : '#1a1a1a',
-                border: '1px solid #333', borderRadius: '6px',
-                color: view === value ? '#fff' : '#aaa',
+                background: view === value ? '#E8540A' : '#fff',
+                border: `1px solid ${view === value ? '#E8540A' : '#dadce0'}`, borderRadius: '6px',
+                color: view === value ? '#fff' : '#3c4043',
                 cursor: 'pointer', fontSize: '0.74rem', padding: '0.35rem 0.7rem',
               }}
             >{label}</button>
@@ -143,19 +161,19 @@ export default function AdminCalendar({ events, clashes = [], loading, error, on
           {onRefresh && (
             <button
               onClick={onRefresh}
-              style={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '6px', color: '#aaa', cursor: 'pointer', fontSize: '0.74rem', padding: '0.35rem 0.7rem' }}
+              style={{ background: '#fff', border: '1px solid #dadce0', borderRadius: '6px', color: '#3c4043', cursor: 'pointer', fontSize: '0.74rem', padding: '0.35rem 0.7rem' }}
             >Refresh</button>
           )}
         </div>
       </div>
 
       {clashes.length > 0 && (
-        <div data-testid="calendar-clashes" style={{ background: '#3a1010', border: '1px solid #f87171', borderRadius: '8px', padding: '0.7rem 0.85rem' }}>
-          <div style={{ color: '#f87171', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+        <div data-testid="calendar-clashes" style={{ background: '#fce8e6', border: '1px solid #d93025', borderRadius: '8px', padding: '0.7rem 0.85rem' }}>
+          <div style={{ color: '#c5221f', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
             Dates that disagree
           </div>
           {clashes.map((clash) => (
-            <div key={clash} style={{ color: '#ddd', fontSize: '0.78rem', marginTop: '0.25rem' }}>{clash}</div>
+            <div key={clash} style={{ color: '#3c4043', fontSize: '0.78rem', marginTop: '0.25rem' }}>{clash}</div>
           ))}
         </div>
       )}
@@ -169,24 +187,24 @@ export default function AdminCalendar({ events, clashes = [], loading, error, on
               onClick={() => toggleKind(kind)}
               aria-pressed={on}
               style={{
-                alignItems: 'center', background: on ? '#1f1f1f' : '#141414',
-                border: `1px solid ${on ? KIND_META[kind].colour : '#333'}`,
-                borderRadius: '999px', color: on ? '#eee' : '#666', cursor: 'pointer',
+                alignItems: 'center', background: on ? KIND_META[kind].colour : '#fff',
+                border: `1px solid ${on ? KIND_META[kind].colour : '#dadce0'}`,
+                borderRadius: '999px', color: on ? '#fff' : '#5f6368', cursor: 'pointer',
                 display: 'flex', fontSize: '0.68rem', gap: '0.35rem', padding: '0.2rem 0.6rem',
               }}
             >
-              <span style={{ background: KIND_META[kind].colour, borderRadius: '50%', display: 'inline-block', height: '7px', opacity: on ? 1 : 0.35, width: '7px' }} />
+              <span style={{ background: on ? '#fff' : KIND_META[kind].colour, borderRadius: '50%', display: 'inline-block', height: '7px', opacity: on ? 0.9 : 0.6, width: '7px' }} />
               {KIND_META[kind].label}
-              <span style={{ color: '#777' }}>{counts.get(kind) ?? 0}</span>
+              <span style={{ opacity: 0.75 }}>{counts.get(kind) ?? 0}</span>
             </button>
           );
         })}
       </div>
 
-      {error && <div style={{ color: '#f87171', fontSize: '0.8rem' }}>{error}</div>}
-      {loading && !events.length && <div style={{ color: '#777', fontSize: '0.85rem', padding: '2rem 0', textAlign: 'center' }}>Loading calendar...</div>}
+      {error && <div style={{ color: '#d93025', fontSize: '0.8rem' }}>{error}</div>}
+      {loading && !events.length && <div style={{ color: '#5f6368', fontSize: '0.85rem', padding: '2rem 0', textAlign: 'center' }}>Loading calendar...</div>}
 
-      <div className="admin-calendar-surface" style={{ background: '#111', border: '1px solid #262626', borderRadius: '10px', padding: '0.6rem' }}>
+      <div className="admin-calendar-surface" style={{ background: '#fff' }}>
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, listPlugin, interactionPlugin]}
@@ -207,21 +225,21 @@ export default function AdminCalendar({ events, clashes = [], loading, error, on
       </div>
 
       {selected && (
-        <div style={{ background: '#151515', border: `1px solid ${KIND_META[selected.kind].colour}`, borderRadius: '8px', padding: '0.8rem 0.9rem' }}>
+        <div style={{ background: '#f8f9fa', borderLeft: `4px solid ${KIND_META[selected.kind].colour}`, border: '1px solid #dadce0', borderRadius: '8px', padding: '0.8rem 0.9rem' }}>
           <div style={{ alignItems: 'start', display: 'flex', gap: '0.6rem', justifyContent: 'space-between' }}>
             <div>
               <div style={{ color: KIND_META[selected.kind].colour, fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                 {KIND_META[selected.kind].label}{selected.isCommitment ? ' · commitment to a customer' : ''}
               </div>
-              <div style={{ color: '#fff', fontSize: '0.95rem', fontWeight: 600, marginTop: '0.2rem' }}>{selected.title}</div>
-              <div style={{ color: '#bbb', fontSize: '0.78rem', marginTop: '0.2rem' }}>{selected.date}{selected.detail ? ` · ${selected.detail}` : ''}</div>
-              <div style={{ color: '#777', fontSize: '0.72rem', marginTop: '0.35rem' }}>
+              <div style={{ color: '#202124', fontSize: '0.95rem', fontWeight: 600, marginTop: '0.2rem' }}>{selected.title}</div>
+              <div style={{ color: '#5f6368', fontSize: '0.78rem', marginTop: '0.2rem' }}>{selected.date}{selected.detail ? ` · ${selected.detail}` : ''}</div>
+              <div style={{ color: '#80868b', fontSize: '0.72rem', marginTop: '0.35rem' }}>
                 Change this date on the {selected.recordType} it belongs to: {selected.recordId}
               </div>
             </div>
             <button
               onClick={() => setSelected(null)}
-              style={{ background: 'transparent', border: '1px solid #333', borderRadius: '6px', color: '#888', cursor: 'pointer', fontSize: '0.72rem', padding: '0.25rem 0.5rem' }}
+              style={{ background: '#fff', border: '1px solid #dadce0', borderRadius: '6px', color: '#5f6368', cursor: 'pointer', fontSize: '0.72rem', padding: '0.25rem 0.5rem' }}
             >Close</button>
           </div>
         </div>
