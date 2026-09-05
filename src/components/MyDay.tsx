@@ -17,6 +17,7 @@ interface Job {
   kind?: string; tickable?: boolean; withOthers?: boolean;
 }
 interface YardItem { kind: string; title: string; time: string }
+interface ContainerOption { slug: string; title: string; publishedEta: string }
 
 interface CrewPayload {
   scope: 'crew' | 'gm';
@@ -26,6 +27,7 @@ interface CrewPayload {
   jobs?: Job[];
   yard?: YardItem[];
   note?: string;
+  containers?: ContainerOption[];
   calendar?: { events: unknown[]; clashes: string[] };
 }
 
@@ -108,6 +110,8 @@ export default function MyDay() {
   const [newJob, setNewJob] = useState('');
   const [note, setNote] = useState('');
   const [status, setStatus] = useState('');
+  const [reporting, setReporting] = useState(false);
+  const [container, setContainer] = useState({ slug: '', date: '', note: '' });
   const noteSaved = useRef('');
 
   useEffect(() => { setKey(readKey()); }, []);
@@ -286,6 +290,66 @@ export default function MyDay() {
           ))}
         </ul>
       </section>
+
+      {(payload?.containers?.length ?? 0) > 0 && (
+        <section className="myday__section">
+          <h2>Containers</h2>
+          {reporting ? (
+            <form
+              className="myday__container"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!container.slug || !container.date) return;
+                const body = { action: 'report_container', productSlug: container.slug, date: container.date, note: container.note };
+                setReporting(false);
+                setContainer({ slug: '', date: '', note: '' });
+                void write(body);
+              }}
+            >
+              <label>
+                Which vehicle
+                <select
+                  value={container.slug}
+                  onChange={(e) => setContainer((c) => ({ ...c, slug: e.target.value }))}
+                  data-testid="container-vehicle"
+                  required
+                >
+                  <option value="">Choose…</option>
+                  {payload!.containers!.map((item) => (
+                    <option key={item.slug} value={item.slug}>
+                      {item.title}{item.publishedEta ? ` — currently ${item.publishedEta}` : ''}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                When is it landing
+                <input type="date" value={container.date} onChange={(e) => setContainer((c) => ({ ...c, date: e.target.value }))} data-testid="container-date" required />
+              </label>
+              <label>
+                Who told you
+                <input
+                  value={container.note}
+                  onChange={(e) => setContainer((c) => ({ ...c, note: e.target.value }))}
+                  placeholder="the shipping line, the factory…"
+                  data-testid="container-note"
+                />
+              </label>
+              <div className="myday__container-actions">
+                <button type="button" onClick={() => setReporting(false)}>Cancel</button>
+                <button type="submit" data-testid="container-save">Tell Alex</button>
+              </div>
+            </form>
+          ) : (
+            <button type="button" className="myday__addbtn" onClick={() => setReporting(true)} data-testid="container-report">
+              + A container is arriving
+            </button>
+          )}
+          <p className="myday__muted">
+            This tells Alex what you have been told. It does not change the website.
+          </p>
+        </section>
+      )}
 
       <section className="myday__section">
         <h2>Note for this day</h2>

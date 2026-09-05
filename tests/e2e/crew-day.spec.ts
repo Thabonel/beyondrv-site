@@ -45,6 +45,10 @@ async function mockCrew(page: Page) {
           ]
           : [],
         note: date === today ? 'waiting on parts' : '',
+        containers: [
+          { slug: 'advent-2450', title: 'Advent 2450', publishedEta: '2026-09-20' },
+          { slug: 'sunpatch-21', title: 'Sunpatch 21', publishedEta: '' },
+        ],
       }),
     });
   });
@@ -175,4 +179,28 @@ test('the day fits every normal phone width without sideways scrolling', async (
 test('the page asks not to be indexed', async ({ page }) => {
   await page.goto('/my-day/');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+});
+
+test('Li can tell Alex when a container is landing, without changing the website', async ({ page }) => {
+  const { writes } = await mockCrew(page);
+  await page.goto(`/my-day/#k=${KEY}`);
+  await expect(page.getByTestId('my-day')).toBeVisible();
+
+  await expect(page.getByText('It does not change the website.')).toBeVisible();
+  await page.getByTestId('container-report').click();
+
+  // The date the website currently shows is on the option, so he can see
+  // whether what he was told is actually news.
+  await expect(page.getByTestId('container-vehicle').locator('option').nth(1)).toHaveText('Advent 2450 — currently 2026-09-20');
+
+  await page.getByTestId('container-vehicle').selectOption('advent-2450');
+  await page.getByTestId('container-date').fill('2026-09-27');
+  await page.getByTestId('container-note').fill('shipping line called');
+  await page.getByTestId('container-save').click();
+
+  await expect.poll(() => writes.length).toBe(1);
+  expect(writes[0].body).toEqual({
+    action: 'report_container', productSlug: 'advent-2450', date: '2026-09-27', note: 'shipping line called',
+  });
+  expect(writes[0].key).toBe(KEY);
 });

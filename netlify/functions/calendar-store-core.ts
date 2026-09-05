@@ -147,7 +147,7 @@ export function validateEvent(input: Record<string, unknown>, options: ValidateO
   const notes = has('notes') ? clean(input.notes, LIMITS.notes) : existing?.notes ?? '';
   const location = has('location') ? clean(input.location, LIMITS.location) : existing?.location ?? '';
   const sourceRaw = has('source') ? clean(input.source, 10) : existing?.source ?? 'gm';
-  const source = (['gm', 'ai', 'chat'] as const).find((item) => item === sourceRaw) ?? 'gm';
+  const source = (['gm', 'ai', 'chat', 'crew'] as const).find((item) => item === sourceRaw) ?? 'gm';
   const sourceEmail = has('sourceEmail') ? cleanSourceEmail(input.sourceEmail) : existing?.sourceEmail;
   const links = has('links') ? cleanLinks(input.links) : existing?.links ?? {};
 

@@ -130,6 +130,7 @@ export interface CrewWriteRequest {
   title?: unknown;
   date?: unknown;
   note?: unknown;
+  productSlug?: unknown;
 }
 
 export type CrewWriteDecision =
@@ -137,6 +138,7 @@ export type CrewWriteDecision =
   | { ok: true; action: 'complete_task'; taskId: string }
   | { ok: true; action: 'move_task'; taskId: string; date: string }
   | { ok: true; action: 'set_note'; date: string; note: string }
+  | { ok: true; action: 'report_container'; productSlug: string; date: string; note: string }
   | { ok: false; error: string };
 
 export function decideCrewWrite(body: CrewWriteRequest): CrewWriteDecision {
@@ -163,6 +165,14 @@ export function decideCrewWrite(body: CrewWriteRequest): CrewWriteDecision {
   if (action === 'set_note') {
     if (!isIsoDate(date)) return { ok: false, error: `"${date}" is not a date.` };
     return { ok: true, action, date, note };
+  }
+  // Li knows when a container lands before anyone else does. This records
+  // what he was told; it does not publish anything.
+  if (action === 'report_container') {
+    const productSlug = clean(body.productSlug, 240);
+    if (!productSlug) return { ok: false, error: 'Which vehicle?' };
+    if (!isIsoDate(date)) return { ok: false, error: `"${date}" is not a date.` };
+    return { ok: true, action, productSlug, date, note };
   }
   return { ok: false, error: `"${action}" is not something this page can do.` };
 }

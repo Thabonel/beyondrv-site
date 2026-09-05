@@ -180,3 +180,11 @@ test('anything with their name on it appears on their day, not only tasks', () =
   assert.equal(mine[1].withOthers, true, 'two people are on the visit');
   assert.equal(mine[0].withOthers, false);
 });
+
+test('a container report needs a vehicle and a real date', () => {
+  assert.equal(decideCrewWrite({ action: 'report_container', date: '2026-09-20' }).ok, false);
+  assert.equal(decideCrewWrite({ action: 'report_container', productSlug: 'advent-2450', date: 'next week' }).ok, false);
+  assert.deepEqual(
+    decideCrewWrite({ action: 'report_container', productSlug: ' advent-2450 ', date: '2026-09-20', note: '  the shipping line  ' }),
+    { ok: true, action: 'report_container', productSlug: 'advent-2450', date: '2026-09-20', note: 'the shipping line' });
+});

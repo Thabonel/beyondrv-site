@@ -10,6 +10,8 @@ import type { Handler } from '@netlify/functions';
 import { blobStoreUserMessage, connectBlobStore, getBlobStore, safeBlobStoreError } from './blob-store';
 import { authenticateCrew, json, refusal } from './crew-auth';
 import { DAY_NOTE_STORE, dayNoteKey, decideCrewWrite, mayActOnTask } from './crew-core';
+import { CALENDAR_EVENT_STORE, calendarEventKey, isDuplicate, validateEvent, type CompanyCalendarEvent } from './calendar-store-core';
+import catalogue from './product-catalogue.json';
 import { newOwnerCopilotId, OWNER_COPILOT_TASK_STORE, taskKey } from './owner-copilot-core';
 
 const NOT_YOURS = 'That job is not on your list.';
@@ -71,6 +73,45 @@ export const handler: Handler = async (event) => {
         updatedAt: now,
       });
       return json(200, { ok: true, message: 'Note saved.' });
+    }
+
+    if (decision.action === 'report_container') {
+      const product = (catalogue as Array<Record<string, unknown>>)
+        .find((item) => typeof item.slug === 'string' && item.slug === decision.productSlug);
+      if (!product) return json(404, { error: 'That vehicle is not on the list.' });
+      const title = `Container ETA: ${typeof product.title === 'string' ? product.title : decision.productSlug}`;
+
+      const store = getBlobStore(CALENDAR_EVENT_STORE);
+      const { blobs } = await store.list({ prefix: 'events/' });
+      const existingEvents = (await Promise.all(blobs.map(async (blob) => {
+        try { return await store.get(blob.key, { type: 'json' }) as CompanyCalendarEvent | null; } catch { return null; }
+      }))).filter((item): item is CompanyCalendarEvent => Boolean(item?.id));
+
+      // A second report for the same vehicle replaces the first: the latest
+      // word from the person tracking it is the one worth keeping, and two
+      // reports a day apart are not two containers.
+      const previous = existingEvents.find((event) =>
+        event.kind === 'container_eta' && event.source === 'crew' && event.links?.productSlug === decision.productSlug && !event.dismissedAt);
+
+      const result = validateEvent({
+        title,
+        kind: 'container_eta',
+        allDay: true,
+        start: decision.date,
+        end: decision.date,
+        notes: `Reported by ${member.name}${decision.note ? `: ${decision.note}` : ''}`,
+        source: 'crew',
+        links: { productSlug: decision.productSlug },
+      }, { actor: member.name, existing: previous ?? null });
+      if (!result.ok) return json(400, { error: result.error });
+
+      await store.setJSON(calendarEventKey(result.event.id), result.event);
+      return json(200, {
+        ok: true,
+        message: previous
+          ? `Updated: ${title.replace('Container ETA: ', '')} now ${decision.date}.`
+          : `Thanks. ${title.replace('Container ETA: ', '')} is due ${decision.date}.`,
+      });
     }
 
     const existing = await tasks.get(taskKey(decision.taskId), { type: 'json' }) as Record<string, unknown> | null;

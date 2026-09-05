@@ -105,6 +105,17 @@ export const handler: Handler = async (event) => {
       name: member.name,
       today,
       date,
+      // The vehicles someone tracking containers would report on: anything
+      // that comes by sea, whether or not it already has a date.
+      containers: (catalogue as unknown as Array<Record<string, unknown>>)
+        .filter((product) => product.containerEligible || product.containerEtaDate)
+        .map((product) => ({
+          slug: String(product.slug ?? ''),
+          title: String(product.title ?? product.slug ?? ''),
+          publishedEta: typeof product.containerEtaDate === 'string' ? product.containerEtaDate : '',
+        }))
+        .filter((product) => product.slug)
+        .sort((a, b) => a.title.localeCompare(b.title)),
       jobs: [
         ...crewJobsFor(tasks, member.id, date, today),
         ...crewAssignedItems(events as unknown as Record<string, unknown>[], member.id, date),
