@@ -25,6 +25,15 @@ push restarts it.
 Brisbane, and one bug only appeared outside business hours. `TZ=UTC npx
 playwright test …` reproduces CI's clock.
 
+**A link on someone's phone must never be built from `window.location.origin`.**
+A deploy preview is a frozen build at its own address, and it shares the live
+data store. A crew link generated while admin was open on a preview pinned that
+phone to the preview for good: it authenticated, reported "opened today", and
+accepted work — and never received another fix. Nothing looked broken from
+either end. Crew links are now hard-coded to `https://beyondrv.com.au`. The
+general rule: anything meant to outlive the session that created it takes the
+canonical origin, not the current one.
+
 **Netlify Blobs listings are eventually consistent.** A read of a key you just
 wrote is reliable; a `list()` that should contain it is not. Anything that
 writes then immediately re-lists will intermittently miss its own write. This
@@ -40,7 +49,8 @@ caused a real bug (below) and will cause more.
 | #95 | Handovers from the calendar, and visits and handovers from email and call notes |
 | #96 | Calendar · Dashboard · Enquiries · Analytics in the admin header |
 | #97 | The phone day view for people who will not log in |
-| #98 | Assign anyone, or several people, to anything; container reports from a phone (open at the time of writing) |
+| #98 | Assign anyone, or several people, to anything; container reports from a phone |
+| #99 | Assignees kept on create; the phone link fixes above |
 
 Production after #97: `generatedAt` 06:0x, 168 published variants, 52 known
 models, `/admin/` 302 unauthenticated. Unchanged, which is correct: everything
@@ -93,6 +103,22 @@ screen.
   to the document URL with its fragment. On iPhone a home-screen web app has
   its own storage and cannot read what Safari cached; without this the icon
   opens to nothing. A test asserts it stays absent.
+- **The key stays in the address bar until the app is installed.** *Add to Home
+  Screen* captures the URL as it stands, so clearing the fragment on first load
+  — which the page used to do, to keep it out of a screenshot — removed the one
+  copy the install had to capture. It is cleared only once
+  `display-mode: standalone` matches, where there is no address bar and the
+  app's own storage already holds it.
+- **The link always points at the live site**, never at whatever address admin
+  is open on. See the warning at the top of this document.
+- **The page reloads when it becomes visible**, on a two-minute backstop, and on
+  request. It used to load once and never look again, so anything assigned
+  after it was opened stayed invisible.
+- **The header names the person.** Without it there was no way to tell which
+  link was on a phone when work went to the wrong one.
+
+Verified on a real iPhone: the icon installs with the Beyond RV logo, launches
+standalone, and carries its key.
 
 A `crew` link shows their jobs, anything else assigned to them, the day's yard
 read-only, a note, and container reporting. A `gm` link shows the whole day.
@@ -131,6 +157,25 @@ payload; the page only knew the crew layout, read a `jobs` array that was not
 there, and said nothing was on. Half a feature shipped because the endpoint and
 the view were built in different sittings.
 
+**The phone link pinned people to a frozen build, and could not carry its own
+key.** Three faults in one path, none of them reachable without a real phone.
+The link took the current origin, so one generated on a preview pointed there
+for ever. The page stripped its own key from the address bar before *Add to
+Home Screen* could capture it. And it never re-checked itself. Between them
+these produced a phone that looked healthy — it authenticated, said "opened
+today", and its own writes reached the calendar — while never showing anything
+assigned to it. **The asymmetry was the clue: writes from the phone arrived,
+reads never updated.** Worth remembering as a shape: when one direction works
+and the other does not, suspect two different builds before suspecting the
+logic.
+
+**Assignees were dropped when an event was created.** The create call sent the
+title, times and notes but not the list of people. Tasks passed theirs, so only
+the other kinds were affected. The tests had covered assigning on create for a
+task and on edit for a meeting, and missed the square between them — a reminder
+that a test matrix with holes reads as thorough right up until someone uses the
+combination nobody tried.
+
 **Save fell off the bottom of the screen.** The popup measured its height once
 on open; picking Task or hitting a validation error made it taller. It now
 re-measures with a `ResizeObserver` and scrolls internally.
@@ -164,6 +209,9 @@ that is usually wrong gets ignored — which is how the first one was missed.
 **Only a hash of a phone key is stored.** So a lost link is replaced, not
 recovered. That is the point: it makes a stolen phone survivable.
 
+**A link that leaves the building takes the canonical origin.** Not the one it
+was made on. This is why crew links are hard-coded.
+
 **Crew see no prices and no order state.** The yard list is stripped in
 `crew-core`, not in the view, so a change to the view cannot start leaking.
 
@@ -174,10 +222,12 @@ recovered. That is the point: it makes a stolen phone survivable.
 1. **Connect the ByondRV mailbox** in the Google tab. Everything AI-facing on
    the calendar is inert until then. Read-only scopes; the redirect URI must be
    exactly `https://beyondrv.com.au/.netlify/functions/google-oauth-callback`.
-2. **Try the home-screen install on a real iPhone.** The manifest reasoning is
-   sound and tested, but no test can prove that Safari's *Add to Home Screen*
-   keeps the fragment. If the icon opens to "ask Alex for a new link", that
-   assumption failed and iOS needs another route.
+2. **Anyone whose link was issued before 5 September needs a new one.** A link
+   generated while admin was on a deploy preview points at that frozen build
+   and cannot be repaired. Delete the icon, **Reissue**, install from the new
+   link. Done for Thabo Nel; check nobody else is on an old one. The Crew panel
+   shows "opened today" either way, so it cannot tell you which — reissue if in
+   doubt.
 3. **Audit the rest of the codebase for write-then-list.** The listing lag is
    general; the calendar is simply where it was noticed.
 4. The `.ics` subscription feed, if the phone views turn out not to be enough.
