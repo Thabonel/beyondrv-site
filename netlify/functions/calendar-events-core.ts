@@ -46,6 +46,8 @@ export interface AdminCalendarEvent {
   /** Set when the date is one someone promised a customer. */
   isCommitment: boolean;
   source: CalendarEventSource;
+  /** For a task: whose job it is. Empty means the GM's own. */
+  assigneeId?: string;
   /**
    * The product this date is about, when there is one. A customer visit and a
    * container ETA are only related if they concern the same vehicle: without
@@ -186,8 +188,11 @@ export function buildCalendarEvents(sources: CalendarSources): AdminCalendarEven
   for (const task of sources.tasks ?? []) {
     const id = text(task.id);
     if (text(task.status, 'open') !== 'open') continue;
+    const taskEvents = events.length;
     push(events, 'task', task.dueDate, 'task', id,
       text(task.title, 'Task'), text(task.priority, 'medium'), '', task.dueTime);
+    const assigneeId = text(task.assigneeId);
+    if (assigneeId && events.length > taskEvents) events[events.length - 1].assigneeId = assigneeId;
   }
 
   for (const product of sources.products ?? []) {

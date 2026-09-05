@@ -58,6 +58,7 @@ export const handler: Handler = async (event) => {
         title: decision.title,
         dueDate: decision.dueDate,
         dueTime: decision.dueTime,
+        assigneeId: decision.assigneeId,
         status: 'open',
         priority: 'medium',
         source: 'calendar',
@@ -67,6 +68,18 @@ export const handler: Handler = async (event) => {
         createdBy: actor.displayName || actor.id || 'admin',
       });
       return json(200, { ok: true, id, message: `Task "${decision.title}" created for ${decision.dueDate}.` });
+    }
+
+    // Giving an existing job to someone, or taking it back.
+    if (body.action === 'assign_task') {
+      const recordId = typeof body.recordId === 'string' ? body.recordId.trim().slice(0, 240) : '';
+      const assigneeId = typeof body.assigneeId === 'string' ? body.assigneeId.trim().slice(0, 240) : '';
+      if (!recordId) return json(400, { error: 'recordId is required.' });
+      const store = getBlobStore(OWNER_COPILOT_TASK_STORE);
+      const existing = await store.get(taskKey(recordId), { type: 'json' }) as Record<string, unknown> | null;
+      if (!existing) return json(404, { error: `No task found with id ${recordId}.` });
+      await store.setJSON(taskKey(recordId), { ...existing, assigneeId, updatedAt: new Date().toISOString() });
+      return json(200, { ok: true, message: assigneeId ? 'Job handed over.' : 'Job taken back.' });
     }
 
     // Moving: write the new date onto the record that owns it.

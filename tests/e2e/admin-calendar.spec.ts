@@ -214,3 +214,38 @@ test('the crew phone links section is visible without scrolling the sidebar', as
   const calendarsBox = await page.getByText('My calendars').boundingBox();
   expect(crewBox!.y).toBeLessThan(calendarsBox!.y);
 });
+
+test('a job can be given to a crew member when it is created', async ({ page, isMobile }) => {
+  test.skip(Boolean(isMobile));
+  const { writes } = await mockCalendar(page);
+  await page.goto('/admin/');
+
+  await page.getByTestId('calendar-create').click();
+  await page.getByTestId('event-form').getByRole('radio', { name: 'Task' }).click();
+
+  const who = page.getByTestId('event-assignee');
+  await expect(who).toBeVisible();
+  // Someone whose link was revoked is not offered a job.
+  await expect(who.locator('option')).toHaveText(['Mine', 'Li', 'Oscar']);
+
+  await page.getByTestId('event-title').fill('Fit the Advent tray');
+  await who.selectOption('crew-li');
+  await page.getByTestId('event-save').click();
+
+  await expect.poll(() => writes.length).toBe(1);
+  expect(writes[0].body).toMatchObject({ action: 'create_task', title: 'Fit the Advent tray', assigneeId: 'crew-li' });
+});
+
+test('the popup only asks whose job it is for a task', async ({ page, isMobile }) => {
+  test.skip(Boolean(isMobile));
+  await mockCalendar(page);
+  await page.goto('/admin/');
+
+  await page.getByTestId('calendar-create').click();
+  const form = page.getByTestId('event-form');
+  await expect(page.getByTestId('event-assignee')).toHaveCount(0);
+  await form.getByRole('radio', { name: 'Task' }).click();
+  await expect(page.getByTestId('event-assignee')).toBeVisible();
+  await form.getByRole('radio', { name: 'Meeting' }).click();
+  await expect(page.getByTestId('event-assignee')).toHaveCount(0);
+});

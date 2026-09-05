@@ -11,6 +11,7 @@ export interface StoredDetail {
 
 interface Props {
   event: AdminCalendarEvent;
+  assigneeName?: string;
   stored?: StoredDetail | null;
   onEdit: () => void;
   onDelete: () => void;
@@ -21,7 +22,7 @@ const RECORD_HOME: Record<AdminCalendarEvent['recordType'], string> = {
   order: 'Orders', enquiry: 'Enquiries', task: 'Tasks', product: 'Products', calendar: 'the calendar',
 };
 
-export default function EventDetail({ event, stored, onEdit, onDelete, onClose }: Props) {
+export default function EventDetail({ event, assigneeName, stored, onEdit, onDelete, onClose }: Props) {
   const meta = EVENT_KIND_META[event.kind];
   const isStore = event.recordType === 'calendar';
   const movable = isStore || MOVABLE_RECORD_KINDS.has(event.kind);
@@ -45,6 +46,9 @@ export default function EventDetail({ event, stored, onEdit, onDelete, onClose }
       </div>
       <div className="gcal-detail__rows">
         <div><span className="gcal-detail__chip" style={{ background: meta.colour }}>{meta.label}</span>{event.isCommitment && <span className="gcal-detail__commit">Commitment to a customer</span>}</div>
+        {event.kind === 'task' && (
+          <div data-testid="event-assignee-name">{assigneeName ? `${assigneeName}'s job` : 'Your job'}</div>
+        )}
         {event.detail && <div>{event.detail}</div>}
         {stored?.notes && <div className="gcal-detail__notes">{stored.notes}</div>}
         {stored?.location && <div>📍 {stored.location}</div>}

@@ -19,7 +19,7 @@ import type { DateSelectArg, DatesSetArg, EventChangeArg, EventClickArg, EventCo
 import CalendarTopBar from './calendar/CalendarTopBar';
 import CalendarSidebar from './calendar/CalendarSidebar';
 import EventDetail, { type StoredDetail } from './calendar/EventDetail';
-import EventForm, { type EventFormValues, type OrderOption } from './calendar/EventForm';
+import EventForm, { type CrewOption, type EventFormValues, type OrderOption } from './calendar/EventForm';
 import Popover from './calendar/Popover';
 import Snackbar, { type SnackbarState } from './calendar/Snackbar';
 import {
@@ -53,8 +53,10 @@ export interface CalendarActions {
   updateStoreEvent: (id: string, body: Record<string, unknown>) => Promise<WriteResult>;
   deleteStoreEvent: (id: string) => Promise<WriteResult>;
   moveRecord: (kind: string, recordId: string, date: string, time: string) => Promise<WriteResult>;
-  createTask: (title: string, date: string, time: string) => Promise<WriteResult>;
+  createTask: (title: string, date: string, time: string, assigneeId: string) => Promise<WriteResult>;
+  assignTask: (recordId: string, assigneeId: string) => Promise<WriteResult>;
   loadOrders: () => Promise<OrderOption[]>;
+  crew: CrewOption[];
   refresh: () => Promise<void>;
 }
 
@@ -97,10 +99,10 @@ function nextWholeHour(now: Date) {
 }
 
 function emptyForm(date: string, startTime = '', endTime = ''): EventFormValues {
-  return { title: '', kind: 'meeting', date, startTime, endTime, allDay: !startTime, notes: '', orderId: '' };
+  return { title: '', kind: 'meeting', date, startTime, endTime, allDay: !startTime, notes: '', orderId: '', assigneeId: '' };
 }
 
-function formFromEvent(event: AdminCalendarEvent, stored?: StoredDetail): EventFormValues {
+function formFromEvent(event: AdminCalendarEvent, stored?: StoredDetail, assigneeId = ''): EventFormValues {
   return {
     title: event.title,
     kind: event.kind,
@@ -110,6 +112,7 @@ function formFromEvent(event: AdminCalendarEvent, stored?: StoredDetail): EventF
     allDay: event.allDay,
     notes: stored?.notes ?? '',
     orderId: '',
+    assigneeId,
   };
 }
 
@@ -328,9 +331,13 @@ export default function AdminCalendar({ events, storedDetails, clashes = [], loa
         result = await actions.updateStoreEvent(form.event.recordId, { title: values.title, start, end, allDay: values.allDay, notes: values.notes });
       } else {
         result = await actions.moveRecord(form.event.kind, form.event.recordId, values.date, values.allDay ? '' : values.startTime);
+        // A job can change hands at the same time as its day.
+        if (form.event.kind === 'task' && values.assigneeId !== form.values.assigneeId) {
+          await actions.assignTask(form.event.recordId, values.assigneeId);
+        }
       }
     } else if (values.kind === 'task') {
-      result = await actions.createTask(values.title, values.date, values.allDay ? '' : values.startTime);
+      result = await actions.createTask(values.title, values.date, values.allDay ? '' : values.startTime, values.assigneeId);
     } else if (ORDER_DATE_KINDS.has(values.kind)) {
       // A visit or a handover is a date on an order; write it there.
       result = await actions.moveRecord(values.kind, values.orderId, values.date, values.allDay ? '' : values.startTime);
@@ -358,7 +365,7 @@ export default function AdminCalendar({ events, storedDetails, clashes = [], loa
   function editSelected() {
     if (!detail) return;
     const stored = storedDetails[detail.event.recordId];
-    setForm({ mode: 'edit', anchor: detail.anchor, values: formFromEvent(detail.event, stored), event: detail.event });
+    setForm({ mode: 'edit', anchor: detail.anchor, values: formFromEvent(detail.event, stored, detail.event.assigneeId ?? ''), event: detail.event });
     setDetail(null);
   }
 
@@ -537,6 +544,7 @@ export default function AdminCalendar({ events, storedDetails, clashes = [], loa
         <Popover anchor={detail.anchor} onClose={closeDetail} label="Event details" width={420} testId="event-popover">
           <EventDetail
             event={detail.event}
+            assigneeName={actions.crew.find((person) => person.id === detail.event.assigneeId)?.name}
             stored={storedDetails[detail.event.recordId]}
             onEdit={editSelected}
             onDelete={() => void deleteSelected()}
@@ -552,6 +560,7 @@ export default function AdminCalendar({ events, storedDetails, clashes = [], loa
             initial={form.values}
             event={form.event}
             orders={orders}
+            crew={actions.crew}
             onLoadOrders={() => void loadOrders()}
             onSubmit={submitForm}
             onCancel={closeForm}

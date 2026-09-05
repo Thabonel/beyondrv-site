@@ -7478,7 +7478,7 @@ export default function AdminPanel({ onOpenGmWorkspace, onSignOut }: { onOpenGmW
                 <li>From then on they tap the icon and their day opens. There is no password and nothing to remember.</li>
               </ol>
               <p style={{ margin: '0.5rem 0 0', color: '#ddd' }}>
-                <strong>Assign work to them</strong> by giving a task an owner. A task with nobody assigned stays yours. They can tick their jobs off, add their own, move one to another day, and leave you a note. They can see the day&rsquo;s visits, handovers and arrivals so they know who is coming, but they cannot move any of them and they see no prices or order detail.
+                <strong>To give someone a job:</strong> create a Task on the calendar, and pick their name under <strong>Whose job</strong>. Leave it on <strong>Mine</strong> and it stays yours. To hand an existing job over, click it, press Edit, and change Whose job. They can tick their jobs off, add their own, move one to another day, and leave you a note. They can see the day&rsquo;s visits, handovers and arrivals so they know who is coming, but they cannot move any of them and they see no prices or order detail.
               </p>
               <ul style={{ margin: '0.5rem 0 0', paddingLeft: '1.2rem', color: '#ddd' }}>
                 <li><strong>If someone loses their phone,</strong> click <strong>Revoke</strong> next to their name. Their link stops working immediately and nobody else is affected.</li>
